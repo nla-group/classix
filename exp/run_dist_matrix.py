@@ -63,8 +63,8 @@ def sorting(data, sorting='pca'):
 
 def rn_wine_dataset():
     plt.style.use('ggplot')
-    data = pd.read_csv("data/wine-clustering.csv").sample(frac=1)
-    X = data.values
+    data = pd.read_csv("data/Real_data/Wine.csv")
+    X = data.drop(['14'],axis=1).values
     font_scale = 3
     dist_corr = np.zeros((len(X), len(X)))
     for i in range(len(X)):
@@ -78,7 +78,7 @@ def rn_wine_dataset():
     plt.xticks([0,  25,  50,  75, 100, 125, 150, 175])
     plt.yticks([0,  25,  50,  75, 100, 125, 150, 175])
     plt.savefig('fresults/original_wine.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
 
 
     ndata, size_pca = sorting(X, sorting='pca')
@@ -94,7 +94,7 @@ def rn_wine_dataset():
     plt.xticks([0,  25,  50,  75, 100, 125, 150, 175])
     plt.yticks([0,  25,  50,  75, 100, 125, 150, 175])
     plt.savefig('fresults/pca_wine.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
 
     ndata, size_no = sorting(X, sorting='norm-orthant')
     dist_corr_sort = np.zeros((len(ndata), len(ndata)))
@@ -109,7 +109,7 @@ def rn_wine_dataset():
     plt.xticks([0,  25,  50,  75, 100, 125, 150, 175])
     plt.yticks([0,  25,  50,  75, 100, 125, 150, 175])
     plt.savefig('fresults/norm-orthant_wine.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
 
 
     ndata, size_nm = sorting(X, sorting='norm-mean')
@@ -125,7 +125,7 @@ def rn_wine_dataset():
     plt.xticks([0,  25,  50,  75, 100, 125, 150, 175])
     plt.yticks([0,  25,  50,  75, 100, 125, 150, 175])
     plt.savefig('img/norm-mean_wine.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
 
     sorting_df = pd.DataFrame()
     sorting_df['PCA'] = size_pca
@@ -136,16 +136,15 @@ def rn_wine_dataset():
     g = sns.pairplot(sorting_df, corner=True, height=4.2, aspect=1)
 
     plt.savefig('fresults/sort_pair_plot_wine.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
     
     
     
 def rn_iris_dataset():
     plt.style.use('ggplot')
-    data = pd.read_csv("data/Iris.csv").sample(frac=1)
+    data = pd.read_csv("data/Real_data/Iris.csv")
     le = preprocessing.LabelEncoder()
     data['Species'] = le.fit_transform(data['Species'])
-
     X = data.drop(['Species','Id'],axis=1).values
     y = data['Species'].values
     
@@ -162,7 +161,7 @@ def rn_iris_dataset():
     plt.xticks([0,  20,  40,  60,  80, 100, 120, 140])
     plt.yticks([0,  20,  40,  60,  80, 100, 120, 140])
     plt.savefig('fresults/original_iris.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
     
     ndata, size_pca = sorting(X, sorting='pca')
     dist_corr_sort = np.zeros((len(ndata), len(ndata)))
@@ -177,7 +176,7 @@ def rn_iris_dataset():
     plt.xticks([0,  20,  40,  60,  80, 100, 120, 140])
     plt.yticks([0,  20,  40,  60,  80, 100, 120, 140])
     plt.savefig('fresults/pca_iris.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
     
     ndata, size_no = sorting(X, sorting='norm-orthant')
     dist_corr_sort = np.zeros((len(ndata), len(ndata)))
@@ -192,7 +191,7 @@ def rn_iris_dataset():
     plt.xticks([0,  20,  40,  60,  80, 100, 120, 140])
     plt.yticks([0,  20,  40,  60,  80, 100, 120, 140])
     plt.savefig('fresults/norm-orthant_iris.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
     
 
     ndata, size_nm = sorting(X, sorting='norm-mean')
@@ -208,7 +207,7 @@ def rn_iris_dataset():
     plt.xticks([0,  20,  40,  60,  80, 100, 120, 140])
     plt.yticks([0,  20,  40,  60,  80, 100, 120, 140])
     plt.savefig('fresults/norm-mean_iris.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
     
     
     sorting_df = pd.DataFrame()
@@ -219,4 +218,4 @@ def rn_iris_dataset():
     sns.set(style='ticks', color_codes=True, font_scale=3)
     g = sns.pairplot(sorting_df, corner=True, height=4.2, aspect=1)
     plt.savefig('fresults/sort_pair_plot_iris.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()

@@ -21,7 +21,7 @@ def rn_mcs_it(save=False):
     fig, ax = plt.subplots(figsize=(8,8))
     ax.scatter(X[:, 0], X[:,1], color='b')
     ax.set_aspect('equal', adjustable='datalim')
-    plt.show()
+    # plt.show()
     TOL = 0.1
 
     minPts = 4
@@ -41,7 +41,7 @@ def rn_mcs_it(save=False):
     plt.tick_params(axis='both', labelsize=20)
     ax.grid(False)
     plt.savefig('fresults/X_noises.pdf')
-    plt.show()
+    # plt.show()
 
 
     minPts = 67
@@ -61,4 +61,4 @@ def rn_mcs_it(save=False):
     plt.tick_params(axis='both', labelsize=20)
     ax.grid(False)
     plt.savefig('fresults/X_no_noises.pdf')
-    plt.show()
+    # plt.show()

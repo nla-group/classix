@@ -16,18 +16,18 @@ import run_facial_cluster
 import run_img_seg
 from tqdm import tqdm 
 
-RUNANALYSIS1 = False
+RUNANALYSIS1 = True
 RUNANALYSIS2 = True
-RUNANALYSIS3 = False
+RUNANALYSIS3 = True
 RUNANALYSIS4 = False
 
 RUNEXP1 = True
-RUNEXP2 = False
-RUNEXP3 = False
-RUNEXP4 = False
-RUNEXP5 = False
-RUNEXP6 = False
-RUNEXP7 = False
+RUNEXP2 = True
+RUNEXP3 = True
+RUNEXP4 = True
+RUNEXP5 = True
+RUNEXP6 = True
+RUNEXP7 = True
 
 pbar = tqdm(total=sum([RUNANALYSIS1, RUNANALYSIS2, RUNANALYSIS3, RUNANALYSIS4, 
                        RUNEXP1, RUNEXP2, RUNEXP3, RUNEXP4, RUNEXP5, RUNEXP6]))
