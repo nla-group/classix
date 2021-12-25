@@ -191,7 +191,7 @@ def params_search():
     # print("Shape of Glass data: ", data.shape, ", labels: ", len(set(y_glass)))
     datasets.append((X_glass, y_glass))
 
-    data = pd.read_csv('datas/Real_data/Banknote_authentication.csv')
+    data = pd.read_csv('data/Real_data/Banknote_authentication.csv')
     X_banknote = data.drop(['4'],axis=1).values
     y_banknote = data['4'].values
     # print("Shape of banknote data: ", data.shape, ", labels: ", len(set(y_banknote)))
