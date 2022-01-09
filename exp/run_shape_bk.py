@@ -392,3 +392,52 @@ def shape_index_plot():
     plt.tight_layout()
     plt.savefig("fresults/shape_sets_mi.pdf", bbox_inches='tight')
     # plt.show()
+    
+    
+
+
+def shape_predict_test():
+    np.random.seed(0)
+    data = pd.read_csv("data/Shape sets/complex9.txt", header=None)
+    X = data[[0,1]].values
+    y = data[[2]].values
+
+    N = len(X)
+    seed = np.arange(0, N)
+    np.random.shuffle(seed)
+
+    split = 0.9
+    X_train, y_train = X[seed[:int(round(N*split))]], y[seed[:int(round(N*split))]]
+    X_test, y_test = X[seed[int(round(N*split)):]], y[seed[int(round(N*split)):]]
+
+    clx = CLASSIX(sorting='norm-orthant', radius=0.12, verbose=0,  group_merging='density', minPts=30)
+    clx.fit(X_train)
+    prediction = clx.predict(X_test)
+
+    plt.figure(figsize=(10,10))
+    plt.scatter(X_train[:,0], X_train[:,1], c=y_train, cmap='tab10')
+    plt.xticks([])
+    plt.yticks([])
+    plt.savefig('fresults/complex9_train_groudt.pdf', bbox_inches='tight')
+    # plt.show()
+
+    plt.figure(figsize=(10,10))
+    plt.scatter(X_test[:,0], X_test[:,1], c=y_test, cmap='tab10')
+    plt.xticks([])
+    plt.yticks([])
+    plt.savefig('fresults/complex9_test_groudt.pdf', bbox_inches='tight')
+    # plt.show()
+
+    plt.figure(figsize=(10,10))
+    plt.scatter(X_train[:,0], X_train[:,1], c=clx.labels_, cmap='tab10')
+    plt.xticks([])
+    plt.yticks([])
+    plt.savefig('fresults/complex9_train_classix.pdf', bbox_inches='tight')
+    # plt.show()
+
+    plt.figure(figsize=(10,10))
+    plt.scatter(X_test[:,0], X_test[:,1], c=prediction, cmap='tab10')
+    plt.xticks([])
+    plt.yticks([])
+    plt.savefig('fresults/complex9_test_classix.pdf', bbox_inches='tight')
+    # plt.show()

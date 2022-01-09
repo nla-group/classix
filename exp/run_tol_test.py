@@ -67,7 +67,7 @@ def run_sensitivity_test_blobs(_range, dataset_sizes, fe_dim=10, n_clusters=10, 
         plt.tick_params(axis='both',  labelsize=18)
 
         plt.savefig('fresults/index{0}_with_size{1}'.format(index, size)+'.pdf', bbox_inches='tight')
-        plt.show()
+        # plt.show()
         
 
 def rn_tol_st():

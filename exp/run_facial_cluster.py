@@ -84,7 +84,7 @@ def rn_facial_cluster():
                 'gist_rainbow', 'rainbow', 'jet', 'turbo', 'nipy_spectral',
                 'gist_ncar']
 
-    folder = 'data/olivetti_faces'
+    folder = 'data/OlivettiFaces'
     data, targets = load_images(folder)
 
     test = data[targets < 10]  
@@ -132,4 +132,4 @@ def rn_facial_cluster():
                        interpolation="nearest")
 
     plt.savefig('fresults/faces1_rectangle.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()

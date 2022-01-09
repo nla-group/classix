@@ -48,7 +48,7 @@ def rn_img_anime_minpts():
     plt.subplot(2,3,3),plt.imshow(classix_result_image3)
     plt.title('Segmented image with clusters = %i' % len(set(classix3.labels_)), fontsize=12), plt.xticks([]), plt.yticks([])
     plt.savefig('fresults/OPM_denoise_.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
 
     
 
@@ -64,7 +64,7 @@ def rn_img_real_tol():
     img = cv2.resize(img, (200,200), interpolation = cv2.INTER_AREA)
     plt.axis('on')
     plt.imshow(img)
-    plt.show()
+    # plt.show()
     
     tols = [0.5, 0.4, 0.3, 0.2, 0.1]
     figure_size = 10
@@ -78,7 +78,7 @@ def rn_img_real_tol():
         plt.imshow(img)
         plt.title('Original Image', fontsize=30), plt.xticks([]), plt.yticks([])
         plt.savefig('fresults/IMG'+str(file)+'.pdf', bbox_inches='tight')
-        plt.show()
+        # plt.show()
 
         # nvectorized = (vectorized - vectorized.mean(axis=0))/vectorized.std(axis=0)
         nvectorized, factor = novel_normalization(vectorized, "pca")
@@ -94,7 +94,7 @@ def rn_img_real_tol():
             plt.imshow(classix_result_image)
             plt.title('Segmented image with clusters = %i' % len(set(classix.labels_)), fontsize=30), plt.xticks([]), plt.yticks([])
             plt.savefig('fresults/CLU_IMG'+str(file) + str(i) + '.pdf', bbox_inches='tight')
-            plt.show()
+            # plt.show()
     
     
     
@@ -102,18 +102,18 @@ def rn_img_real_tol():
     
 def rn_img_real_comp():
     imagePaths = [
-     'datasets/COCO2017/000000002473.jpg',
-     'datasets/COCO2017/000000000009.jpg',
-     'datasets/COCO2017/000000006012.jpg',
-     'datasets/COCO2017/000000000247.jpg',
-     'datasets/COCO2017/000000000034.jpg',
-     'datasets/COCO2017/000000067406.jpg',
-     'datasets/COCO2017/000000000092.jpg',
-     'datasets/COCO2017/000000003255.jpg',
-     'datasets/COCO2017/000000082180.jpg',
-     'datasets/COCO2017/000000000074.jpg',
-     'datasets/COCO2017/000000001451.jpg',
-     'datasets/COCO2017/000000001332.jpg'
+     'data/COCO2017/000000002473.jpg',
+     'data/COCO2017/000000000009.jpg',
+     'data/COCO2017/000000006012.jpg',
+     'data/COCO2017/000000000247.jpg',
+     'data/COCO2017/000000000034.jpg',
+     'data/COCO2017/000000067406.jpg',
+     'data/COCO2017/000000000092.jpg',
+     'data/COCO2017/000000003255.jpg',
+     'data/COCO2017/000000082180.jpg',
+     'data/COCO2017/000000000074.jpg',
+     'data/COCO2017/000000001451.jpg',
+     'data/COCO2017/000000001332.jpg'
     ]
     
     data = []
@@ -191,21 +191,21 @@ def rn_img_real_comp():
         plt.imshow(img)
         plt.title('Original Image',fontsize=fontsize), plt.xticks([]), plt.yticks([])
         plt.savefig('fresults/segmentation_org_' + str(i) + '.pdf', bbox_inches='tight')
-        plt.show()
+        # plt.show()
 
         plt.figure(figsize=(figure_size,figure_size))
         plt.imshow(dbscan_result_image)
         plt.title('DBSCAN (%i clusters)' % len(set(dbscan.labels_)),fontsize=fontsize), plt.xticks([]), plt.yticks([])
         plt.text(.99, .01, ('%.2fs' % (dbscan_time/sample_size)).lstrip('0'), transform=plt.gca().transAxes, size=20, horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
         plt.savefig('fresults/segmentation_dbscan_' + str(i) + '.pdf', bbox_inches='tight')
-        plt.show()
+        # plt.show()
 
         plt.figure(figsize=(figure_size,figure_size))
         plt.imshow(hdbscan_result_image)
         plt.title('HDBSCAN (%i clusters)' % len(set(hdbscan_.labels_)),fontsize=fontsize), plt.xticks([]), plt.yticks([])
         plt.text(.99, .01, ('%.2fs' % (hdbscan_time/sample_size)).lstrip('0'), transform=plt.gca().transAxes, size=20, horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
         plt.savefig('fresults/segmentation_hdbscan_' + str(i) + '.pdf', bbox_inches='tight')
-        plt.show()
+        # plt.show()
 
         plt.figure(figsize=(figure_size,figure_size))
         plt.imshow(classix_result_image)
@@ -219,4 +219,4 @@ def rn_img_real_comp():
         plt.text(.99, .01, ('%.2fs' % (quicks_time/sample_size)).lstrip('0'), transform=plt.gca().transAxes, size=20, horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5))
         plt.savefig('fresults/segmentation_quicks_' + str(i) + '.pdf', bbox_inches='tight')
         
-        plt.show()
+        # plt.show()

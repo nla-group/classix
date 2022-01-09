@@ -300,7 +300,7 @@ def rn_sklearn_benchmark():
                 plot_num += 1
 
     plt.savefig('fresults/general_test.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
 
     arcsv = pd.DataFrame(clustering_algorithms_scores_ar)
     amicsv = pd.DataFrame(clustering_algorithms_scores_ami)

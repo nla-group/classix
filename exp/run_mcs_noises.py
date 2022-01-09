@@ -39,8 +39,10 @@ def rn_mcs_it(save=False):
     ax.scatter(X[classix.labels_ == -1,0], X[classix.labels_ == -1,1], c="k", s=20) 
     ax.set_aspect('equal', adjustable='datalim')
     plt.tick_params(axis='both', labelsize=20)
+    plt.xticks([])
+    plt.yticks([])
     ax.grid(False)
-    plt.savefig('fresults/X_noises.pdf')
+    plt.savefig('fresults/X_noises.pdf', bbox_inches='tight')
     # plt.show()
 
 
@@ -59,6 +61,8 @@ def rn_mcs_it(save=False):
     # cbar.ax.tick_params(labelsize=22) 
     ax.set_aspect('equal', adjustable='datalim')
     plt.tick_params(axis='both', labelsize=20)
+    plt.xticks([])
+    plt.yticks([])
     ax.grid(False)
-    plt.savefig('fresults/X_no_noises.pdf')
+    plt.savefig('fresults/X_no_noises.pdf', bbox_inches='tight')
     # plt.show()

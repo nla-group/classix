@@ -19,7 +19,7 @@ from tqdm import tqdm
 RUNANALYSIS1 = True
 RUNANALYSIS2 = True
 RUNANALYSIS3 = True
-RUNANALYSIS4 = False
+RUNANALYSIS4 = True
 
 RUNEXP1 = True
 RUNEXP2 = True
@@ -30,7 +30,7 @@ RUNEXP6 = True
 RUNEXP7 = True
 
 pbar = tqdm(total=sum([RUNANALYSIS1, RUNANALYSIS2, RUNANALYSIS3, RUNANALYSIS4, 
-                       RUNEXP1, RUNEXP2, RUNEXP3, RUNEXP4, RUNEXP5, RUNEXP6]))
+                       RUNEXP1, RUNEXP2, RUNEXP3, RUNEXP4, RUNEXP5, RUNEXP6, RUNEXP7]))
 # sys.stdout.write("Progress: [ %s" % ("" * 9))
 # sys.stdout.flush()
 # sys.stdout.write("\b" * (9+1)) 
@@ -74,6 +74,7 @@ if RUNEXP1:
     # sys.stdout.write("=")
     # sys.stdout.flush()
     pbar.update(1)
+    
 #---------------------------------------------------------------------------------------------------------    
 # tolerance sensitivity  [exp 2]
 if RUNEXP2:
@@ -81,6 +82,7 @@ if RUNEXP2:
     # sys.stdout.write("=")
     # sys.stdout.flush()
     pbar.update(1)
+    
 #---------------------------------------------------------------------------------------------------------   
 # sklearn synthetic benchmark [exp 3]
 if RUNEXP3:
@@ -88,12 +90,14 @@ if RUNEXP3:
     # sys.stdout.write("=")
     # sys.stdout.flush()
     pbar.update(1)
+    
 #---------------------------------------------------------------------------------------------------------   
 # shape benchmark [exp 4]
 if RUNEXP4:
     run_parameter_shape.main()
     run_shape_bk.rn_cluster_shape()
     run_shape_bk.shape_index_plot()
+    run_shape_bk.shape_predict_test()
     # sys.stdout.write("=")
     # sys.stdout.flush()
     pbar.update(1)

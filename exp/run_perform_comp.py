@@ -157,7 +157,7 @@ def rn_gaussian_dim():
     ax = sns.lineplot(data=quicks_time, x="x", y="y", marker='p', markersize=17, label='Quickshift++', linestyle=(0, (3, 1, 1, 1, 1, 1)), linewidth=6)
     
     ax.set(xlabel='dimensions', ylabel='time (s)', title="Gaussian blobs (n=10000)")
-    plt.savefig('fresults/gaussian_dim_time.pdf')
+    plt.savefig('fresults/gaussian_dim_time.pdf', bbox_inches='tight')
 
     plt.figure(figsize=(12,8))
     plt.style.use('bmh')
@@ -175,7 +175,7 @@ def rn_gaussian_dim():
     
     ax.set(xlabel='dimensions', ylabel='adjusted Rand index', title="Gaussian blobs (n=10000)")
     ax.set(ylim=(-.1, 1.1))
-    plt.savefig('fresults/gaussian_dim_ar.pdf')
+    plt.savefig('fresults/gaussian_dim_ar.pdf', bbox_inches='tight')
     
 
 def rn_gaussian_size():
@@ -220,7 +220,7 @@ def rn_gaussian_size():
     ax = sns.lineplot(data=quicks_time, x="x", y="y", marker='p', markersize=17, label='Quickshift++', linestyle=(0, (3, 1, 1, 1, 1, 1)), linewidth=6)
     
     ax.set(xlabel='data size', ylabel='time (s)', title="Gaussian blobs (dim=10)")
-    plt.savefig('fresults/gaussian_size_time.pdf')
+    plt.savefig('fresults/gaussian_size_time.pdf', bbox_inches='tight')
 
     plt.figure(figsize=(12,8))
     plt.style.use('bmh')
@@ -237,4 +237,4 @@ def rn_gaussian_size():
     
     ax.set(xlabel='data size', ylabel='adjusted Rand index', title="Gaussian blobs (dim=10)")
     ax.set(ylim=(0, 1.1))
-    plt.savefig('fresults/gaussian_size_ar.pdf')
+    plt.savefig('fresults/gaussian_size_ar.pdf', bbox_inches='tight')
