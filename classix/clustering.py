@@ -1343,7 +1343,7 @@ class CLASSIX:
         if not os.path.isdir(path):
             os.makedirs(path)
         fig.savefig(path + '/linkage_scale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.pdf')
-        plt.show()
+        # plt.show()
     
     
     
