@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Explainable Clustering &#8212; CLASSIX 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Outlier Detection" href="outlier_detection.html" />
+    <link rel="prev" title="Clustering Tutorial" href="clustering_tutorial.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="explainable-clustering">
+<h1>Explainable Clustering<a class="headerlink" href="#explainable-clustering" title="Permalink to this headline">¶</a></h1>
+<p>CLASSIX provides an appealing explanation for clustering results, either in global view or by specific indexing.</p>
+<p>If we would like to make plot accompany just remember to set <code class="docutils literal notranslate"><span class="pre">plot</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<section id="global-insight">
+<h2>Global insight<a class="headerlink" href="#global-insight" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">classix</span> <span class="kn">import</span> <span class="n">CLASSIX</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">make_blobs</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cluster_std</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">clx</span> <span class="o">=</span> <span class="n">CLASSIX</span><span class="p">(</span><span class="n">sorting</span><span class="o">=</span><span class="s1">&#39;pca&#39;</span><span class="p">,</span> <span class="n">group_merging</span><span class="o">=</span><span class="s1">&#39;density&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">minPts</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">clx</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">clx</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The output is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="n">clustering</span> <span class="n">of</span> <span class="mi">5000</span> <span class="n">data</span> <span class="n">points</span> <span class="k">with</span> <span class="mi">2</span> <span class="n">features</span> <span class="n">has</span> <span class="n">been</span> <span class="n">performed</span><span class="o">.</span>
+<span class="n">The</span> <span class="n">radius</span> <span class="n">parameter</span> <span class="n">was</span> <span class="nb">set</span> <span class="n">to</span> <span class="mf">0.50</span> <span class="ow">and</span> <span class="n">MinPts</span> <span class="n">was</span> <span class="nb">set</span> <span class="n">to</span> <span class="mf">4.</span>
+<span class="n">As</span> <span class="n">the</span> <span class="n">provided</span> <span class="n">data</span> <span class="n">has</span> <span class="n">been</span> <span class="n">scaled</span> <span class="n">by</span> <span class="n">a</span> <span class="n">factor</span> <span class="n">of</span> <span class="mi">1</span><span class="o">/</span><span class="mf">6.01</span><span class="p">,</span>
+<span class="n">data</span> <span class="n">points</span> <span class="n">within</span> <span class="n">a</span> <span class="n">radius</span> <span class="n">of</span> <span class="n">R</span><span class="o">=</span><span class="mf">0.50</span><span class="o">*</span><span class="mf">6.01</span><span class="o">=</span><span class="mf">3.01</span> <span class="n">were</span> <span class="n">aggregated</span> <span class="n">into</span> <span class="n">groups</span><span class="o">.</span>
+<span class="n">In</span> <span class="n">total</span> <span class="mi">7903</span> <span class="n">comparisons</span> <span class="n">were</span> <span class="n">required</span> <span class="p">(</span><span class="mf">1.58</span> <span class="n">comparisons</span> <span class="n">per</span> <span class="n">data</span> <span class="n">point</span><span class="p">)</span><span class="o">.</span>
+<span class="n">This</span> <span class="n">resulted</span> <span class="ow">in</span> <span class="mi">14</span> <span class="n">groups</span><span class="p">,</span> <span class="n">each</span> <span class="n">uniquely</span> <span class="n">associated</span> <span class="k">with</span> <span class="n">a</span> <span class="n">starting</span> <span class="n">point</span><span class="o">.</span>
+<span class="n">These</span> <span class="mi">14</span> <span class="n">groups</span> <span class="n">were</span> <span class="n">subsequently</span> <span class="n">merged</span> <span class="n">into</span> <span class="mi">2</span> <span class="n">clusters</span><span class="o">.</span>
+<span class="n">A</span> <span class="nb">list</span> <span class="n">of</span> <span class="nb">all</span> <span class="n">starting</span> <span class="n">points</span> <span class="ow">is</span> <span class="n">shown</span> <span class="n">below</span><span class="o">.</span>
+<span class="o">----------------------------------------</span>
+<span class="n">Group</span>  <span class="n">NrPts</span>  <span class="n">Cluster</span>  <span class="n">Coordinates</span>
+<span class="mi">0</span>     <span class="mi">398</span>      <span class="mi">0</span>     <span class="o">-</span><span class="mf">1.19</span> <span class="o">-</span><span class="mf">1.09</span>
+<span class="mi">1</span>    <span class="mi">1073</span>      <span class="mi">0</span>     <span class="o">-</span><span class="mf">0.65</span> <span class="o">-</span><span class="mf">1.15</span>
+<span class="mi">2</span>     <span class="mi">553</span>      <span class="mi">0</span>     <span class="o">-</span><span class="mf">1.17</span> <span class="o">-</span><span class="mf">0.56</span>
+<span class="mi">3</span>     <span class="mi">466</span>      <span class="mi">0</span>     <span class="o">-</span><span class="mf">0.67</span> <span class="o">-</span><span class="mf">0.65</span>
+<span class="mi">4</span>       <span class="mi">6</span>      <span class="mi">0</span>     <span class="o">-</span><span class="mf">0.19</span> <span class="o">-</span><span class="mf">0.88</span>
+<span class="mi">5</span>       <span class="mi">3</span>      <span class="mi">0</span>     <span class="o">-</span><span class="mf">0.72</span> <span class="o">-</span><span class="mf">0.03</span>
+<span class="mi">6</span>       <span class="mi">1</span>      <span class="mi">0</span>     <span class="o">-</span><span class="mf">0.22</span> <span class="o">-</span><span class="mf">0.28</span>
+<span class="mi">7</span>     <span class="mi">470</span>      <span class="mi">1</span>       <span class="mf">0.31</span> <span class="mf">0.21</span>
+<span class="mi">8</span>     <span class="mi">675</span>      <span class="mi">1</span>       <span class="mf">0.18</span> <span class="mf">0.71</span>
+<span class="mi">9</span>     <span class="mi">579</span>      <span class="mi">1</span>       <span class="mf">0.86</span> <span class="mf">0.19</span>
+<span class="mi">10</span>     <span class="mi">763</span>      <span class="mi">1</span>       <span class="mf">0.69</span> <span class="mf">0.67</span>
+<span class="mi">11</span>       <span class="mi">6</span>      <span class="mi">1</span>       <span class="mf">0.42</span> <span class="mf">1.35</span>
+<span class="mi">12</span>       <span class="mi">5</span>      <span class="mi">1</span>       <span class="mf">1.24</span> <span class="mf">0.59</span>
+<span class="mi">13</span>       <span class="mi">2</span>      <span class="mi">1</span>        <span class="mf">1.0</span> <span class="mf">1.08</span>
+<span class="o">----------------------------------------</span>
+<span class="n">In</span> <span class="n">order</span> <span class="n">to</span> <span class="n">explain</span> <span class="n">the</span> <span class="n">clustering</span> <span class="n">of</span> <span class="n">individual</span> <span class="n">data</span> <span class="n">points</span><span class="p">,</span>
+<span class="n">use</span> <span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="n">ind1</span><span class="p">)</span> <span class="ow">or</span> <span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">)</span> <span class="k">with</span> <span class="n">indices</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="n">points</span><span class="o">.</span>
+</pre></div>
+</div>
+<img alt="_images/explain_viz.png" src="_images/explain_viz.png" />
+</section>
+<section id="track-single-data">
+<h2>Track single data<a class="headerlink" href="#track-single-data" title="Permalink to this headline">¶</a></h2>
+<p>Following the previous steps, we can analyze the specific data by refering to the index, for example here, we want to track the data with index 0:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">clx</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span>  <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;PNG&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">data</span> <span class="n">point</span> <span class="ow">is</span> <span class="ow">in</span> <span class="n">group</span> <span class="mi">2</span><span class="p">,</span> <span class="n">which</span> <span class="n">has</span> <span class="n">been</span> <span class="n">merged</span> <span class="n">into</span> <span class="n">cluster</span> <span class="c1">#0.</span>
+</pre></div>
+</div>
+<img alt="_images/None0.png" src="_images/None0.png" />
+</section>
+<section id="comparison-insight">
+<h2>Comparison insight<a class="headerlink" href="#comparison-insight" title="Permalink to this headline">¶</a></h2>
+<p>We give two examples to compare the data pair cluster assignment as follows.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">clx</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span>  <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">data</span> <span class="n">point</span> <span class="mi">0</span> <span class="ow">is</span> <span class="ow">in</span> <span class="n">group</span> <span class="mi">2</span><span class="p">,</span> <span class="n">which</span> <span class="n">has</span> <span class="n">been</span> <span class="n">merged</span> <span class="n">into</span> <span class="n">cluster</span> <span class="mf">0.</span>
+<span class="n">The</span> <span class="n">data</span> <span class="n">point</span> <span class="mi">2000</span> <span class="ow">is</span> <span class="ow">in</span> <span class="n">group</span> <span class="mi">10</span><span class="p">,</span> <span class="n">which</span> <span class="n">has</span> <span class="n">been</span> <span class="n">merged</span> <span class="n">into</span> <span class="n">cluster</span> <span class="mf">1.</span>
+<span class="n">There</span> <span class="ow">is</span> <span class="n">no</span> <span class="n">path</span> <span class="n">of</span> <span class="n">overlapping</span> <span class="n">groups</span> <span class="n">between</span> <span class="n">these</span> <span class="n">clusters</span><span class="o">.</span>
+</pre></div>
+</div>
+<img alt="_images/None0_2000.png" src="_images/None0_2000.png" />
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">clx</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2008</span><span class="p">,</span>  <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">data</span> <span class="n">point</span> <span class="mi">0</span> <span class="ow">is</span> <span class="ow">in</span> <span class="n">group</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">data</span> <span class="n">point</span> <span class="mi">2008</span> <span class="ow">is</span> <span class="ow">in</span> <span class="n">group</span> <span class="mi">4</span><span class="p">,</span>
+<span class="n">both</span> <span class="n">of</span> <span class="n">which</span> <span class="n">were</span> <span class="n">merged</span> <span class="n">into</span> <span class="n">cluster</span> <span class="c1">#0.</span>
+<span class="n">These</span> <span class="n">two</span> <span class="n">groups</span> <span class="n">are</span> <span class="n">connected</span> <span class="n">via</span> <span class="n">groups</span> <span class="mi">2</span> <span class="o">&lt;-&gt;</span> <span class="mi">1</span> <span class="o">&lt;-&gt;</span> <span class="mf">4.</span>
+</pre></div>
+</div>
+<img alt="_images/None0_2008.png" src="_images/None0_2008.png" />
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">CLASSIX</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Get Started with CLASSIX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clustering_tutorial.html">Clustering Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Explainable Clustering</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#global-insight">Global insight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#track-single-data">Track single data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#comparison-insight">Comparison insight</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="outlier_detection.html">Outlier Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="clustering_parameters.html">Clustering Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="agg_parameters.html">Aggregation Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg_parameters.html">Merging Parameters</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="clustering_tutorial.html" title="previous chapter">Clustering Tutorial</a></li>
+      <li>Next: <a href="outlier_detection.html" title="next chapter">Outlier Detection</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Stefan Güttel, Xinye Chen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/explainable_clustering.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
