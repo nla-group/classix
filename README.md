@@ -9,18 +9,19 @@
 [![Documentation Status](https://readthedocs.org/projects/classix/badge/?version=latest)](https://classix.readthedocs.io/en/latest/?badge=latest)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/nla-group/classix/HEAD)
 
-CLASSIX is a fast and scalable clustering algorithm based on sorting, which results in explanable clustering. It is flexible for any shape of data with easy-tuning parameters, and share the features as follows:
+CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
 
 - A novel clustering algorithm which exploits the sorting of data points.
 - Ability to  cluster low and high-dimensional data of arbitrary shape efficiently.
 - Ability to detect and deal with outliers in the data.
 - Ability to provide textual explanations for the generated clusters.
-- Accompanied by a Python module and scripts for full reproducibility of all tests.
-- Cython compiler Support.
+- Full reproducibility of all tests in the accompanying paper.
+- Support of Cython compilation.
 
-The detailed documentation, including tutorials, are available at [CLASSIX DOCS](https://classix.readthedocs.io/en/latest/)
+The detailed documentation, including tutorials, is available at [CLASSIX DOCS](https://classix.readthedocs.io/en/latest/)
 
-CLASSIX is a novel clustering method which shares features with both distance and density-based methods. ``CLASSIX`` is a contrived acronym of ``CLustering by Aggregation with Sorting-based Indexing'`` and the letter ``X`` for ``explainability``. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter for the aggregation and another parameter controlling the minimal cluster size. Our performance studies demonstrate that the CLASSIX achieves competing results against k-means++, DBSCAN, HDBSCAN and Quickshift++ with respect to speed and several metrics of cluster quality. In addition, CLASSIX inherent simplicity allows for the easy explainability of the clustering results.  Specifically, CLASSIX runs the aggregation with user determined parameter, namely radius, to determine the initial  groups by greedily selecting the heuristic centers from the whole data being sorted (the heuristic centers are formally defined as starting points in the following section). The heuristic centers, to a large extent, serve the purpose of subsampling of whole data, which are reckoned as informative as the whole data and representative with respect to the distribution of the features.  Then we define density measure in the level of groups and their intersection. We define the graph on the heuristic centers by viewing the centers as vertices and an edge between each pair of vertices (weights as 1) if the density of their intersection is greater than that of any of them otherwise no edge (weith as 0). Then we find the connected components the graph as the final clusters. 
+``CLASSIX`` is a contrived acronym of ``CLustering by Aggregation with Sorting-based Indexing`` and the letter ``X`` for ``explainability``. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter for the aggregation and another parameter controlling the minimal cluster size. 
+
 ## Install
 
 CLASSIX requires the following dependencies:
@@ -35,7 +36,7 @@ To install the current release via PIP use:
 $ pip install ClassixClustering
 ```
 
-Download this repository:
+Download this repository via:
 ```
 $ git clone https://github.com/nla-group/CLASSIX.git
 ```
@@ -61,16 +62,17 @@ plt.scatter(X[:,0], X[:,1], c=clx.labels_)
 plt.show()
 ```
 
-## Explainable function
-CLASSIX provides convenient API for visualization of cluster assignment explanation, particularly for single object tracking and pair of object comparison.
-Now we demonstrate this function with example of the same data as follows:
+## The explain method
+
+CLASSIX provides an API for the easy visualization of clusters, and to explain the assignment of data points to their clusters.
+Now we demonstrate this functionality with some simple data:
 
 ```Python
 classix.explain(plot=True)
 ```
 <img src=https://github.com/nla-group/classix/blob/master/docs/source/images/explain_viz.png width=500 />
 
-The output clearly illustrates groups and clusters information:
+The output summarizes the computed groups and clusters:
 
 ```
 A clustering of 5000 data points with 2 features has been performed. 
@@ -102,7 +104,7 @@ In order to explain the clustering of individual data points,
 use .explain(ind1) or .explain(ind1, ind2) with indices of the data points. 
 ```
 
-In the column of the simple table's, ``Group`` denotes the group label, ``NrPts`` denotes the number of data points in the associated group, ``Cluster`` is referred to as the cluster label assigned to the corresponding group,  ``Coordinates`` is referred to as the coordinates of starting point associated with the group. You can easily infer the required information in this table by using following methods which we're about to demonstrate.
+In the columns of the above table, ``Group`` denotes the group label, ``NrPts`` denotes the number of data points in the associated group, ``Cluster`` is the cluster label assigned to the corresponding group,  and ``Coordinates`` are the coordinates of starting point associated with the group. In order to explain the cluster assignment of a particular data point, we just have to provide its index to the explain method:
 
 ```Python
 clx.explain(0,  plot=True)
@@ -129,11 +131,11 @@ There is no path of overlapping groups between these clusters.
 
 
 ## Citation
-If you use CLASSIX in a scientific publication, we would appreciate your citing:
+Here is the full CLASSIX paper. If you find CLASSIX useful in a scientific publication, we would appreciate a citation:
 
 ```bibtex
 @misc{CLASSIX,
-      title={Fast and explainable sorted based clustering}, 
+      title={Fast and explainable clustering based on sorting}, 
       author={Xinye Chen and G\"{u}ttel, Stefan},
       year={2022},
       eprint={},
