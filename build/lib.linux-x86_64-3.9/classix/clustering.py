@@ -956,8 +956,10 @@ class CLASSIX:
                             os.mkdir("img")
                         if fmt == 'pdf':
                             plt.savefig('img/' + str(figname) + str(index1) +'.pdf', bbox_inches='tight')
-                        else:
+                        elif fmt == 'png':
                             plt.savefig('img/' + str(figname) + str(index1) +'.png', bbox_inches='tight')
+                        else:
+                            plt.savefig('img/' + str(figname) + str(index1) +'.'+fmt, bbox_inches='tight')
                         print("successfully save")
                     plt.show()
                     
@@ -1211,8 +1213,10 @@ class CLASSIX:
                             os.mkdir("img")
                         if fmt == 'pdf':
                             plt.savefig('img/' + str(figname) + str(index1) + '_' + str(index2) +'.pdf', bbox_inches='tight')
-                        else:
+                        elif fmt == 'png':
                             plt.savefig('img/' + str(figname) + str(index1) + '_' + str(index2) +'.png', bbox_inches='tight')
+                        else:
+                            plt.savefig('img/' + str(figname) + str(index1) + '_' + str(index2) +'.'+fmt, bbox_inches='tight')
                         print("image successfully save.")
                     plt.show()
                     
@@ -1335,8 +1339,10 @@ class CLASSIX:
                 os.mkdir("img")
             if fmt == 'pdf':
                 plt.savefig('img/explain_viz.pdf', bbox_inches='tight')
-            else:
+            elif fmt == 'png':
                 plt.savefig('img/explain_viz.png', bbox_inches='tight')
+            else:
+                plt.savefig('img/explain_viz.'+fmt, bbox_inches='tight')
             print("successfully save")
         plt.show()
         
