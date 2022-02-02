@@ -7,6 +7,8 @@
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/ClassixClustering.svg)](https://pypi.python.org/pypi/ClassixClustering/)
 [![!pypi](https://img.shields.io/pypi/v/ClassixClustering?color=orange)](https://pypi.org/project/ClassixClustering/)
 [![Documentation Status](https://readthedocs.org/projects/classix/badge/?version=latest)](https://classix.readthedocs.io/en/latest/?badge=latest)
+[![Anaconda-Server Badge](https://anaconda.org/xinyechennull/classix/badges/version.svg)](https://anaconda.org/xinyechennull/classix)
+[![Anaconda-Server Badge](https://anaconda.org/xinyechennull/classix/badges/downloads.svg)](https://anaconda.org/xinyechennull/classix)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/nla-group/classix/HEAD)
 
 CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
@@ -70,7 +72,7 @@ Now we demonstrate this functionality with some simple data:
 ```Python
 classix.explain(plot=True)
 ```
-<img src=https://github.com/nla-group/classix/blob/master/docs/source/images/explain_viz.png width=500 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=500 />
 
 The output summarizes the computed groups and clusters:
 
@@ -109,7 +111,7 @@ In the columns of the above table, ``Group`` denotes the group label, ``NrPts`` 
 ```Python
 clx.explain(0,  plot=True)
 ```
-<img src=https://github.com/nla-group/classix/blob/master/docs/source/images/None0.png width=720 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0.png width=720 />
 Output:
 
 ```
@@ -119,7 +121,7 @@ The data point 0 is in group 2, which has been merged into cluster #0.
 ```Python
 clx.explain(0, 2000,  plot=True)
 ```
-<img src=https://github.com/nla-group/classix/blob/master/docs/source/images/None0_2000.png width=720 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0_2000.png width=720 />
 Output:
 
 ```

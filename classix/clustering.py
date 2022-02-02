@@ -40,7 +40,6 @@ import warnings
 import collections
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 from numpy.linalg import norm
 #import pyximport; pyximport.install()
 from matplotlib import pyplot as plt
