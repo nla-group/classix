@@ -62,6 +62,7 @@ classix.explain(plot=True)
 <img src=https://github.com/nla-group/classix/blob/master/docs/source/images/explain_viz.png width=500 />
 
 The output clearly illustrates groups and clusters information:
+
 ```
 A clustering of 5000 data points with 2 features has been performed. 
 The radius parameter was set to 0.50 and MinPts was set to 0. 
@@ -91,6 +92,7 @@ A list of all starting points is shown below.
 In order to explain the clustering of individual data points, 
 use .explain(ind1) or .explain(ind1, ind2) with indices of the data points. 
 ```
+
 In the column of the simple table's, ``Group`` denotes the group label, ``NrPts`` denotes the number of data points in the associated group, ``Cluster`` is referred to as the cluster label assigned to the corresponding group,  ``Coordinates`` is referred to as the coordinates of starting point associated with the group. You can easily infer the required information in this table by using following methods which we're about to demonstrate.
 
 ```Python
@@ -98,6 +100,7 @@ clx.explain(0,  plot=True)
 ```
 <img src=https://github.com/nla-group/classix/blob/master/docs/source/images/None0.png width=720 />
 Output:
+
 ```
 The data point 0 is in group 2, which has been merged into cluster #0.
 ```
@@ -107,6 +110,7 @@ clx.explain(0, 2000,  plot=True)
 ```
 <img src=https://github.com/nla-group/classix/blob/master/docs/source/images/None0_2000.png width=720 />
 Output:
+
 ```
 The data point 0 is in group 2, which has been merged into cluster 0.
 The data point 2000 is in group 10, which has been merged into cluster 1.
