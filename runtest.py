@@ -32,10 +32,10 @@ for tol in np.arange(0.5,1.1,0.1):
     clx.fit_transform(vdu_signals)
     
     # version 0.2.0
-    # np.save('classix/data/checkpoint_' + str(tol) + '.npy', clx.labels_) 
+    # np.save('classix/data/checkpoint_' + str(np.round(tol,2)) + '.npy', clx.labels_) 
     
     # test new version
-    checkpoint = np.load('classix/data/checkpoint_' + str(tol) + '.npy')
+    checkpoint = np.load('classix/data/checkpoint_' + str(np.round(tol,2)) + '.npy')
     comp = clx.labels_ == checkpoint
     assert(comp.all())
 
