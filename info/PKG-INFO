@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ClassixClustering
-Version: 0.1.9
+Version: 0.2.2
 Summary: Fast and explainable clustering based on sorting
 Home-page: https://github.com/nla-group/CLASSIX.git
 Author: Stefan Guettel, Xinye Chen
@@ -13,7 +13,9 @@ Classifier: Programming Language :: Python
 Classifier: Topic :: Software Development
 Classifier: Topic :: Scientific/Engineering
 Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
 Classifier: Operating System :: Unix
+Classifier: Operating System :: MacOS
 Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
 Description-Content-Type: text/markdown
@@ -28,6 +30,9 @@ License-File: LICENSE
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/ClassixClustering.svg)](https://pypi.python.org/pypi/ClassixClustering/)
 [![!pypi](https://img.shields.io/pypi/v/ClassixClustering?color=orange)](https://pypi.org/project/ClassixClustering/)
 [![Documentation Status](https://readthedocs.org/projects/classix/badge/?version=latest)](https://classix.readthedocs.io/en/latest/?badge=latest)
+[![Anaconda-Server Badge](https://anaconda.org/nla.stefan.xinye/classix/badges/version.svg)](https://anaconda.org/nla.stefan.xinye/classix)
+[![Anaconda-Server Badge](https://anaconda.org/nla.stefan.xinye/classix/badges/downloads.svg)](https://anaconda.org/nla.stefan.xinye/classix)
+[![Anaconda-Server Badge](https://anaconda.org/nla.stefan.xinye/classix/badges/latest_release_date.svg)](https://anaconda.org/nla.stefan.xinye/classix)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/nla-group/classix/HEAD)
 
 CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
@@ -45,12 +50,16 @@ The detailed documentation, including tutorials, is available at [CLASSIX DOCS](
 
 ## Install
 
-CLASSIX requires the following dependencies:
+CLASSIX requires the following essential dependencies for clustering:
 
 - cython>=0.29.4
 - numpy>=1.20.0
 - scipy>1.6.0
+
+while requires the following dependencies for data visualization:
+
 - matplotlib
+- scikit-learn
 
 To install the current release via PIP use:
 ```
@@ -59,7 +68,7 @@ $ pip install ClassixClustering
 
 Download this repository via:
 ```
-$ git clone https://github.com/nla-group/CLASSIX.git
+$ git clone https://github.com/nla-group/classix.git
 ```
 ## Quick Start
 
@@ -91,7 +100,7 @@ Now we demonstrate this functionality with some simple data:
 ```Python
 classix.explain(plot=True)
 ```
-<img src=https://github.com/nla-group/classix/blob/master/docs/source/images/explain_viz.png width=500 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=500 />
 
 The output summarizes the computed groups and clusters:
 
@@ -130,7 +139,7 @@ In the columns of the above table, ``Group`` denotes the group label, ``NrPts`` 
 ```Python
 clx.explain(0,  plot=True)
 ```
-<img src=https://github.com/nla-group/classix/blob/master/docs/source/images/None0.png width=720 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0.png width=720 />
 Output:
 
 ```
@@ -140,7 +149,7 @@ The data point 0 is in group 2, which has been merged into cluster #0.
 ```Python
 clx.explain(0, 2000,  plot=True)
 ```
-<img src=https://github.com/nla-group/classix/blob/master/docs/source/images/None0_2000.png width=720 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0_2000.png width=720 />
 Output:
 
 ```

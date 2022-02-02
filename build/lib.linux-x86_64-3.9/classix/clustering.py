@@ -37,6 +37,7 @@ except ModuleNotFoundError:
 import os
 import copy
 import warnings
+import requests
 import collections
 import numpy as np
 import pandas as pd
@@ -76,7 +77,7 @@ class CLASSIX:
         and an object is less than or equal to the tolerance, the object will be allocated 
         to the group which the starting point belongs to. 
     
-    group_merging : str, {'density', 'distance', 'scc-distance', 'mst-distance'}, default='density'
+    group_merging : str, {'density', 'distance', 'scc-distance', 'mst-distance'}, default='distance'
         The method for merging the groups. 
         - 'density': two groups are merged if the density of data points in their intersection 
            is at least as high the smaller density of both groups. This option uses the disjoint 
@@ -1952,12 +1953,20 @@ def return_csr_matrix_indices(csr_matrix):
 
 
 
+def get_data(current_dir=''):
+    url_parent = "https://github.com/nla-group/classix/raw/master/classix/data/vdu_signals.npy"
+    vdu_signals = requests.get(url_parent).content
+    with open(os.path.join(current_dir, 'data/vdu_signals.npy'), 'wb') as handler:
+        handler.write(vdu_signals)
+        
 
 def load_data(name='vdu_signals'):
-    this_dir, this_filename = os.path.split(__file__)
+    current_dir, current_filename = os.path.split(__file__)
     
     if name == 'vdu_signals':
-        DATA_PATH = os.path.join(this_dir, 'data/vdu_signals.npy')
+        DATA_PATH = os.path.join(current_dir, 'data/vdu_signals.npy')
+        if not os.path.isfile(DATA_PATH):
+            get_data(current_dir)
         return np.load(DATA_PATH)
     else:
         warnings.warn("Currently not support this data.")

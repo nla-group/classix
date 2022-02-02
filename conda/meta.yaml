@@ -17,12 +17,11 @@ requirements:
     - scipy
     - matplotlib
     - scikit-learn
-    
 
   run:
     - python
 
 about:
   home: https://github.com/nla-group/classix
-  license_family: MIT
+  license_family: MIT License
   license_file: LICENSE

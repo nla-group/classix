@@ -17,4 +17,3 @@ classix/clustering.py
 classix/merging.py
 classix/merging_cm.c
 classix/merging_cm.pyx
-classix/data/vdu_signals.npy
