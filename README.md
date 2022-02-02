@@ -133,7 +133,4 @@ If you use CLASSIX in a scientific publication, we would appreciate your citing:
 }
 ```
 
-## Performance
-<img src=https://github.com/nla-group/classix/blob/master/docs/source/images/performance.png width=720 />
-
 
