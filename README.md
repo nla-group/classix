@@ -41,7 +41,7 @@ $ pip install ClassixClustering
 
 Download this repository via:
 ```
-$ git clone https://github.com/nla-group/CLASSIX.git
+$ git clone https://github.com/nla-group/classix.git
 ```
 ## Quick Start
 
