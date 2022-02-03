@@ -4,7 +4,7 @@ import pandas as pd
 import seaborn as sns
 import sklearn.datasets as data
 from scipy.sparse import csr_matrix, _sparsetools
-from src.clustering import CLASSIX, visualize_connections, return_csr_matrix_indices
+from classix import CLASSIX, visualize_connections, return_csr_matrix_indices
 import matplotlib.pyplot as plt
 
 def rn_scale_explore():
