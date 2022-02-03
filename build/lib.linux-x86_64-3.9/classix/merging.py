@@ -320,84 +320,84 @@ def cal_inter_volume(starting_point, spo, radius):
 # ------------------------------------------------------------------------------------------------------------------
 
 # Deprecated function
-def agglomerate_trivial(data, splist, radius, method="distance", scale=1.5):
-    connected_pairs = list()
-    for i in range(splist.shape[0]):
-        sp1 = splist[int(i), 3:]
-        neigbor_sp = splist[i+1:, 3:]
-        select_stps = np.arange(i+1, splist.shape[0], dtype=int)
-        if method == "density":                    # calculate the density
-            volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
-            index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= radius # 2*distance_scale*radius
-            # index_overlap = np.where(np.linalg.norm(splist[:,3:] - sp1, ord=2, axis=-1) <= 2*radius)  # -> [for np.where, removed], 2*distance_scale*radius
-            select_stps = select_stps[index_overlap]
-            neigbor_sp = neigbor_sp[index_overlap,:] # calculate their neighbor ...2)
-            # calculate their neighbors ...1)
-            # later decide whether sps should merge with neighbors
-            if not np.any(index_overlap):
-                continue
-            # neigbor_sp = neigbor_sp[index_overlap]
+# def agglomerate_trivial(data, splist, radius, method="distance", scale=1.5):
+#     connected_pairs = list()
+#     for i in range(splist.shape[0]):
+#         sp1 = splist[int(i), 3:]
+#         neigbor_sp = splist[i+1:, 3:]
+#         select_stps = np.arange(i+1, splist.shape[0], dtype=int)
+#         if method == "density":                    # calculate the density
+#             volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
+#             index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= radius # 2*distance_scale*radius
+#             # index_overlap = np.where(np.linalg.norm(splist[:,3:] - sp1, ord=2, axis=-1) <= 2*radius)  # -> [for np.where, removed], 2*distance_scale*radius
+#             select_stps = select_stps[index_overlap]
+#             neigbor_sp = neigbor_sp[index_overlap,:] # calculate their neighbor ...2)
+#             # calculate their neighbors ...1)
+#             # later decide whether sps should merge with neighbors
+#             if not np.any(index_overlap):
+#                 continue
+#             # neigbor_sp = neigbor_sp[index_overlap]
 
-            c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
-            den1 = np.count_nonzero(c1) / volume
-            # den1 = splist[int(i), 2] / volume # density(splist[int(i), 2], volume = volume) 
-            for j in select_stps:
-                sp2 = splist[int(j), 3:]
+#             c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
+#             den1 = np.count_nonzero(c1) / volume
+#             # den1 = splist[int(i), 2] / volume # density(splist[int(i), 2], volume = volume) 
+#             for j in select_stps:
+#                 sp2 = splist[int(j), 3:]
+# 
+#                 c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
+#                 den2 = np.count_nonzero(c2) / volume
+#                 #den2 = splist[int(j), 2] / volume # density(splist[int(j), 2], volume = volume)
+#                 if check_if_overlap(sp1, sp2, radius=radius): # , scale=distance_scale
+#                     # interdata = np.linalg.norm(data[agg_labels==i] - sp2, ord=2, axis=-1)
+#                     # internum = len(interdata[interdata <= 2*radius])
+#                     internum = np.count_nonzero(c1 & c2)
+#                     cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
+#                     if cid >= den1 or cid >= den2: # eta*cid >= den1 or eta*cid >= den2:
+#                         connected_pairs.append([i,j]) # store connected groups
 
-                c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
-                den2 = np.count_nonzero(c2) / volume
-                #den2 = splist[int(j), 2] / volume # density(splist[int(j), 2], volume = volume)
-                if check_if_overlap(sp1, sp2, radius=radius): # , scale=distance_scale
-                    # interdata = np.linalg.norm(data[agg_labels==i] - sp2, ord=2, axis=-1)
-                    # internum = len(interdata[interdata <= 2*radius])
-                    internum = np.count_nonzero(c1 & c2)
-                    cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
-                    if cid >= den1 or cid >= den2: # eta*cid >= den1 or eta*cid >= den2:
-                        connected_pairs.append([i,j]) # store connected groups
+#         else:#  "distance": 
+#             index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  # 2*distance_scale*radius
+#             select_stps = select_stps[index_overlap]
+#             if not np.any(index_overlap): # calculate their neighbors ...1)
+#                 continue
 
-        else:#  "distance": 
-            index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  # 2*distance_scale*radius
-            select_stps = select_stps[index_overlap]
-            if not np.any(index_overlap): # calculate their neighbors ...1)
-                continue
-
-            # neigbor_sp = neigbor_sp[index_overlap] # calculate their neighbor ...2)
-            for j in select_stps:
-                # two groups merge when their starting points distance is smaller than 1.5*radius
-                connected_pairs.append([i,j]) # store connected groups
-        
-    return connected_pairs
+#             # neigbor_sp = neigbor_sp[index_overlap] # calculate their neighbor ...2)
+#             for j in select_stps:
+#                 # two groups merge when their starting points distance is smaller than 1.5*radius
+#                 connected_pairs.append([i,j]) # store connected groups
+#         
+#     return connected_pairs
 
 # Deprecated function
-def merge_pairs_dr(pairs):
-    """Transform connected pairs to connected groups (list)"""
-    
-    len_p = len(pairs)
-    ulabels = np.full(len_p, -1, dtype=int)
-    labels = list()
-    maxid = 0
-    for i in range(len_p):
-        if ulabels[i] == -1:
-            sub = pairs[i]
-            ulabels[i] = maxid
-
-            for j in range(i+1, len_p):
-                com = pairs[j]
-                if set(sub).intersection(com) != set():
-                    sub = sub + com
-                    if ulabels[j] == -1:
-                        ulabels[j] = maxid
-                    else:
-                        ulabels[ulabels == maxid] = ulabels[j]
-
-            maxid = maxid + 1
-
-    for i in np.unique(ulabels):
-        sub = list()
-        for j in [p for p in range(len_p) if ulabels[p] == i]: # np.where(ulabels == i)[0] 
-            sub = sub + list(pairs[int(j)])
-        labels.append(list(set(sub)))
-    return labels
+# def merge_pairs_dr(pairs):
+#     """Transform connected pairs to connected groups (list)"""
+#     
+#     len_p = len(pairs)
+#     ulabels = np.full(len_p, -1, dtype=int)
+#     labels = list()
+#     maxid = 0
+#     for i in range(len_p):
+#         if ulabels[i] == -1:
+#             sub = pairs[i]
+#             ulabels[i] = maxid
+# 
+#             for j in range(i+1, len_p):
+#                 com = pairs[j]
+#                 if set(sub).intersection(com) != set():
+#                     sub = sub + com
+#                     if ulabels[j] == -1:
+#                         ulabels[j] = maxid
+#                     else:
+#                         ulabels[ulabels == maxid] = ulabels[j]
+# 
+#             maxid = maxid + 1
+# 
+#     for i in np.unique(ulabels):
+#         sub = list()
+#         for j in [p for p in range(len_p) if ulabels[p] == i]: # np.where(ulabels == i)[0] 
+#             sub = sub + list(pairs[int(j)])
+#         labels.append(list(set(sub)))
+#     return labels
 
 # ------------------------------------------------------------------------------------------------------------------
 #====================================================================================================================#

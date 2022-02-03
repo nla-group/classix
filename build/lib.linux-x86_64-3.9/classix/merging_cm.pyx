@@ -203,7 +203,49 @@ cpdef merge(s1, s2):
 
 
 
-        
+cpdef check_if_overlap(double[:] starting_point, double[:] spo, double radius, int scale = 1):
+    """Check if two groups formed by aggregation overlap
+    """
+    cdef Py_ssize_t dim
+    cdef double[:] subs = starting_point.copy()
+    for dim in range(starting_point.shape[0]):
+        subs[dim] = starting_point[dim] - spo[dim]
+    return np.linalg.norm(subs, ord=2, axis=-1) <= 2 * scale * radius
+
+
+    
+
+cpdef cal_inter_density(double[:] starting_point, double[:] spo, double radius, int num):
+    """Calculate the density of intersection (lens)
+    """
+    cdef double in_volume = cal_inter_volume(starting_point, spo, radius)
+    return num / in_volume
+
+
+
+
+cpdef cal_inter_volume(double[:] starting_point, double[:] spo, double radius):
+    """
+    Returns the volume of the intersection of two spheres in n-dimensional space.
+    The radius of the two spheres is r and the distance of their centers is d.
+    For d=0 the function returns the volume of full sphere.
+    Reference: https://math.stackexchange.com/questions/162250/how-to-compute-the-volume-of-intersection-between-two-hyperspheres
+
+    """
+    
+    cdef Py_ssize_t dim
+    cdef unsigned int fdim = starting_point.shape[0]
+    cdef double[:] subs = starting_point.copy()
+    for dim in range(fdim):
+        subs[dim] = starting_point[dim] - spo[dim]
+    cdef double dist = np.linalg.norm(subs, ord=2, axis=-1) # the distance between the two groups
+    if dist > 2*radius:
+        return 0
+    cdef double c = dist / 2
+    return np.pi**(fdim/2)/gamma(fdim/2 + 1)*(radius**fdim)*betainc((fdim + 1)/2, 1/2, 1 - c**2/radius**2) + np.finfo(float).eps
+
+
+
 # Strongly connected components finding algorithm 
 # cpdef scc_agglomerate(np.ndarray[np.float64_t, ndim=2] splist, double radius=0.5, double scale=1.5, int n_jobs=-1): # limited to distance-based method
 #     cdef list index_set = list()
@@ -225,95 +267,92 @@ cpdef merge(s1, s2):
 
 
 # Deprecated function
-cpdef agglomerate_trivial(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.float64_t, ndim=2] splist, double radius, str method="distance", double scale=1.5):
-    cdef list connected_pairs = list()
-    cdef double volume, den1, den2, cid
-    cdef unsigned int i, j, internum
-    cdef np.ndarray[np.float64_t, ndim=2] neigbor_sp
-    cdef np.ndarray[long, ndim=1] select_stps
-    cdef np.ndarray[np.npy_bool, ndim=1, cast=True] index_overlap, c1, c2
-    if method == "density":
-        volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1) + np.finfo(float).eps
-    else:
-        volume = 0.0 # no need for distance-based method
+# cpdef agglomerate_trivial(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.float64_t, ndim=2] splist, double radius, str method="distance", double scale=1.5):
+#     cdef list connected_pairs = list()
+#     cdef double volume, den1, den2, cid
+#     cdef unsigned int i, j, internum
+#     cdef np.ndarray[np.float64_t, ndim=2] neigbor_sp
+#     cdef np.ndarray[long, ndim=1] select_stps
+#     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] index_overlap, c1, c2
+#     if method == "density":
+#         volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1) + np.finfo(float).eps
+#     else:
+#         volume = 0.0 # no need for distance-based method
+#     
+#     for i in range(splist.shape[0]):
+#         sp1 = splist[i, 3:]
+#         neigbor_sp = splist[i+1:, 3:]
+#         
+#         select_stps = np.arange(i+1, splist.shape[0], dtype=int)
+#         sort_vals = splist[i:, 1]
+#         
+#         if method == "density":
+#             index_overlap = np.linalg.norm(neigbor_sp[:,2:] - sp1, ord=2, axis=-1) <= 2*radius 
+#             select_stps = select_stps[index_overlap]
+#             if not np.any(index_overlap):
+#                 continue
+#             # neigbor_sp = neigbor_sp[index_overlap]
+#             c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
+#             den1 = np.count_nonzero(c1) / volume
+#             for j in select_stps:
+#                 sp2 = splist[j, 3:]
+#                 c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
+#                 den2 = np.count_nonzero(c2) / volume
+#                 if check_if_overlap(sp1, sp2, radius=radius): 
+#                     internum = np.count_nonzero(c1 & c2)
+#                     cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
+#                     if cid >= den1 or cid >= den2: 
+#                         connected_pairs.append([i, j])
+#         else:
+#             index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  
+#             select_stps = select_stps[index_overlap]
+#             if not np.any(index_overlap):
+#                 continue
+# 
+#             # neigbor_sp = neigbor_sp[index_overlap] 
+#             for j in select_stps:
+#                 connected_pairs.append([i, j])
+#     return connected_pairs
+
+
+
+# cpdef merge_pairs_dr(list pairs):
+#     """Transform connected pairs to connected groups (list)"""
+#     
+#     cdef unsigned int len_p = len(pairs)
+#     cdef unsigned int maxid = 0
+#     cdef long long[:] ulabels = np.full(len_p, -1, dtype=int)
+#     cdef list labels = list()
+#     cdef list sub = list()
+#     cdef list com = list()
+#     cdef Py_ssize_t i, j, ind
     
-    for i in range(splist.shape[0]):
-        sp1 = splist[i, 3:]
-        neigbor_sp = splist[i+1:, 3:]
-        
-        select_stps = np.arange(i+1, splist.shape[0], dtype=int)
-        sort_vals = splist[i:, 1]
-        
-        if method == "density":
-            index_overlap = np.linalg.norm(neigbor_sp[:,2:] - sp1, ord=2, axis=-1) <= 2*radius 
-            select_stps = select_stps[index_overlap]
-            if not np.any(index_overlap):
-                continue
-            # neigbor_sp = neigbor_sp[index_overlap]
-            c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
-            den1 = np.count_nonzero(c1) / volume
-            for j in select_stps:
-                sp2 = splist[j, 3:]
-                c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
-                den2 = np.count_nonzero(c2) / volume
-                if check_if_overlap(sp1, sp2, radius=radius): 
-                    internum = np.count_nonzero(c1 & c2)
-                    cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
-                    if cid >= den1 or cid >= den2: 
-                        connected_pairs.append([i, j])
-        else:
-            index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  
-            select_stps = select_stps[index_overlap]
-            if not np.any(index_overlap):
-                continue
-
-            # neigbor_sp = neigbor_sp[index_overlap] 
-            for j in select_stps:
-                connected_pairs.append([i, j])
-    return connected_pairs
+#     for i in range(len_p):
+#         if ulabels[i] == -1:
+#             sub = pairs[i]
+#             ulabels[i] = maxid
+# 
+#             for j in range(i+1, len_p):
+#                 com = pairs[j]
+#                 if not set(sub).isdisjoint(com):
+#                     sub = sub + com
+#                     if ulabels[j] == -1:
+#                         ulabels[j] = maxid
+#                     else:
+#                         for ind in range(len_p):
+#                             if ulabels[ind] == maxid:
+#                                 ulabels[ind] = ulabels[j]
+#             maxid = maxid + 1
+#     
+#     for i in np.unique(ulabels):
+#         sub = list()
+#         for j in [ind for ind in range(len_p) if ulabels[ind] == i]:
+#             sub = sub + pairs[int(j)]
+#         labels.append(list(set(sub)))
+#     return labels
 
 
 
-cpdef merge_pairs_dr(list pairs):
-    """Transform connected pairs to connected groups (list)"""
-    
-    cdef unsigned int len_p = len(pairs)
-    cdef unsigned int maxid = 0
-    cdef long long[:] ulabels = np.full(len_p, -1, dtype=int)
-    cdef list labels = list()
-    cdef list sub = list()
-    cdef list com = list()
-    cdef Py_ssize_t i, j, ind
-    
-    for i in range(len_p):
-        if ulabels[i] == -1:
-            sub = pairs[i]
-            ulabels[i] = maxid
-
-            for j in range(i+1, len_p):
-                com = pairs[j]
-                if not set(sub).isdisjoint(com):
-                    sub = sub + com
-                    if ulabels[j] == -1:
-                        ulabels[j] = maxid
-                    else:
-                        for ind in range(len_p):
-                            if ulabels[ind] == maxid:
-                                ulabels[ind] = ulabels[j]
-            maxid = maxid + 1
-    
-    for i in np.unique(ulabels):
-        sub = list()
-        for j in [ind for ind in range(len_p) if ulabels[ind] == i]:
-            sub = sub + pairs[int(j)]
-        labels.append(list(set(sub)))
-    return labels
-
-
-
-
-
-        
 
 # cpdef merge_pairs(list pairs):
 #     """Transform connected pairs to connected groups (list)"""
@@ -365,50 +404,3 @@ cpdef merge_pairs_dr(list pairs):
 # cpdef check_if_intersect(list g1, list g2):
 #     """Check if two list have the same elements."""
 #     return not set(g1).isdisjoint(g2) # set(g1).intersection(g2) != set()
-
-
-
-cpdef check_if_overlap(double[:] starting_point, double[:] spo, double radius, int scale = 1):
-    """Check if two groups formed by aggregation overlap
-    """
-    cdef Py_ssize_t dim
-    cdef double[:] subs = starting_point.copy()
-    for dim in range(starting_point.shape[0]):
-        subs[dim] = starting_point[dim] - spo[dim]
-    return np.linalg.norm(subs, ord=2, axis=-1) <= 2 * scale * radius
-
-
-    
-
-cpdef cal_inter_density(double[:] starting_point, double[:] spo, double radius, int num):
-    """Calculate the density of intersection (lens)
-    """
-    cdef double in_volume = cal_inter_volume(starting_point, spo, radius)
-    return num / in_volume
-
-
-
-
-cpdef cal_inter_volume(double[:] starting_point, double[:] spo, double radius):
-    """
-    Returns the volume of the intersection of two spheres in n-dimensional space.
-    The radius of the two spheres is r and the distance of their centers is d.
-    For d=0 the function returns the volume of full sphere.
-    Reference: https://math.stackexchange.com/questions/162250/how-to-compute-the-volume-of-intersection-between-two-hyperspheres
-
-    """
-    
-    cdef Py_ssize_t dim
-    cdef unsigned int fdim = starting_point.shape[0]
-    cdef double[:] subs = starting_point.copy()
-    for dim in range(fdim):
-        subs[dim] = starting_point[dim] - spo[dim]
-    cdef double dist = np.linalg.norm(subs, ord=2, axis=-1) # the distance between the two groups
-    if dist > 2*radius:
-        return 0
-    cdef double c = dist / 2
-    return np.pi**(fdim/2)/gamma(fdim/2 + 1)*(radius**fdim)*betainc((fdim + 1)/2, 1/2, 1 - c**2/radius**2) + np.finfo(float).eps
-
-
-
-

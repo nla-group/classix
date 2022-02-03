@@ -8,3 +8,7 @@ except ModuleNotFoundError:
     
 from .clustering import CLASSIX
 from .clustering import load_data
+from .clustering import calculate_cluster_centers
+from .clustering import novel_normalization
+from .clustering import visualize_connections
+from .clustering import return_csr_matrix_indices
