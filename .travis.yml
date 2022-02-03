@@ -1,7 +1,9 @@
 language: python
+
 python:
   - 3.8 
   - 3.9
+  
 before_install:
   - pip3 install -r requirements.txt
   - python3 setup.py build_ext --inplace
@@ -14,3 +16,6 @@ script:
 
 after_success:
   - codecov 
+  
+notifications:
+  email: false
