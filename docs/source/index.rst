@@ -17,7 +17,7 @@ Guide
    clustering_tutorial
    explainable_clustering
    outlier_detection
-   license
+   
 
 API Reference
 -------------
@@ -28,6 +28,10 @@ API Reference
    agg_parameters
    mg_parameters
 
+
+Contact
+-------------
+license
 
 Indices and Tables
 ==================
