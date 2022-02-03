@@ -72,12 +72,14 @@ plt.show()
 ## The explain method
 
 CLASSIX provides an API for the easy visualization of clusters, and to explain the assignment of data points to their clusters.
-Now we demonstrate this functionality with some simple data:
+Now we demonstrate this functionality with some simple data. To show the whole picture of starting points location and the associated orderd groups, simply type:
 
 ```Python
-classix.explain(plot=True)
+clx.explain(plot=True)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=500 />
+
+The starting points are marked as small red boxes (the color can be specified by users), note if you do not specify ``plot=True`` the picture won't appear. You can illustrate this picture with the following output table:
 
 The output summarizes the computed groups and clusters:
 
@@ -123,6 +125,7 @@ Output:
 The data point 0 is in group 2, which has been merged into cluster #0.
 ```
 
+You can also track and compare the two objects merging and division with 
 ```Python
 clx.explain(0, 2000,  plot=True)
 ```
