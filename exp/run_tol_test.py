@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import sklearn.datasets
 from sklearn import metrics
-from src.clustering import CLASSIX
+from classix import CLASSIX
 from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
