@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Explainable Clustering &mdash; CLASSIX 0.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/_.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -39,6 +39,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Get Started with CLASSIX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Performance Comparison</a></li>
 <li class="toctree-l1"><a class="reference internal" href="clustering_tutorial.html">Clustering Tutorial</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Explainable Clustering</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#global-insight">Global insight</a></li>
@@ -48,12 +49,16 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="outlier_detection.html">Outlier Detection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="clustering_parameters.html">Clustering Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="agg_parameters.html">Aggregation Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mg_parameters.html">Merging Parameters</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgement.html">Acknowledgement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 
         </div>
@@ -216,8 +221,8 @@ we leave the default parameters except setting radius to 1.</p>
 </pre></div>
 </div>
 <p>From this, we can see there is big gap between the number of cluster 4 and cluster 5, by which we can assume the data within a cluster with size smaller than 38 are outliers. Therefore, we set
-<code class="docutils literal notranslate"><span class="pre">minPts</span></code> to 38., we can get the same result as that with radius of 1. You can also set the parameter of <code class="docutils literal notranslate"><span class="pre">post_alloc</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code>, then all outliers will be marked as label of -1 instead of
-executing the allocation strategy.</p>
+<code class="docutils literal notranslate"><span class="pre">minPts</span></code> to 38. After that, we can get the same result as that with radius of 1. You can also set the parameter of <code class="docutils literal notranslate"><span class="pre">post_alloc</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code>, then all outliers will be marked as label of -1 instead of
+executing the allocation strategy. Though in most cases outliers are hard to define and capture, this case tells us how to select an appropriate value for <cite>minPts</cite> to separate outliers or deal with outliers based on distance.</p>
 <p>As above, we view the whole picture for data simply by</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">clx</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -281,6 +286,9 @@ setting <code class="docutils literal notranslate"><span class="pre">sp_fontsize
 </div>
 <p>We can see most of data objects are allocated to groups 26~33, which correspond to cluster 0.</p>
 <p>Then to track or compare any data by indexing, you can enter like</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">clx</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="mi">14940</span><span class="p">,</span> <span class="mi">16943</span><span class="p">,</span>  <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sp_fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
 <img alt="_images/kamil_14940_16943.png" src="_images/kamil_14940_16943.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">data</span> <span class="n">point</span> <span class="mi">14940</span> <span class="ow">is</span> <span class="ow">in</span> <span class="n">group</span> <span class="mi">7</span><span class="p">,</span> <span class="n">which</span> <span class="n">has</span> <span class="n">been</span> <span class="n">merged</span> <span class="n">into</span> <span class="n">cluster</span> <span class="mf">1.</span>
 <span class="n">The</span> <span class="n">data</span> <span class="n">point</span> <span class="mi">16943</span> <span class="ow">is</span> <span class="ow">in</span> <span class="n">group</span> <span class="mi">11</span><span class="p">,</span> <span class="n">which</span> <span class="n">has</span> <span class="n">been</span> <span class="n">merged</span> <span class="n">into</span> <span class="n">cluster</span> <span class="mf">3.</span>

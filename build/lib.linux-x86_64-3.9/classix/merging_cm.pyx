@@ -65,9 +65,11 @@ cpdef fast_agglomerate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.floa
 
     method : str, default='distance'
         Method for group merging, Available options are:
+        
         - 'density': two groups are merged if the density of data points in their intersection 
            is at least as high the smaller density of both groups. This option uses the disjoint 
            set structure to speedup agglomerate.
+           
         - 'distance': two groups are merged if the distance of their starting points is at 
            most scale*radius (the parameter above). This option uses the disjoint 
            set structure to speedup agglomerate.
@@ -83,6 +85,7 @@ cpdef fast_agglomerate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.floa
     
     connected_pairs_store : list
         List for connected group labels.
+
 
     References
     ----------

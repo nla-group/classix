@@ -88,9 +88,13 @@ class CLASSIX:
     ----------
     sorting : str, {'pca', 'norm-mean', 'norm-orthant', None}，default='pca'
         Sorting method used for the aggregation phase.
+        
         - 'pca': sort data points by their first principal component
+        
         - 'norm-mean': shift data to have zero mean and then sort by 2-norm values
+        
         - 'norm-orthant': shift data to positive orthant and then sort by 2-norm values
+        
         - None: aggregate the raw data without any sorting
         
     radius : float, default=0.5
@@ -100,12 +104,15 @@ class CLASSIX:
     
     group_merging : str, {'density', 'distance'}, default='distance'
         The method for merging the groups. 
+        
         - 'density': two groups are merged if the density of data points in their intersection 
            is at least as high the smaller density of both groups. This option uses the disjoint 
            set structure to speedup agglomerate.
+        
         - 'distance': two groups are merged if the distance of their starting points is at 
            most scale*radius (the parameter above). This option uses the disjoint 
            set structure to speedup agglomerate.
+        
         For more details, we refer to [1].
     
     minPts : int, default=0
@@ -304,13 +311,13 @@ class CLASSIX:
         self.clean_index = np.full(self.data.shape[0], True) # claim clean data indices
         # clustering
         self.labels_ = self.clustering(
-            data=self.data, 
-            agg_labels=self.agg_labels, 
-            splist=self.splist, 
-            sorting=self.sorting, 
-            radius=self.radius, 
-            method=self.group_merging, # eta=self.eta, distance_scale=self.distance_scale, 
-            minPts=self.minPts # percent=self.noise_percent, noise_scale=self.noise_scale,
+                            data=self.data, 
+                            agg_labels=self.agg_labels, 
+                            splist=self.splist, 
+                            sorting=self.sorting, 
+                            radius=self.radius, 
+                            method=self.group_merging, # eta=self.eta, distance_scale=self.distance_scale, 
+                            minPts=self.minPts # percent=self.noise_percent, noise_scale=self.noise_scale,
         ) 
         return self
 
@@ -756,11 +763,15 @@ class CLASSIX:
         replace_name : str or list (optional)
             Replace the index with name. 
             * For example: as for indices 1 and 1300 we have 
-            >>> classix.explain(1, 1300, showsplist=True, plot=False, figstyle="seaborn") # or classix.explain(obj1, obj4)
+            
+            ``classix.explain(1, 1300, plot=False, figstyle="seaborn") # or classix.explain(obj1, obj4)``
+            
             The data point 1 is in group 9 and the data point 1300 is in group 8, both of which were merged into cluster #0. 
             These two groups are connected via groups 9 -> 2 -> 8.
             * if we specify the replace name, then the output will be
-            >>> classix.explain(1, 1300, showsplist=False, replace_name=["Peter Meyer", "Anna Fields"], plot=False, figstyle="seaborn")
+            
+            ``classix.explain(1, 1300, replace_name=["Peter Meyer", "Anna Fields"], figstyle="seaborn")``
+            
             The data point Peter Meyer is in group 9 and the data point Anna Fields is in group 8, both of which were merged into cluster #0. 
             These two groups are connected via groups 9 -> 2 -> 8.
 

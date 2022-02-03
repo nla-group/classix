@@ -14,10 +14,11 @@ Guide
    :maxdepth: 2
    
    quickstart
+   comparison
    clustering_tutorial
    explainable_clustering
    outlier_detection
-   license
+   
 
 API Reference
 -------------
@@ -28,6 +29,16 @@ API Reference
    agg_parameters
    mg_parameters
 
+
+Others
+-------------
+.. toctree::
+   :maxdepth: 2
+   
+   contact
+   acknowledgement
+   license
+   
 
 Indices and Tables
 ==================

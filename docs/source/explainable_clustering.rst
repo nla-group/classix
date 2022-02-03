@@ -70,6 +70,7 @@ Following the previous steps, we can analyze the specific data by refering to th
 Output:
 
 .. parsed-literal::
+
     The data point is in group 2, which has been merged into cluster #0.
 .. image:: images/None0.png
 
@@ -82,6 +83,7 @@ We give two examples to compare the data pair cluster assignment as follows.
     clx.explain(0, 2000,  plot=True, savefig=True, fmt='png')
 
 .. parsed-literal::
+
     The data point 0 is in group 2, which has been merged into cluster 0.
     The data point 2000 is in group 10, which has been merged into cluster 1.
     There is no path of overlapping groups between these clusters.
@@ -131,6 +133,7 @@ Then, we employ classix model to train the data and record the timing:
     print("consume time:", et - st)
 
 .. parsed-literal::
+
     CLASSIX(sorting='pca', radius=1, minPts=0, group_merging='distance')
     The 2028780 data points were aggregated into 36 groups.
     In total 3920623 comparisons were required (1.93 comparisons per data point). 
@@ -144,6 +147,7 @@ Then, we employ classix model to train the data and record the timing:
 
 If you set radius to 0.5, you can get the output:
 .. parsed-literal::
+
     CLASSIX(sorting='pca', radius=0.5, minPts=0, group_merging='distance')
     The 2028780 data points were aggregated into 93 groups.
     In total 6252385 comparisons were required (3.08 comparisons per data point). 
@@ -178,6 +182,7 @@ setting ``sp_fontsize`` larger or change the shape by tunning appropriate value 
 .. image:: images/kamil_explain_viz.png
 
 .. parsed-literal::
+
     A clustering of 2028780 data points with 2 features has been performed. 
     The radius parameter was set to 1.00 and MinPts was set to 0. 
     As the provided data has been scaled by a factor of 1/2.46,
@@ -234,11 +239,13 @@ We can see most of data objects are allocated to groups 26~33, which correspond 
 Then to track or compare any data by indexing, you can enter like
 
 .. code:: python
+
     clx.explain(14940, 16943,  plot=True, savefig=True, sp_fontsize=10)
 
 .. image:: images/kamil_14940_16943.png
 
 .. parsed-literal::
+
     The data point 14940 is in group 7, which has been merged into cluster 1.
     The data point 16943 is in group 11, which has been merged into cluster 3.
     There is no path of overlapping groups between these clusters.

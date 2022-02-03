@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clustering Parameters &mdash; CLASSIX 0.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/_.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Aggregation Parameters" href="agg_parameters.html" />
-    <link rel="prev" title="License" href="license.html" /> 
+    <link rel="prev" title="Outlier Detection" href="outlier_detection.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -39,15 +39,20 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Get Started with CLASSIX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Performance Comparison</a></li>
 <li class="toctree-l1"><a class="reference internal" href="clustering_tutorial.html">Clustering Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="explainable_clustering.html">Explainable Clustering</a></li>
 <li class="toctree-l1"><a class="reference internal" href="outlier_detection.html">Outlier Detection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Clustering Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="agg_parameters.html">Aggregation Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mg_parameters.html">Merging Parameters</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgement.html">Acknowledgement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 
         </div>
@@ -84,23 +89,26 @@
 <p>The user only need to concern the hyperparameters of <a href="#id1"><span class="problematic" id="id2">``</span></a>sorting’’, <a href="#id3"><span class="problematic" id="id4">``</span></a>radius’’, and <a href="#id5"><span class="problematic" id="id6">``</span></a>minPts’’ in the most cases.
 If want a flexible clustering, might consider other hyperparameters such as <a href="#id7"><span class="problematic" id="id8">``</span></a>group_merging’’, <a href="#id9"><span class="problematic" id="id10">``</span></a>scale’’, and <a href="#id11"><span class="problematic" id="id12">``</span></a>post_alloc’’.</p>
 <dl>
-<dt>sorting<span class="classifier">str, {‘pca’, ‘norm-mean’, ‘norm-orthant’, None}，default=’pca’</span></dt><dd><p>Sorting method used for the aggregation phase.
-- ‘pca’: sort data points by their first principal component
-- ‘norm-mean’: shift data to have zero mean and then sort by 2-norm values
-- ‘norm-orthant’: shift data to positive orthant and then sort by 2-norm values
-- None: aggregate the raw data without any sorting</p>
+<dt>sorting<span class="classifier">str, {‘pca’, ‘norm-mean’, ‘norm-orthant’, None}，default=’pca’</span></dt><dd><p>Sorting method used for the aggregation phase.</p>
+<ul class="simple">
+<li><p>‘pca’: sort data points by their first principal component</p></li>
+<li><p>‘norm-mean’: shift data to have zero mean and then sort by 2-norm values</p></li>
+<li><p>‘norm-orthant’: shift data to positive orthant and then sort by 2-norm values</p></li>
+<li><p>None: aggregate the raw data without any sorting</p></li>
+</ul>
 </dd>
 <dt>radius<span class="classifier">float, default=0.5</span></dt><dd><p>Tolerance to control the aggregation. If the distance between a starting point 
 and an object is less than or equal to the tolerance, the object will be allocated 
 to the group which the starting point belongs to. For details, we refer users to [1].</p>
 </dd>
-<dt>group_merging<span class="classifier">str, {‘density’, ‘distance’}, default=’distance’</span></dt><dd><p>The method for merging the groups. 
-- ‘density’: two groups are merged if the density of data points in their intersection</p>
-<blockquote>
-<div><p>is at least as high the smaller density of both groups. This option uses the disjoint 
-set structure to speedup agglomerate.</p>
-</div></blockquote>
+<dt>group_merging<span class="classifier">str, {‘density’, ‘distance’}, default=’distance’</span></dt><dd><p>The method for merging the groups.</p>
 <ul class="simple">
+<li><dl class="simple">
+<dt>‘density’: two groups are merged if the density of data points in their intersection </dt><dd><p>is at least as high the smaller density of both groups. This option uses the disjoint 
+set structure to speedup agglomerate.</p>
+</dd>
+</dl>
+</li>
 <li><dl class="simple">
 <dt>‘distance’: two groups are merged if the distance of their starting points is at </dt><dd><p>most scale*radius (the parameter above). This option uses the disjoint 
 set structure to speedup agglomerate.</p>
@@ -203,7 +211,7 @@ When assgin it 0, algorithm won’t check noises.</p>
 [-] clusters (made up of groups)</p>
 </dd>
 </dl>
-<dl class="simple">
+<dl>
 <dt>index1<span class="classifier">int or numpy.ndarray (optional)</span></dt><dd><p>Input object1 [with index ‘index1’] for explanation.</p>
 </dd>
 <dt>index2<span class="classifier">int or numpy.ndarray (optional)</span></dt><dd><p>Input object2 [with index ‘index2’] for explanation, and compare objects [with indices ‘index1’ and ‘index2’].</p>
@@ -215,13 +223,13 @@ Default as True.</p>
 <dt>max_colwidth<span class="classifier">int (optional)</span></dt><dd><p>Max width to truncate each column in characters. By default, no limit.</p>
 </dd>
 <dt>replace_name<span class="classifier">str or list (optional)</span></dt><dd><p>Replace the index with name. 
-* For example: as for indices 1 and 1300 we have 
-&gt;&gt;&gt; classix.explain(1, 1300, showsplist=True, plot=False, figstyle=”seaborn”) # or classix.explain(obj1, obj4)
-The data point 1 is in group 9 and the data point 1300 is in group 8, both of which were merged into cluster #0. 
+* For example: as for indices 1 and 1300 we have</p>
+<p><code class="docutils literal notranslate"><span class="pre">classix.explain(1,</span> <span class="pre">1300,</span> <span class="pre">plot=False,</span> <span class="pre">figstyle=&quot;seaborn&quot;)</span> <span class="pre">#</span> <span class="pre">or</span> <span class="pre">classix.explain(obj1,</span> <span class="pre">obj4)</span></code></p>
+<p>The data point 1 is in group 9 and the data point 1300 is in group 8, both of which were merged into cluster #0. 
 These two groups are connected via groups 9 -&gt; 2 -&gt; 8.
-* if we specify the replace name, then the output will be
-&gt;&gt;&gt; classix.explain(1, 1300, showsplist=False, replace_name=[“Peter Meyer”, “Anna Fields”], plot=False, figstyle=”seaborn”)
-The data point Peter Meyer is in group 9 and the data point Anna Fields is in group 8, both of which were merged into cluster #0. 
+* if we specify the replace name, then the output will be</p>
+<p><code class="docutils literal notranslate"><span class="pre">classix.explain(1,</span> <span class="pre">1300,</span> <span class="pre">replace_name=[&quot;Peter</span> <span class="pre">Meyer&quot;,</span> <span class="pre">&quot;Anna</span> <span class="pre">Fields&quot;],</span> <span class="pre">figstyle=&quot;seaborn&quot;)</span></code></p>
+<p>The data point Peter Meyer is in group 9 and the data point Anna Fields is in group 8, both of which were merged into cluster #0. 
 These two groups are connected via groups 9 -&gt; 2 -&gt; 8.</p>
 </dd>
 <dt>plot<span class="classifier">boolean</span></dt><dd><p>Determine if visulize the explaination. Default as False.</p>
@@ -335,7 +343,7 @@ see reference: <a class="reference external" href="https://matplotlib.org/stable
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="license.html" class="btn btn-neutral float-left" title="License" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="outlier_detection.html" class="btn btn-neutral float-left" title="Outlier Detection" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="agg_parameters.html" class="btn btn-neutral float-right" title="Aggregation Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

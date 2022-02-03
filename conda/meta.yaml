@@ -1,11 +1,11 @@
 package:
   name: classix
-  version: 0.0.3
+  version: 0.0.5
 
 source:
-  fn: ClassixClustering-0.2.7.tar.gz
-  url: https://files.pythonhosted.org/packages/f5/e6/aa65b6bc0f73782af2aa72ab2bb7415010499c512750174bc69ae2366bf2/ClassixClustering-0.2.7.tar.gz
-  sha256: 3de629f1a8a034cce216ac018e7b947227815b282ad4a9f9102071ab4dfedc65
+  fn: ClassixClustering-0.2.8.tar.gz
+  url: https://files.pythonhosted.org/packages/84/54/541a8093420c5860906daa5ceec61faf92957225dbf2ba66920b1bdcf874/ClassixClustering-0.2.8.tar.gz
+  sha256: ff181f8a51b176754a75082956167d7d0927bb505eb3f61cd2ad200d1d6a7134
 
 requirements:
   host:
@@ -18,6 +18,7 @@ requirements:
     - matplotlib
 
   build:
+    - pip
     - python
     - pandas
     - numpy >=1.20.0

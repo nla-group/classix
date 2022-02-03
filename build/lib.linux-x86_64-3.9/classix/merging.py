@@ -55,9 +55,11 @@ def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
 
     method : str, default='distance'
         Method for group merging, Available options are:
+        
         - 'density': two groups are merged if the density of data points in their intersection 
            is at least as high the smaller density of both groups. This option uses the disjoint 
            set structure to speedup agglomerate.
+           
         - 'distance': two groups are merged if the distance of their starting points is at 
            most scale*radius (the parameter above). This option uses the disjoint 
            set structure to speedup agglomerate.
