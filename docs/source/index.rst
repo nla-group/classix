@@ -31,7 +31,9 @@ API Reference
 
 Contact
 -------------
-license
+.. toctree::
+   :maxdepth: 2
+   license
 
 Indices and Tables
 ==================
