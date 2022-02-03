@@ -21,6 +21,8 @@ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here ar
 - Full reproducibility of all tests in the accompanying paper.
 - Support of Cython compilation.
 
+<video src='https://www.youtube.com/watch?v=Zj4echgrfmo' width=180/>
+
 The detailed documentation, including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/)
 
 ``CLASSIX`` is a contrived acronym of ``CLustering by Aggregation with Sorting-based Indexing`` and the letter ``X`` for ``explainability``. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter for the aggregation and another parameter controlling the minimal cluster size. 
