@@ -32,11 +32,11 @@ CLASSIX requires the following essential dependencies for clustering:
 - cython>=0.29.4
 - numpy>=1.20.0
 - scipy>1.6.0
+- requests
 
 while requires the following dependencies for data visualization:
 
 - matplotlib
-- scikit-learn
 
 To install the current release via PIP use:
 ```
