@@ -41,7 +41,13 @@ while requires the following dependencies for data visualization:
 
 To install the current release via PIP use:
 ```
-$ pip install ClassixClustering
+pip install ClassixClustering
+```
+
+For conda environment, to install this package with conda run:
+
+```
+conda install -c nla.stefan.xinye classix
 ```
 
 Download this repository via:
