@@ -37,7 +37,7 @@ class TestClassix(unittest.TestCase):
             clx.fit_transform(vdu_signals)
             
             # version 0.2.7
-            np.save('classix/data/checkpoint_distance_' + str(np.round(tol,2)) + '.npy', clx.labels_) 
+            # np.save('classix/data/checkpoint_distance_' + str(np.round(tol,2)) + '.npy', clx.labels_) 
             
             # test new version
             checkpoint = np.load('classix/data/checkpoint_distance_' + str(np.round(tol,2)) + '.npy')
@@ -52,7 +52,7 @@ class TestClassix(unittest.TestCase):
             clx.fit_transform(vdu_signals)
             
             # version 0.2.7
-            np.save('classix/data/checkpoint_density_' + str(np.round(tol,2)) + '.npy', clx.labels_) 
+            # np.save('classix/data/checkpoint_density_' + str(np.round(tol,2)) + '.npy', clx.labels_) 
             
             # test new version
             checkpoint = np.load('classix/data/checkpoint_density_' + str(np.round(tol,2)) + '.npy')
