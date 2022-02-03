@@ -10,7 +10,7 @@ import pandas as pd
 import seaborn as sns
 from numpy.linalg import norm
 from src.aggregation_test import aggregate
-from src.clustering import CLASSIX
+from classix import CLASSIX
 from quickshift.QuickshiftPP import *
 from sklearn import metrics
 import matplotlib.pyplot as plt
