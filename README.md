@@ -21,7 +21,7 @@ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here ar
 - Full reproducibility of all tests in the accompanying paper.
 - Support of Cython compilation.
 
-<video src='https://www.youtube.com/watch?v=Zj4echgrfmo' width=180/>
+[![Watch this simple tutorial video](https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png)](https://www.youtube.com/watch?v=Zj4echgrfmo)
 
 The detailed documentation, including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/)
 
