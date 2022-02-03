@@ -1,3 +1,4 @@
+requests
 cython>=0.29.4
 numpy>=1.20.0
 scipy>1.6.0
