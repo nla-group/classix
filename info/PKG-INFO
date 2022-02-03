@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ClassixClustering
-Version: 0.2.2
+Version: 0.2.6
 Summary: Fast and explainable clustering based on sorting
 Home-page: https://github.com/nla-group/CLASSIX.git
 Author: Stefan Guettel, Xinye Chen
@@ -55,11 +55,11 @@ CLASSIX requires the following essential dependencies for clustering:
 - cython>=0.29.4
 - numpy>=1.20.0
 - scipy>1.6.0
+- requests
 
 while requires the following dependencies for data visualization:
 
 - matplotlib
-- scikit-learn
 
 To install the current release via PIP use:
 ```

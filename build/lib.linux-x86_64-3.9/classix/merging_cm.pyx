@@ -35,7 +35,7 @@ cimport cython
 import numpy as np
 cimport numpy as np
 from scipy.special import betainc, gamma
-from sklearn.metrics import pairwise_distances
+# from sklearn.metrics import pairwise_distances
 from scipy.sparse import csr_matrix, _sparsetools
 from scipy.sparse.csgraph import connected_components
 ctypedef np.uint8_t uint8
@@ -162,22 +162,22 @@ cpdef merge(s1, s2):
 
         
 # Strongly connected components finding algorithm 
-cpdef scc_agglomerate(np.ndarray[np.float64_t, ndim=2] splist, double radius=0.5, double scale=1.5, int n_jobs=-1): # limited to distance-based method
-    cdef list index_set = list()
-
-    cdef np.ndarray[long, ndim=2] distm = (
-        pairwise_distances(splist[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs) <= radius*scale
-    ).astype(int)
-    
-    cdef int n_components
-    cdef np.ndarray[int, ndim=1] labels
-    cdef list labels_set = list()
-    n_components, labels = connected_components(csgraph=csr_matrix(distm), directed=False, return_labels=True)
-    
-    cdef int lab, i
-    for lab in np.unique(labels):
-        labels_set.append([i for i in range(len(labels)) if labels[i] == lab])
-    return labels_set
+# cpdef scc_agglomerate(np.ndarray[np.float64_t, ndim=2] splist, double radius=0.5, double scale=1.5, int n_jobs=-1): # limited to distance-based method
+#     cdef list index_set = list()
+# 
+#     cdef np.ndarray[long, ndim=2] distm = (
+#         pairwise_distances(splist[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs) <= radius*scale
+#     ).astype(int)
+#     
+#     cdef int n_components
+#     cdef np.ndarray[int, ndim=1] labels
+#     cdef list labels_set = list()
+#     n_components, labels = connected_components(csgraph=csr_matrix(distm), directed=False, return_labels=True)
+#     
+#     cdef int lab, i
+#     for lab in np.unique(labels):
+#         labels_set.append([i for i in range(len(labels)) if labels[i] == lab])
+#     return labels_set
 
 
 

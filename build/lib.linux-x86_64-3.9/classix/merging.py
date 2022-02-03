@@ -30,7 +30,7 @@
 import numpy as np
 # from tqdm import tqdm 
 from scipy.special import betainc, gamma
-from sklearn.metrics import pairwise_distances
+# from sklearn.metrics import pairwise_distances # for scc algorithm
 from scipy.sparse.csgraph import connected_components
 from scipy.sparse import csr_matrix, _sparsetools
 # from scipy.sparse.csgraph import minimum_spanning_tree
@@ -113,42 +113,42 @@ def fast_agglomerate(data, splist, radius, method="distance", scale=1.5):
 
 
 
-def scc_agglomerate(splist, radius=0.5, scale=1.5, n_jobs=-1): # limited to distance-based method
-    """
-    Implement CLASSIX's merging with strongly connected components finding algorithm in undirected graph.
-    """
+# def scc_agglomerate(splist, radius=0.5, scale=1.5, n_jobs=-1): # limited to distance-based method
+#     """
+#     Implement CLASSIX's merging with strongly connected components finding algorithm in undirected graph.
+#     """
+# 
+#     distm = pairwise_distances(splist[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs)
+#     index_set = []
+#     distm = (distm <= radius*scale).astype(int)
+# 
+#     n_components, labels = connected_components(csgraph=csr_matrix(distm), directed=False, return_labels=True)
+#     labels_set = list()
+#     for i in np.unique(labels):
+#         labels_set.append(np.where(labels == i)[0].tolist())
+#     return labels_set
 
-    distm = pairwise_distances(splist[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs)
-    index_set = []
-    distm = (distm <= radius*scale).astype(int)
-
-    n_components, labels = connected_components(csgraph=csr_matrix(distm), directed=False, return_labels=True)
-    labels_set = list()
-    for i in np.unique(labels):
-        labels_set.append(np.where(labels == i)[0].tolist())
-    return labels_set
 
 
-
-def minimum_spanning_tree_agglomerate(splist, radius=0.5, scale=1.5):
-    """
-    Implement CLASSIX's merging with minimum spanning tree clustering.
-    """
-    # distm = pairwise_distances(splist[:,3:], Y=None, metric='euclidean', n_jobs=-1)
-    # min_span = minimum_spanning_tree(csr_matrix(distm))
-    # print(min_span)
-    # min_span = csr_matrix((min_span.todense()<=radius*scale).astype(int))
-    # link_list = [list(pair)for pair in csr_matrix_indices(min_span)]
-    # return link_list
-    from mst_clustering import MSTClustering
-
-    # predict the labels with the MST algorithm
-    model = MSTClustering(cutoff_scale=radius*scale)
-    labels = model.fit_predict(splist[:, 3:])
-    labels_set = list()
-    for i in np.unique(labels):
-        labels_set.append(np.where(labels == i)[0].tolist())
-    return labels_set
+# def minimum_spanning_tree_agglomerate(splist, radius=0.5, scale=1.5):
+#     """
+#     Implement CLASSIX's merging with minimum spanning tree clustering.
+#     """
+#     # distm = pairwise_distances(splist[:,3:], Y=None, metric='euclidean', n_jobs=-1)
+#     # min_span = minimum_spanning_tree(csr_matrix(distm))
+#     # print(min_span)
+#     # min_span = csr_matrix((min_span.todense()<=radius*scale).astype(int))
+#     # link_list = [list(pair)for pair in csr_matrix_indices(min_span)]
+#     # return link_list
+#     from mst_clustering import MSTClustering
+# 
+#     # predict the labels with the MST algorithm
+#     model = MSTClustering(cutoff_scale=radius*scale)
+#     labels = model.fit_predict(splist[:, 3:])
+#     labels_set = list()
+#     for i in np.unique(labels):
+#         labels_set.append(np.where(labels == i)[0].tolist())
+#     return labels_set
 
 
 
