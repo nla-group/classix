@@ -21,7 +21,6 @@ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here ar
 - Full reproducibility of all tests in the accompanying paper.
 - Support of Cython compilation.
 
-[![Watch this simple tutorial video](https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png)](https://www.youtube.com/watch?v=Zj4echgrfmo)
 
 The detailed documentation, including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/)
 
@@ -147,6 +146,9 @@ The data point 2000 is in group 10, which has been merged into cluster 1.
 There is no path of overlapping groups between these clusters.
 ```
 
+
+You can watch this quick tutorial with vivid explanation before starting:
+[![Watch this simple tutorial video](https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png)](https://www.youtube.com/watch?v=Zj4echgrfmo)
 
 
 ## Citation
