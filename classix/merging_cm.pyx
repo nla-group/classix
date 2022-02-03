@@ -225,89 +225,89 @@ cpdef merge(s1, s2):
 
 
 # Deprecated function
-cpdef agglomerate_trivial(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.float64_t, ndim=2] splist, double radius, str method="distance", double scale=1.5):
-    cdef list connected_pairs = list()
-    cdef double volume, den1, den2, cid
-    cdef unsigned int i, j, internum
-    cdef np.ndarray[np.float64_t, ndim=2] neigbor_sp
-    cdef np.ndarray[long, ndim=1] select_stps
-    cdef np.ndarray[np.npy_bool, ndim=1, cast=True] index_overlap, c1, c2
-    if method == "density":
-        volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1) + np.finfo(float).eps
-    else:
-        volume = 0.0 # no need for distance-based method
+# cpdef agglomerate_trivial(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.float64_t, ndim=2] splist, double radius, str method="distance", double scale=1.5):
+#     cdef list connected_pairs = list()
+#     cdef double volume, den1, den2, cid
+#     cdef unsigned int i, j, internum
+#     cdef np.ndarray[np.float64_t, ndim=2] neigbor_sp
+#     cdef np.ndarray[long, ndim=1] select_stps
+#     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] index_overlap, c1, c2
+#     if method == "density":
+#         volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1) + np.finfo(float).eps
+#     else:
+#         volume = 0.0 # no need for distance-based method
+#     
+#     for i in range(splist.shape[0]):
+#         sp1 = splist[i, 3:]
+#         neigbor_sp = splist[i+1:, 3:]
+#         
+#         select_stps = np.arange(i+1, splist.shape[0], dtype=int)
+#         sort_vals = splist[i:, 1]
+#         
+#         if method == "density":
+#             index_overlap = np.linalg.norm(neigbor_sp[:,2:] - sp1, ord=2, axis=-1) <= 2*radius 
+#             select_stps = select_stps[index_overlap]
+#             if not np.any(index_overlap):
+#                 continue
+#             # neigbor_sp = neigbor_sp[index_overlap]
+#             c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
+#             den1 = np.count_nonzero(c1) / volume
+#             for j in select_stps:
+#                 sp2 = splist[j, 3:]
+#                 c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
+#                 den2 = np.count_nonzero(c2) / volume
+#                 if check_if_overlap(sp1, sp2, radius=radius): 
+#                     internum = np.count_nonzero(c1 & c2)
+#                     cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
+#                     if cid >= den1 or cid >= den2: 
+#                         connected_pairs.append([i, j])
+#         else:
+#             index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  
+#             select_stps = select_stps[index_overlap]
+#             if not np.any(index_overlap):
+#                 continue
+# 
+#             # neigbor_sp = neigbor_sp[index_overlap] 
+#             for j in select_stps:
+#                 connected_pairs.append([i, j])
+#     return connected_pairs
+
+
+
+# cpdef merge_pairs_dr(list pairs):
+#     """Transform connected pairs to connected groups (list)"""
+#     
+#     cdef unsigned int len_p = len(pairs)
+#     cdef unsigned int maxid = 0
+#     cdef long long[:] ulabels = np.full(len_p, -1, dtype=int)
+#     cdef list labels = list()
+#     cdef list sub = list()
+#     cdef list com = list()
+#     cdef Py_ssize_t i, j, ind
     
-    for i in range(splist.shape[0]):
-        sp1 = splist[i, 3:]
-        neigbor_sp = splist[i+1:, 3:]
-        
-        select_stps = np.arange(i+1, splist.shape[0], dtype=int)
-        sort_vals = splist[i:, 1]
-        
-        if method == "density":
-            index_overlap = np.linalg.norm(neigbor_sp[:,2:] - sp1, ord=2, axis=-1) <= 2*radius 
-            select_stps = select_stps[index_overlap]
-            if not np.any(index_overlap):
-                continue
-            # neigbor_sp = neigbor_sp[index_overlap]
-            c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
-            den1 = np.count_nonzero(c1) / volume
-            for j in select_stps:
-                sp2 = splist[j, 3:]
-                c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
-                den2 = np.count_nonzero(c2) / volume
-                if check_if_overlap(sp1, sp2, radius=radius): 
-                    internum = np.count_nonzero(c1 & c2)
-                    cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
-                    if cid >= den1 or cid >= den2: 
-                        connected_pairs.append([i, j])
-        else:
-            index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  
-            select_stps = select_stps[index_overlap]
-            if not np.any(index_overlap):
-                continue
-
-            # neigbor_sp = neigbor_sp[index_overlap] 
-            for j in select_stps:
-                connected_pairs.append([i, j])
-    return connected_pairs
-
-
-
-cpdef merge_pairs_dr(list pairs):
-    """Transform connected pairs to connected groups (list)"""
-    
-    cdef unsigned int len_p = len(pairs)
-    cdef unsigned int maxid = 0
-    cdef long long[:] ulabels = np.full(len_p, -1, dtype=int)
-    cdef list labels = list()
-    cdef list sub = list()
-    cdef list com = list()
-    cdef Py_ssize_t i, j, ind
-    
-    for i in range(len_p):
-        if ulabels[i] == -1:
-            sub = pairs[i]
-            ulabels[i] = maxid
-
-            for j in range(i+1, len_p):
-                com = pairs[j]
-                if not set(sub).isdisjoint(com):
-                    sub = sub + com
-                    if ulabels[j] == -1:
-                        ulabels[j] = maxid
-                    else:
-                        for ind in range(len_p):
-                            if ulabels[ind] == maxid:
-                                ulabels[ind] = ulabels[j]
-            maxid = maxid + 1
-    
-    for i in np.unique(ulabels):
-        sub = list()
-        for j in [ind for ind in range(len_p) if ulabels[ind] == i]:
-            sub = sub + pairs[int(j)]
-        labels.append(list(set(sub)))
-    return labels
+#     for i in range(len_p):
+#         if ulabels[i] == -1:
+#             sub = pairs[i]
+#             ulabels[i] = maxid
+# 
+#             for j in range(i+1, len_p):
+#                 com = pairs[j]
+#                 if not set(sub).isdisjoint(com):
+#                     sub = sub + com
+#                     if ulabels[j] == -1:
+#                         ulabels[j] = maxid
+#                     else:
+#                         for ind in range(len_p):
+#                             if ulabels[ind] == maxid:
+#                                 ulabels[ind] = ulabels[j]
+#             maxid = maxid + 1
+#     
+#     for i in np.unique(ulabels):
+#         sub = list()
+#         for j in [ind for ind in range(len_p) if ulabels[ind] == i]:
+#             sub = sub + pairs[int(j)]
+#         labels.append(list(set(sub)))
+#     return labels
 
 
 
