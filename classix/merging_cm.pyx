@@ -203,7 +203,49 @@ cpdef merge(s1, s2):
 
 
 
-        
+cpdef check_if_overlap(double[:] starting_point, double[:] spo, double radius, int scale = 1):
+    """Check if two groups formed by aggregation overlap
+    """
+    cdef Py_ssize_t dim
+    cdef double[:] subs = starting_point.copy()
+    for dim in range(starting_point.shape[0]):
+        subs[dim] = starting_point[dim] - spo[dim]
+    return np.linalg.norm(subs, ord=2, axis=-1) <= 2 * scale * radius
+
+
+    
+
+cpdef cal_inter_density(double[:] starting_point, double[:] spo, double radius, int num):
+    """Calculate the density of intersection (lens)
+    """
+    cdef double in_volume = cal_inter_volume(starting_point, spo, radius)
+    return num / in_volume
+
+
+
+
+cpdef cal_inter_volume(double[:] starting_point, double[:] spo, double radius):
+    """
+    Returns the volume of the intersection of two spheres in n-dimensional space.
+    The radius of the two spheres is r and the distance of their centers is d.
+    For d=0 the function returns the volume of full sphere.
+    Reference: https://math.stackexchange.com/questions/162250/how-to-compute-the-volume-of-intersection-between-two-hyperspheres
+
+    """
+    
+    cdef Py_ssize_t dim
+    cdef unsigned int fdim = starting_point.shape[0]
+    cdef double[:] subs = starting_point.copy()
+    for dim in range(fdim):
+        subs[dim] = starting_point[dim] - spo[dim]
+    cdef double dist = np.linalg.norm(subs, ord=2, axis=-1) # the distance between the two groups
+    if dist > 2*radius:
+        return 0
+    cdef double c = dist / 2
+    return np.pi**(fdim/2)/gamma(fdim/2 + 1)*(radius**fdim)*betainc((fdim + 1)/2, 1/2, 1 - c**2/radius**2) + np.finfo(float).eps
+
+
+
 # Strongly connected components finding algorithm 
 # cpdef scc_agglomerate(np.ndarray[np.float64_t, ndim=2] splist, double radius=0.5, double scale=1.5, int n_jobs=-1): # limited to distance-based method
 #     cdef list index_set = list()
@@ -312,9 +354,6 @@ cpdef merge(s1, s2):
 
 
 
-
-        
-
 # cpdef merge_pairs(list pairs):
 #     """Transform connected pairs to connected groups (list)"""
 #     
@@ -365,50 +404,3 @@ cpdef merge(s1, s2):
 # cpdef check_if_intersect(list g1, list g2):
 #     """Check if two list have the same elements."""
 #     return not set(g1).isdisjoint(g2) # set(g1).intersection(g2) != set()
-
-
-
-cpdef check_if_overlap(double[:] starting_point, double[:] spo, double radius, int scale = 1):
-    """Check if two groups formed by aggregation overlap
-    """
-    cdef Py_ssize_t dim
-    cdef double[:] subs = starting_point.copy()
-    for dim in range(starting_point.shape[0]):
-        subs[dim] = starting_point[dim] - spo[dim]
-    return np.linalg.norm(subs, ord=2, axis=-1) <= 2 * scale * radius
-
-
-    
-
-cpdef cal_inter_density(double[:] starting_point, double[:] spo, double radius, int num):
-    """Calculate the density of intersection (lens)
-    """
-    cdef double in_volume = cal_inter_volume(starting_point, spo, radius)
-    return num / in_volume
-
-
-
-
-cpdef cal_inter_volume(double[:] starting_point, double[:] spo, double radius):
-    """
-    Returns the volume of the intersection of two spheres in n-dimensional space.
-    The radius of the two spheres is r and the distance of their centers is d.
-    For d=0 the function returns the volume of full sphere.
-    Reference: https://math.stackexchange.com/questions/162250/how-to-compute-the-volume-of-intersection-between-two-hyperspheres
-
-    """
-    
-    cdef Py_ssize_t dim
-    cdef unsigned int fdim = starting_point.shape[0]
-    cdef double[:] subs = starting_point.copy()
-    for dim in range(fdim):
-        subs[dim] = starting_point[dim] - spo[dim]
-    cdef double dist = np.linalg.norm(subs, ord=2, axis=-1) # the distance between the two groups
-    if dist > 2*radius:
-        return 0
-    cdef double c = dist / 2
-    return np.pi**(fdim/2)/gamma(fdim/2 + 1)*(radius**fdim)*betainc((fdim + 1)/2, 1/2, 1 - c**2/radius**2) + np.finfo(float).eps
-
-
-
-
