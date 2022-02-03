@@ -33,6 +33,7 @@ Contact
 -------------
 .. toctree::
    :maxdepth: 2
+   
    license
 
 Indices and Tables
