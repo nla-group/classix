@@ -37,6 +37,7 @@ CLASSIX requires the following essential dependencies for clustering:
 while requires the following dependencies for data visualization:
 
 - matplotlib
+- pandas
 
 To install the current release via PIP use:
 ```
