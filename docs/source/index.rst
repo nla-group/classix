@@ -14,7 +14,7 @@ Guide
    :maxdepth: 2
    
    quickstart
-   comparison.rst
+   comparison
    clustering_tutorial
    explainable_clustering
    outlier_detection
