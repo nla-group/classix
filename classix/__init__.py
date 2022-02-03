@@ -8,3 +8,5 @@ except ModuleNotFoundError:
     
 from .clustering import CLASSIX
 from .clustering import load_data
+from .clustering import calculate_cluster_centers
+from .clustering import novel_normalization
