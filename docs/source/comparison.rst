@@ -1,2 +1,2 @@
-Performance comparison
-===================================
+Performance Comparison
+======================================
