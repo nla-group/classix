@@ -4,7 +4,7 @@ import pandas as pd
 import seaborn as sns
 from sklearn.datasets import make_moons
 from sklearn.datasets import make_blobs
-from src.clustering import CLASSIX
+from classix import CLASSIX
 import matplotlib.pyplot as plt
 import matplotlib
 np.random.seed(0)
