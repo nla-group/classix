@@ -1632,8 +1632,8 @@ class CLASSIX:
         if value <= 0:
             raise ValueError(
                 "Please feed an correct value (>0) for tolerance")
-        if value > 1:
-            warnings.warn("Might lead to bad aggregation", DeprecationWarning)
+        # if value > 1:
+        #     warnings.warn("Might lead to bad aggregation", DeprecationWarning)
         self._radius = value
     
     
@@ -1983,6 +1983,8 @@ def return_csr_matrix_indices(csr_matrix):
     indices = np.empty(len(length_range), dtype=csr_matrix.indices.dtype)
     _sparsetools.expandptr(shape_dim1, csr_matrix.indptr, indices)
     return np.array(list(zip(indices, length_range)))
+
+
 
 # deprecated (24/07/2021) -> for scipy shortest distance use
 # def get_shortest_path(predecessors, i, j):
