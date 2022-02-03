@@ -4,7 +4,7 @@ import hdbscan
 import numpy as np
 import pandas as pd
 from sklearn import metrics
-from src.clustering import CLASSIX
+from classix import CLASSIX
 from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
 from quickshift.QuickshiftPP import *
