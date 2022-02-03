@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn import metrics
 from sklearn.base import clone
 import matplotlib.pyplot as plt
-from src.clustering import CLASSIX
+from classix import CLASSIX
 from quickshift.QuickshiftPP import *
 from threadpoolctl import threadpool_limits
 from sklearn import cluster, datasets, mixture
