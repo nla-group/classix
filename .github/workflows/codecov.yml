@@ -20,7 +20,8 @@ jobs:
         pip install -r requirements.txt
         pip install pytest
         pip install pytest-cov
-        pytest runtest.py
+        pip install coverage
+        coverage run runtest.py
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
