@@ -47,26 +47,26 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
     Parameters
     ----------
     data : numpy.ndarray
-        the input that is array-like of shape (n_samples,).
+        The input that is array-like of shape (n_samples,).
 
     sorting : str
-        the sorting way refered for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
+        The sorting way refered for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
 
     tol : float
-        the tolerance to control the aggregation, if the distance between the starting point 
+        The tolerance to control the aggregation, if the distance between the starting point 
         and the object is less than or equal than the tolerance,
         the object should allocated to the group which starting point belongs to.  
 
     Returns
     -------
     labels (numpy.ndarray) : 
-        the group category of the data after aggregation
+        The group category of the data after aggregation.
     
     splist (list) : 
-        the list of the starting points
+        The list of the starting points.
     
     nr_dist (int) :
-        distance computation calculations
+        The number of pairwise distance calculations.
     """
     cdef Py_ssize_t fdim = data.shape[1] # feature dimension
     cdef Py_ssize_t len_ind = data.shape[0] # size of data

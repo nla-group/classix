@@ -25,3 +25,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 If you have any questions, be free to reach the software contributiors: Stefan Güttel (<stefan.guettel@manchester.ac.uk>), Xinye Chen (<xinye.chen@manchester.ac.uk>).
+
+We are grateful to Kamil Oster who provided us with the dataset used in the Appendix of the paper and also used in this tutorial.

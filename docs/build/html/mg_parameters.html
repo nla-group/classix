@@ -1,78 +1,42 @@
-
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-    <title>Merging Parameters &#8212; CLASSIX 0.0.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merging Parameters &mdash; CLASSIX 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Aggregation Parameters" href="agg_parameters.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="prev" title="Aggregation Parameters" href="agg_parameters.html" /> 
+</head>
 
-  </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-            
-  <section id="merging-parameters">
-<h1>Merging Parameters<a class="headerlink" href="#merging-parameters" title="Permalink to this headline">¶</a></h1>
-<p>This involves CLASSIX’s merging parameters.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="classix.agglomerate">
-<span class="sig-prename descclassname"><span class="pre">classix.</span></span><span class="sig-name descname"><span class="pre">agglomerate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'distance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classix.agglomerate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement CLASSIX’s merging with disjoint-set data structure, default choice for the merging.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="classix.merging.scc_agglomerate">
-<span class="sig-prename descclassname"><span class="pre">classix.merging.</span></span><span class="sig-name descname"><span class="pre">scc_agglomerate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">splist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classix.merging.scc_agglomerate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement CLASSIX’s merging with strongly connected components finding algorithm in undirected graph.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="classix.merging.minimum_spanning_tree_agglomerate">
-<span class="sig-prename descclassname"><span class="pre">classix.merging.</span></span><span class="sig-name descname"><span class="pre">minimum_spanning_tree_agglomerate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">splist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classix.merging.minimum_spanning_tree_agglomerate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement CLASSIX’s merging with minimum spanning tree clustering.</p>
-</dd></dl>
-
-</section>
-
-
-          </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">CLASSIX</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CLASSIX
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Get Started with CLASSIX</a></li>
 <li class="toctree-l1"><a class="reference internal" href="clustering_tutorial.html">Clustering Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="explainable_clustering.html">Explainable Clustering</a></li>
@@ -85,50 +49,104 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Merging Parameters</a></li>
 </ul>
 
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="agg_parameters.html" title="previous chapter">Aggregation Parameters</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2022, Stefan Güttel, Xinye Chen.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.2.0</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/mg_parameters.rst.txt"
-          rel="nofollow">Page source</a>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CLASSIX</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Merging Parameters</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/mg_parameters.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="merging-parameters">
+<h1>Merging Parameters<a class="headerlink" href="#merging-parameters" title="Permalink to this headline"></a></h1>
+<p>This involves CLASSIX’s merging parameters.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="classix.agglomerate">
+<span class="sig-prename descclassname"><span class="pre">classix.</span></span><span class="sig-name descname"><span class="pre">agglomerate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'distance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#classix.agglomerate" title="Permalink to this definition"></a></dt>
+<dd><p>Implement CLASSIX’s merging with disjoint-set data structure, default choice for the merging.</p>
+<dl>
+<dt>data<span class="classifier">numpy.ndarray</span></dt><dd><p>The input that is array-like of shape (n_samples,).</p>
+</dd>
+<dt>splist<span class="classifier">numpy.ndarray</span></dt><dd><p>List of starting points formed in the aggregation.</p>
+</dd>
+<dt>radius<span class="classifier">float</span></dt><dd><p>The tolerance to control the aggregation. If the distance between the starting point 
+of a group and another data point is less than or equal to the tolerance,
+the point is allocated to that group. For details, we refer users to [1].</p>
+</dd>
+<dt>method<span class="classifier">str, default=’distance’</span></dt><dd><p>Method for group merging, Available options are:
+- ‘density’: two groups are merged if the density of data points in their intersection</p>
+<blockquote>
+<div><p>is at least as high the smaller density of both groups. This option uses the disjoint 
+set structure to speedup agglomerate.</p>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt>‘distance’: two groups are merged if the distance of their starting points is at </dt><dd><p>most scale*radius (the parameter above). This option uses the disjoint 
+set structure to speedup agglomerate.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>scale<span class="classifier">float</span></dt><dd><p>Design for distance-clustering, when distance between the two starting points 
+associated with two distinct groups smaller than scale*radius, then the two groups merge.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>labels_set<span class="classifier">list</span></dt><dd><p>Connected components of graph with groups as vertices.</p>
+</dd>
+<dt>connected_pairs_store<span class="classifier">list</span></dt><dd><p>List for connected group labels.</p>
+</dd>
+</dl>
+<p>[1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="agg_parameters.html" class="btn btn-neutral float-left" title="Aggregation Parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
-    
+  <hr/>
 
-    
-  </body>
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Stefan Güttel, Xinye Chen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

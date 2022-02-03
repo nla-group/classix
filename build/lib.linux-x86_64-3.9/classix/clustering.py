@@ -96,7 +96,7 @@ class CLASSIX:
     radius : float, default=0.5
         Tolerance to control the aggregation. If the distance between a starting point 
         and an object is less than or equal to the tolerance, the object will be allocated 
-        to the group which the starting point belongs to. 
+        to the group which the starting point belongs to. For details, we refer users to [1].
     
     group_merging : str, {'density', 'distance'}, default='distance'
         The method for merging the groups. 
@@ -106,6 +106,7 @@ class CLASSIX:
         - 'distance': two groups are merged if the distance of their starting points is at 
            most scale*radius (the parameter above). This option uses the disjoint 
            set structure to speedup agglomerate.
+        For more details, we refer to [1].
     
     minPts : int, default=0
         Clusters with less than minPts points are classified as abnormal clusters.  
@@ -115,7 +116,7 @@ class CLASSIX:
     norm : boolean, default=True
         If normalize the data associated with the sorting, default as True. 
         
-    scale : double
+    scale : float
         Design for distance-clustering, when distance between the two starting points 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
 
@@ -138,7 +139,7 @@ class CLASSIX:
         Groups labels of aggregation.
     
     splist : numpy.ndarray
-        List formed in the aggregation storing starting points.
+        List of starting points formed in the aggregation.
         
     labels_ : list
         Clustering class labels for data objects 
@@ -171,6 +172,9 @@ class CLASSIX:
         The indices index1 and index2 are optional parameters (int) corresponding to the 
         indices of the data points. 
         
+    References
+    ----------
+    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
     """
         
     # deprecated descriptions
@@ -1365,8 +1369,8 @@ class CLASSIX:
                     else:
                         plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), fontsize=fontsize, bbox=bbox)
             plt.axis(axis) # the axis here may not be consistent, so hide.
-            plt.xlim([np.min(self.s_pca[:,0])-0.1, np.max(self.s_pca[:,0])+0.1])
-            plt.ylim([np.min(self.s_pca[:,1])-0.1, np.max(self.s_pca[:,1])+0.1])
+            plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
+            plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
         else:
             print("Visualization is restricted to multidimensional (dimension greater than or equal to 2) data.")
             
@@ -1661,9 +1665,10 @@ class CLASSIX:
     def group_merging(self, value):
         if not isinstance(value, str):
             raise TypeError('Expected a string type')
-        if value not in ['density', 'distance', 'mst-distance', 'scc-distance', 'trivial-distance', 'trivial-density']:
+        if value not in ['density', 'distance']: # 'mst-distance', 'scc-distance', 'trivial-distance', 'trivial-density'
             raise ValueError(
-                "Please refer to an correct sorting way, namely 'density', 'distance', 'scc-distance' and 'mst-distance'")
+                "Please refer to an correct sorting way, namely 'density' and 'distance'"
+                ) # 'scc-distance' and 'mst-distance'
         self._group_merging = value
         
 

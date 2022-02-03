@@ -3,12 +3,8 @@ Get Started with CLASSIX
 ======================================
 Clustering is a widely-used unsupervised learning technique to find patterns and structures in data. The applications of clustering are wide-ranging,  including areas like finance, traffic, civil engineering, and bioinformatics.  Clustering algorithms aim to group the data points into distinct clusters such that points within a cluster share similar characteristics on the basis of spatial properties, while points in two distinct clusters are less similar.  It might be easy for a human to perceive the clusters with a small sample in a small (1 or 2) dimensional space, however, in practice, the real world data with increasing dimensions and size of the data usually make a human out of reach. Considering data provided with labels are considerably rare and expensive, reliable and easy-to-tune explainable clustering methods are highly desirable. 
 
-A novel clustering method called CLASSIX was proposed which shares features with both distance and density-based methods. It can handle arbitrarily shaped clusters without specifying the number of clusters in advance.  The method comprises two phases: aggregation and merging. 
-In the aggregation phase, data points are sorted along their first principal axis and then grouped using a greedy aggregation technique.  The aggregation phase is followed by the merging of overlapping groups into clusters using either a distance or density-based criterion. The density-based merging criterion usually results in slightly better clusters than the distance-based criterion, but the latter has a significant speed advantage. CLASSIX has two parameters to be defined and its tuning is relatively straightforward. In brief, there is a distance parameter $R$ that serves as a tolerance for the grouping in the aggregation phase, while an $\minPts$ parameter specifies the smallest acceptable cluster size.
-
-Owing to the initial sorting of the data points, CLASSIX does not perform spatial range queries for each data point. CLASSIX's inherent simplicity allows us to derive a procedure to explain the clustering result. We believe that this feature, explainability, in addition to the fast clustering time of CLASSIX, might make this method very attractive to users.
-
-Here we show you how to get a quick start!
+We introduce a novel clustering method called CLASSIX. The appealing characteristics of CLASSIX include fast speed, scalable clustering and explainable descriptions and visualization of clusters. It consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points,  followed by the merging of groups into clusters. The algorithm is controlled by two scalar parameters, namely a distance parameter for the aggregation and another parameter controlling the minimal cluster size. Extensive experiments are conducted to give a comprehensive evaluation of the clustering performance on  synthetic and real-world datasets, with various cluster shapes and low to high feature dimensionality. Our experiments demonstrate that CLASSIX competes with state-of-the-art clustering algorithms. The algorithm has linear space complexity and achieves near linear time complexity on a wide range of problems. Its inherent simplicity allows for the generation of intuitive explanations of the computed clusters.
+This documentation will provide you with a beginner-friendly tutorial, and show you how to get a quick start!
 
 Installation guide
 ------------------------------
@@ -61,3 +57,5 @@ The result is as belows:
 .. image:: images/demo1.png
 
 That is a basic setting tutorial of CLASSIX, which applied to most cases. If you want to learn more, please go through other sections of the documentation.
+
+

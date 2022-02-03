@@ -36,9 +36,48 @@ from scipy.sparse import csr_matrix, _sparsetools
 # from scipy.sparse.csgraph import minimum_spanning_tree
 
 
-def fast_agglomerate(data, splist, radius, method="distance", scale=1.5):
+def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
+    
+    Parameters
+    ----------
+    data : numpy.ndarray
+        The input that is array-like of shape (n_samples,).
+    
+    splist : numpy.ndarray
+        List of starting points formed in the aggregation.
+
+    radius : float
+        The tolerance to control the aggregation. If the distance between the starting point 
+        of a group and another data point is less than or equal to the tolerance,
+        the point is allocated to that group. For details, we refer users to [1].
+
+    method : str, default='distance'
+        Method for group merging, Available options are:
+        - 'density': two groups are merged if the density of data points in their intersection 
+           is at least as high the smaller density of both groups. This option uses the disjoint 
+           set structure to speedup agglomerate.
+        - 'distance': two groups are merged if the distance of their starting points is at 
+           most scale*radius (the parameter above). This option uses the disjoint 
+           set structure to speedup agglomerate.
+    
+    scale : float
+        Design for distance-clustering, when distance between the two starting points 
+        associated with two distinct groups smaller than scale*radius, then the two groups merge.
+
+    Returns
+    -------
+    labels_set : list
+        Connected components of graph with groups as vertices.
+    
+    connected_pairs_store : list
+        List for connected group labels.
+
+    References
+    ----------
+    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
+
     """
     # connected_pairs = list()
     connected_pairs = [SET(i) for i in range(splist.shape[0])]

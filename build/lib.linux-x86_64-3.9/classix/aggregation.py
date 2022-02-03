@@ -38,26 +38,26 @@ def aggregate(data, sorting="pca", tol=0.5): # , verbose=1
     Parameters
     ----------
     data : numpy.ndarray
-        the input that is array-like of shape (n_samples,).
+        The input that is array-like of shape (n_samples,).
 
     sorting : str
-        the sorting method for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
+        The sorting method for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
 
     tol : float
-        the tolerance to control the aggregation. if the distance between the starting point 
+        The tolerance to control the aggregation. if the distance between the starting point 
         of a group and another data point is less than or equal to the tolerance,
         the point is allocated to that group.  
 
     Returns
     -------
     labels (numpy.ndarray) : 
-        the group categories of the data after aggregation
+        The group categories of the data after aggregation.
     
     splist (list) : 
-        the list of the starting points
+        The list of the starting points.
     
     nr_dist (int) :
-        number of pairwise distance calculations
+        The number of pairwise distance calculations.
     """
 
     splist = list() # store the starting points

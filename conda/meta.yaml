@@ -1,6 +1,6 @@
 package:
   name: classix
-  version: 0.0.1
+  version: 0.0.2
 
 source:
   fn: ClassixClustering-0.1.9.tar.gz
@@ -16,12 +16,11 @@ requirements:
     - cython
     - scipy
     - matplotlib
-    - scikit-learn
 
   run:
     - python
 
 about:
   home: https://github.com/nla-group/classix
-  license_family: MIT License
+  license_family: MIT
   license_file: LICENSE
