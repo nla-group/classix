@@ -1,9 +1,14 @@
+Acknowledgement
+======================================
+We are grateful to Kamil Oster who provided us with the dataset used in the Appendix of the paper and also used in this tutorial.
+
+Contact
+------------------------------
+If you have any questions, be free to reach the software contributiors: Stefan Güttel (<stefan.guettel@manchester.ac.uk>), Xinye Chen (<xinye.chen@manchester.ac.uk>).
+
 
 License
-======================================
-
-MIT License
-
+------------------------------
 Copyright (c) 2022 Stefan Güttel, Xinye Chen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +28,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-If you have any questions, be free to reach the software contributiors: Stefan Güttel (<stefan.guettel@manchester.ac.uk>), Xinye Chen (<xinye.chen@manchester.ac.uk>).
-
-We are grateful to Kamil Oster who provided us with the dataset used in the Appendix of the paper and also used in this tutorial.
