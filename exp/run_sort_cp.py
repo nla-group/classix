@@ -4,7 +4,7 @@ import seaborn as sns
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
-from src.aggregation_test import aggregate
+from classix.aggregation_test import aggregate
 from sklearn.metrics.cluster import adjusted_mutual_info_score as ami
 from sklearn.metrics.cluster import adjusted_rand_score as ari
 
