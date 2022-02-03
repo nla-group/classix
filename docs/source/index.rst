@@ -30,7 +30,7 @@ API Reference
    mg_parameters
 
 
-Acknowledgement
+Others
 -------------
 .. toctree::
    :maxdepth: 2
