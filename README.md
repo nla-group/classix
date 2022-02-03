@@ -21,10 +21,10 @@ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here ar
 - Full reproducibility of all tests in the accompanying paper.
 - Support of Cython compilation.
 
-``CLASSIX`` is a contrived acronym of ``CLustering by Aggregation with Sorting-based Indexing`` and the letter ``X`` for ``explainability``. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter for the aggregation and another parameter controlling the minimal cluster size. 
+``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter ``radius`` for the aggregation and a ``minPts`` parameter controlling the minimal cluster size. 
 
-You can watch this quick tutorial with vivid explanation before starting:
-[![Watch this simple tutorial video](https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png)](https://www.youtube.com/watch?v=Zj4echgrfmo)
+Here is a video abstract of the CLASSIX:
+[![Watch this simple tutorial video](https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png)](https://www.youtube.com/watch?v=K94zgRjFEYo)
 
 The detailed documentation, including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/)
 
@@ -82,14 +82,14 @@ plt.show()
 ## The explain method
 
 CLASSIX provides an API for the easy visualization of clusters, and to explain the assignment of data points to their clusters.
-Now we demonstrate this functionality with some simple data. To show the whole picture of starting points location and the associated orderd groups, simply type:
+Let us demonstrate this functionality with some simple data. To get an overview of all the data, the location of starting points, and their associated groups, simply type:
 
 ```Python
 clx.explain(plot=True)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=500 />
 
-The starting points are marked as small red boxes (the color can be specified by users), note if you do not specify ``plot=True`` the picture won't appear. You can illustrate this picture with the following output table:
+The starting points are marked as the small red boxes (the color can be specified by user). If ``plot=True`` is omitted, only a textual summary will be produced. 
 
 The output summarizes the computed groups and clusters:
 
@@ -147,7 +147,6 @@ The data point 0 is in group 2, which has been merged into cluster 0.
 The data point 2000 is in group 10, which has been merged into cluster 1.
 There is no path of overlapping groups between these clusters.
 ```
-
 
 
 ## Citation
