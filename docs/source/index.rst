@@ -30,12 +30,15 @@ API Reference
    mg_parameters
 
 
-Contact
+Acknowledgement
 -------------
 .. toctree::
    :maxdepth: 2
    
+   contact
    acknowledgement
+   license
+   
 
 Indices and Tables
 ==================
