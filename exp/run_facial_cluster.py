@@ -3,7 +3,7 @@ import os
 import copy
 import numpy as np
 import pandas as pd
-from src.clustering import CLASSIX
+from classix import CLASSIX
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
