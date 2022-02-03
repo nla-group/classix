@@ -5,7 +5,7 @@ import pandas as pd
 import hdbscan
 import sklearn.datasets
 from sklearn import metrics
-from src.clustering import CLASSIX
+from classix import CLASSIX
 from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import MeanShift
