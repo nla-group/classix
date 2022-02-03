@@ -34,7 +34,7 @@ Contact
 .. toctree::
    :maxdepth: 2
    
-   license
+   acknowledgement
 
 Indices and Tables
 ==================
