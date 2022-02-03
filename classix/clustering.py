@@ -44,18 +44,38 @@ import pandas as pd
 from numpy.linalg import norm
 #import pyximport; pyximport.install()
 from matplotlib import pyplot as plt
-from sklearn.decomposition import PCA
+from scipy.sparse.linalg import svds
+# from sklearn.decomposition import PCA
 from scipy.sparse import csr_matrix, _sparsetools
 from .merging import minimum_spanning_tree_agglomerate 
-
-np.random.seed(0)
 # from scipy.sparse import csr_matrix
 # from scipy.sparse.csgraph import shortest_path
-# from .lite_func import *
-# from scipy.sparse.linalg import svds
+np.random.seed(0)
 
 
-# ##########################################################################################################
+
+
+
+def get_data(current_dir=''):
+    url_parent = "https://github.com/nla-group/classix/raw/master/classix/data/vdu_signals.npy"
+    vdu_signals = requests.get(url_parent).content
+    with open(os.path.join(current_dir, 'data/vdu_signals.npy'), 'wb') as handler:
+        handler.write(vdu_signals)
+        
+
+def load_data(name='vdu_signals'):
+    current_dir, current_filename = os.path.split(__file__)
+    
+    if name == 'vdu_signals':
+        DATA_PATH = os.path.join(current_dir, 'data/vdu_signals.npy')
+        if not os.path.isfile(DATA_PATH):
+            get_data(current_dir)
+        return np.load(DATA_PATH)
+    else:
+        warnings.warn("Currently not support this data.")
+
+        
+        
 # ******************************************** the main wrapper ********************************************
 class CLASSIX:
     """CLASSIX: Fast and explainable clustering based on sorting.
@@ -794,6 +814,7 @@ class CLASSIX:
             Specify the format of the image to be saved, default as 'pdf', other choice: png.
         
         """
+        
         # deprecated (24/07/2021)
         # cols = ["NrPts"] 
         # for i in range(self.splist.shape[1] - 2):
@@ -835,10 +856,14 @@ class CLASSIX:
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
             self.form_starting_point_clusters_table()
             if self.data.shape[1] > 2:
-                self.pca = PCA(n_components=2)
-                self.x_pca = self.pca.fit_transform(self.data)
-                self.s_pca = self.pca.transform(self.data[self.splist[:, 0].astype(int)])
-
+                # self.pca = PCA(n_components=2)
+                # self.x_pca = self.pca.fit_transform(self.data)
+                # self.s_pca = self.pca.transform(self.data[self.splist[:, 0].astype(int)])
+                scaled_data = self.data - self.data.mean(axis=0)
+                _U, _s, self._V = svds(scaled_data, k=2, return_singular_vectors="u")
+                self.x_pca = np.matmul(scaled_data, self._V[np.argsort(_s)].T)
+                self.s_pca = self.x_pca[self.splist[:, 0].astype(int)]
+                
             elif self.data.shape[1] == 2:
                 self.x_pca = self.data.copy()
                 self.s_pca = self.data[self.splist[:, 0].astype(int)] # self.splist[:, 3:].copy()
@@ -1838,6 +1863,9 @@ def calculate_cluster_centers(data, labels):
         centers[c] = np.mean(data[indc,:], axis=0)
     return centers
 
+
+
+
 # ##########################################################################################################
 # *************************** <!-- the independent functions of checking overlap ***************************
 # *******************************  determine if two groups should be merged ********************************
@@ -1949,27 +1977,8 @@ def return_csr_matrix_indices(csr_matrix):
 #         path.append(predecessors[i, k])
 #         k = predecessors[i, k]
 #     return path[::-1]
-# ##########################################################################################################
 
 
-
-def get_data(current_dir=''):
-    url_parent = "https://github.com/nla-group/classix/raw/master/classix/data/vdu_signals.npy"
-    vdu_signals = requests.get(url_parent).content
-    with open(os.path.join(current_dir, 'data/vdu_signals.npy'), 'wb') as handler:
-        handler.write(vdu_signals)
-        
-
-def load_data(name='vdu_signals'):
-    current_dir, current_filename = os.path.split(__file__)
-    
-    if name == 'vdu_signals':
-        DATA_PATH = os.path.join(current_dir, 'data/vdu_signals.npy')
-        if not os.path.isfile(DATA_PATH):
-            get_data(current_dir)
-        return np.load(DATA_PATH)
-    else:
-        warnings.warn("Currently not support this data.")
 
 
 
