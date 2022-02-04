@@ -15,30 +15,29 @@
 
 CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
 
-- A novel clustering algorithm which exploits the sorting of data points.
-- Ability to  cluster low and high-dimensional data of arbitrary shape efficiently.
+- Ability to cluster low and high-dimensional data of arbitrary shape efficiently.
 - Ability to detect and deal with outliers in the data.
 - Ability to provide textual explanations for the generated clusters.
 - Full reproducibility of all tests in the accompanying paper.
 - Support of Cython compilation.
 
-``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter ``radius`` for the aggregation and a ``minPts`` parameter controlling the minimal cluster size. 
+``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter ``radius`` for the group aggregation and a ``minPts`` parameter controlling the minimal cluster size. 
 
 Here is a video abstract of the CLASSIX:
-[![Watch this simple tutorial video](https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png)](https://www.youtube.com/watch?v=K94zgRjFEYo)
+[![Video abstract](https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png)](https://www.youtube.com/watch?v=K94zgRjFEYo)
 
-The detailed documentation, including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/)
+A detailed documentation, including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/)
 
 ## Install
 
-CLASSIX requires the following essential dependencies for clustering:
+CLASSIX has the following dependencies for its clustering functionality:
 
 - cython>=0.29.4
 - numpy>=1.20.0
 - scipy>1.6.0
 - requests
 
-while requires the following dependencies for data visualization:
+and requires the following packages for data visualization:
 
 - matplotlib
 - pandas
@@ -48,8 +47,7 @@ To install the current release via PIP use:
 pip install ClassixClustering
 ```
 
-For conda environment, to install this package with conda run:
-
+To install this package with conda run:
 ```
 conda install -c nla.stefan.xinye classix
 ```
@@ -66,8 +64,7 @@ $ git clone https://github.com/nla-group/classix.git
 ```
 
 
-
-## Quick Start
+## Quick start
 
 ```Python
 from sklearn import datasets
@@ -91,17 +88,14 @@ plt.show()
 
 ## The explain method
 
-CLASSIX provides an API for the easy visualization of clusters, and to explain the assignment of data points to their clusters.
-Let us demonstrate this functionality with some simple data. To get an overview of all the data, the location of starting points, and their associated groups, simply type:
+CLASSIX provides an API for the easy visualization of clusters, and to explain the assignment of data points to their clusters. To get an overview of the data points, the location of starting points, and their associated groups, simply type:
 
 ```Python
 clx.explain(plot=True)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=500 />
 
-The starting points are marked as the small red boxes (the color can be specified by user). If ``plot=True`` is omitted, only a textual summary will be produced. 
-
-The output summarizes the computed groups and clusters:
+The starting points are marked as the small red boxes. The method also returns a textual summary as follows:
 
 ```
 A clustering of 5000 data points with 2 features has been performed. 
@@ -117,14 +111,7 @@ A list of all starting points is shown below.
    0     398      0     -1.19 -1.09 
    1    1073      0     -0.65 -1.15 
    2     553      0     -1.17 -0.56 
-   3     466      0     -0.67 -0.65 
-   4       6      0     -0.19 -0.88 
-   5       3      0     -0.72 -0.03 
-   6       1      0     -0.22 -0.28 
-   7     470      1       0.31 0.21 
-   8     675      1       0.18 0.71 
-   9     579      1       0.86 0.19 
-  10     763      1       0.69 0.67 
+  ---      lines omitted        ---
   11       6      1       0.42 1.35 
   12       5      1       1.24 0.59 
   13       2      1        1.0 1.08 
@@ -133,7 +120,7 @@ In order to explain the clustering of individual data points,
 use .explain(ind1) or .explain(ind1, ind2) with indices of the data points. 
 ```
 
-In the columns of the above table, ``Group`` denotes the group label, ``NrPts`` denotes the number of data points in the group, ``Cluster`` is the cluster label assigned to the group,  and ``Coordinates`` are the coordinates of the starting point associated with the group. In order to explain the cluster assignment of a particular data point, we provide its index to the explain method:
+In the above table, *Group* denotes the group label, *NrPts* denotes the number of data points in the group, *Cluster* is the cluster label assigned to the group, and the final column shows the *Coordinates* of the starting point. In order to explain the cluster assignment of a particular data point, we provide its index to the explain method:
 
 ```Python
 clx.explain(0, plot=True)
@@ -145,7 +132,7 @@ Output:
 The data point 0 is in group 2, which has been merged into cluster #0.
 ```
 
-We can also query two data points ended up in the same cluster, or not: 
+We can also query why two data points ended up in the same cluster, or not: 
 ```Python
 clx.explain(0, 2000, plot=True)
 ```
