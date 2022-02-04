@@ -25,7 +25,7 @@ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here ar
 
 Here is a video abstract of CLASSIX: 
 
-[<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png width=400 />](https://www.youtube.com/watch?v=K94zgRjFEYo)
+[<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png width=420 />](https://www.youtube.com/watch?v=K94zgRjFEYo)
  
 
 A detailed documentation (still in progress), including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/). 
