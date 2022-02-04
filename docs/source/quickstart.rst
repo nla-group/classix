@@ -50,6 +50,12 @@ To check the installation, run:
     
     conda list classix 
 
+and uninstall it with 
+
+.. parsed-literal::
+
+    conda uninstall classix
+    
 Download this repository via:
 
 .. parsed-literal::
