@@ -8,14 +8,49 @@ This documentation will provide you with a beginner-friendly tutorial, and show 
 
 Installation guide
 ------------------------------
+CLASSIX has the following dependencies for its clustering functionality:
+    
+    * cython>=0.29.4
+    * numpy>=1.20.0
+    * scipy>1.6.0
+    * requests
+    
+and requires the following packages for data visualization:
+    
+    * matplotlib
+    * pandas
+    
 To install the current release via PIP use:
 
 .. parsed-literal::
     
     pip install ClassixClustering
 
+To check the installation, simply run:
 
-Download CLASSIX code:
+.. parsed-literal::
+    
+    python -m pip show ClassixClustering
+    
+If you want to uninstall it, you can use:
+
+.. parsed-literal::
+
+    pip uninstall ClassixClustering
+    
+
+For conda users, to install this package with conda run:
+
+.. parsed-literal::
+    conda install -c nla.stefan.xinye classix
+    
+To check the installation, run:
+
+.. parsed-literal::
+    
+    conda list classix 
+
+Download this repository via:
 
 .. parsed-literal::
     
