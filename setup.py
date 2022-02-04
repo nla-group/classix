@@ -37,3 +37,4 @@ setuptools.setup(
     url="https://github.com/nla-group/CLASSIX.git",
     license='MIT License'
 )
+
