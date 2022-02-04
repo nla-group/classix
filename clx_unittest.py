@@ -70,12 +70,12 @@ class TestClassix(unittest.TestCase):
         for scale in np.arange(1, 3.3, 0.1):
             classix = CLASSIX(sorting='pca', radius=TOL, group_merging='distance', verbose=0)
             classix.fit_transform(X)
-            visualize_linkage(scale=scale, figsize=(8,8), labelsize=24, path='img')
+            visualize_linkage(scale=scale, figsize=(8,8), labelsize=24)
 
         for tol in np.arange(0.1, 1.3, 0.1):
             classix = CLASSIX(sorting='pca', radius=tol, group_merging='distance', verbose=0)
             classix.fit_transform(X)
-            visualize_linkage(scale=1.5, figsize=(8,8), labelsize=24, plot_boundary=True, path='img')
+            visualize_linkage(scale=1.5, figsize=(8,8), labelsize=24, plot_boundary=True)
 
 
 if __name__ == '__main__':
