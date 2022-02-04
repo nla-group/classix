@@ -42,6 +42,7 @@ If you want to uninstall it, you can use:
 For conda users, to install this package with conda run:
 
 .. parsed-literal::
+
     conda install -c nla.stefan.xinye classix
     
 To check the installation, run:
@@ -83,9 +84,11 @@ The sample is exhibited with 2 clusters of 1000 2-dimensional data. Then, we emp
     clx = CLASSIX(radius=0.5, minPts=13)
     clx.fit(X)
 
+
 .. admonition:: Remember
     
     By default, CLASSIX will use ``pca`` sorting and apply distance-based merging. 
+
 
 After that, to get the clustering result, we just need to load ``clx.labels_``. Also you can return the cluster labels directly by ``labels = clx.fit_transform(X)``.
 Now we plot the clustering result:
