@@ -54,14 +54,9 @@ For conda environment, to install this package with conda run:
 conda install -c nla.stefan.xinye classix
 ```
 
-To check the installation you can use
+To check the installation you can use either of 
 ```
 python -m pip show ClassixClustering
-```
-
-or 
-
-```
 conda list classix
 ```
 
