@@ -133,10 +133,10 @@ In order to explain the clustering of individual data points,
 use .explain(ind1) or .explain(ind1, ind2) with indices of the data points. 
 ```
 
-In the columns of the above table, ``Group`` denotes the group label, ``NrPts`` denotes the number of data points in the associated group, ``Cluster`` is the cluster label assigned to the corresponding group,  and ``Coordinates`` are the coordinates of starting point associated with the group. In order to explain the cluster assignment of a particular data point, we just have to provide its index to the explain method:
+In the columns of the above table, ``Group`` denotes the group label, ``NrPts`` denotes the number of data points in the group, ``Cluster`` is the cluster label assigned to the group,  and ``Coordinates`` are the coordinates of the starting point associated with the group. In order to explain the cluster assignment of a particular data point, we provide its index to the explain method:
 
 ```Python
-clx.explain(0,  plot=True)
+clx.explain(0, plot=True)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0.png width=720 />
 Output:
@@ -145,9 +145,9 @@ Output:
 The data point 0 is in group 2, which has been merged into cluster #0.
 ```
 
-You can also track and compare the two objects merging and division with 
+We can also query two data points ended up in the same cluster, or not: 
 ```Python
-clx.explain(0, 2000,  plot=True)
+clx.explain(0, 2000, plot=True)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0_2000.png width=720 />
 Output:
@@ -160,16 +160,18 @@ There is no path of overlapping groups between these clusters.
 
 
 ## Citation
-Here is the full CLASSIX paper. If you find CLASSIX useful in a scientific publication, we would appreciate a citation:
 
 ```bibtex
-@misc{CLASSIX,
-      title={Fast and explainable clustering based on sorting}, 
-      author={Xinye Chen and G\"{u}ttel, Stefan},
-      year={2022},
-      eprint={},
-      archivePrefix={arXiv},
-      primaryClass={}
+@techreport{CG22b,
+  title   = {Fast and explainable clustering based on sorting},
+  author  = {Chen, Xinye and G\"{u}ttel, Stefan},
+  year    = {2022},
+  number  = {arXiv:2202.01456},
+  pages   = {25},
+  institution = {The University of Manchester},
+  address = {UK},
+  type    = {arXiv EPrint},
+  url     = {https://arxiv.org/abs/2202.01456}
 }
 ```
 
