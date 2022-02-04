@@ -1843,7 +1843,7 @@ class CLASSIX:
 
 
 
-def pairwise_distance(X):
+def pairwise_distances(X):
     distm = np.zeros((X.shape[0], X.shape[0]))
     for i in range(X.shape[0]):
         for j in range(i, X.shape[0]):
