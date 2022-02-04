@@ -1,6 +1,6 @@
 package:
   name: classix
-  version: 0.0.6
+  version: 0.0.8
 
 source:
   fn: ClassixClustering-0.3.1.tar.gz

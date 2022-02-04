@@ -90,11 +90,47 @@
 This documentation will provide you with a beginner-friendly tutorial, and show you how to get a quick start!</p>
 <section id="installation-guide">
 <h2>Installation guide<a class="headerlink" href="#installation-guide" title="Permalink to this headline"></a></h2>
+<p>CLASSIX has the following dependencies for its clustering functionality:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>cython&gt;=0.29.4</p></li>
+<li><p>numpy&gt;=1.20.0</p></li>
+<li><p>scipy&gt;1.6.0</p></li>
+<li><p>requests</p></li>
+</ul>
+</div></blockquote>
+<p>and requires the following packages for data visualization:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>matplotlib</p></li>
+<li><p>pandas</p></li>
+</ul>
+</div></blockquote>
 <p>To install the current release via PIP use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">ClassixClustering</span>
 </pre></div>
 </div>
-<p>Download CLASSIX code:</p>
+<p>To check the installation, simply run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">show</span> <span class="n">ClassixClustering</span>
+</pre></div>
+</div>
+<p>If you want to uninstall it, you can use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">uninstall</span> <span class="n">ClassixClustering</span>
+</pre></div>
+</div>
+<p>For conda users, to install this package with conda run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">nla</span><span class="o">.</span><span class="n">stefan</span><span class="o">.</span><span class="n">xinye</span> <span class="n">classix</span>
+</pre></div>
+</div>
+<p>To check the installation, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="nb">list</span> <span class="n">classix</span>
+</pre></div>
+</div>
+<p>and uninstall it with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">uninstall</span> <span class="n">classix</span>
+</pre></div>
+</div>
+<p>Download this repository via:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">nla</span><span class="o">-</span><span class="n">group</span><span class="o">/</span><span class="n">CLASSIX</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
@@ -109,9 +145,13 @@ The sample is exhibited with 2 clusters of 1000 2-dimensional data. Then, we emp
 <span class="kn">from</span> <span class="nn">classix</span> <span class="kn">import</span> <span class="n">CLASSIX</span>
 
 <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_blobs</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">clx</span> <span class="o">=</span> <span class="n">CLASSIX</span><span class="p">(</span><span class="n">sorting</span><span class="o">=</span><span class="s1">&#39;pca&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minPts</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+<span class="n">clx</span> <span class="o">=</span> <span class="n">CLASSIX</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">minPts</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
 <span class="n">clx</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 </pre></div>
+</div>
+<div class="admonition-remember admonition">
+<p class="admonition-title">Remember</p>
+<p>By default, CLASSIX will use <code class="docutils literal notranslate"><span class="pre">pca</span></code> sorting and apply distance-based merging.</p>
 </div>
 <p>After that, to get the clustering result, we just need to load <code class="docutils literal notranslate"><span class="pre">clx.labels_</span></code>. Also you can return the cluster labels directly by <code class="docutils literal notranslate"><span class="pre">labels</span> <span class="pre">=</span> <span class="pre">clx.fit_transform(X)</span></code>.
 Now we plot the clustering result:</p>

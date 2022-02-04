@@ -8,14 +8,56 @@ This documentation will provide you with a beginner-friendly tutorial, and show 
 
 Installation guide
 ------------------------------
+CLASSIX has the following dependencies for its clustering functionality:
+
+    * cython>=0.29.4
+    * numpy>=1.20.0
+    * scipy>1.6.0
+    * requests
+    
+and requires the following packages for data visualization:
+
+    * matplotlib
+    * pandas
+    
 To install the current release via PIP use:
 
 .. parsed-literal::
     
     pip install ClassixClustering
 
+To check the installation, simply run:
 
-Download CLASSIX code:
+.. parsed-literal::
+    
+    python -m pip show ClassixClustering
+    
+If you want to uninstall it, you can use:
+
+.. parsed-literal::
+
+    pip uninstall ClassixClustering
+    
+
+For conda users, to install this package with conda run:
+
+.. parsed-literal::
+
+    conda install -c nla.stefan.xinye classix
+    
+To check the installation, run:
+
+.. parsed-literal::
+    
+    conda list classix 
+
+and uninstall it with 
+
+.. parsed-literal::
+
+    conda uninstall classix
+    
+Download this repository via:
 
 .. parsed-literal::
     
@@ -39,8 +81,14 @@ The sample is exhibited with 2 clusters of 1000 2-dimensional data. Then, we emp
     from classix import CLASSIX
 
     X, y = make_blobs(n_samples=1000, centers=2, n_features=2, random_state=1)    
-    clx = CLASSIX(sorting='pca', radius=0.5, verbose=0, minPts=13)
+    clx = CLASSIX(radius=0.5, minPts=13)
     clx.fit(X)
+
+
+.. admonition:: Remember
+    
+    By default, CLASSIX will use ``pca`` sorting and apply distance-based merging. 
+
 
 After that, to get the clustering result, we just need to load ``clx.labels_``. Also you can return the cluster labels directly by ``labels = clx.fit_transform(X)``.
 Now we plot the clustering result:

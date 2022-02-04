@@ -16,6 +16,10 @@ The examples here are demonstrated with a sample with a more complicated shape:
     X = np.vstack([blobs, moons])
 
 
+.. admonition:: Note
+
+    Setting radius lower, the more groups will form, and the groups tend to be separated instead of merging as clusters, and therefore runtime will increase. 
+    
 
 Density clustering
 ------------------------------

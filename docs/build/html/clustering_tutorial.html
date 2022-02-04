@@ -97,6 +97,10 @@
 <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">blobs</span><span class="p">,</span> <span class="n">moons</span><span class="p">])</span>
 </pre></div>
 </div>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>Setting radius lower, the more groups will form, and the groups tend to be separated instead of merging as clusters, and therefore runtime will increase.</p>
+</div>
 <section id="density-clustering">
 <h2>Density clustering<a class="headerlink" href="#density-clustering" title="Permalink to this headline"></a></h2>
 <p>Instead of leaving the default option as the previous example, in this example, we can explicitly set a parameter <code class="docutils literal notranslate"><span class="pre">group_merging</span></code> to specify which merging strategy we would like to adopt.
