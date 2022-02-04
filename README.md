@@ -150,7 +150,7 @@ There is no path of overlapping groups between these clusters.
 
 ## Reproducible experiment
 All empirical data in the paper are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
-Before running, ensure the dependency package `scikit-learn` and `hdbscan` are installed and ``Quickshift++`` code are compiled (obtained in [Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)). After configuring all of these, run the commands below. All results will be stored on ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
+Before running, ensure the dependency package `scikit-learn` and `hdbscan` are installed, and compile ``Quickshift++`` code (obtained in [Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)). After configuring all of these, run the commands below. All results will be stored on ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
 
 ```
 cd exp
