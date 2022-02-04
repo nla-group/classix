@@ -80,8 +80,12 @@ The sample is exhibited with 2 clusters of 1000 2-dimensional data. Then, we emp
     from classix import CLASSIX
 
     X, y = make_blobs(n_samples=1000, centers=2, n_features=2, random_state=1)    
-    clx = CLASSIX(sorting='pca', radius=0.5, verbose=0, minPts=13)
+    clx = CLASSIX(radius=0.5, minPts=13)
     clx.fit(X)
+
+.. admonition:: Remember
+    
+    By default, CLASSIX will use ``pca`` sorting and apply distance-based merging. 
 
 After that, to get the clustering result, we just need to load ``clx.labels_``. Also you can return the cluster labels directly by ``labels = clx.fit_transform(X)``.
 Now we plot the clustering result:
