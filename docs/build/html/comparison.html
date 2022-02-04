@@ -112,7 +112,7 @@ We perform this experiment on Kamil dataset, and synthetic Gaussian blobs cluste
 </div></blockquote>
 <p>The DBSCAN, HDBSCAN, Quickshift++ fails in this experiment (runtime &gt; 24 hr) while CLASSIX use around 1.2 seconds for clustering of whole data.
 Therefore, to compare the the four algorithms (ensure they can finish clustering within a day), we need to preprocess the data for downsampling:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># this block of code is provided by Kamil Oster</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This block of code is provided by Kamil Oster</span>
 <span class="n">final_len</span> <span class="o">=</span> <span class="mi">100000</span>
 <span class="n">outliers_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">X_pca</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">7.5</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">no_outliers_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_pca</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])),</span> <span class="n">outliers_position</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -137,6 +137,8 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sample_size</span> <span class="o">=</span> <span class="mi">10</span> <span class="c1"># each algorithm&#39;s running repeats for 10 times</span>
 
 <span class="n">sum_time</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">timing</span> <span class="o">=</span> <span class="p">[]</span>
+
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sample_size</span><span class="p">):</span>
     <span class="n">st</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">dbscan</span> <span class="o">=</span> <span class="n">DBSCAN</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">min_samples</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
@@ -144,11 +146,13 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
     <span class="n">et</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">sum_time</span> <span class="o">=</span> <span class="n">sum_time</span> <span class="o">+</span> <span class="n">et</span> <span class="o">-</span> <span class="n">st</span>
 
+<span class="n">timing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sum_time</span><span class="o">/</span><span class="n">sample_size</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average consume time: &quot;</span><span class="p">,</span> <span class="n">sum_time</span><span class="o">/</span><span class="n">sample_size</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">dbscan</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span>  <span class="n">labelsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;results/DBSCAN_kamil.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;DBSCAN&#39;</span><span class="p">,</span>  <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;DBSCAN.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="n">sum_time</span> <span class="o">=</span> <span class="mi">0</span>
@@ -159,12 +163,14 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
     <span class="n">et</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">sum_time</span> <span class="o">=</span> <span class="n">sum_time</span> <span class="o">+</span> <span class="n">et</span> <span class="o">-</span> <span class="n">st</span>
 
+<span class="n">timing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sum_time</span><span class="o">/</span><span class="n">sample_size</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average consume time: &quot;</span><span class="p">,</span> <span class="n">sum_time</span><span class="o">/</span><span class="n">sample_size</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">hdbscan_labels</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span>  <span class="n">labelsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;HDBSCAN_kamil.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
-<span class="c1"># plt.show()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;HDBSCAN&#39;</span><span class="p">,</span>  <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;HDBSCAN.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="n">sum_time</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sample_size</span><span class="p">):</span>
@@ -175,11 +181,13 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
     <span class="n">et</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">sum_time</span> <span class="o">=</span> <span class="n">sum_time</span> <span class="o">+</span> <span class="n">et</span> <span class="o">-</span> <span class="n">st</span>
 
+<span class="n">timing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sum_time</span><span class="o">/</span><span class="n">sample_size</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average consume time: &quot;</span><span class="p">,</span> <span class="n">sum_time</span><span class="o">/</span><span class="n">sample_size</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">quicks_labels</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span>  <span class="n">labelsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;Quickshiftpp_kamil.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Quickshift++&#39;</span><span class="p">,</span>  <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;Quickshiftpp.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="n">sum_time</span> <span class="o">=</span> <span class="mi">0</span>
@@ -190,14 +198,35 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
     <span class="n">et</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">sum_time</span> <span class="o">=</span> <span class="n">sum_time</span> <span class="o">+</span> <span class="n">et</span> <span class="o">-</span> <span class="n">st</span>
 
+<span class="n">timing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sum_time</span><span class="o">/</span><span class="n">sample_size</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average consume time: &quot;</span><span class="p">,</span> <span class="n">sum_time</span><span class="o">/</span><span class="n">sample_size</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">clx</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span>  <span class="n">labelsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;CLASSIX_kamil.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;CLASSIX&#39;</span><span class="p">,</span>  <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;CLASSIX.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+<img alt="_images/DBSCAN_kamil.png" src="_images/DBSCAN_kamil.png" />
+<img alt="_images/HDBSCAN_kamil.png" src="_images/HDBSCAN_kamil.png" />
+<img alt="_images/Quickshiftpp_kamil.png" src="_images/Quickshiftpp_kamil.png" />
+<img alt="_images/CLASSIX_kamil.png" src="_images/CLASSIX_kamil.png" />
+<p>We can simply visualize the runtime:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;clustering&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DBSCAN&#39;</span><span class="p">,</span> <span class="s1">&#39;HDBSCAN&#39;</span><span class="p">,</span> <span class="s1">&#39;Quickshift++&#39;</span><span class="p">,</span> <span class="s1">&#39;CLASSIX&#39;</span><span class="p">]</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;runtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timing</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">font_scale</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;clustering&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;runtime&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;results/runtime.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The runtime is as below, we can see that CLASSIX achieve faster speed even run with whole data.</p>
+<img alt="_images/runtime_kamil.png" src="_images/runtime_kamil.png" />
 <p>Synthetic Gaussian blobs test can be refer to the paper
 The test is referenced from <a class="reference external" href="https://hdbscan.readthedocs.io/en/latest/performance_and_scalability.html">https://hdbscan.readthedocs.io/en/latest/performance_and_scalability.html</a></p>
 <img alt="_images/performance.png" src="_images/performance.png" />

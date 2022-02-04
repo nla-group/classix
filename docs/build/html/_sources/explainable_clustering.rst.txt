@@ -72,6 +72,7 @@ Output:
 .. parsed-literal::
 
     The data point is in group 2, which has been merged into cluster #0.
+
 .. image:: images/None0.png
 
 Comparison insight
@@ -87,6 +88,7 @@ We give two examples to compare the data pair cluster assignment as follows.
     The data point 0 is in group 2, which has been merged into cluster 0.
     The data point 2000 is in group 10, which has been merged into cluster 1.
     There is no path of overlapping groups between these clusters.
+
 .. image:: images/None0_2000.png
 
 
@@ -98,6 +100,7 @@ We give two examples to compare the data pair cluster assignment as follows.
     The data point 0 is in group 2 and the data point 2008 is in group 4, 
     both of which were merged into cluster #0. 
     These two groups are connected via groups 2 <-> 1 <-> 4.
+
 .. image:: images/None0_2008.png
 
 

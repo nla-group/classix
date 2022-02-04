@@ -131,11 +131,7 @@ class CLASSIX:
         If allocate the outliers to the closest groups, hence the corresponding clusters. 
         If False, all outliers will be labeled as -1.
     
-    n_jobs : int, default=-1
-        This parameter only works for method called 'scc-distance', which refers to the
-        number of jobs to use for the computation by breaking down the pairwise matrix into n_jobs 
-        even slices and computing them in parallel.
-        
+
     verbose : boolean or int, default=1
         Whether print the logs or not.
              
@@ -197,8 +193,12 @@ class CLASSIX:
     #        strongly connected components.
     #     - 'mst-distance': it is also a distance based group_merging, but use minimum spanning tree instead
     #        in the second stage with cutoff_scale scale*radius.
+    # n_jobs : int, default=-1
+    #     This parameter only works for method called 'scc-distance', which refers to the
+    #     number of jobs to use for the computation by breaking down the pairwise matrix into n_jobs 
+    #     even slices and computing them in parallel.
         
-    def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, n_jobs=-1, verbose=1): 
+    def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, verbose=1): 
         # deprecated parameter (15/07/2021): noise_percent=0, distance_scale=1, eta=1, cython=True
         # eta (deprecated): float, default=1.0
         #     the value for the density-based groups merging, the groups will 
@@ -244,7 +244,7 @@ class CLASSIX:
         self.norm = norm # usually, we do not use this parameter
         self.scale = scale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
-        self.n_jobs = n_jobs
+        # self.n_jobs = n_jobs
         self.clean_index = None
         self.connected_pairs = None
         self.cluster_color = None
@@ -1446,12 +1446,10 @@ class CLASSIX:
         
         
     
-    def visualize_linkage(self, scale=1.5, figsize=(8,8), labelsize=24, 
-                          norm=True, markersize=320, plot_boundary=False, bound_color='red', path='img', fmt='pdf'):
+    def visualize_linkage(self, scale=1.5, figsize=(8,8), labelsize=24, norm=True, markersize=320, plot_boundary=False,
+                                             bound_color='red', path='.', fmt='pdf'):
         
-        distm, n_components, labels = visualize_connections(self.splist, radius=self.radius, 
-                                                            scale=round(scale,2), 
-                                                            n_jobs=-1)
+        distm, n_components, labels = visualize_connections(self.splist, radius=self.radius, scale=round(scale,2))
         # plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = 'white'
         if norm:
@@ -1844,8 +1842,18 @@ class CLASSIX:
 #     return labels, splist, agg_centers
 
 
-def visualize_connections(splist, radius=0.5, scale=1.5, n_jobs=-1):
-    distm = pairwise_distances(splist[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs)
+
+def pairwise_distance(X):
+    distm = np.zeros((X.shape[0], X.shape[0]))
+    for i in range(X.shape[0]):
+        for j in range(i, X.shape[0]):
+            distm[i, j] = distm[j, i] = norm(X[i,:]-X[j,:], ord=2)
+    return distm
+
+
+
+def visualize_connections(splist, radius=0.5, scale=1.5):
+    distm = pairwise_distances(splist[:,3:])
     tol = radius*scale
     distm = (distm <= tol).astype(int)
     n_components, labels = connected_components(csgraph=distm, directed=False, return_labels=True)

@@ -38,7 +38,7 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
 
 .. code:: python
     
-    # this block of code is provided by Kamil Oster
+    # This block of code is provided by Kamil Oster
     final_len = 100000
     outliers_position = np.where(X_pca[:,0] > 7.5)[0]
     no_outliers_position = np.delete(np.arange(0, len(X_pca[:,0])), outliers_position, axis=0)
@@ -65,18 +65,22 @@ Then we employ the algorithms except CLASSIX on the downsampling data while empl
     sample_size = 10 # each algorithm's running repeats for 10 times
 
     sum_time = 0
+    timing = []
+
     for i in range(sample_size):
         st = time.time()
         dbscan = DBSCAN(eps=0.7, min_samples=6)
         dbscan.fit(X)
         et = time.time() 
         sum_time = sum_time + et - st
-        
+
+    timing.append(sum_time/sample_size)
     print("Average consume time: ", sum_time/sample_size)
     plt.figure(figsize=(24,10))
     plt.scatter(X[:,0], X[:,1], c=dbscan.labels_, cmap='jet')
     plt.tick_params(axis='both',  labelsize=15)
-    plt.savefig('results/DBSCAN_kamil.png', bbox_inches='tight')
+    plt.title('DBSCAN',  fontsize=20)
+    plt.savefig('DBSCAN.png', bbox_inches='tight')
     plt.show()
 
     sum_time = 0
@@ -87,12 +91,14 @@ Then we employ the algorithms except CLASSIX on the downsampling data while empl
         et = time.time()
         sum_time = sum_time + et - st
 
+    timing.append(sum_time/sample_size)
     print("Average consume time: ", sum_time/sample_size)
     plt.figure(figsize=(24,10))
     plt.scatter(X[:,0], X[:,1], c=hdbscan_labels, cmap='jet')
     plt.tick_params(axis='both',  labelsize=15)
-    plt.savefig('HDBSCAN_kamil.png', bbox_inches='tight')
-    # plt.show()
+    plt.title('HDBSCAN',  fontsize=20)
+    plt.savefig('HDBSCAN.png', bbox_inches='tight')
+    plt.show()
 
     sum_time = 0
     for i in range(sample_size):
@@ -103,11 +109,13 @@ Then we employ the algorithms except CLASSIX on the downsampling data while empl
         et = time.time()
         sum_time = sum_time + et - st
 
+    timing.append(sum_time/sample_size)
     print("Average consume time: ", sum_time/sample_size)
     plt.figure(figsize=(24,10))
     plt.scatter(X[:,0], X[:,1], c=quicks_labels, cmap='jet')
     plt.tick_params(axis='both',  labelsize=15)
-    plt.savefig('Quickshiftpp_kamil.png', bbox_inches='tight')
+    plt.title('Quickshift++',  fontsize=20)
+    plt.savefig('Quickshiftpp.png', bbox_inches='tight')
     plt.show()
 
     sum_time = 0
@@ -117,15 +125,39 @@ Then we employ the algorithms except CLASSIX on the downsampling data while empl
         clx.fit_transform(data)
         et = time.time()
         sum_time = sum_time + et - st
-        
+    
+    timing.append(sum_time/sample_size)
     print("Average consume time: ", sum_time/sample_size)
     plt.figure(figsize=(24,10))
     plt.scatter(data[:,0], data[:,1], c=clx.labels_, cmap='jet')
     plt.tick_params(axis='both',  labelsize=15)
-    plt.savefig('CLASSIX_kamil.png', bbox_inches='tight')
+    plt.title('CLASSIX',  fontsize=20)
+    plt.savefig('CLASSIX.png', bbox_inches='tight')
     plt.show()
 
+.. image:: images/DBSCAN_kamil.png
+.. image:: images/HDBSCAN_kamil.png
+.. image:: images/Quickshiftpp_kamil.png
+.. image:: images/CLASSIX_kamil.png
 
+We can simply visualize the runtime:
+
+.. code:: python
+
+    import seaborn as sns
+
+    data = pd.DataFrame()
+    data['clustering'] = ['DBSCAN', 'HDBSCAN', 'Quickshift++', 'CLASSIX']
+    data['runtime'] = timing
+
+    plt.figure(figsize=(12,6))
+    sns.set(font_scale=2, style="whitegrid")
+    ax = sns.barplot(x="clustering", y="runtime", data=data)
+    plt.savefig('results/runtime.png', bbox_inches='tight')
+
+The runtime is as below, we can see that CLASSIX achieve faster speed even run with whole data.
+
+.. image:: images/runtime_kamil.png
 
 Synthetic Gaussian blobs test can be refer to the paper 
 The test is referenced from https://hdbscan.readthedocs.io/en/latest/performance_and_scalability.html

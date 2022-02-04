@@ -101,7 +101,9 @@ The visualization of clustering results is reasonable:
     plt.figure(figsize=(5,5))
     plt.scatter(X[:,0], X[:,1], c=clx.labels_)
     plt.show()
+
 .. image:: images/demo2.png
+    :width: 360
 
 
 Distance clustering
@@ -166,8 +168,29 @@ Visualize the result:
     plt.show()
 
 .. image:: images/demo3.png
+    :width: 360
 
-There is one more parameter that affect distance based CLASSIX, that is ``scale``. Setting ``radius=1``, we visualize the connection between starting points with varying ``scale`` as belows:  
+
+Visualize connecting edge
+------------------------------
+Now we use the same example to demonstrate how cluster are formed by computing starting points and edge connections. We can output the information by
+
+.. code:: python
+
+    clx.visualize_linkage(scale=1.5, figsize=(8,8), labelsize=24, fmt='png')
+
+.. image:: images/linkage_scale_1.5_tol_0.1.png
+
+
+
+There is one more parameter that affects distance-based CLASSIX, that is ``scale``.  By simply adding the parameter ``plot_boundary`` and setting it to ``True``, then we can obtain the starting points with their group boundary. The visualization of the connecting edge between starting points with varying ``scale`` is plotted as below:
+
+.. code:: python
+
+    for scale in np.arange(1.1, 2, 0.1):
+        classix = CLASSIX(sorting='pca', radius=0.1, group_merging='distance', verbose=0)
+        classix.fit_transform(X)
+        classix.visualize_linkage(scale=round(scale,1), figsize=(8,8), labelsize=24, plot_boundary=True, fmt='png')
 
 .. image:: images/single_linkage.png
 

@@ -9,6 +9,7 @@
     background-color: #ffffff;
 }
 
+
 .wy-side-nav-search {
     /*background color of the top search bar*/
     background-color: #43B02A;
@@ -26,27 +27,27 @@
 
 .wy-menu-vertical li.on a:hover,.wy-menu-vertical li.current>a:hover {
     /*background color of text upon hovering an open list*/
-    background: #c9c9c9
+    background: #c0dfa7
 }
 
 .wy-menu-vertical {
     /* text color of expanded menu items in the sidebar */
-    color:#414042;
+    color:#0b4220;
 }
 
 .section h1 {
     /*header 1 text color */
-    color: #047704;
+    color: #0a270a;
  }
 
 .rst-content .toctree-wrapper p.caption, h2, h3, h4, h5, h6, legend {
     /*text color of rst content and subheads*/
-    color: #414042;
+    color: #0a270a;
 }
 
 .wy-menu-vertical a {
     /* Text color of toc */
-    color: #025C02;
+    color: #144b14;
 }
 
 .wy-nav-content-wrap {
@@ -56,12 +57,12 @@
 
 .section-title {
     /*text color of section titles*/
-    color:#078E07;
+    color:#0c380c;
 }
 
 .rst-content pre.literal-block, .rst-content div[class^='highlight'] pre, .rst-content .linenodiv pre {
     /*color of code blocks*/
-    background-color: #EEEEEE
+    background-color: #f8feff
 }
 
 h1, h2, .rst-content .toctree-wrapper p.caption, h3, h4, h5, h6, legend {
@@ -80,4 +81,10 @@ h1, h2, .rst-content .toctree-wrapper p.caption, h3, h4, h5, h6, legend {
 .wy-nav-top {
     /*color of nav at top when the window is narrow*/
     background: #43B02A;
+}
+
+
+code.literal {
+    color: #021613 !important;
+    background-color: #f4fdfd !important;
 }

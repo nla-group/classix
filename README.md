@@ -28,7 +28,7 @@ Here is a video abstract of CLASSIX:
 [<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png width=400 />](https://www.youtube.com/watch?v=K94zgRjFEYo)
  
 
-A detailed documentation, including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/).
+A detailed documentation (still in progress), including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/). 
 
 ## Install
 
@@ -148,8 +148,18 @@ There is no path of overlapping groups between these clusters.
 ```
 
 
-## Citation
+## Reproducible experiment
+All empirical data in the paper are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
+Before running, ensure the dependency package `scikit-learn` and `hdbscan` are installed and ``Quickshift++`` code are compiled (obtained in [Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)). After configuring all of these, run the commands below. All results will be stored on ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
 
+```
+cd exp
+python3 run exp_main.py
+```
+
+
+
+## Citation
 ```bibtex
 @techreport{CG22b,
   title   = {Fast and explainable clustering based on sorting},
@@ -165,3 +175,5 @@ There is no path of overlapping groups between these clusters.
 ```
 
 
+## License
+This project is licensed under the terms of the [MIT license](https://github.com/nla-group/classix/blob/master/LICENSE).

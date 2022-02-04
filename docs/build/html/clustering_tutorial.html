@@ -43,6 +43,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Clustering Tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#density-clustering">Density clustering</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#distance-clustering">Distance clustering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualize-connecting-edge">Visualize connecting edge</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="explainable_clustering.html">Explainable Clustering</a></li>
@@ -170,7 +171,7 @@ Usually, the thinner boundary between the clusters are, the lower <code class="d
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="_images/demo2.png" src="_images/demo2.png" />
+<a class="reference internal image-reference" href="_images/demo2.png"><img alt="_images/demo2.png" src="_images/demo2.png" style="width: 360px;" /></a>
 </section>
 <section id="distance-clustering">
 <h2>Distance clustering<a class="headerlink" href="#distance-clustering" title="Permalink to this headline"></a></h2>
@@ -223,8 +224,22 @@ Also, we propose a distance-based clustering exempted from calculating the densi
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img alt="_images/demo3.png" src="_images/demo3.png" />
-<p>There is one more parameter that affect distance based CLASSIX, that is <code class="docutils literal notranslate"><span class="pre">scale</span></code>. Setting <code class="docutils literal notranslate"><span class="pre">radius=1</span></code>, we visualize the connection between starting points with varying <code class="docutils literal notranslate"><span class="pre">scale</span></code> as belows:</p>
+<a class="reference internal image-reference" href="_images/demo3.png"><img alt="_images/demo3.png" src="_images/demo3.png" style="width: 360px;" /></a>
+</section>
+<section id="visualize-connecting-edge">
+<h2>Visualize connecting edge<a class="headerlink" href="#visualize-connecting-edge" title="Permalink to this headline"></a></h2>
+<p>Now we use the same example to demonstrate how cluster are formed by computing starting points and edge connections. We can output the information by</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">clx</span><span class="o">.</span><span class="n">visualize_linkage</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/linkage_scale_1.5_tol_0.1.png" src="_images/linkage_scale_1.5_tol_0.1.png" />
+<p>There is one more parameter that affects distance-based CLASSIX, that is <code class="docutils literal notranslate"><span class="pre">scale</span></code>.  By simply adding the parameter <code class="docutils literal notranslate"><span class="pre">plot_boundary</span></code> and setting it to <code class="docutils literal notranslate"><span class="pre">True</span></code>, then we can obtain the starting points with their group boundary. The visualization of the connecting edge between starting points with varying <code class="docutils literal notranslate"><span class="pre">scale</span></code> is plotted as below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">):</span>
+    <span class="n">classix</span> <span class="o">=</span> <span class="n">CLASSIX</span><span class="p">(</span><span class="n">sorting</span><span class="o">=</span><span class="s1">&#39;pca&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">group_merging</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">classix</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">classix</span><span class="o">.</span><span class="n">visualize_linkage</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">plot_boundary</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 <img alt="_images/single_linkage.png" src="_images/single_linkage.png" />
 <p>Considering a graph constructed by the starting points, as <code class="docutils literal notranslate"><span class="pre">scale</span></code> increases, the number of edges increases, therefore, the connected components area enlarges while the number of connected components decreases.
 Though in most cases, the scale setting is not necessary, when the small <code class="docutils literal notranslate"><span class="pre">radius</span></code> needed, adopting distance-based CLASSIX with an appropriate <code class="docutils literal notranslate"><span class="pre">scale</span></code> can greatly speed up the clustering application, such as image segmentation.</p>
