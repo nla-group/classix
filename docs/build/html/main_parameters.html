@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clustering Parameters &mdash; CLASSIX 0.0.1 documentation</title>
+  <title>Main Parameters &mdash; CLASSIX 0.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/_.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Aggregation Parameters" href="agg_parameters.html" />
-    <link rel="prev" title="Outlier Detection" href="outlier_detection.html" /> 
+    <link rel="prev" title="classix.merging" href="_autosummary/classix.merging.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,14 +45,15 @@
 <li class="toctree-l1"><a class="reference internal" href="outlier_detection.html">Outlier Detection</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Clustering Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Main Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="agg_parameters.html">Aggregation Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mg_parameters.html">Merging Parameters</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acknowledgement.html">Acknowledgement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
 </ul>
 
         </div>
@@ -69,9 +70,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Clustering Parameters</li>
+      <li>Main Parameters</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/clustering_parameters.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/main_parameters.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -79,15 +80,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="clustering-parameters">
-<h1>Clustering Parameters<a class="headerlink" href="#clustering-parameters" title="Permalink to this headline"></a></h1>
+  <section id="main-parameters">
+<h1>Main Parameters<a class="headerlink" href="#main-parameters" title="Permalink to this headline"></a></h1>
 <p>Major classe is <code class="xref py py-class docutils literal notranslate"><span class="pre">CLASSIX</span></code>, which include clustering and visualization.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="classix.clustering.CLASSIX">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">classix.clustering.</span></span><span class="sig-name descname"><span class="pre">CLASSIX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sorting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minPts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_merging</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'distance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_alloc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classix/clustering.html#CLASSIX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classix.clustering.CLASSIX" title="Permalink to this definition"></a></dt>
 <dd><p>CLASSIX: Fast and explainable clustering based on sorting.</p>
-<p>The user only need to concern the hyperparameters of <a href="#id1"><span class="problematic" id="id2">``</span></a>sorting’’, <a href="#id3"><span class="problematic" id="id4">``</span></a>radius’’, and <a href="#id5"><span class="problematic" id="id6">``</span></a>minPts’’ in the most cases.
-If want a flexible clustering, might consider other hyperparameters such as <a href="#id7"><span class="problematic" id="id8">``</span></a>group_merging’’, <a href="#id9"><span class="problematic" id="id10">``</span></a>scale’’, and <a href="#id11"><span class="problematic" id="id12">``</span></a>post_alloc’’.</p>
+<p>The user only need to concern the hyperparameters of <code class="docutils literal notranslate"><span class="pre">sorting</span></code>, <code class="docutils literal notranslate"><span class="pre">radius</span></code>, and <code class="docutils literal notranslate"><span class="pre">minPts</span></code> in the most cases.
+If want a flexible clustering, might consider other hyperparameters such as <code class="docutils literal notranslate"><span class="pre">group_merging'',</span> <span class="pre">``scale</span></code>, and <code class="docutils literal notranslate"><span class="pre">post_alloc</span></code>.</p>
 <dl>
 <dt>sorting<span class="classifier">str, {‘pca’, ‘norm-mean’, ‘norm-orthant’, None}，default=’pca’</span></dt><dd><p>Sorting method used for the aggregation phase.</p>
 <ul class="simple">
@@ -134,25 +135,27 @@ If False, all outliers will be labeled as -1.</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>agg_labels<span class="classifier">numpy.ndarray</span></dt><dd><p>Groups labels of aggregation.</p>
+<dt><a href="#id1"><span class="problematic" id="id2">agg_labels_</span></a><span class="classifier">numpy.ndarray</span></dt><dd><p>Groups labels of aggregation.</p>
 </dd>
-<dt>splist<span class="classifier">numpy.ndarray</span></dt><dd><p>List of starting points formed in the aggregation.</p>
+<dt><a href="#id3"><span class="problematic" id="id4">splist_</span></a><span class="classifier">numpy.ndarray</span></dt><dd><p>List of starting points formed in the aggregation.</p>
 </dd>
-<dt><a href="#id13"><span class="problematic" id="id14">labels_</span></a><span class="classifier">list</span></dt><dd><p>Clustering class labels for data objects</p>
+<dt><a href="#id5"><span class="problematic" id="id6">labels_</span></a><span class="classifier">numpy.ndarray</span></dt><dd><p>Clustering class labels for data objects</p>
 </dd>
-<dt>group_outliers<span class="classifier">numpy.ndarray</span></dt><dd><p>Indices of outliers (aggregation groups level), 
+<dt><a href="#id7"><span class="problematic" id="id8">group_outliers_</span></a><span class="classifier">numpy.ndarray</span></dt><dd><p>Indices of outliers (aggregation groups level), 
 i.e., indices of abnormal groups within the clusters with fewer 
 data points than minPts points.</p>
 </dd>
-<dt>clean_index :</dt><dd><p>The data without outliers. Given data X,  the data without outliers 
-can be exported by X_clean = X[classix.clean_index,:] while the outliers can be exported by 
-Outliers = X[~classix.clean_index,:]</p>
+<dt><a href="#id9"><span class="problematic" id="id10">clean_index_</span></a><span class="classifier">numpy.ndarray</span></dt><dd><p>The data without outliers. Given data X,  the data without outliers 
+can be exported by X_clean = X[<a href="#id11"><span class="problematic" id="id12">classix.clean_index_</span></a>,:] while the outliers can be exported by 
+Outliers = X[~classix.clean_index_,:]</p>
+</dd>
+<dt><a href="#id13"><span class="problematic" id="id14">connected_pairs_</span></a><span class="classifier">list</span></dt><dd><p>List for connected group labels.</p>
 </dd>
 </dl>
 <dl class="simple">
-<dt>fit(data):</dt><dd><p>Cluster data while the parameters of the model will be saved. The labels can be extracted by calling ‘.labels_’</p>
+<dt>fit(data):</dt><dd><p>Cluster data while the parameters of the model will be saved. The labels can be extracted by calling <code class="docutils literal notranslate"><span class="pre">self.labels_</span></code>.</p>
 </dd>
-<dt>fit_transform(data):</dt><dd><p>Cluster data and return labels. The labels can also be extracted by calling ‘.labels_’</p>
+<dt>fit_transform(data):</dt><dd><p>Cluster data and return labels. The labels can also be extracted by calling <code class="docutils literal notranslate"><span class="pre">self.labels_</span></code>.</p>
 </dd>
 <dt>predict(data):</dt><dd><p>After clustering the in-sample data, predict the out-sample data.
 Data will be allocated to the clusters with the nearest starting point in the stage of aggregation. Default values.</p>
@@ -283,12 +286,12 @@ see reference: <a class="reference external" href="https://matplotlib.org/stable
 <dl class="py method">
 <dt class="sig sig-object py" id="classix.clustering.CLASSIX.fit">
 <span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classix/clustering.html#CLASSIX.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classix.clustering.CLASSIX.fit" title="Permalink to this definition"></a></dt>
-<dd><p>Cluster the data.</p>
+<dd><p>Cluster the data and return the associated cluster labels.</p>
 <dl class="simple">
 <dt>data<span class="classifier">numpy.ndarray</span></dt><dd><p>The ndarray-like input of shape (n_samples,)</p>
 </dd>
 </dl>
-<p>None</p>
+<p>self</p>
 </dd></dl>
 
 <dl class="py method">
@@ -300,7 +303,7 @@ see reference: <a class="reference external" href="https://matplotlib.org/stable
 </dd>
 </dl>
 <dl class="simple">
-<dt><a href="#id15"><span class="problematic" id="id16">labels_</span></a><span class="classifier">numpy.ndarray</span></dt><dd><p>The clustering labels.</p>
+<dt>labels<span class="classifier">numpy.ndarray</span></dt><dd><p>Index of the cluster each sample belongs to.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -339,7 +342,7 @@ see reference: <a class="reference external" href="https://matplotlib.org/stable
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="outlier_detection.html" class="btn btn-neutral float-left" title="Outlier Detection" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="_autosummary/classix.merging.html" class="btn btn-neutral float-left" title="classix.merging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="agg_parameters.html" class="btn btn-neutral float-right" title="Aggregation Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

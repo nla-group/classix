@@ -18,7 +18,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Clustering Parameters" href="clustering_parameters.html" />
+    <link rel="next" title="API Reference" href="api_reference.html" />
     <link rel="prev" title="Explainable Clustering" href="explainable_clustering.html" /> 
 </head>
 
@@ -45,14 +45,15 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Outlier Detection</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="clustering_parameters.html">Clustering Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_parameters.html">Main Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="agg_parameters.html">Aggregation Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mg_parameters.html">Merging Parameters</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acknowledgement.html">Acknowledgement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
 </ul>
 
         </div>
@@ -83,6 +84,10 @@
 <h1>Outlier Detection<a class="headerlink" href="#outlier-detection" title="Permalink to this headline"></a></h1>
 <p>The outlier detection function of CLASSIX is fully dominated by the parameter of <code class="docutils literal notranslate"><span class="pre">minPts</span></code>. We have mentioned this parameter in the previous sections. However, if you would like to employ the
 outlier detection, we should set <code class="docutils literal notranslate"><span class="pre">post_alloc=False</span></code>, then the outliers will be marked as -1 instead of being allocated to other clusters. The example is as below:</p>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>The minPts criterion is applied on the cluster level in CLASSIX, while in DBSCAN it is used to distinguish between noise, core, and boundary points.</p>
+</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
 <span class="kn">from</span> <span class="nn">classix</span> <span class="kn">import</span> <span class="n">CLASSIX</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -110,7 +115,7 @@ outlier detection, we should set <code class="docutils literal notranslate"><spa
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="explainable_clustering.html" class="btn btn-neutral float-left" title="Explainable Clustering" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="clustering_parameters.html" class="btn btn-neutral float-right" title="Clustering Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api_reference.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -33,7 +33,7 @@ This data has more than 2 million objects, which is very challenging for most cl
     * 1.5 TB RAM (=1536 GB RAM)
     * 1.8 TB disk space (expandable)
 
-The DBSCAN, HDBSCAN, Quickshift++ fails in this experiment (runtime > 24 hr) while CLASSIX use around 1.2 seconds for clustering of whole data.
+The DBSCAN, HDBSCAN, Quickshift++ fail in this experiment (runtime > 24 hr) while CLASSIX use around 1.2 seconds for clustering of whole data.
 Therefore, to compare the the four algorithms (ensure they can finish clustering within a day), we need to preprocess the data for downsampling:
 
 .. code:: python
@@ -155,7 +155,7 @@ We can simply visualize the runtime:
     ax = sns.barplot(x="clustering", y="runtime", data=data)
     plt.savefig('results/runtime.png', bbox_inches='tight')
 
-The runtime is as below, we can see that CLASSIX achieve faster speed even run with whole data.
+The runtime bar plot is as below, we can see that CLASSIX achieves the fastest speed even if it runs with the whole data.
 
 .. image:: images/runtime_kamil.png
 

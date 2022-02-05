@@ -33,7 +33,7 @@ from scipy.sparse.linalg import svds
 
 # python implementation for aggregation
 def aggregate(data, sorting="pca", tol=0.5): # , verbose=1
-    """aggregate the data
+    """Aggregate the data
 
     Parameters
     ----------

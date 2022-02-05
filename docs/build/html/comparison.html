@@ -45,14 +45,15 @@
 <li class="toctree-l1"><a class="reference internal" href="outlier_detection.html">Outlier Detection</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="clustering_parameters.html">Clustering Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_parameters.html">Main Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="agg_parameters.html">Aggregation Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mg_parameters.html">Merging Parameters</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acknowledgement.html">Acknowledgement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
 </ul>
 
         </div>
@@ -110,7 +111,7 @@ We perform this experiment on Kamil dataset, and synthetic Gaussian blobs cluste
 <li><p>1.8 TB disk space (expandable)</p></li>
 </ul>
 </div></blockquote>
-<p>The DBSCAN, HDBSCAN, Quickshift++ fails in this experiment (runtime &gt; 24 hr) while CLASSIX use around 1.2 seconds for clustering of whole data.
+<p>The DBSCAN, HDBSCAN, Quickshift++ fail in this experiment (runtime &gt; 24 hr) while CLASSIX use around 1.2 seconds for clustering of whole data.
 Therefore, to compare the the four algorithms (ensure they can finish clustering within a day), we need to preprocess the data for downsampling:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This block of code is provided by Kamil Oster</span>
 <span class="n">final_len</span> <span class="o">=</span> <span class="mi">100000</span>
@@ -225,7 +226,7 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
 <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;results/runtime.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The runtime is as below, we can see that CLASSIX achieve faster speed even run with whole data.</p>
+<p>The runtime bar plot is as below, we can see that CLASSIX achieves the fastest speed even if it runs with the whole data.</p>
 <img alt="_images/runtime_kamil.png" src="_images/runtime_kamil.png" />
 <p>Synthetic Gaussian blobs test can be refer to the paper
 The test is referenced from <a class="reference external" href="https://hdbscan.readthedocs.io/en/latest/performance_and_scalability.html">https://hdbscan.readthedocs.io/en/latest/performance_and_scalability.html</a></p>

@@ -4,6 +4,10 @@ Outlier Detection
 The outlier detection function of CLASSIX is fully dominated by the parameter of ``minPts``. We have mentioned this parameter in the previous sections. However, if you would like to employ the 
 outlier detection, we should set ``post_alloc=False``, then the outliers will be marked as -1 instead of being allocated to other clusters. The example is as below:
 
+.. admonition:: Note
+
+    The minPts criterion is applied on the cluster level in CLASSIX, while in DBSCAN it is used to distinguish between noise, core, and boundary points.
+
 .. code:: python
 
     from sklearn import datasets

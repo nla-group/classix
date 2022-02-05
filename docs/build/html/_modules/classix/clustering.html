@@ -42,14 +42,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../../outlier_detection.html">Outlier Detection</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../clustering_parameters.html">Clustering Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../main_parameters.html">Main Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../agg_parameters.html">Aggregation Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../mg_parameters.html">Merging Parameters</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../contact.html">Contact</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../acknowledgement.html">Acknowledgement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact.html">Contact</a></li>
 </ul>
 
         </div>
@@ -136,6 +137,7 @@
 
 
 <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">current_dir</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Download the built-in data.&quot;&quot;&quot;</span>
     <span class="n">url_parent</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/nla-group/classix/raw/master/classix/data/vdu_signals.npy&quot;</span>
     <span class="n">vdu_signals</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url_parent</span><span class="p">)</span><span class="o">.</span><span class="n">content</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s1">&#39;data/vdu_signals.npy&#39;</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handler</span><span class="p">:</span>
@@ -143,6 +145,7 @@
         
 
 <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;vdu_signals&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Obtain the built-in data.&quot;&quot;&quot;</span>
     <span class="n">current_dir</span><span class="p">,</span> <span class="n">current_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
     
     <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;vdu_signals&#39;</span><span class="p">:</span>
@@ -157,11 +160,11 @@
         
         
 <span class="c1"># ******************************************** the main wrapper ********************************************</span>
-<div class="viewcode-block" id="CLASSIX"><a class="viewcode-back" href="../../clustering_parameters.html#classix.clustering.CLASSIX">[docs]</a><span class="k">class</span> <span class="nc">CLASSIX</span><span class="p">:</span>
+<div class="viewcode-block" id="CLASSIX"><a class="viewcode-back" href="../../main_parameters.html#classix.clustering.CLASSIX">[docs]</a><span class="k">class</span> <span class="nc">CLASSIX</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;CLASSIX: Fast and explainable clustering based on sorting.</span>
 <span class="sd">    </span>
-<span class="sd">    The user only need to concern the hyperparameters of ``sorting&#39;&#39;, ``radius&#39;&#39;, and ``minPts&#39;&#39; in the most cases.</span>
-<span class="sd">    If want a flexible clustering, might consider other hyperparameters such as ``group_merging&#39;&#39;, ``scale&#39;&#39;, and ``post_alloc&#39;&#39;.</span>
+<span class="sd">    The user only need to concern the hyperparameters of ``sorting``, ``radius``, and ``minPts`` in the most cases.</span>
+<span class="sd">    If want a flexible clustering, might consider other hyperparameters such as ``group_merging&#39;&#39;, ``scale``, and ``post_alloc``.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -217,33 +220,36 @@
 <span class="sd">             </span>
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    agg_labels : numpy.ndarray</span>
+<span class="sd">    agg_labels_ : numpy.ndarray</span>
 <span class="sd">        Groups labels of aggregation.</span>
 <span class="sd">    </span>
-<span class="sd">    splist : numpy.ndarray</span>
+<span class="sd">    splist_ : numpy.ndarray</span>
 <span class="sd">        List of starting points formed in the aggregation.</span>
 <span class="sd">        </span>
-<span class="sd">    labels_ : list</span>
+<span class="sd">    labels_ : numpy.ndarray</span>
 <span class="sd">        Clustering class labels for data objects </span>
 
-<span class="sd">    group_outliers : numpy.ndarray</span>
+<span class="sd">    group_outliers_ : numpy.ndarray</span>
 <span class="sd">        Indices of outliers (aggregation groups level), </span>
 <span class="sd">        i.e., indices of abnormal groups within the clusters with fewer </span>
 <span class="sd">        data points than minPts points.</span>
 <span class="sd">        </span>
-<span class="sd">    clean_index :</span>
+<span class="sd">    clean_index_ : numpy.ndarray</span>
 <span class="sd">        The data without outliers. Given data X,  the data without outliers </span>
-<span class="sd">        can be exported by X_clean = X[classix.clean_index,:] while the outliers can be exported by </span>
-<span class="sd">        Outliers = X[~classix.clean_index,:] </span>
+<span class="sd">        can be exported by X_clean = X[classix.clean_index_,:] while the outliers can be exported by </span>
+<span class="sd">        Outliers = X[~classix.clean_index_,:] </span>
 <span class="sd">        </span>
-<span class="sd">        </span>
+<span class="sd">    connected_pairs_ : list</span>
+<span class="sd">        List for connected group labels.</span>
+
+
 <span class="sd">    Methods:</span>
 <span class="sd">    ----------</span>
 <span class="sd">    fit(data):</span>
-<span class="sd">        Cluster data while the parameters of the model will be saved. The labels can be extracted by calling &#39;.labels_&#39;</span>
+<span class="sd">        Cluster data while the parameters of the model will be saved. The labels can be extracted by calling ``self.labels_``.</span>
 <span class="sd">        </span>
 <span class="sd">    fit_transform(data):</span>
-<span class="sd">        Cluster data and return labels. The labels can also be extracted by calling &#39;.labels_&#39;</span>
+<span class="sd">        Cluster data and return labels. The labels can also be extracted by calling ``self.labels_``.</span>
 <span class="sd">        </span>
 <span class="sd">    predict(data):</span>
 <span class="sd">        After clustering the in-sample data, predict the out-sample data.</span>
@@ -278,6 +284,7 @@
     <span class="c1">#     even slices and computing them in parallel.</span>
         
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sorting</span><span class="o">=</span><span class="s2">&quot;pca&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">minPts</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">group_merging</span><span class="o">=</span><span class="s2">&quot;distance&quot;</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">post_alloc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span> 
+        
         <span class="c1"># deprecated parameter (15/07/2021): noise_percent=0, distance_scale=1, eta=1, cython=True</span>
         <span class="c1"># eta (deprecated): float, default=1.0</span>
         <span class="c1">#     the value for the density-based groups merging, the groups will </span>
@@ -302,7 +309,6 @@
         <span class="c1">#     the cluster is very likely to be a abnormal cluster.</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
-        <span class="c1"># self.noise_percent = noise_percent</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minPts</span> <span class="o">=</span> <span class="n">minPts</span>
 
         <span class="c1"># if self.minPts == 0:</span>
@@ -324,85 +330,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span> <span class="c1"># For distance measure, usually, we do not use this parameter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">post_alloc</span> <span class="o">=</span> <span class="n">post_alloc</span>
         <span class="c1"># self.n_jobs = n_jobs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">clean_index</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connected_pairs</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">agg_labels_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_index_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connected_pairs_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cluster_color</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">splist_indices</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
             
             
-<div class="viewcode-block" id="CLASSIX.fit"><a class="viewcode-back" href="../../clustering_parameters.html#classix.clustering.CLASSIX.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; </span>
-<span class="sd">        Cluster the data.</span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        data : numpy.ndarray</span>
-<span class="sd">            The ndarray-like input of shape (n_samples,)</span>
-<span class="sd">        </span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-                
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span>  <span class="s1">&#39;float64&#39;</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sorting</span> <span class="o">==</span> <span class="s2">&quot;norm-mean&quot;</span><span class="p">:</span>
-                <span class="c1"># self._mu, self._std = data.mean(axis=0), data.std()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span>
-
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">sorting</span> <span class="o">==</span> <span class="s2">&quot;pca&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="c1"># mean center</span>
-                <span class="n">rds</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># distance of each data point from 0</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">rds</span><span class="p">)</span> <span class="c1"># 50% of data points are within that radius</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span> <span class="c1"># now 50% of data are in unit ball </span>
-
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">sorting</span> <span class="o">==</span> <span class="s2">&quot;norm-orthant&quot;</span><span class="p">:</span>
-                <span class="c1"># self._mu, self._std = data.min(axis=0), data.std()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span>
-
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># self._mu, self._std = data.mean(axis=0), data.std(axis=0) # z-score</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span> <span class="c1"># no normalization</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span> <span class="o">=</span> <span class="mi">1</span>
-            
-        <span class="c1"># aggregation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">agg_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">dist_nr</span> <span class="o">=</span> <span class="n">aggregate</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">sorting</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sorting</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span> 
-        <span class="bp">self</span><span class="o">.</span><span class="n">splist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">)</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">clean_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span> <span class="c1"># claim clean data indices</span>
-        <span class="c1"># clustering</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering</span><span class="p">(</span>
-                            <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> 
-                            <span class="n">agg_labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">agg_labels</span><span class="p">,</span> 
-                            <span class="n">splist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">,</span> 
-                            <span class="n">sorting</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sorting</span><span class="p">,</span> 
-                            <span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> 
-                            <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">group_merging</span><span class="p">,</span> <span class="c1"># eta=self.eta, distance_scale=self.distance_scale, </span>
-                            <span class="n">minPts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">minPts</span> <span class="c1"># percent=self.noise_percent, noise_scale=self.noise_scale,</span>
-        <span class="p">)</span> 
-        <span class="k">return</span> <span class="bp">self</span></div>
-
-
-        
-<div class="viewcode-block" id="CLASSIX.fit_transform"><a class="viewcode-back" href="../../clustering_parameters.html#classix.clustering.CLASSIX.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="CLASSIX.fit"><a class="viewcode-back" href="../../main_parameters.html#classix.clustering.CLASSIX.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">        Cluster the data and return the associated cluster labels. </span>
 <span class="sd">        </span>
@@ -413,8 +352,7 @@
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        labels_ : numpy.ndarray</span>
-<span class="sd">            The clustering labels.</span>
+<span class="sd">        self</span>
 <span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -458,26 +396,45 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span>
         
         <span class="c1"># aggregation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">agg_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_nr</span> <span class="o">=</span> <span class="n">aggregate</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">sorting</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sorting</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span> 
-        <span class="bp">self</span><span class="o">.</span><span class="n">splist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agg_labels_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_nr</span> <span class="o">=</span> <span class="n">aggregate</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">sorting</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sorting</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">splist_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">)</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">clean_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span> <span class="c1"># claim clean data indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_index_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span> <span class="c1"># claim clean data indices</span>
         <span class="c1"># clustering</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-            <span class="n">agg_labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">agg_labels</span><span class="p">,</span> 
-            <span class="n">splist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">,</span>             
+            <span class="n">agg_labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">agg_labels_</span><span class="p">,</span> 
+            <span class="n">splist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">,</span>             
             <span class="n">sorting</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sorting</span><span class="p">,</span> 
             <span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> 
             <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">group_merging</span><span class="p">,</span> <span class="c1"># eta=self.eta, distance_scale=self.distance_scale, </span>
             <span class="n">minPts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">minPts</span> <span class="c1"># percent=self.noise_percent, noise_scale=self.noise_scale,</span>
         <span class="p">)</span> 
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
         
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span></div>
+<div class="viewcode-block" id="CLASSIX.fit_transform"><a class="viewcode-back" href="../../main_parameters.html#classix.clustering.CLASSIX.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Cluster the data and return the associated cluster labels. </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : numpy.ndarray</span>
+<span class="sd">            The ndarray-like input of shape (n_samples,)</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        labels : numpy.ndarray</span>
+<span class="sd">            Index of the cluster each sample belongs to.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">labels_</span></div>
         
         
         
-<div class="viewcode-block" id="CLASSIX.predict"><a class="viewcode-back" href="../../clustering_parameters.html#classix.clustering.CLASSIX.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="CLASSIX.predict"><a class="viewcode-back" href="../../main_parameters.html#classix.clustering.CLASSIX.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Allocate the data to their nearest clusters.</span>
 <span class="sd">        </span>
@@ -520,7 +477,7 @@
         
         <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
-            <span class="n">splabel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[:,</span><span class="mi">3</span><span class="p">:]</span> <span class="o">-</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">splabel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[:,</span><span class="mi">3</span><span class="p">:]</span> <span class="o">-</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
             <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_change</span><span class="p">[</span><span class="n">splabel</span><span class="p">])</span>
 
         <span class="c1"># else:</span>
@@ -530,7 +487,7 @@
     
     
     
-<div class="viewcode-block" id="CLASSIX.clustering"><a class="viewcode-back" href="../../clustering_parameters.html#classix.clustering.CLASSIX.clustering">[docs]</a>    <span class="k">def</span> <span class="nf">clustering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">agg_labels</span><span class="p">,</span> <span class="n">splist</span><span class="p">,</span> <span class="n">sorting</span><span class="o">=</span><span class="s2">&quot;pca&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;distance&quot;</span><span class="p">,</span> <span class="n">minPts</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="CLASSIX.clustering"><a class="viewcode-back" href="../../main_parameters.html#classix.clustering.CLASSIX.clustering">[docs]</a>    <span class="k">def</span> <span class="nf">clustering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">agg_labels</span><span class="p">,</span> <span class="n">splist</span><span class="p">,</span> <span class="n">sorting</span><span class="o">=</span><span class="s2">&quot;pca&quot;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;distance&quot;</span><span class="p">,</span> <span class="n">minPts</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Merge groups after aggregation. </span>
 
@@ -637,31 +594,31 @@
         
         <span class="c1"># --Deprecated </span>
         <span class="c1"># elif method == &#39;trivial-distance&#39;: # deprecated method: brute force</span>
-        <span class="c1">#     self.connected_pairs = agglomerate_trivial(data, splist, radius, &quot;distance&quot;, scale=self.scale)</span>
+        <span class="c1">#     self.connected_pairs_ = agglomerate_trivial(data, splist, radius, &quot;distance&quot;, scale=self.scale)</span>
             <span class="c1"># self.check_labels = labels</span>
             <span class="c1"># reassign lalels, start from 0, since the cluster number not start with 0.</span>
 
             <span class="c1"># we employ an intutive and simple way to implement merging groups, resulting in a fast clustering</span>
-            <span class="c1"># self.merge_groups = merge_pairs_dr(self.connected_pairs)</span>
+            <span class="c1"># self.merge_groups = merge_pairs_dr(self.connected_pairs_)</span>
         
         <span class="c1"># elif method == &#39;trivial-density&#39;: # deprecated method: brute force</span>
-            <span class="c1"># self.connected_pairs = agglomerate_trivial(data, splist, radius, &quot;density&quot;, scale=self.scale)</span>
+            <span class="c1"># self.connected_pairs_ = agglomerate_trivial(data, splist, radius, &quot;density&quot;, scale=self.scale)</span>
             <span class="c1"># self.check_labels = labels</span>
             <span class="c1"># reassign lalels, start from 0, since the cluster number not start with 0.</span>
 
             <span class="c1"># we employ an intutive and simple way to implement merging groups, resulting in a fast clustering</span>
-            <span class="c1"># self.merge_groups = merge_pairs_dr(self.connected_pairs)</span>
+            <span class="c1"># self.merge_groups = merge_pairs_dr(self.connected_pairs_)</span>
         
         <span class="c1"># else:</span>
             <span class="c1"># print(&quot;clusters merging initialize...&quot;)</span>
-            <span class="c1"># self.merge_groups, self.connected_pairs = fast_agglomerate(data, splist, radius, method, scale=self.scale)</span>
+            <span class="c1"># self.merge_groups, self.connected_pairs_ = fast_agglomerate(data, splist, radius, method, scale=self.scale)</span>
             <span class="c1"># self.check_labels = labels</span>
             <span class="c1"># reassign lalels, start from 0, since the cluster number not start with 0.</span>
 
             <span class="c1"># we employ an intutive and simple way to implement merging groups, resulting in a fast clustering</span>
-            <span class="c1"># self.merge_groups = merge_pairs(self.connected_pairs)</span>
+            <span class="c1"># self.merge_groups = merge_pairs(self.connected_pairs_)</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">merge_groups</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_pairs</span> <span class="o">=</span> <span class="n">fast_agglomerate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">splist</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">merge_groups</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_pairs_</span> <span class="o">=</span> <span class="n">fast_agglomerate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">splist</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
         <span class="n">maxid</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         
         <span class="c1"># after this step, the connected pairs (groups) will be transformed into merged clusters, </span>
@@ -722,25 +679,25 @@
             <span class="c1"># self.ne_outliers = np.where(labels != maxid)[0]</span>
             
             <span class="c1"># assign outliers in terms of group level</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">clean_index</span> <span class="o">=</span> <span class="n">labels</span> <span class="o">!=</span> <span class="n">maxid</span>
-            <span class="n">agln</span> <span class="o">=</span> <span class="n">agg_labels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_index</span><span class="p">]</span>
-            <span class="c1"># agg_clean_index = np.unique(agln) # extract the unique number of aggregation groups.</span>
-            <span class="c1"># agg_noise_index = np.unique(self.agg_labels[self.outliers]) # extract the unique number of aggregation groups.</span>
-            <span class="c1"># print(&quot;agg_clean_index:&quot;, agg_clean_index)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">label_change</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">agln</span><span class="p">,</span> <span class="n">labels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_index</span><span class="p">]))</span> <span class="c1"># how object change group to cluster.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clean_index_</span> <span class="o">=</span> <span class="n">labels</span> <span class="o">!=</span> <span class="n">maxid</span>
+            <span class="n">agln</span> <span class="o">=</span> <span class="n">agg_labels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_index_</span><span class="p">]</span>
+            <span class="c1"># agg_clean_index_ = np.unique(agln) # extract the unique number of aggregation groups.</span>
+            <span class="c1"># agg_noise_index = np.unique(self.agg_labels_[self.outliers]) # extract the unique number of aggregation groups.</span>
+            <span class="c1"># print(&quot;aggregation clean index:&quot;, agg_clean_index_)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_change</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">agln</span><span class="p">,</span> <span class="n">labels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_index_</span><span class="p">]))</span> <span class="c1"># how object change group to cluster.</span>
             <span class="c1"># print(&quot;label change:&quot;, self.label_change)</span>
             <span class="c1"># allocate the outliers to the corresponding closest cluster.</span>
             
-            <span class="bp">self</span><span class="o">.</span><span class="n">group_outliers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">agg_labels</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_index</span><span class="p">])</span> <span class="c1"># abnormal groups</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group_outliers_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">agg_labels</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_index_</span><span class="p">])</span> <span class="c1"># abnormal groups</span>
             <span class="n">unique_agln</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">agln</span><span class="p">)</span>
             <span class="n">splist_clean</span> <span class="o">=</span> <span class="n">splist</span><span class="p">[</span><span class="n">unique_agln</span><span class="p">]</span>
-            <span class="c1"># splist_outliers = splist[self.group_outliers] </span>
+            <span class="c1"># splist_outliers = splist[self.group_outliers_] </span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_alloc</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">nsp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_outliers</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">nsp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_outliers_</span><span class="p">:</span>
                     <span class="n">alloc_class</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">splist_clean</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:]</span> <span class="o">-</span> <span class="n">splist</span><span class="p">[</span><span class="n">nsp</span><span class="p">,</span> <span class="mi">3</span><span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
                     <span class="n">labels</span><span class="p">[</span><span class="n">agg_labels</span> <span class="o">==</span> <span class="n">nsp</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_change</span><span class="p">[</span><span class="n">unique_agln</span><span class="p">[</span><span class="n">alloc_class</span><span class="p">]]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">labels</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">agg_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_outliers</span><span class="p">)]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="n">labels</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">agg_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_outliers_</span><span class="p">)]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
             <span class="c1"># previous code works on the point level</span>
             <span class="c1"># ----------------------------------- old code 1-----------------------------------</span>
             <span class="c1"># self.outliers = np.where(labels == maxid)[0]</span>
@@ -756,7 +713,7 @@
             <span class="c1"># -------------------------------------------------------------------------------- </span>
             
             <span class="c1"># ----------------------------------- old code 2-----------------------------------</span>
-            <span class="c1"># splist_clean = splist[agg_clean_index]</span>
+            <span class="c1"># splist_clean = splist[agg_clean_index_]</span>
             <span class="c1"># print(&quot;splist_clean:&quot;, splist_clean)</span>
             <span class="c1"># if self.outliers.size &gt; 0:</span>
             <span class="c1">#     # marked outliers location, and allocate the outliers to their closest clusters.</span>
@@ -807,7 +764,7 @@
     
     
     
-<div class="viewcode-block" id="CLASSIX.explain"><a class="viewcode-back" href="../../clustering_parameters.html#classix.clustering.CLASSIX.explain">[docs]</a>    <span class="k">def</span> <span class="nf">explain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index1</span><span class="o">=</span><span class="s2">&quot;NULL&quot;</span><span class="p">,</span> <span class="n">index2</span><span class="o">=</span><span class="s2">&quot;NULL&quot;</span><span class="p">,</span> <span class="n">showsplist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_colwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">replace_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+<div class="viewcode-block" id="CLASSIX.explain"><a class="viewcode-back" href="../../main_parameters.html#classix.clustering.CLASSIX.explain">[docs]</a>    <span class="k">def</span> <span class="nf">explain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index1</span><span class="o">=</span><span class="s2">&quot;NULL&quot;</span><span class="p">,</span> <span class="n">index2</span><span class="o">=</span><span class="s2">&quot;NULL&quot;</span><span class="p">,</span> <span class="n">showsplist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_colwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">replace_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                 <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">figstyle</span><span class="o">=</span><span class="s2">&quot;ggplot&quot;</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ind_color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">ind_marker_size</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>
                 <span class="n">sp_fcolor</span><span class="o">=</span><span class="s1">&#39;tomato&#39;</span><span class="p">,</span>  <span class="n">sp_alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">sp_pad</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sp_fontsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sp_bbox</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                 <span class="n">dp_fcolor</span><span class="o">=</span><span class="s1">&#39;bisque&#39;</span><span class="p">,</span>  <span class="n">dp_alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">dp_pad</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dp_fontsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dp_bbox</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -922,17 +879,17 @@
         
         <span class="c1"># deprecated (24/07/2021)</span>
         <span class="c1"># cols = [&quot;NrPts&quot;] </span>
-        <span class="c1"># for i in range(self.splist.shape[1] - 2):</span>
+        <span class="c1"># for i in range(self.splist_.shape[1] - 2):</span>
         <span class="c1">#     cols = cols + [&quot;feat.&quot; + str(i + 1)]</span>
         
         <span class="c1"># deprecated (24/07/2021)</span>
         <span class="c1"># -----------------------------alternative method--------------------------------</span>
-        <span class="c1"># if self.splist.shape[1] - 2 !=2:</span>
+        <span class="c1"># if self.splist_.shape[1] - 2 !=2:</span>
         <span class="c1">#     pca = PCA(n_components=2)</span>
-        <span class="c1">#     x_pca = pca.fit_transform(self.splist[:, 3:])</span>
-        <span class="c1">#     spdisplay = pd.DataFrame(np.hstack((self.splist[:, 0:2], x_pca)), columns=cols)</span>
+        <span class="c1">#     x_pca = pca.fit_transform(self.splist_[:, 3:])</span>
+        <span class="c1">#     spdisplay = pd.DataFrame(np.hstack((self.splist_[:, 0:2], x_pca)), columns=cols)</span>
         <span class="c1"># else:</span>
-        <span class="c1">#     spdisplay = pd.DataFrame(self.splist[:, 1:], columns=cols)</span>
+        <span class="c1">#     spdisplay = pd.DataFrame(self.splist_[:, 1:], columns=cols)</span>
         
         <span class="c1"># -----------------------------second method--------------------------------</span>
         <span class="k">if</span> <span class="n">sp_bbox</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -963,21 +920,21 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="c1"># self.pca = PCA(n_components=2)</span>
                 <span class="c1"># self.x_pca = self.pca.fit_transform(self.data)</span>
-                <span class="c1"># self.s_pca = self.pca.transform(self.data[self.splist[:, 0].astype(int)])</span>
+                <span class="c1"># self.s_pca = self.pca.transform(self.data[self.splist_[:, 0].astype(int)])</span>
                 <span class="n">scaled_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
                 <span class="n">_U</span><span class="p">,</span> <span class="n">_s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_V</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">scaled_data</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">return_singular_vectors</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">x_pca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">scaled_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_V</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">_s</span><span class="p">)]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">s_pca</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_pca</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">s_pca</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_pca</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
                 
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">x_pca</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">s_pca</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span> <span class="c1"># self.splist[:, 3:].copy()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">s_pca</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span> <span class="c1"># self.splist_[:, 3:].copy()</span>
 
             <span class="k">else</span><span class="p">:</span> <span class="c1"># when data is one-dimensional, no PCA transform</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">x_pca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()),</span> <span class="mi">2</span><span class="p">))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">x_pca</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">s_pca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">s_pca</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span> <span class="c1"># self.splist[:, 2]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">s_pca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">s_pca</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span> <span class="c1"># self.splist_[:, 2]</span>
                 
                 <span class="c1"># remove (24/07/2021):</span>
                 <span class="c1"># print(&quot;This function is restricted to multidimensional (dimension greater than or equal to 2) data.&quot;)</span>
@@ -986,7 +943,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please enter a valid value for index1.&quot;</span><span class="p">)</span>
             
         <span class="c1"># pd.options.display.max_colwidth = colwidth</span>
-        <span class="n">dash_line</span> <span class="o">=</span> <span class="s2">&quot;--------&quot;</span><span class="o">*</span><span class="mi">5</span> <span class="c1"># &quot;--------&quot;*(self.splist.shape[1])</span>
+        <span class="n">dash_line</span> <span class="o">=</span> <span class="s2">&quot;--------&quot;</span><span class="o">*</span><span class="mi">5</span> <span class="c1"># &quot;--------&quot;*(self.splist_.shape[1])</span>
             
         <span class="k">if</span> <span class="n">index1</span> <span class="o">==</span> <span class="s2">&quot;NULL&quot;</span><span class="p">:</span> <span class="c1"># analyze in the general way with a global view</span>
             <span class="k">if</span> <span class="n">plot</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
@@ -1001,8 +958,8 @@
                 <span class="n">scl</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_scl</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">tolscl</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_scl</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span>
             <span class="p">))</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;In total </span><span class="si">{dist:.0f}</span><span class="s2"> comparisons were required (</span><span class="si">{avg:.2f}</span><span class="s2"> comparisons per data point). &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_nr</span><span class="p">,</span> <span class="n">avg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_nr</span><span class="o">/</span><span class="n">data_size</span><span class="p">))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;This resulted in </span><span class="si">{groups:.0f}</span><span class="s2"> groups, each uniquely associated with a starting point. &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;These </span><span class="si">{groups:.0f}</span><span class="s2"> groups were subsequently merged into </span><span class="si">{num_clusters:.0f}</span><span class="s2"> clusters. &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">num_clusters</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels_</span><span class="p">))))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;This resulted in </span><span class="si">{groups:.0f}</span><span class="s2"> groups, each uniquely associated with a starting point. &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;These </span><span class="si">{groups:.0f}</span><span class="s2"> groups were subsequently merged into </span><span class="si">{num_clusters:.0f}</span><span class="s2"> clusters. &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">groups</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">num_clusters</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels_</span><span class="p">))))</span>
             
             <span class="k">if</span> <span class="n">showsplist</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;A list of all starting points is shown below.&quot;&quot;&quot;</span><span class="p">)</span>
@@ -1018,7 +975,7 @@
         <span class="k">else</span><span class="p">:</span> <span class="c1"># explain(index1)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index1</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
                 <span class="n">object1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_pca</span><span class="p">[</span><span class="n">index1</span><span class="p">]</span> <span class="c1"># self.data has been normalized</span>
-                <span class="n">agg_label1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agg_labels</span><span class="p">[</span><span class="n">index1</span><span class="p">]</span> <span class="c1"># get the group index for object1</span>
+                <span class="n">agg_label1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agg_labels_</span><span class="p">[</span><span class="n">index1</span><span class="p">]</span> <span class="c1"># get the group index for object1</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">object1</span> <span class="o">=</span> <span class="p">(</span><span class="n">index1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span> <span class="c1"># allow for out-sample data</span>
                 <span class="n">agg_label1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_pca</span> <span class="o">-</span> <span class="n">object1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span> <span class="c1"># get the group index for object1</span>
@@ -1031,7 +988,7 @@
             
             <span class="c1"># explain one object</span>
             <span class="c1"># cluster_centers = self.calculate_group_centers(self.data, self.labels_)</span>
-            <span class="c1"># print(&quot;Starting point list of {} data:&quot;.format(len(self.agg_labels)))</span>
+            <span class="c1"># print(&quot;Starting point list of {} data:&quot;.format(len(self.agg_labels_)))</span>
 
             <span class="k">if</span> <span class="n">index2</span> <span class="o">==</span> <span class="s2">&quot;NULL&quot;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">replace_name</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
@@ -1043,7 +1000,7 @@
                     <span class="n">index1_name</span> <span class="o">=</span> <span class="n">index1</span>
 
                 <span class="n">cluster_label1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_change</span><span class="p">[</span><span class="n">agg_label1</span><span class="p">]</span>
-                <span class="n">sp_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[</span><span class="n">agg_label1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:]</span>
+                <span class="n">sp_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[</span><span class="n">agg_label1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:]</span>
                 
                 <span class="k">if</span> <span class="n">plot</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">figstyle</span><span class="p">)</span>
@@ -1070,13 +1027,13 @@
                         <span class="k">if</span> <span class="n">sp_fontsize</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">s_pca</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">s_pca</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
                                     <span class="n">s</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="o">.</span><span class="n">Group</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="o">.</span><span class="n">Cluster</span> <span class="o">==</span> <span class="n">cluster_label1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
-                                    <span class="c1"># self.splist[self.sp_info.Cluster == cluster_label1, 1][i].astype(int).astype(str), </span>
+                                    <span class="c1"># self.splist_[self.sp_info.Cluster == cluster_label1, 1][i].astype(int).astype(str), </span>
                                     <span class="n">bbox</span><span class="o">=</span><span class="n">sp_bbox</span>
                             <span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">s_pca</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">s_pca</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
                                     <span class="n">s</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="o">.</span><span class="n">Group</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="o">.</span><span class="n">Cluster</span> <span class="o">==</span> <span class="n">cluster_label1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span>
-                                    <span class="c1"># self.splist[self.sp_info.Cluster == cluster_label1, 1][i].astype(int).astype(str), </span>
+                                    <span class="c1"># self.splist_[self.sp_info.Cluster == cluster_label1, 1][i].astype(int).astype(str), </span>
                                     <span class="n">fontsize</span><span class="o">=</span><span class="n">sp_fontsize</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="n">sp_bbox</span>
                             <span class="p">)</span>
                     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
@@ -1097,7 +1054,7 @@
                     <span class="c1"># if self.data.shape[1] != 2:</span>
                     <span class="c1">#     pca = PCA(n_components=2)</span>
                     <span class="c1">#     x_pca = pca.fit_transform(self.data)</span>
-                    <span class="c1">#     s_pca = pca.transform(self.splist[:, 3:])</span>
+                    <span class="c1">#     s_pca = pca.transform(self.splist_[:, 3:])</span>
                     <span class="c1">#     </span>
                     <span class="c1">#     # select indices</span>
                     <span class="c1">#     x_pca = x_pca[self.labels_ == cluster_label1]</span>
@@ -1114,7 +1071,7 @@
                     <span class="c1">#         ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))</span>
                     <span class="c1">#         ax.set_aspect(&#39;equal&#39;, adjustable=&#39;datalim&#39;)</span>
                     <span class="c1">#         ax.text(s_pca[i, 0], s_pca[i, 1],</span>
-                    <span class="c1">#                  s=self.splist[self.sp_info.Cluster == cluster_label1,1][i].astype(int).astype(str), </span>
+                    <span class="c1">#                  s=self.splist_[self.sp_info.Cluster == cluster_label1,1][i].astype(int).astype(str), </span>
                     <span class="c1">#                  bbox=sp_bbox)</span>
                     <span class="c1">#     ax.plot()</span>
                     <span class="c1">#     if savefig:</span>
@@ -1126,7 +1083,7 @@
                         
                     <span class="c1"># elif self.data.shape[1] == 2:</span>
                     <span class="c1">#     x_pca = self.data.copy()</span>
-                    <span class="c1">#     s_pca = self.splist[:, 3:].copy()</span>
+                    <span class="c1">#     s_pca = self.splist_[:, 3:].copy()</span>
                     <span class="c1">#     </span>
                     <span class="c1">#     # select indices</span>
                     <span class="c1">#     x_pca = x_pca[self.labels_ == cluster_label1]</span>
@@ -1143,7 +1100,7 @@
                     <span class="c1">#         ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))</span>
                     <span class="c1">#         ax.set_aspect(&#39;equal&#39;, adjustable=&#39;datalim&#39;)</span>
                     <span class="c1">#         plt.text(s_pca[i, 0], s_pca[i, 1],</span>
-                    <span class="c1">#                  s=self.splist[self.sp_info.Cluster == cluster_label1,1][i].astype(int).astype(str), </span>
+                    <span class="c1">#                  s=self.splist_[self.sp_info.Cluster == cluster_label1,1][i].astype(int).astype(str), </span>
                     <span class="c1">#                  bbox=sp_bbox)</span>
                     <span class="c1">#     ax.plot() </span>
                     <span class="c1">#     if savefig:</span>
@@ -1176,7 +1133,7 @@
             <span class="k">else</span><span class="p">:</span> <span class="c1"># explain(index1, index2)</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index2</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
                     <span class="n">object2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_pca</span><span class="p">[</span><span class="n">index2</span><span class="p">]</span> <span class="c1"># self.data has been normalized</span>
-                    <span class="n">agg_label2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agg_labels</span><span class="p">[</span><span class="n">index2</span><span class="p">]</span> <span class="c1"># get the group index for object2</span>
+                    <span class="n">agg_label2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agg_labels_</span><span class="p">[</span><span class="n">index2</span><span class="p">]</span> <span class="c1"># get the group index for object2</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">object2</span> <span class="o">=</span> <span class="p">(</span><span class="n">index2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span> <span class="c1"># allow for out-sample data</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
@@ -1207,14 +1164,14 @@
                
                 
                 <span class="k">if</span> <span class="n">agg_label1</span> <span class="o">==</span> <span class="n">agg_label2</span><span class="p">:</span> <span class="c1"># when ind1 &amp; ind2 are in the same group</span>
-                    <span class="n">sp_str</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array2string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[</span><span class="n">agg_label1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:],</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                    <span class="n">sp_str</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array2string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[</span><span class="n">agg_label1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:],</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The data points </span><span class="si">%(index1)s</span><span class="s2"> and </span><span class="si">%(index2)s</span><span class="s2"> are in the same group </span><span class="si">%(agg_id)i</span><span class="s2">, hence were merged into the same cluster #</span><span class="si">%(m_c)i</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">{</span>
                         <span class="s2">&quot;index1&quot;</span><span class="p">:</span><span class="n">index1</span><span class="p">,</span> <span class="s2">&quot;index2&quot;</span><span class="p">:</span><span class="n">index2</span><span class="p">,</span> <span class="s2">&quot;agg_id&quot;</span><span class="p">:</span><span class="n">agg_label1</span><span class="p">,</span> <span class="s2">&quot;m_c&quot;</span><span class="p">:</span><span class="n">cluster_label1</span><span class="p">}</span>
                     <span class="p">)</span>
                     <span class="n">connected_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">agg_label1</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">sp1_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[</span><span class="n">agg_label1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:]</span>
-                    <span class="n">sp2_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[</span><span class="n">agg_label2</span><span class="p">,</span> <span class="mi">3</span><span class="p">:]</span>
+                    <span class="n">sp1_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[</span><span class="n">agg_label1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:]</span>
+                    <span class="n">sp2_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[</span><span class="n">agg_label2</span><span class="p">,</span> <span class="mi">3</span><span class="p">:]</span>
                     <span class="c1"># print(&quot;&quot;&quot;The two objects are assigned to different groups through aggregation.&quot;&quot;&quot;)</span>
 
                     <span class="c1"># print(</span>
@@ -1227,20 +1184,20 @@
                     <span class="c1">#     &quot;agg_id&quot;:agg_label2, &quot;sp&quot;:sp2_str, &quot;radius&quot;:self.radius, &quot;m_c&quot;:cluster_label2</span>
                     <span class="c1"># })</span>
                     
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_pairs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">distm</span> <span class="o">=</span> <span class="n">pairwise_distances</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[:,</span><span class="mi">3</span><span class="p">:],</span> <span class="n">Y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_pairs_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">distm</span> <span class="o">=</span> <span class="n">pairwise_distances</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[:,</span><span class="mi">3</span><span class="p">:],</span> <span class="n">Y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span>
                         <span class="n">distm</span> <span class="o">=</span> <span class="p">(</span><span class="n">distm</span> <span class="o">&lt;=</span> <span class="n">radius</span><span class="o">*</span><span class="n">scale</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">connected_pairs</span> <span class="o">=</span> <span class="n">return_csr_matrix_indices</span><span class="p">(</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">distm</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="c1"># list</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">connected_pairs_</span> <span class="o">=</span> <span class="n">return_csr_matrix_indices</span><span class="p">(</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">distm</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="c1"># list</span>
                         
                     <span class="k">if</span> <span class="n">cluster_label1</span> <span class="o">==</span> <span class="n">cluster_label2</span><span class="p">:</span> <span class="c1"># when ind1 &amp; ind2 are in the same cluster but diff group</span>
                         <span class="c1"># deprecated (24/07/2021)  from scipy.sparse.csgraph import shortest_path -&gt; Dijkstra’s algorithm </span>
-                        <span class="c1"># path_graph = pairs_to_graph(self.connected_pairs, N=self.splist.shape[0], sparse=True)</span>
+                        <span class="c1"># path_graph = pairs_to_graph(self.connected_pairs_, N=self.splist_.shape[0], sparse=True)</span>
                         <span class="c1">## apply Dijkstra’s algorithm with Fibonacci heaps for shortest path finding</span>
                         <span class="c1"># dist_matrix, predecessors = shortest_path(csgraph=path_graph, method=&quot;D&quot;, directed=False, return_predecessors=True) </span>
                         <span class="c1"># connected_paths = get_shortest_path(predecessors, agg_label1, agg_label2)</span>
                         <span class="n">connected_paths</span> <span class="o">=</span> <span class="n">find_shortest_path</span><span class="p">(</span><span class="n">agg_label1</span><span class="p">,</span>
-                                                             <span class="bp">self</span><span class="o">.</span><span class="n">connected_pairs</span><span class="p">,</span>
-                                                             <span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                             <span class="bp">self</span><span class="o">.</span><span class="n">connected_pairs_</span><span class="p">,</span>
+                                                             <span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                                              <span class="n">agg_label2</span>
                         <span class="p">)</span>
                         
@@ -1354,7 +1311,7 @@
                     <span class="c1"># if self.data.shape[1] &gt; 2:</span>
                     <span class="c1">#     pca = PCA(n_components=2)</span>
                     <span class="c1">#     x_pca = pca.fit_transform(self.data)</span>
-                    <span class="c1">#     s_pca = pca.transform(self.splist[:, 3:])</span>
+                    <span class="c1">#     s_pca = pca.transform(self.splist_[:, 3:])</span>
                     <span class="c1">#     </span>
                     <span class="c1">#     # select indices</span>
                     <span class="c1">#     x_pca = x_pca[(self.labels_ == cluster_label1) | (self.labels_ == cluster_label2)]</span>
@@ -1387,7 +1344,7 @@
                     <span class="c1">#     </span>
                     <span class="c1"># elif self.data.shape[1] == 2:</span>
                     <span class="c1">#     x_pca = self.data.copy()</span>
-                    <span class="c1">#     s_pca = self.splist[:, 3:].copy()</span>
+                    <span class="c1">#     s_pca = self.splist_[:, 3:].copy()</span>
                     <span class="c1">#     </span>
                     <span class="c1">#     # select indices</span>
                     <span class="c1">#     x_pca = x_pca[(self.labels_ == cluster_label1) | (self.labels_ == cluster_label2)]</span>
@@ -1435,7 +1392,7 @@
     
     
     
-<div class="viewcode-block" id="CLASSIX.explain_viz"><a class="viewcode-back" href="../../clustering_parameters.html#classix.clustering.CLASSIX.explain_viz">[docs]</a>    <span class="k">def</span> <span class="nf">explain_viz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">figstyle</span><span class="o">=</span><span class="s2">&quot;ggplot&quot;</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;facecolor&#39;</span><span class="p">:</span> <span class="s1">&#39;tomato&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="CLASSIX.explain_viz"><a class="viewcode-back" href="../../main_parameters.html#classix.clustering.CLASSIX.explain_viz">[docs]</a>    <span class="k">def</span> <span class="nf">explain_viz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">figstyle</span><span class="o">=</span><span class="s2">&quot;ggplot&quot;</span><span class="p">,</span> <span class="n">savefig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;facecolor&#39;</span><span class="p">:</span> <span class="s1">&#39;tomato&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Visualize the starting point and data points</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1480,14 +1437,14 @@
         
         
 
-<div class="viewcode-block" id="CLASSIX.form_starting_point_clusters_table"><a class="viewcode-back" href="../../clustering_parameters.html#classix.clustering.CLASSIX.form_starting_point_clusters_table">[docs]</a>    <span class="k">def</span> <span class="nf">form_starting_point_clusters_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="CLASSIX.form_starting_point_clusters_table"><a class="viewcode-back" href="../../main_parameters.html#classix.clustering.CLASSIX.form_starting_point_clusters_table">[docs]</a>    <span class="k">def</span> <span class="nf">form_starting_point_clusters_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;form the columns details for starting points and clusters information&quot;&quot;&quot;</span>
-        <span class="c1"># won&#39;t change the original order of self.splist</span>
+        <span class="c1"># won&#39;t change the original order of self.splist_</span>
         <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Group&quot;</span><span class="p">,</span> <span class="s2">&quot;NrPts&quot;</span><span class="p">]</span>
         <span class="n">coord</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         
         <span class="k">if</span> <span class="n">aggregate</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:],</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:],</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
                 <span class="n">fill</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
@@ -1499,10 +1456,10 @@
                 <span class="n">fill</span> <span class="o">+=</span> <span class="s2">&quot;&quot;</span>
                 <span class="n">coord</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fill</span><span class="p">)</span>
 
-            <span class="c1"># self.sp_info = pd.DataFrame(self.splist[:, 1:2], columns=cols)</span>
+            <span class="c1"># self.sp_info = pd.DataFrame(self.splist_[:, 1:2], columns=cols)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]:</span>
                 <span class="n">fill</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
                 <span class="n">sp_item</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="p">:],</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sp_item</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
@@ -1516,10 +1473,10 @@
                 <span class="n">coord</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fill</span><span class="p">)</span>
                 
         <span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="p">[</span><span class="s2">&quot;Group&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="p">[</span><span class="s2">&quot;NrPts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="p">[</span><span class="s2">&quot;Cluster&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">label_change</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="p">[</span><span class="s2">&quot;Coordinates&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coord</span> <span class="c1"># np.around(self.splist[:,3:], 2).tolist()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="p">[</span><span class="s2">&quot;Group&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="p">[</span><span class="s2">&quot;NrPts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="p">[</span><span class="s2">&quot;Cluster&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">label_change</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sp_info</span><span class="p">[</span><span class="s2">&quot;Coordinates&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coord</span> <span class="c1"># np.around(self.splist_[:,3:], 2).tolist()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sp_to_c_info</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span></div>
         
@@ -1528,17 +1485,17 @@
     <span class="k">def</span> <span class="nf">visualize_linkage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">320</span><span class="p">,</span> <span class="n">plot_boundary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                              <span class="n">bound_color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">):</span>
         
-        <span class="n">distm</span><span class="p">,</span> <span class="n">n_components</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">visualize_connections</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">distm</span><span class="p">,</span> <span class="n">n_components</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">visualize_connections</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
         <span class="c1"># plt.figure(figsize=figsize)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.facecolor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;white&#39;</span>
         <span class="k">if</span> <span class="n">norm</span><span class="p">:</span>
-            <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:]</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_scl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_scl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span>
         <span class="n">link_list</span> <span class="o">=</span> <span class="n">return_csr_matrix_indices</span><span class="p">(</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">distm</span><span class="p">))</span>
         
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="n">markersize</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">plot_boundary</span><span class="p">:</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">Circle</span><span class="p">((</span><span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">P</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> 
@@ -1564,7 +1521,7 @@
     <span class="k">def</span> <span class="nf">load_splist_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist_indices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">splist_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">splist_indices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splist</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">splist_indices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">splist_</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">splist_indices</span>
         
         
@@ -1588,7 +1545,7 @@
 
     
     
-<div class="viewcode-block" id="CLASSIX.outlier_filter"><a class="viewcode-back" href="../../clustering_parameters.html#classix.clustering.CLASSIX.outlier_filter">[docs]</a>    <span class="k">def</span> <span class="nf">outlier_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">min_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_samples_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span> <span class="c1"># percent</span>
+<div class="viewcode-block" id="CLASSIX.outlier_filter"><a class="viewcode-back" href="../../main_parameters.html#classix.clustering.CLASSIX.outlier_filter">[docs]</a>    <span class="k">def</span> <span class="nf">outlier_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">min_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_samples_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span> <span class="c1"># percent</span>
         <span class="sd">&quot;&quot;&quot;Filter outliers in terms of min_samples&quot;&quot;&quot;</span>
         <span class="c1"># print(&quot;Min_samples (minPts):{:.0f}&quot;.format(min_samples))</span>
         <span class="c1"># self.cluster_count_dict = collections.Counter(labels) # move</span>
@@ -1923,6 +1880,7 @@
 
 
 <span class="k">def</span> <span class="nf">pairwise_distances</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the Euclidean distance matrix.&quot;&quot;&quot;</span>
     <span class="n">distm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
@@ -1932,6 +1890,7 @@
 
 
 <span class="k">def</span> <span class="nf">visualize_connections</span><span class="p">(</span><span class="n">splist</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the connected components for graph constructed by starting points given radius and scale.&quot;&quot;&quot;</span>
     <span class="n">distm</span> <span class="o">=</span> <span class="n">pairwise_distances</span><span class="p">(</span><span class="n">splist</span><span class="p">[:,</span><span class="mi">3</span><span class="p">:])</span>
     <span class="n">tol</span> <span class="o">=</span> <span class="n">radius</span><span class="o">*</span><span class="n">scale</span>
     <span class="n">distm</span> <span class="o">=</span> <span class="p">(</span><span class="n">distm</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
@@ -1941,6 +1900,7 @@
     
     
 <span class="k">def</span> <span class="nf">novel_normalization</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initial data preparation of CLASSIX.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">base</span> <span class="o">==</span> <span class="s2">&quot;norm-mean&quot;</span><span class="p">:</span>
         <span class="c1"># self._mu, self._std = data.mean(axis=0), data.std()</span>
         <span class="n">_mu</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -1970,6 +1930,7 @@
 
 
 <span class="k">def</span> <span class="nf">calculate_cluster_centers</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the mean centers of clusters from given data.&quot;&quot;&quot;</span>
     <span class="n">ulabels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
     <span class="n">centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">ulabels</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ulabels</span><span class="p">:</span>
@@ -1990,7 +1951,7 @@
 
 
 <span class="k">def</span> <span class="nf">find_shortest_path</span><span class="p">(</span><span class="n">source_node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">connected_pairs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_node</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;get single-sourse shortest paths as well as distance from source node,</span>
+    <span class="sd">&quot;&quot;&quot;Get single-sourse shortest paths as well as distance from source node,</span>
 <span class="sd">    design especially for unweighted undirected graph. The time complexity is O(|V| + |E|)</span>
 <span class="sd">    where |V| is the number of vertices and |E| is the number of edges.</span>
 <span class="sd">    </span>
@@ -2074,7 +2035,8 @@
 
 
 
-<span class="k">def</span> <span class="nf">return_csr_matrix_indices</span><span class="p">(</span><span class="n">csr_matrix</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">return_csr_matrix_indices</span><span class="p">(</span><span class="n">csr_matrix</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;Return sparce matrix indices.&quot;&quot;&quot;</span>
     <span class="n">shape_dim1</span><span class="p">,</span> <span class="n">shape_dim2</span> <span class="o">=</span> <span class="n">csr_matrix</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">length_range</span> <span class="o">=</span> <span class="n">csr_matrix</span><span class="o">.</span><span class="n">indices</span>
 

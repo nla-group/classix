@@ -50,14 +50,15 @@
 <li class="toctree-l1"><a class="reference internal" href="outlier_detection.html">Outlier Detection</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="clustering_parameters.html">Clustering Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_parameters.html">Main Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="agg_parameters.html">Aggregation Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mg_parameters.html">Merging Parameters</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acknowledgement.html">Acknowledgement</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
 </ul>
 
         </div>
@@ -229,6 +230,10 @@ Also, we propose a distance-based clustering exempted from calculating the densi
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="_images/demo3.png"><img alt="_images/demo3.png" src="_images/demo3.png" style="width: 360px;" /></a>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>The density-based merging criterion usually results in slightly better clusters than the distance-based criterion, but the latter has a significant speed advantage.</p>
+</div>
 </section>
 <section id="visualize-connecting-edge">
 <h2>Visualize connecting edge<a class="headerlink" href="#visualize-connecting-edge" title="Permalink to this headline"></a></h2>
@@ -237,6 +242,10 @@ Also, we propose a distance-based clustering exempted from calculating the densi
 </pre></div>
 </div>
 <img alt="_images/linkage_scale_1.5_tol_0.1.png" src="_images/linkage_scale_1.5_tol_0.1.png" />
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>The starting points can be interpreted as a reduced-density estimator of the data.</p>
+</div>
 <p>There is one more parameter that affects distance-based CLASSIX, that is <code class="docutils literal notranslate"><span class="pre">scale</span></code>.  By simply adding the parameter <code class="docutils literal notranslate"><span class="pre">plot_boundary</span></code> and setting it to <code class="docutils literal notranslate"><span class="pre">True</span></code>, then we can obtain the starting points with their group boundary. The visualization of the connecting edge between starting points with varying <code class="docutils literal notranslate"><span class="pre">scale</span></code> is plotted as below:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">):</span>
     <span class="n">classix</span> <span class="o">=</span> <span class="n">CLASSIX</span><span class="p">(</span><span class="n">sorting</span><span class="o">=</span><span class="s1">&#39;pca&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">group_merging</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>

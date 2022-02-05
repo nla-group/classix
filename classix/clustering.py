@@ -57,6 +57,7 @@ np.random.seed(0)
 
 
 def get_data(current_dir=''):
+    """Download the built-in data."""
     url_parent = "https://github.com/nla-group/classix/raw/master/classix/data/vdu_signals.npy"
     vdu_signals = requests.get(url_parent).content
     with open(os.path.join(current_dir, 'data/vdu_signals.npy'), 'wb') as handler:
@@ -64,6 +65,7 @@ def get_data(current_dir=''):
         
 
 def load_data(name='vdu_signals'):
+    """Obtain the built-in data."""
     current_dir, current_filename = os.path.split(__file__)
     
     if name == 'vdu_signals':
@@ -81,8 +83,8 @@ def load_data(name='vdu_signals'):
 class CLASSIX:
     """CLASSIX: Fast and explainable clustering based on sorting.
     
-    The user only need to concern the hyperparameters of ``sorting'', ``radius'', and ``minPts'' in the most cases.
-    If want a flexible clustering, might consider other hyperparameters such as ``group_merging'', ``scale'', and ``post_alloc''.
+    The user only need to concern the hyperparameters of ``sorting``, ``radius``, and ``minPts`` in the most cases.
+    If want a flexible clustering, might consider other hyperparameters such as ``group_merging'', ``scale``, and ``post_alloc``.
     
     Parameters
     ----------
@@ -138,33 +140,36 @@ class CLASSIX:
              
     Attributes
     ----------
-    agg_labels : numpy.ndarray
+    agg_labels_ : numpy.ndarray
         Groups labels of aggregation.
     
-    splist : numpy.ndarray
+    splist_ : numpy.ndarray
         List of starting points formed in the aggregation.
         
-    labels_ : list
+    labels_ : numpy.ndarray
         Clustering class labels for data objects 
 
-    group_outliers : numpy.ndarray
+    group_outliers_ : numpy.ndarray
         Indices of outliers (aggregation groups level), 
         i.e., indices of abnormal groups within the clusters with fewer 
         data points than minPts points.
         
-    clean_index :
+    clean_index_ : numpy.ndarray
         The data without outliers. Given data X,  the data without outliers 
-        can be exported by X_clean = X[classix.clean_index,:] while the outliers can be exported by 
-        Outliers = X[~classix.clean_index,:] 
+        can be exported by X_clean = X[classix.clean_index_,:] while the outliers can be exported by 
+        Outliers = X[~classix.clean_index_,:] 
         
-        
+    connected_pairs_ : list
+        List for connected group labels.
+
+
     Methods:
     ----------
     fit(data):
-        Cluster data while the parameters of the model will be saved. The labels can be extracted by calling '.labels_'
+        Cluster data while the parameters of the model will be saved. The labels can be extracted by calling ``self.labels_``.
         
     fit_transform(data):
-        Cluster data and return labels. The labels can also be extracted by calling '.labels_'
+        Cluster data and return labels. The labels can also be extracted by calling ``self.labels_``.
         
     predict(data):
         After clustering the in-sample data, predict the out-sample data.
@@ -199,6 +204,7 @@ class CLASSIX:
     #     even slices and computing them in parallel.
         
     def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, verbose=1): 
+        
         # deprecated parameter (15/07/2021): noise_percent=0, distance_scale=1, eta=1, cython=True
         # eta (deprecated): float, default=1.0
         #     the value for the density-based groups merging, the groups will 
@@ -223,7 +229,6 @@ class CLASSIX:
         #     the cluster is very likely to be a abnormal cluster.
 
         self.verbose = verbose
-        # self.noise_percent = noise_percent
         self.minPts = minPts
 
         # if self.minPts == 0:
@@ -245,8 +250,11 @@ class CLASSIX:
         self.scale = scale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
         # self.n_jobs = n_jobs
-        self.clean_index = None
-        self.connected_pairs = None
+
+        self.agg_labels_ = None
+        self.clean_index_ = None
+        self.labels_ = None
+        self.connected_pairs_ = None
         self.cluster_color = None
         if self.verbose:
             print(self)
@@ -254,76 +262,6 @@ class CLASSIX:
             
             
     def fit(self, data):
-        """ 
-        Cluster the data.
-        
-        Parameters
-        ----------
-        data : numpy.ndarray
-            The ndarray-like input of shape (n_samples,)
-        
-        Returns
-        -------
-        None
-        """
-        if not isinstance(data, np.ndarray):
-            data = np.array(data)
-            if len(data.shape) == 1:
-                data = data.reshape(-1,1)
-                
-        if data.dtype !=  'float64':
-            data = data.astype('float64')
-        
-        if self.norm:
-            if self.sorting == "norm-mean":
-                # self._mu, self._std = data.mean(axis=0), data.std()
-                self._mu = data.mean(axis=0)
-                self.data = data - self._mu
-                self._scl = self.data.std()
-                self.data = self.data / self._scl
-
-            elif self.sorting == "pca":
-                self._mu = data.mean(axis=0)
-                self.data = data - self._mu # mean center
-                rds = norm(self.data, axis=1) # distance of each data point from 0
-                self._scl = np.median(rds) # 50% of data points are within that radius
-                self.data = self.data / self._scl # now 50% of data are in unit ball 
-
-            elif self.sorting == "norm-orthant":
-                # self._mu, self._std = data.min(axis=0), data.std()
-                self._mu = data.min(axis=0)
-                self.data = data - self._mu
-                self._scl = self.data.std()
-                self.data = self.data / self._scl
-
-            else:
-                # self._mu, self._std = data.mean(axis=0), data.std(axis=0) # z-score
-                self._mu, self._scl = 0, 1 # no normalization
-                self.data = (data - self._mu) / self._scl
-        else:
-            self._mu = 0
-            self._scl = 1
-            
-        # aggregation
-        self.agg_labels, self.splist,  self.dist_nr = aggregate(data=self.data, sorting=self.sorting, tol=self.radius) 
-        self.splist = np.array(self.splist)
-        
-        self.clean_index = np.full(self.data.shape[0], True) # claim clean data indices
-        # clustering
-        self.labels_ = self.clustering(
-                            data=self.data, 
-                            agg_labels=self.agg_labels, 
-                            splist=self.splist, 
-                            sorting=self.sorting, 
-                            radius=self.radius, 
-                            method=self.group_merging, # eta=self.eta, distance_scale=self.distance_scale, 
-                            minPts=self.minPts # percent=self.noise_percent, noise_scale=self.noise_scale,
-        ) 
-        return self
-
-
-        
-    def fit_transform(self, data):
         """ 
         Cluster the data and return the associated cluster labels. 
         
@@ -334,8 +272,7 @@ class CLASSIX:
         
         Returns
         -------
-        labels_ : numpy.ndarray
-            The clustering labels.
+        self
             
         """
         if not isinstance(data, np.ndarray):
@@ -379,22 +316,41 @@ class CLASSIX:
             self.data = (data - self._mu) / self._scl
         
         # aggregation
-        self.agg_labels, self.splist, self.dist_nr = aggregate(data=self.data, sorting=self.sorting, tol=self.radius) 
-        self.splist = np.array(self.splist)
+        self.agg_labels_, self.splist_, self.dist_nr = aggregate(data=self.data, sorting=self.sorting, tol=self.radius) 
+        self.splist_ = np.array(self.splist_)
         
-        self.clean_index = np.full(self.data.shape[0], True) # claim clean data indices
+        self.clean_index_ = np.full(self.data.shape[0], True) # claim clean data indices
         # clustering
         self.labels_ = self.clustering(
             data=self.data,
-            agg_labels=self.agg_labels, 
-            splist=self.splist,             
+            agg_labels=self.agg_labels_, 
+            splist=self.splist_,             
             sorting=self.sorting, 
             radius=self.radius, 
             method=self.group_merging, # eta=self.eta, distance_scale=self.distance_scale, 
             minPts=self.minPts # percent=self.noise_percent, noise_scale=self.noise_scale,
         ) 
+        return self
+
+
         
-        return self.labels_
+    def fit_transform(self, data):
+        """ 
+        Cluster the data and return the associated cluster labels. 
+        
+        Parameters
+        ----------
+        data : numpy.ndarray
+            The ndarray-like input of shape (n_samples,)
+        
+        Returns
+        -------
+        labels : numpy.ndarray
+            Index of the cluster each sample belongs to.
+            
+        """
+        
+        return self.fit(data).labels_
         
         
         
@@ -441,7 +397,7 @@ class CLASSIX:
         
         data = (data - self._mu) / self._scl
         for i in range(len(data)):
-            splabel = np.argmin(np.linalg.norm(self.splist[:,3:] - data[i], axis=1, ord=2))
+            splabel = np.argmin(np.linalg.norm(self.splist_[:,3:] - data[i], axis=1, ord=2))
             labels.append(self.label_change[splabel])
 
         # else:
@@ -558,31 +514,31 @@ class CLASSIX:
         
         # --Deprecated 
         # elif method == 'trivial-distance': # deprecated method: brute force
-        #     self.connected_pairs = agglomerate_trivial(data, splist, radius, "distance", scale=self.scale)
+        #     self.connected_pairs_ = agglomerate_trivial(data, splist, radius, "distance", scale=self.scale)
             # self.check_labels = labels
             # reassign lalels, start from 0, since the cluster number not start with 0.
 
             # we employ an intutive and simple way to implement merging groups, resulting in a fast clustering
-            # self.merge_groups = merge_pairs_dr(self.connected_pairs)
+            # self.merge_groups = merge_pairs_dr(self.connected_pairs_)
         
         # elif method == 'trivial-density': # deprecated method: brute force
-            # self.connected_pairs = agglomerate_trivial(data, splist, radius, "density", scale=self.scale)
+            # self.connected_pairs_ = agglomerate_trivial(data, splist, radius, "density", scale=self.scale)
             # self.check_labels = labels
             # reassign lalels, start from 0, since the cluster number not start with 0.
 
             # we employ an intutive and simple way to implement merging groups, resulting in a fast clustering
-            # self.merge_groups = merge_pairs_dr(self.connected_pairs)
+            # self.merge_groups = merge_pairs_dr(self.connected_pairs_)
         
         # else:
             # print("clusters merging initialize...")
-            # self.merge_groups, self.connected_pairs = fast_agglomerate(data, splist, radius, method, scale=self.scale)
+            # self.merge_groups, self.connected_pairs_ = fast_agglomerate(data, splist, radius, method, scale=self.scale)
             # self.check_labels = labels
             # reassign lalels, start from 0, since the cluster number not start with 0.
 
             # we employ an intutive and simple way to implement merging groups, resulting in a fast clustering
-            # self.merge_groups = merge_pairs(self.connected_pairs)
+            # self.merge_groups = merge_pairs(self.connected_pairs_)
         
-        self.merge_groups, self.connected_pairs = fast_agglomerate(data, splist, radius, method, scale=self.scale)
+        self.merge_groups, self.connected_pairs_ = fast_agglomerate(data, splist, radius, method, scale=self.scale)
         maxid = max(labels) + 1
         
         # after this step, the connected pairs (groups) will be transformed into merged clusters, 
@@ -643,25 +599,25 @@ class CLASSIX:
             # self.ne_outliers = np.where(labels != maxid)[0]
             
             # assign outliers in terms of group level
-            self.clean_index = labels != maxid
-            agln = agg_labels[self.clean_index]
-            # agg_clean_index = np.unique(agln) # extract the unique number of aggregation groups.
-            # agg_noise_index = np.unique(self.agg_labels[self.outliers]) # extract the unique number of aggregation groups.
-            # print("agg_clean_index:", agg_clean_index)
-            self.label_change = dict(zip(agln, labels[self.clean_index])) # how object change group to cluster.
+            self.clean_index_ = labels != maxid
+            agln = agg_labels[self.clean_index_]
+            # agg_clean_index_ = np.unique(agln) # extract the unique number of aggregation groups.
+            # agg_noise_index = np.unique(self.agg_labels_[self.outliers]) # extract the unique number of aggregation groups.
+            # print("aggregation clean index:", agg_clean_index_)
+            self.label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
             # print("label change:", self.label_change)
             # allocate the outliers to the corresponding closest cluster.
             
-            self.group_outliers = np.unique(agg_labels[~self.clean_index]) # abnormal groups
+            self.group_outliers_ = np.unique(agg_labels[~self.clean_index_]) # abnormal groups
             unique_agln = np.unique(agln)
             splist_clean = splist[unique_agln]
-            # splist_outliers = splist[self.group_outliers] 
+            # splist_outliers = splist[self.group_outliers_] 
             if self.post_alloc:
-                for nsp in self.group_outliers:
+                for nsp in self.group_outliers_:
                     alloc_class = np.argmin(np.linalg.norm(splist_clean[:, 3:] - splist[nsp, 3:], axis=1, ord=2))
                     labels[agg_labels == nsp] = self.label_change[unique_agln[alloc_class]]
             else:
-                labels[np.isin(agg_labels, self.group_outliers)] = -1
+                labels[np.isin(agg_labels, self.group_outliers_)] = -1
             # previous code works on the point level
             # ----------------------------------- old code 1-----------------------------------
             # self.outliers = np.where(labels == maxid)[0]
@@ -677,7 +633,7 @@ class CLASSIX:
             # -------------------------------------------------------------------------------- 
             
             # ----------------------------------- old code 2-----------------------------------
-            # splist_clean = splist[agg_clean_index]
+            # splist_clean = splist[agg_clean_index_]
             # print("splist_clean:", splist_clean)
             # if self.outliers.size > 0:
             #     # marked outliers location, and allocate the outliers to their closest clusters.
@@ -843,17 +799,17 @@ class CLASSIX:
         
         # deprecated (24/07/2021)
         # cols = ["NrPts"] 
-        # for i in range(self.splist.shape[1] - 2):
+        # for i in range(self.splist_.shape[1] - 2):
         #     cols = cols + ["feat." + str(i + 1)]
         
         # deprecated (24/07/2021)
         # -----------------------------alternative method--------------------------------
-        # if self.splist.shape[1] - 2 !=2:
+        # if self.splist_.shape[1] - 2 !=2:
         #     pca = PCA(n_components=2)
-        #     x_pca = pca.fit_transform(self.splist[:, 3:])
-        #     spdisplay = pd.DataFrame(np.hstack((self.splist[:, 0:2], x_pca)), columns=cols)
+        #     x_pca = pca.fit_transform(self.splist_[:, 3:])
+        #     spdisplay = pd.DataFrame(np.hstack((self.splist_[:, 0:2], x_pca)), columns=cols)
         # else:
-        #     spdisplay = pd.DataFrame(self.splist[:, 1:], columns=cols)
+        #     spdisplay = pd.DataFrame(self.splist_[:, 1:], columns=cols)
         
         # -----------------------------second method--------------------------------
         if sp_bbox is None:
@@ -884,21 +840,21 @@ class CLASSIX:
             if self.data.shape[1] > 2:
                 # self.pca = PCA(n_components=2)
                 # self.x_pca = self.pca.fit_transform(self.data)
-                # self.s_pca = self.pca.transform(self.data[self.splist[:, 0].astype(int)])
+                # self.s_pca = self.pca.transform(self.data[self.splist_[:, 0].astype(int)])
                 scaled_data = self.data - self.data.mean(axis=0)
                 _U, _s, self._V = svds(scaled_data, k=2, return_singular_vectors="u")
                 self.x_pca = np.matmul(scaled_data, self._V[np.argsort(_s)].T)
-                self.s_pca = self.x_pca[self.splist[:, 0].astype(int)]
+                self.s_pca = self.x_pca[self.splist_[:, 0].astype(int)]
                 
             elif self.data.shape[1] == 2:
                 self.x_pca = self.data.copy()
-                self.s_pca = self.data[self.splist[:, 0].astype(int)] # self.splist[:, 3:].copy()
+                self.s_pca = self.data[self.splist_[:, 0].astype(int)] # self.splist_[:, 3:].copy()
 
             else: # when data is one-dimensional, no PCA transform
                 self.x_pca = np.ones((len(self.data.copy()), 2))
                 self.x_pca = self.data[:, 0]
-                self.s_pca = np.ones((len(self.splist), 2))
-                self.s_pca[:, 1] = self.data[self.splist[:, 0].astype(int)] # self.splist[:, 2]
+                self.s_pca = np.ones((len(self.splist_), 2))
+                self.s_pca[:, 1] = self.data[self.splist_[:, 0].astype(int)] # self.splist_[:, 2]
                 
                 # remove (24/07/2021):
                 # print("This function is restricted to multidimensional (dimension greater than or equal to 2) data.")
@@ -907,7 +863,7 @@ class CLASSIX:
             raise ValueError("Please enter a valid value for index1.")
             
         # pd.options.display.max_colwidth = colwidth
-        dash_line = "--------"*5 # "--------"*(self.splist.shape[1])
+        dash_line = "--------"*5 # "--------"*(self.splist_.shape[1])
             
         if index1 == "NULL": # analyze in the general way with a global view
             if plot == True:
@@ -922,8 +878,8 @@ class CLASSIX:
                 scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius
             ))
             print("""In total {dist:.0f} comparisons were required ({avg:.2f} comparisons per data point). """.format(dist=self.dist_nr, avg=self.dist_nr/data_size))
-            print("""This resulted in {groups:.0f} groups, each uniquely associated with a starting point. """.format(groups=self.splist.shape[0]))
-            print("""These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. """.format(groups=self.splist.shape[0], num_clusters=len(np.unique(self.labels_))))
+            print("""This resulted in {groups:.0f} groups, each uniquely associated with a starting point. """.format(groups=self.splist_.shape[0]))
+            print("""These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. """.format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_))))
             
             if showsplist:
                 print("""A list of all starting points is shown below.""")
@@ -939,7 +895,7 @@ class CLASSIX:
         else: # explain(index1)
             if isinstance(index1, int):
                 object1 = self.x_pca[index1] # self.data has been normalized
-                agg_label1 = self.agg_labels[index1] # get the group index for object1
+                agg_label1 = self.agg_labels_[index1] # get the group index for object1
             else:
                 object1 = (index1 - self._mu) / self._scl # allow for out-sample data
                 agg_label1 = np.argmin(np.linalg.norm(self.s_pca - object1, axis=1, ord=2)) # get the group index for object1
@@ -952,7 +908,7 @@ class CLASSIX:
             
             # explain one object
             # cluster_centers = self.calculate_group_centers(self.data, self.labels_)
-            # print("Starting point list of {} data:".format(len(self.agg_labels)))
+            # print("Starting point list of {} data:".format(len(self.agg_labels_)))
 
             if index2 == "NULL":
                 if replace_name != None:
@@ -964,7 +920,7 @@ class CLASSIX:
                     index1_name = index1
 
                 cluster_label1 = self.label_change[agg_label1]
-                sp_str = self.splist[agg_label1, 3:]
+                sp_str = self.splist_[agg_label1, 3:]
                 
                 if plot == True:
                     plt.style.use(style=figstyle)
@@ -991,13 +947,13 @@ class CLASSIX:
                         if sp_fontsize is None:
                             ax.text(s_pca[i, 0], s_pca[i, 1],
                                     s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
-                                    # self.splist[self.sp_info.Cluster == cluster_label1, 1][i].astype(int).astype(str), 
+                                    # self.splist_[self.sp_info.Cluster == cluster_label1, 1][i].astype(int).astype(str), 
                                     bbox=sp_bbox
                             )
                         else:
                             ax.text(s_pca[i, 0], s_pca[i, 1],
                                     s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
-                                    # self.splist[self.sp_info.Cluster == cluster_label1, 1][i].astype(int).astype(str), 
+                                    # self.splist_[self.sp_info.Cluster == cluster_label1, 1][i].astype(int).astype(str), 
                                     fontsize=sp_fontsize, bbox=sp_bbox
                             )
                     ax.plot()
@@ -1018,7 +974,7 @@ class CLASSIX:
                     # if self.data.shape[1] != 2:
                     #     pca = PCA(n_components=2)
                     #     x_pca = pca.fit_transform(self.data)
-                    #     s_pca = pca.transform(self.splist[:, 3:])
+                    #     s_pca = pca.transform(self.splist_[:, 3:])
                     #     
                     #     # select indices
                     #     x_pca = x_pca[self.labels_ == cluster_label1]
@@ -1035,7 +991,7 @@ class CLASSIX:
                     #         ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
                     #         ax.set_aspect('equal', adjustable='datalim')
                     #         ax.text(s_pca[i, 0], s_pca[i, 1],
-                    #                  s=self.splist[self.sp_info.Cluster == cluster_label1,1][i].astype(int).astype(str), 
+                    #                  s=self.splist_[self.sp_info.Cluster == cluster_label1,1][i].astype(int).astype(str), 
                     #                  bbox=sp_bbox)
                     #     ax.plot()
                     #     if savefig:
@@ -1047,7 +1003,7 @@ class CLASSIX:
                         
                     # elif self.data.shape[1] == 2:
                     #     x_pca = self.data.copy()
-                    #     s_pca = self.splist[:, 3:].copy()
+                    #     s_pca = self.splist_[:, 3:].copy()
                     #     
                     #     # select indices
                     #     x_pca = x_pca[self.labels_ == cluster_label1]
@@ -1064,7 +1020,7 @@ class CLASSIX:
                     #         ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
                     #         ax.set_aspect('equal', adjustable='datalim')
                     #         plt.text(s_pca[i, 0], s_pca[i, 1],
-                    #                  s=self.splist[self.sp_info.Cluster == cluster_label1,1][i].astype(int).astype(str), 
+                    #                  s=self.splist_[self.sp_info.Cluster == cluster_label1,1][i].astype(int).astype(str), 
                     #                  bbox=sp_bbox)
                     #     ax.plot() 
                     #     if savefig:
@@ -1097,7 +1053,7 @@ class CLASSIX:
             else: # explain(index1, index2)
                 if isinstance(index2, int):
                     object2 = self.x_pca[index2] # self.data has been normalized
-                    agg_label2 = self.agg_labels[index2] # get the group index for object2
+                    agg_label2 = self.agg_labels_[index2] # get the group index for object2
                 else:
                     object2 = (index2 - self._mu) / self._scl # allow for out-sample data
                     if self.data.shape[1] >= 2:
@@ -1128,14 +1084,14 @@ class CLASSIX:
                
                 
                 if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
-                    sp_str = np.array2string(self.splist[agg_label1, 3:], separator=',')
+                    sp_str = np.array2string(self.splist_[agg_label1, 3:], separator=',')
                     print("The data points %(index1)s and %(index2)s are in the same group %(agg_id)i, hence were merged into the same cluster #%(m_c)i"%{
                         "index1":index1, "index2":index2, "agg_id":agg_label1, "m_c":cluster_label1}
                     )
                     connected_paths = [agg_label1]
                 else:
-                    sp1_str = self.splist[agg_label1, 3:]
-                    sp2_str = self.splist[agg_label2, 3:]
+                    sp1_str = self.splist_[agg_label1, 3:]
+                    sp2_str = self.splist_[agg_label2, 3:]
                     # print("""The two objects are assigned to different groups through aggregation.""")
 
                     # print(
@@ -1148,20 +1104,20 @@ class CLASSIX:
                     #     "agg_id":agg_label2, "sp":sp2_str, "radius":self.radius, "m_c":cluster_label2
                     # })
                     
-                    if self.connected_pairs is None:
-                        distm = pairwise_distances(self.splist[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs)
+                    if self.connected_pairs_ is None:
+                        distm = pairwise_distances(self.splist_[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs)
                         distm = (distm <= radius*scale).astype(int)
-                        self.connected_pairs = return_csr_matrix_indices(csr_matrix(distm)).tolist() # list
+                        self.connected_pairs_ = return_csr_matrix_indices(csr_matrix(distm)).tolist() # list
                         
                     if cluster_label1 == cluster_label2: # when ind1 & ind2 are in the same cluster but diff group
                         # deprecated (24/07/2021)  from scipy.sparse.csgraph import shortest_path -> Dijkstra’s algorithm 
-                        # path_graph = pairs_to_graph(self.connected_pairs, N=self.splist.shape[0], sparse=True)
+                        # path_graph = pairs_to_graph(self.connected_pairs_, N=self.splist_.shape[0], sparse=True)
                         ## apply Dijkstra’s algorithm with Fibonacci heaps for shortest path finding
                         # dist_matrix, predecessors = shortest_path(csgraph=path_graph, method="D", directed=False, return_predecessors=True) 
                         # connected_paths = get_shortest_path(predecessors, agg_label1, agg_label2)
                         connected_paths = find_shortest_path(agg_label1,
-                                                             self.connected_pairs,
-                                                             self.splist.shape[0],
+                                                             self.connected_pairs_,
+                                                             self.splist_.shape[0],
                                                              agg_label2
                         )
                         
@@ -1275,7 +1231,7 @@ class CLASSIX:
                     # if self.data.shape[1] > 2:
                     #     pca = PCA(n_components=2)
                     #     x_pca = pca.fit_transform(self.data)
-                    #     s_pca = pca.transform(self.splist[:, 3:])
+                    #     s_pca = pca.transform(self.splist_[:, 3:])
                     #     
                     #     # select indices
                     #     x_pca = x_pca[(self.labels_ == cluster_label1) | (self.labels_ == cluster_label2)]
@@ -1308,7 +1264,7 @@ class CLASSIX:
                     #     
                     # elif self.data.shape[1] == 2:
                     #     x_pca = self.data.copy()
-                    #     s_pca = self.splist[:, 3:].copy()
+                    #     s_pca = self.splist_[:, 3:].copy()
                     #     
                     #     # select indices
                     #     x_pca = x_pca[(self.labels_ == cluster_label1) | (self.labels_ == cluster_label2)]
@@ -1403,12 +1359,12 @@ class CLASSIX:
 
     def form_starting_point_clusters_table(self, aggregate=False):
         """form the columns details for starting points and clusters information"""
-        # won't change the original order of self.splist
+        # won't change the original order of self.splist_
         cols = ["Group", "NrPts"]
         coord = list()
         
         if aggregate:
-            for i in np.around(self.splist[:, 3:], 2).tolist():
+            for i in np.around(self.splist_[:, 3:], 2).tolist():
                 fill = ""
                 if len(i) <= 5:
                     for j in i:
@@ -1420,10 +1376,10 @@ class CLASSIX:
                 fill += ""
                 coord.append(fill)
 
-            # self.sp_info = pd.DataFrame(self.splist[:, 1:2], columns=cols)
+            # self.sp_info = pd.DataFrame(self.splist_[:, 1:2], columns=cols)
 
         else:
-            for i in self.splist[:, 0]:
+            for i in self.splist_[:, 0]:
                 fill = ""
                 sp_item = np.around(self.data[int(i), :], 2).tolist()
                 if len(sp_item) <= 5:
@@ -1437,10 +1393,10 @@ class CLASSIX:
                 coord.append(fill)
                 
         self.sp_info = pd.DataFrame(columns=cols)
-        self.sp_info["Group"] = np.arange(0, self.splist.shape[0])
-        self.sp_info["NrPts"] = self.splist[:, 2].astype(int)
-        self.sp_info["Cluster"] = [self.label_change[i] for i in range(self.splist.shape[0])]
-        self.sp_info["Coordinates"] = coord # np.around(self.splist[:,3:], 2).tolist()
+        self.sp_info["Group"] = np.arange(0, self.splist_.shape[0])
+        self.sp_info["NrPts"] = self.splist_[:, 2].astype(int)
+        self.sp_info["Cluster"] = [self.label_change[i] for i in range(self.splist_.shape[0])]
+        self.sp_info["Coordinates"] = coord # np.around(self.splist_[:,3:], 2).tolist()
         self.sp_to_c_info = True
         return
         
@@ -1449,17 +1405,17 @@ class CLASSIX:
     def visualize_linkage(self, scale=1.5, figsize=(8,8), labelsize=24, norm=True, markersize=320, plot_boundary=False,
                                              bound_color='red', path='.', fmt='pdf'):
         
-        distm, n_components, labels = visualize_connections(self.splist, radius=self.radius, scale=round(scale,2))
+        distm, n_components, labels = visualize_connections(self.splist_, radius=self.radius, scale=round(scale,2))
         # plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = 'white'
         if norm:
-            P = self.splist[:, 3:]
+            P = self.splist_[:, 3:]
         else:
-            P = self.splist[:, 3:]*self._scl + self._mu
+            P = self.splist_[:, 3:]*self._scl + self._mu
         link_list = return_csr_matrix_indices(csr_matrix(distm))
         
         fig, ax = plt.subplots(figsize=figsize)
-        for i in range(self.splist.shape[0]):
+        for i in range(self.splist_.shape[0]):
             ax.scatter(P[i,0], P[i,1], s=markersize, c='k', marker='.')
             if plot_boundary:
                 ax.add_patch(plt.Circle((P[i, 0], P[i, 1]), self.radius, 
@@ -1485,7 +1441,7 @@ class CLASSIX:
     def load_splist_indices(self):
         if self.splist_indices is not None:
             self.splist_indices = np.full(self.data.shape[0], 0, dtype=int)
-            self.splist_indices[self.splist[:,0].astype(int)] = 1
+            self.splist_indices[self.splist_[:,0].astype(int)] = 1
         return self.splist_indices
         
         
@@ -1844,6 +1800,7 @@ class CLASSIX:
 
 
 def pairwise_distances(X):
+    """Calculate the Euclidean distance matrix."""
     distm = np.zeros((X.shape[0], X.shape[0]))
     for i in range(X.shape[0]):
         for j in range(i, X.shape[0]):
@@ -1853,6 +1810,7 @@ def pairwise_distances(X):
 
 
 def visualize_connections(splist, radius=0.5, scale=1.5):
+    """Calculate the connected components for graph constructed by starting points given radius and scale."""
     distm = pairwise_distances(splist[:,3:])
     tol = radius*scale
     distm = (distm <= tol).astype(int)
@@ -1862,6 +1820,7 @@ def visualize_connections(splist, radius=0.5, scale=1.5):
     
     
 def novel_normalization(data, base):
+    """Initial data preparation of CLASSIX."""
     if base == "norm-mean":
         # self._mu, self._std = data.mean(axis=0), data.std()
         _mu = data.mean(axis=0)
@@ -1891,6 +1850,7 @@ def novel_normalization(data, base):
 
 
 def calculate_cluster_centers(data, labels):
+    """Calculate the mean centers of clusters from given data."""
     ulabels = set(labels)
     centers = np.zeros((len(ulabels), data.shape[1]))
     for c in ulabels:
@@ -1911,7 +1871,7 @@ def calculate_cluster_centers(data, labels):
 
 
 def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, target_node=None):
-    """get single-sourse shortest paths as well as distance from source node,
+    """Get single-sourse shortest paths as well as distance from source node,
     design especially for unweighted undirected graph. The time complexity is O(|V| + |E|)
     where |V| is the number of vertices and |E| is the number of edges.
     
@@ -1995,7 +1955,8 @@ def pairs_to_graph(pairs, num_nodes, sparse=True):
 
 
 
-def return_csr_matrix_indices(csr_matrix):
+def return_csr_matrix_indices(csr_matrix): 
+    """Return sparce matrix indices."""
     shape_dim1, shape_dim2 = csr_matrix.shape
     length_range = csr_matrix.indices
 

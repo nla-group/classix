@@ -110,6 +110,7 @@ The visualization of clustering results is reasonable:
     :width: 360
 
 
+
 Distance clustering
 ------------------------------
 The distance-based CLASSIX has the same steps as density-based CLASSIX except that the density comparison steps, in such a way distance-based CLASSIX does not require calculating the density, hence intuitively would be faster. By contrast, it just compares the pair of the clusters one at a time to determine if they should merge. 
@@ -174,6 +175,10 @@ Visualize the result:
 .. image:: images/demo3.png
     :width: 360
 
+.. admonition:: Note
+
+    The density-based merging criterion usually results in slightly better clusters than the distance-based criterion, but the latter has a significant speed advantage.
+
 
 Visualize connecting edge
 ------------------------------
@@ -186,6 +191,9 @@ Now we use the same example to demonstrate how cluster are formed by computing s
 .. image:: images/linkage_scale_1.5_tol_0.1.png
 
 
+.. admonition:: Note
+
+    The starting points can be interpreted as a reduced-density estimator of the data. 
 
 There is one more parameter that affects distance-based CLASSIX, that is ``scale``.  By simply adding the parameter ``plot_boundary`` and setting it to ``True``, then we can obtain the starting points with their group boundary. The visualization of the connecting edge between starting points with varying ``scale`` is plotted as below:
 
