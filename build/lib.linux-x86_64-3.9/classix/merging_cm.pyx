@@ -158,6 +158,7 @@ cpdef fast_agglomerate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.floa
 
 
 cpdef fast_query(double[:,:] data, double[:] starting_point, double[:] sort_vals, double tol):
+    """Fast query with built in early stopping strategy for merging."""
     cdef int len_ind = data.shape[0]
     cdef double[:] candidate
     cdef double dist
@@ -180,7 +181,8 @@ cpdef fast_query(double[:,:] data, double[:] starting_point, double[:] sort_vals
     return index_query
 
 
-cdef class SET: # disjoint union
+cdef class SET: 
+    """Disjoint-set data structure."""
     cdef public int data
     cdef public object parent
     def __init__(self, data):
@@ -190,6 +192,7 @@ cdef class SET: # disjoint union
         
         
 cpdef findParent(s):
+    """Find parent of node."""
     if (s.data != s.parent.data) :
         s.parent = findParent((s.parent))
     return s.parent
@@ -197,6 +200,7 @@ cpdef findParent(s):
 
 
 cpdef merge(s1, s2):
+    """Merge the roots of two node."""
     parent_of_s1 = findParent(s1)
     parent_of_s2 = findParent(s2)
 
@@ -207,7 +211,7 @@ cpdef merge(s1, s2):
 
 
 cpdef check_if_overlap(double[:] starting_point, double[:] spo, double radius, int scale = 1):
-    """Check if two groups formed by aggregation overlap
+    """Check if two groups formed by aggregation overlap.
     """
     cdef Py_ssize_t dim
     cdef double[:] subs = starting_point.copy()
@@ -219,7 +223,7 @@ cpdef check_if_overlap(double[:] starting_point, double[:] spo, double radius, i
     
 
 cpdef cal_inter_density(double[:] starting_point, double[:] spo, double radius, int num):
-    """Calculate the density of intersection (lens)
+    """Calculate the density of intersection (lens).
     """
     cdef double in_volume = cal_inter_volume(starting_point, spo, radius)
     return num / in_volume
@@ -232,7 +236,7 @@ cpdef cal_inter_volume(double[:] starting_point, double[:] spo, double radius):
     Returns the volume of the intersection of two spheres in n-dimensional space.
     The radius of the two spheres is r and the distance of their centers is d.
     For d=0 the function returns the volume of full sphere.
-    Reference: https://math.stackexchange.com/questions/162250/how-to-compute-the-volume-of-intersection-between-two-hyperspheres
+    Reference: https://math.stackexchange.com/questions/162250/how-to-compute-the-volume-of-intersection-between-two-hyperspheres.
 
     """
     

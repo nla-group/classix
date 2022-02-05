@@ -195,6 +195,7 @@ def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
 
 
 class SET:
+    """Disjoint-set data structure."""
     def __init__( self, data):
         self.data = data
         self.parent = self
@@ -202,6 +203,7 @@ class SET:
         
         
 def findParent(s):
+    """Find parent of node."""
     if (s.data != s.parent.data) :
         s.parent = findParent((s.parent))
     return s.parent
@@ -209,6 +211,7 @@ def findParent(s):
 
 
 def merge(s1, s2):
+    """Merge the roots of two node."""
     parent_of_s1 = findParent(s1)
     parent_of_s2 = findParent(s2)
 

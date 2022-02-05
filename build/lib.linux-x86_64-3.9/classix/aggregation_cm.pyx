@@ -42,7 +42,7 @@ np.import_array()
 
 
 cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
-    """aggregate the data
+    """Aggregate the data
 
     Parameters
     ----------
@@ -68,6 +68,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
     nr_dist (int) :
         The number of pairwise distance calculations.
     """
+
     cdef Py_ssize_t fdim = data.shape[1] # feature dimension
     cdef Py_ssize_t len_ind = data.shape[0] # size of data
     cdef double[:] sort_vals

@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ClassixClustering
-Version: 0.3.1
+Version: 0.3.2
 Summary: Fast and explainable clustering based on sorting
 Home-page: https://github.com/nla-group/CLASSIX.git
 Author: Stefan Guettel, Xinye Chen
@@ -23,7 +23,7 @@ License-File: LICENSE
 
 # CLASSIX
 
-#### Fast and explainable clustering based on sorting=
+#### Fast and explainable clustering based on sorting
 [![Build Status](https://app.travis-ci.com/nla-group/classix.svg?token=SziD2n1qxpnRwysssUVq&branch=master)](https://app.travis-ci.com/nla-group/classix)
 [![codecov](https://codecov.io/gh/nla-group/classix/branch/master/graph/badge.svg?token=D4MQZS67H1)](https://codecov.io/gh/nla-group/classix)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
