@@ -1,5 +1,3 @@
-# A quick test for CLASSIX
-#
 # MIT License
 #
 # Copyright (c) 2022 Stefan Güttel, Xinye Chen
@@ -26,13 +24,21 @@ import unittest
 import numpy as np
 import sklearn.datasets as data
 from classix import CLASSIX, load_data
+from classix import aggregation_test, novel_normalization
 
+def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
+    data, (_mu, _scl) = novel_normalization(data, sorting)
+    labels, splist, nr_dist = aggregation_test.aggregate(data, sorting=sorting,
+                                                     tol=tol, early_stopping=early_stopping
+    )
+    return nr_dist, labels
 
 class TestClassix(unittest.TestCase):
+
     def test_distance_cluster(self):
         vdu_signals = load_data('vdu_signals')
 
-        for tol in np.arange(0.5,1.01,0.1):
+        for tol in np.arange(0.5, 1, 0.1):
             clx = CLASSIX(radius=tol, group_merging='distance', verbose=0)
             clx.fit_transform(vdu_signals)
             
@@ -47,7 +53,7 @@ class TestClassix(unittest.TestCase):
     def test_density_cluster(self):
         vdu_signals = load_data('vdu_signals')
 
-        for tol in np.arange(0.5,1.01,0.1):
+        for tol in np.arange(0.5, 1, 0.1):
             clx = CLASSIX(radius=tol, group_merging='density', verbose=0)
             clx.fit_transform(vdu_signals)
             
@@ -59,7 +65,123 @@ class TestClassix(unittest.TestCase):
             comp = clx.labels_ == checkpoint
             assert(comp.all())
 
+    def test_scale_linkage(self):
+        TOL = 0.1 
+        random_state = 1
 
+        moons, _ = data.make_moons(n_samples=1000, noise=0.05, random_state=random_state)
+        blobs, _ = data.make_blobs(n_samples=1500, centers=[(-0.85,2.75), (1.75,2.25)], cluster_std=0.5, random_state=random_state)
+        X = np.vstack([blobs, moons])
 
+        checkpoint = 1
+        for scale in np.arange(1.8, 2, 0.1):
+            try:
+                clx = CLASSIX(sorting='pca', radius=TOL, group_merging='distance', verbose=0)
+                clx.fit_transform(X)
+                clx.visualize_linkage(scale=scale, figsize=(8,8), labelsize=24)
+            except:
+                checkpoint = 0
+        self.assertEqual(checkpoint, 1)
+        
+        checkpoint = 1
+        for tol in np.arange(0.9, 1, 0.1):
+            try:
+                clx = CLASSIX(sorting='pca', radius=tol, group_merging='distance', verbose=0)
+                clx.fit_transform(X)
+                clx.visualize_linkage(scale=1.5, figsize=(8,8), labelsize=24, plot_boundary=True)
+            except:
+                checkpoint = 0
+        self.assertEqual(checkpoint, 1)
+
+        checkpoint = 1
+        for scale in np.arange(1.8, 2, 0.1):
+            try:
+                clx = CLASSIX(sorting='norm-orthant', radius=TOL, group_merging='distance', verbose=0)
+                clx.fit_transform(X)
+                clx.visualize_linkage(scale=scale, figsize=(8,8), labelsize=24)
+            except:
+                checkpoint = 0
+        self.assertEqual(checkpoint, 1)
+        
+        checkpoint = 1
+        for tol in np.arange(0.9, 1, 0.1):
+            try:
+                clx = CLASSIX(sorting='norm-orthant', radius=tol, group_merging='distance', verbose=0)
+                clx.fit_transform(X)
+                clx.visualize_linkage(scale=1.5, figsize=(8,8), labelsize=24, plot_boundary=True)
+            except:
+                checkpoint = 0
+        self.assertEqual(checkpoint, 1)
+
+        checkpoint = 1
+        for scale in np.arange(1.8, 2, 0.1):
+            try:
+                clx = CLASSIX(sorting='norm-mean', radius=TOL, group_merging='distance', verbose=0)
+                clx.fit_transform(X)
+                clx.visualize_linkage(scale=scale, figsize=(8,8), labelsize=24)
+            except:
+                checkpoint = 0
+        self.assertEqual(checkpoint, 1)
+        
+        checkpoint = 1
+        for tol in np.arange(0.9, 1, 0.1):
+            try:
+                clx = CLASSIX(sorting='norm-mean', radius=tol, group_merging='distance', verbose=0)
+                clx.fit_transform(X)
+                clx.visualize_linkage(scale=1.5, figsize=(8,8), labelsize=24, plot_boundary=True)
+            except:
+                checkpoint = 0
+        self.assertEqual(checkpoint, 1)
+
+    def test_agg_early_stop(self):
+        X, y = data.make_blobs(n_samples=1000, centers=10, n_features=2, random_state=0)
+
+        for TOL in np.arange(0.1, 1, 0.1):
+            ort_nr_dist_true, ort_labels_true = exp_aggregate_nr_dist(X, tol=TOL, sorting='norm-orthant', early_stopping=True)
+            ort_nr_dist_false, ort_labels_false = exp_aggregate_nr_dist(X, tol=TOL, sorting='norm-orthant', early_stopping=False)
+            if ort_labels_true.tolist() == ort_labels_false.tolist():
+                assert(True)
+            if ort_nr_dist_true == ort_nr_dist_false:
+                assert(True)
+
+            mean_nr_dist_true, mean_labels_true = exp_aggregate_nr_dist(X, tol=TOL, sorting='norm-mean', early_stopping=True)
+            mean_nr_dist_false, mean_labels_false = exp_aggregate_nr_dist(X, tol=TOL, sorting='norm-mean', early_stopping=False)
+            if mean_labels_true.tolist() == mean_labels_false.tolist():
+                assert(True)
+            if mean_nr_dist_true == mean_nr_dist_false:
+                assert(True)    
+
+            pca_nr_dist_true, pca_labels_true = exp_aggregate_nr_dist(X, tol=TOL, sorting='pca', early_stopping=True)
+            pca_nr_dist_false, pca_labels_false = exp_aggregate_nr_dist(X, tol=TOL, sorting='pca', early_stopping=False)
+            if pca_labels_true.tolist() == pca_labels_false.tolist():
+                assert(True)
+            if pca_nr_dist_true == pca_nr_dist_false:
+                assert(True)
+
+    def test_explain(self):
+        X, y = data.make_blobs(n_samples=5000, 
+                  centers=2, n_features=2, 
+                  cluster_std=1, 
+                  random_state=1
+        )
+        checkpoint = 1
+        try:
+            clx = CLASSIX(radius=0.5, group_merging='density', minPts=10)
+            clx.fit_transform(X)
+            clx.predict(X)
+            clx.explain(plot=True, figsize=(10,10),  savefig=True)
+            clx.explain(0,  plot=True, savefig=True)
+            clx.explain(3, 2000,  plot=True, savefig=True)
+            clx.explain(0, 2008,  plot=True, savefig=True)
+            clx.explain(plot=True, figsize=(10,10), sp_fontsize=10, savefig=False)
+            clx.explain(0,  plot=True, sp_fontsize=10, savefig=False)
+            clx.explain(3, 2000,  plot=True, sp_fontsize=10, savefig=False)
+            clx.explain(0, 2008,  plot=True, sp_fontsize=10, savefig=False)
+        except:
+            checkpoint = 0
+
+        self.assertEqual(checkpoint, 1)
+        
 if __name__ == '__main__':
     unittest.main()
+
