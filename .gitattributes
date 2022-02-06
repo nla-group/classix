@@ -1,1 +1,1 @@
-*.* linguist-language=Python
+*.html linguist-detectable=false
