@@ -20,9 +20,9 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install -U scikit-learn
-        pip install ClassixClustering
         pip install coverage
-        coverage run clx_unittest.py
+        pip install pytest-cov
+        pytest clx_unittest.py --cov=classix
         coverage xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
