@@ -19,6 +19,7 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install -U scikit-learn
+        pip install ClassixClustering
         pip install coverage
         coverage run clx_unittest.py
         coverage xml
