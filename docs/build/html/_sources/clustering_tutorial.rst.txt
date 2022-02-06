@@ -200,9 +200,9 @@ There is one more parameter that affects distance-based CLASSIX, that is ``scale
 .. code:: python
 
     for scale in np.arange(1.1, 2, 0.1):
-        classix = CLASSIX(sorting='pca', radius=0.1, group_merging='distance', verbose=0)
-        classix.fit_transform(X)
-        classix.visualize_linkage(scale=round(scale,1), figsize=(8,8), labelsize=24, plot_boundary=True, fmt='png')
+        clx = CLASSIX(sorting='pca', radius=0.1, group_merging='distance', verbose=0)
+        clx.fit_transform(X)
+        clx.visualize_linkage(scale=round(scale,1), figsize=(8,8), labelsize=24, plot_boundary=True, fmt='png')
 
 .. image:: images/single_linkage.png
 
