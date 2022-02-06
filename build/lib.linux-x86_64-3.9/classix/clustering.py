@@ -1824,9 +1824,9 @@ def novel_normalization(data, base):
     if base == "norm-mean":
         # self._mu, self._std = data.mean(axis=0), data.std()
         _mu = data.mean(axis=0)
-        ndata = data - self._mu
+        ndata = data - _mu
         _scl = ndata.std()
-        ndata = ndata / self._scl
+        ndata = ndata / _scl
 
     elif base == "pca":
         _mu = data.mean(axis=0)
@@ -1847,6 +1847,7 @@ def novel_normalization(data, base):
         _mu, _scl = 0, 1 # no normalization
         ndata = (data - _mu) / _scl
     return ndata, (_mu, _scl)
+
 
 
 def calculate_cluster_centers(data, labels):
