@@ -159,14 +159,14 @@ class TestClassix(unittest.TestCase):
                 assert(True)
 
     def test_explain(self):
-        X, y = data.make_blobs(n_samples=5000, 
+        X, y = make_blobs(n_samples=5000, 
                   centers=2, n_features=2, 
-                  cluster_std=1, 
+                  cluster_std=1.5, 
                   random_state=1
         )
         checkpoint = 1
         try:
-            clx = CLASSIX(radius=0.5, group_merging='density', minPts=10)
+            clx = CLASSIX(radius=0.2, group_merging='distance', minPts=3)
             clx.fit_transform(X)
             clx.predict(X)
             clx.explain(plot=True, figsize=(10,10),  savefig=True)
