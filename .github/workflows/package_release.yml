@@ -1,4 +1,4 @@
-name: Publish
+name: Release
 
 on:
   release:
@@ -21,14 +21,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install setuptools wheel twine
-    - name: Build and publish
+    - name: Build test
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         python setup.py sdist bdist_wheel
-        python -m twine upload --repository testpypi dist/*.tar.gz --verbose  
-
+        
         
         
         
