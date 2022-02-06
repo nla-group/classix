@@ -28,14 +28,14 @@ def rn_mcs_it(save=False):
     classix = CLASSIX(sorting='pca', radius=TOL, group_merging='distance', minPts=minPts, post_alloc=False, verbose=0)
     classix.fit_transform(X)
 
-    X_clean = X[classix.clean_index,:]
+    X_clean = X[classix.clean_index_,:]
 
     plt.rcParams['axes.facecolor'] = 'white'
     fig, ax = plt.subplots(figsize=(8,8))
-    ax.scatter(X_clean[classix.labels_[classix.clean_index] == 0,0], X_clean[classix.labels_[classix.clean_index] == 0,1], c="hotpink", s=20)
-    ax.scatter(X_clean[classix.labels_[classix.clean_index] == 1,0], X_clean[classix.labels_[classix.clean_index] == 1,1], c="yellowgreen", s=20)
-    ax.scatter(X_clean[classix.labels_[classix.clean_index] == 2,0], X_clean[classix.labels_[classix.clean_index] == 2,1], c="tomato", s=20)
-    ax.scatter(X_clean[classix.labels_[classix.clean_index] == 3,0], X_clean[classix.labels_[classix.clean_index] == 3,1], c="cadetblue", s=20)
+    ax.scatter(X_clean[classix.labels_[classix.clean_index_] == 0,0], X_clean[classix.labels_[classix.clean_index_] == 0,1], c="hotpink", s=20)
+    ax.scatter(X_clean[classix.labels_[classix.clean_index_] == 1,0], X_clean[classix.labels_[classix.clean_index_] == 1,1], c="yellowgreen", s=20)
+    ax.scatter(X_clean[classix.labels_[classix.clean_index_] == 2,0], X_clean[classix.labels_[classix.clean_index_] == 2,1], c="tomato", s=20)
+    ax.scatter(X_clean[classix.labels_[classix.clean_index_] == 3,0], X_clean[classix.labels_[classix.clean_index_] == 3,1], c="cadetblue", s=20)
     ax.scatter(X[classix.labels_ == -1,0], X[classix.labels_ == -1,1], c="k", s=20) 
     ax.set_aspect('equal', adjustable='datalim')
     plt.tick_params(axis='both', labelsize=20)
@@ -49,7 +49,7 @@ def rn_mcs_it(save=False):
     classix = CLASSIX(sorting='pca', radius=TOL, group_merging='distance', minPts=minPts, post_alloc=True, verbose=0)
     classix.fit_transform(X)
 
-    X_clean = X[classix.clean_index,:]
+    X_clean = X[classix.clean_index_,:]
     plt.rcParams['axes.facecolor'] = 'white'
     fig, ax = plt.subplots(figsize=(8,8))
     ax.scatter(X[classix.labels_== 0,0], X[classix.labels_== 0,1], c="hotpink", s=20)

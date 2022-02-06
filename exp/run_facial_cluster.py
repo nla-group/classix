@@ -96,7 +96,7 @@ def rn_facial_cluster():
     outlier_label = max(labels) + 1
     color_outlier = 'gray'
     # print("outliers color and label:{}, {}".format(color_outlier, outlier_label))
-    outliers = [i for i in range(len(classix.agg_labels)) if classix.agg_labels[i] in classix.group_outliers]
+    outliers = [i for i in range(len(classix.agg_labels_)) if classix.agg_labels_[i] in classix.group_outliers_]
     labels[outliers] = max(labels) + 1
     # for i in range(10):
     #     print([labels[i*10 + j] for j in range(10)])

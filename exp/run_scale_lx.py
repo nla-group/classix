@@ -1,10 +1,5 @@
-import math
-import numpy as np
-import pandas as pd
-import seaborn as sns
 import sklearn.datasets as data
-from scipy.sparse import csr_matrix, _sparsetools
-from classix import CLASSIX, visualize_connections, return_csr_matrix_indices
+from classix import CLASSIX
 import matplotlib.pyplot as plt
 
 def rn_scale_explore():
@@ -17,14 +12,14 @@ def rn_scale_explore():
     X = np.vstack([blobs, moons])
 
     for scale in np.arange(1, 3.3, 0.1):
-        classix = CLASSIX(sorting='pca', radius=TOL, group_merging='distance', verbose=0)
-        classix.fit_transform(X)
-        classix.visualize_linkage(scale=scale, figsize=(8,8), labelsize=24, path='img')
+        clx = CLASSIX(sorting='pca', radius=TOL, group_merging='distance', verbose=0)
+        clx.fit_transform(X)
+        clx.visualize_linkage(scale=scale, figsize=(8,8), labelsize=24, path='img')
 
 
     for tol in np.arange(0.1, 1.3, 0.1):
-        classix = CLASSIX(sorting='pca', radius=tol, group_merging='distance', verbose=0)
-        classix.fit_transform(X)
-        classix.visualize_linkage(scale=1.5, figsize=(8,8), labelsize=24, plot_boundary=True, path='img')
+        clx = CLASSIX(sorting='pca', radius=tol, group_merging='distance', verbose=0)
+        clx.fit_transform(X)
+        clx.visualize_linkage(scale=1.5, figsize=(8,8), labelsize=24, plot_boundary=True, path='img')
     
     
