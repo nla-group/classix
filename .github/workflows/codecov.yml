@@ -1,5 +1,5 @@
 name: Workflow for Codecov
-on: 
+on: [push]
   push:
     branches:
      - master
