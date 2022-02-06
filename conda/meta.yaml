@@ -3,9 +3,9 @@ package:
   version: 0.0.8
 
 source:
-  fn: ClassixClustering-0.3.3.tar.gz
-  url: https://files.pythonhosted.org/packages/b5/ca/615f0cec2694057692989204bf5be01187257a0c382a569d5e1df1cb65b7/ClassixClustering-0.3.3.tar.gz
-  sha256: b914b701ff55223f6913b7c7ed99a9daa4e1bd5476fd26c88db7e68186563ba2
+  fn: ClassixClustering-0.3.4.tar.gz
+  url: https://files.pythonhosted.org/packages/04/b1/c6dda9bde56d492d664bc0e00fac050108e174417137b88dd694f9b04b36/ClassixClustering-0.3.4.tar.gz
+  sha256: 854d4277e1f62f5d8a30ebb6e61cba248d637ed5f5b73b9b7b4aea17efe6006d
 
 requirements:
   host:

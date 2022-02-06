@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ClassixClustering
-Version: 0.3.3
+Version: 0.3.4
 Summary: Fast and explainable clustering based on sorting
 Home-page: https://github.com/nla-group/CLASSIX.git
 Author: Stefan Guettel, Xinye Chen
