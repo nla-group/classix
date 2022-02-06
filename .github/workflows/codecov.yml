@@ -22,6 +22,7 @@ jobs:
         pip install -U scikit-learn
         pip install coverage
         pip install pytest-cov
+        rm -r 'classix/data/vdu_signals.npy'
         pytest clx_unittest.py --cov=classix
         coverage xml
     - name: Upload coverage to Codecov
