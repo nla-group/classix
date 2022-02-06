@@ -93,6 +93,8 @@ def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
         sp1 = splist[int(i), 3:]
         neigbor_sp = splist[i+1:, 3:] # deprecated: splist[i+1:, :] 
         select_stps = np.arange(i+1, splist.shape[0], dtype=int)
+        sort_vals = splist[i:, 1]
+        
         if method == "density":                    # calculate the density
             # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
             # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
@@ -130,7 +132,8 @@ def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
             # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
             # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
             # AGGREGATION.
-            index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  # 2*distance_scale*radius
+            # index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  # 2*distance_scale*radius
+            index_overlap = fast_query(neigbor_sp, sp1, sort_vals, scale*radius)
             select_stps = select_stps[index_overlap]
             if not np.any(index_overlap): # calculate their neighbors ...1)
                 continue
@@ -151,6 +154,26 @@ def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
     for i in np.unique(labels):
         labels_set.append(np.where(labels == i)[0].tolist())
     return labels_set, connected_pairs_store  # merge_pairs(connected_pairs)
+
+
+
+def fast_query(data, starting_point, sort_vals, tol):
+    """Fast query with built in early stopping strategy for merging."""
+    len_ind = data.shape[0]
+    fdim = data.shape[1] # remove the first three elements that not included in the features
+    index_query=np.full(len_ind, False, dtype=bool)
+    for i in range(len_ind):
+        candidate = data[i]
+        
+        if (sort_vals[i+1] - sort_vals[0] > tol):
+            break
+            
+        dat = candidate - starting_point
+        dist = np.inner(dat, dat)
+        if dist <= tol**2:
+            index_query[i] = True
+            
+    return index_query
 
 
 
@@ -372,6 +395,8 @@ def cal_inter_volume(starting_point, spo, radius):
 #                 connected_pairs.append([i,j]) # store connected groups
 #         
 #     return connected_pairs
+
+
 
 # Deprecated function
 # def merge_pairs_dr(pairs):
