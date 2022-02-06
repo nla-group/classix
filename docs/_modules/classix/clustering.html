@@ -1904,9 +1904,9 @@
     <span class="k">if</span> <span class="n">base</span> <span class="o">==</span> <span class="s2">&quot;norm-mean&quot;</span><span class="p">:</span>
         <span class="c1"># self._mu, self._std = data.mean(axis=0), data.std()</span>
         <span class="n">_mu</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">ndata</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span>
+        <span class="n">ndata</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">_mu</span>
         <span class="n">_scl</span> <span class="o">=</span> <span class="n">ndata</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
-        <span class="n">ndata</span> <span class="o">=</span> <span class="n">ndata</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scl</span>
+        <span class="n">ndata</span> <span class="o">=</span> <span class="n">ndata</span> <span class="o">/</span> <span class="n">_scl</span>
 
     <span class="k">elif</span> <span class="n">base</span> <span class="o">==</span> <span class="s2">&quot;pca&quot;</span><span class="p">:</span>
         <span class="n">_mu</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -1927,6 +1927,7 @@
         <span class="n">_mu</span><span class="p">,</span> <span class="n">_scl</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span> <span class="c1"># no normalization</span>
         <span class="n">ndata</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="n">_mu</span><span class="p">)</span> <span class="o">/</span> <span class="n">_scl</span>
     <span class="k">return</span> <span class="n">ndata</span><span class="p">,</span> <span class="p">(</span><span class="n">_mu</span><span class="p">,</span> <span class="n">_scl</span><span class="p">)</span>
+
 
 
 <span class="k">def</span> <span class="nf">calculate_cluster_centers</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
