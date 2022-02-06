@@ -159,10 +159,8 @@ class TestClassix(unittest.TestCase):
                 assert(True)
 
     def test_explain(self):
-        X, y = make_blobs(n_samples=5000, 
-                  centers=2, n_features=2, 
-                  cluster_std=1.5, 
-                  random_state=1
+        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=2, 
+                               cluster_std=1.5, random_state=1
         )
         checkpoint = 1
         try:
