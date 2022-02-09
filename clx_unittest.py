@@ -26,12 +26,14 @@ import sklearn.datasets as data
 from classix import CLASSIX, load_data
 from classix import aggregation_test, novel_normalization
 
+
 def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
     data, (_mu, _scl) = novel_normalization(data, sorting)
     labels, splist, nr_dist = aggregation_test.aggregate(data, sorting=sorting,
                                                      tol=tol, early_stopping=early_stopping
     )
     return nr_dist, labels
+
 
 class TestClassix(unittest.TestCase):
 
@@ -50,6 +52,7 @@ class TestClassix(unittest.TestCase):
             comp = clx.labels_ == checkpoint
             assert(comp.all())
 
+            
     def test_density_cluster(self):
         vdu_signals = load_data('vdu_signals')
 
@@ -65,6 +68,7 @@ class TestClassix(unittest.TestCase):
             comp = clx.labels_ == checkpoint
             assert(comp.all())
 
+            
     def test_scale_linkage(self):
         TOL = 0.1 
         random_state = 1
@@ -133,6 +137,7 @@ class TestClassix(unittest.TestCase):
                 checkpoint = 0
         self.assertEqual(checkpoint, 1)
 
+        
     def test_agg_early_stop(self):
         X, y = data.make_blobs(n_samples=1000, centers=10, n_features=2, random_state=0)
 
@@ -158,6 +163,7 @@ class TestClassix(unittest.TestCase):
             if pca_nr_dist_true == pca_nr_dist_false:
                 assert(True)
 
+                
     def test_explain(self):
         X, y = data.make_blobs(n_samples=5000, centers=2, n_features=2, 
                                cluster_std=1.5, random_state=1
@@ -178,6 +184,17 @@ class TestClassix(unittest.TestCase):
         except:
             checkpoint = 0
 
+        self.assertEqual(checkpoint, 1)
+   
+
+    def test_built_in_data(self):
+        checkpoint = 1
+        try:
+            for dn in ['vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 'Phoneme', 'Wine']:
+                load_data(name=dn)
+        except:
+            checkpoint = 0
+            
         self.assertEqual(checkpoint, 1)
         
 if __name__ == '__main__':
