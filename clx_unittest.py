@@ -40,7 +40,7 @@ class TestClassix(unittest.TestCase):
     def test_distance_cluster(self):
         vdu_signals = load_data('vdu_signals')
 
-        for tol in np.arange(0.5, 1, 0.1):
+        for tol in np.arange(0.8, 1, 0.1):
             clx = CLASSIX(radius=tol, group_merging='distance', verbose=0)
             clx.fit_transform(vdu_signals)
             
@@ -56,7 +56,7 @@ class TestClassix(unittest.TestCase):
     def test_density_cluster(self):
         vdu_signals = load_data('vdu_signals')
 
-        for tol in np.arange(0.5, 1, 0.1):
+        for tol in np.arange(0.8, 1, 0.1):
             clx = CLASSIX(radius=tol, group_merging='density', verbose=0)
             clx.fit_transform(vdu_signals)
             
