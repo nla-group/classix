@@ -52,15 +52,10 @@ To install the current release via PIP use:
 pip install ClassixClustering
 ```
 
-To install this package with conda run:
-```
-conda install -c nla.stefan.xinye classix
-```
 
-To check the installation you can use either of commands (the second is for conda users)
+To check the installation you can use:
 ```
 python -m pip show ClassixClustering
-conda list classix
 ```
 
 Download this repository via:
