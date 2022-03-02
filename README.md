@@ -14,7 +14,9 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/nla-group/classix/HEAD)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6207093.svg)](https://doi.org/10.5281/zenodo.6207093)
 
-✨ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
+## ✨ Features
+
+CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
 
 - Ability to cluster low and high-dimensional data of arbitrary shape efficiently.
 - Ability to detect and deal with outliers in the data.
@@ -86,7 +88,7 @@ plt.scatter(X[:,0], X[:,1], c=clx.labels_)
 plt.show()
 ```
 
-## The explain method
+## 🎓 The explain method
 
 CLASSIX provides an API for the easy visualization of clusters, and to explain the assignment of data points to their clusters. To get an overview of the data points, the location of starting points, and their associated groups, simply type:
 
@@ -146,7 +148,7 @@ There is no path of overlapping groups between these clusters.
 ```
 
 
-## Reproducible experiment
+## 🎨 Reproducible experiment
 All empirical data in the paper are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
 Before running, ensure the dependency package `scikit-learn` and `hdbscan` are installed, and compile ``Quickshift++`` code (obtained in [Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)). After configuring all of these, run the commands below. 
 
@@ -158,7 +160,7 @@ python3 run exp_main.py
 All results will be stored on ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
 
 
-## Citation
+## ✨ Citation
 ```bibtex
 @techreport{CG22b,
   title   = {Fast and explainable clustering based on sorting},
@@ -174,5 +176,5 @@ All results will be stored on ["exp/results"](https://github.com/nla-group/class
 ```
 
 
-## License
+## 📝 License
 This project is licensed under the terms of the [MIT license](https://github.com/nla-group/classix/blob/master/LICENSE).
