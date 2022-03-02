@@ -3,9 +3,7 @@
 </h1>
 
 <p align="center">
-  <strong> Fast and explainable clustering based on sorting </strong>
-
-  💻🤖🙌
+  <strong> Fast and explainable clustering based on sorting </strong>  💻🤖🙌
 </p>
 
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
