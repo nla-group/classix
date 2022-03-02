@@ -36,7 +36,7 @@ A detailed documentation (still in progress), including tutorials, is available 
 CLASSIX has the following dependencies for its clustering functionality:
 
 - cython>=0.29.4
-- numpy>=1.20.0
+- numpy>=1.22.0
 - scipy>1.6.0
 - requests
 
@@ -44,6 +44,8 @@ and requires the following packages for data visualization:
 
 - matplotlib
 - pandas
+
+To ensure successful Cython compiling, please update your NumPy to the latest version 1.22.0.  
 
 To install the current release via PIP use:
 ```
