@@ -1,5 +1,5 @@
 <h1 align="center">
-  CLASSIX
+  CLASSIX 🐝
   
   
    
@@ -9,7 +9,7 @@
 <h3 align="center">
   <strong> Fast and explainable clustering based on sorting </strong>  
   
-  🐝🌲 🌰👀
+ 🐲 🌲 🌰 👀
 </h3>
 
 
