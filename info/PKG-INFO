@@ -1,10 +1,10 @@
 Metadata-Version: 2.1
 Name: ClassixClustering
-Version: 0.3.6
+Version: 0.3.7
 Summary: Fast and explainable clustering based on sorting
 Home-page: https://github.com/nla-group/CLASSIX.git
-Author: Stefan Guettel, Xinye Chen
-Author-email: stefan.guettel@manchester.ac.uk, xinye.chen@manchester.ac.uk
+Author: Xinye Chen, Stefan Güttel
+Author-email: xinye.chen@manchester.ac.uk, stefan.guettel@manchester.ac.uk
 License: MIT License
 Platform: UNKNOWN
 Classifier: Intended Audience :: Science/Research
@@ -16,6 +16,8 @@ Classifier: Operating System :: Microsoft :: Windows
 Classifier: Operating System :: POSIX
 Classifier: Operating System :: Unix
 Classifier: Operating System :: MacOS
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
 Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
 Description-Content-Type: text/markdown
@@ -35,6 +37,7 @@ License-File: LICENSE
 [![Download Status](https://static.pepy.tech/badge/ClassixClustering)](https://pypi.org/project/ClassixClustering/)
 [![Anaconda-Server Badge](https://anaconda.org/nla.stefan.xinye/classix/badges/latest_release_date.svg)](https://anaconda.org/nla.stefan.xinye/classix)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/nla-group/classix/HEAD)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6207093.svg)](https://doi.org/10.5281/zenodo.6207093)
 
 CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
 
