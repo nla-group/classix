@@ -1,11 +1,9 @@
 <p align="center">
   <a>
-    <img alt="CLASSIX" src="https://raw.githubusercontent.com/nla-group/classix/master/docs/logo/CLX.PNG" width="60" />
+    <img alt="CLASSIX" src="https://raw.githubusercontent.com/nla-group/classix/master/docs/logo/CLX.PNG" width="260" />
   </a>
 </p>
-<h1 align="center">
-  CLASSIX
-</h1>
+
 
 #### Fast and explainable clustering based on sorting
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
