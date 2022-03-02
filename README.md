@@ -14,7 +14,7 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/nla-group/classix/HEAD)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6207093.svg)](https://doi.org/10.5281/zenodo.6207093)
 
-CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
+✨ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
 
 - Ability to cluster low and high-dimensional data of arbitrary shape efficiently.
 - Ability to detect and deal with outliers in the data.
@@ -31,7 +31,7 @@ Here is a video abstract of CLASSIX:
 
 A detailed documentation (still in progress), including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/). 
 
-## Install
+## 🚀 Install
 
 CLASSIX has the following dependencies for its clustering functionality:
 
@@ -64,7 +64,7 @@ $ git clone https://github.com/nla-group/classix.git
 ```
 
 
-## Quick start
+##  🏁 Quick start
 
 ```Python
 from sklearn import datasets
