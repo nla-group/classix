@@ -160,7 +160,7 @@ python3 run exp_main.py
 All results will be stored on ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
 
 
-## ✨ Citation
+## ✨⭐ Citation
 ```bibtex
 @techreport{CG22b,
   title   = {Fast and explainable clustering based on sorting},
