@@ -1,4 +1,6 @@
-# CLASSIX
+<h1 align="center">
+  CLASSIX
+</h1>
 
 #### Fast and explainable clustering based on sorting
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
