@@ -169,7 +169,8 @@ python3 run exp_main.py
 All results will be stored on ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
 
 
-## ✨⭐ Citation [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6207093.svg)](https://doi.org/10.5281/zenodo.6207093)
+## ✨⭐ Citation 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6207093.svg)](https://doi.org/10.5281/zenodo.6207093)
 
 ```bibtex
 @techreport{CG22b,
