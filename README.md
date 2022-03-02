@@ -2,9 +2,10 @@
   CLASSIX
 </h1>
 
-<p align="center">
+<h3 align="center">
   <strong> Fast and explainable clustering based on sorting </strong>  💻🤖🙌
-</p>
+</h3>
+
 
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
 [![Build Status](https://app.travis-ci.com/nla-group/classix.svg?token=SziD2n1qxpnRwysssUVq&branch=master)](https://app.travis-ci.com/nla-group/classix)
