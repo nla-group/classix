@@ -9,6 +9,17 @@
 </h3>
 
 
+## ✨ Features
+
+CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
+
+- Ability to cluster low and high-dimensional data of arbitrary shape efficiently.
+- Ability to detect and deal with outliers in the data.
+- Ability to provide textual explanations for the generated clusters.
+- Full reproducibility of all tests in the accompanying paper.
+- Support of Cython compilation.
+
+
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
 [![Build Status](https://app.travis-ci.com/nla-group/classix.svg?token=SziD2n1qxpnRwysssUVq&branch=master)](https://app.travis-ci.com/nla-group/classix)
 [![codecov](https://codecov.io/gh/nla-group/classix/branch/master/graph/badge.svg?token=D4MQZS67H1)](https://codecov.io/gh/nla-group/classix)
@@ -22,15 +33,6 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/nla-group/classix/HEAD)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6207093.svg)](https://doi.org/10.5281/zenodo.6207093)
 
-## ✨ Features
-
-CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
-
-- Ability to cluster low and high-dimensional data of arbitrary shape efficiently.
-- Ability to detect and deal with outliers in the data.
-- Ability to provide textual explanations for the generated clusters.
-- Full reproducibility of all tests in the accompanying paper.
-- Support of Cython compilation.
 
 ``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter ``radius`` for the group aggregation and a ``minPts`` parameter controlling the minimal cluster size. 
 
