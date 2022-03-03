@@ -92,7 +92,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
     
     if sorting == "norm-mean" or sorting == "norm-orthant": 
         c_data = data.copy()
-        sort_vals = np.linalg.norm(data, ord=2, axis=1)
+        sort_vals = np.linalg.norm(c_data, ord=2, axis=1)
         ind = np.argsort(sort_vals)
 
     elif sorting == "pca":
@@ -119,19 +119,18 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
         sp = ind[i] 
         if labels[sp] >= 0:
             continue
-        else:
-            clustc = c_data[sp,:] 
-            labels[sp] = lab
-            num_group = 1
+        
+        clustc = c_data[sp,:] 
+        labels[sp] = lab
+        num_group = 1
 
         for j in ind[i:]:
-            if labels[j] >= 0:
+            if labels[j] != -1:
                 continue
             
             if (sort_vals[j] - sort_vals[sp] > tol):
                 break       
             
-            # dist = cnorm(clustc, c_data[j,:], fdim)
             # dat = clustc - c_data[j,:]
             # dist = np.inner(dat, dat) 
             
@@ -145,7 +144,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
                 num_group = num_group + 1
                 labels[j] = lab
 
-        splist.append( [sp, lab] + [num_group] + list(data[sp,:]) ) # respectively store starting point
+        splist.append([sp, sort_vals[sp], num_group] + list(data[sp,:]) ) # respectively store starting point
                                                                 # index, label, number of neighbor objects, center (starting point).
         lab += 1
 
