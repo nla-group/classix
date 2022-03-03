@@ -8,7 +8,7 @@ with open("README.md", 'r') as f:
 setuptools.setup(
     name="ClassixClustering",
     packages=["classix"],
-    version="0.4.2",
+    version="0.4.3",
     setup_requires=["cython>=0.29.4", "numpy>=1.22.0", "scipy>1.6.0", "matplotlib"],
     install_requires=["numpy>=1.22.0", "pandas", "matplotlib"],
     ext_modules=cythonize(["classix/*.pyx"], include_path=["classix"]),
@@ -26,6 +26,7 @@ setuptools.setup(
             'Operating System :: POSIX',
             'Operating System :: Unix',
             'Operating System :: MacOS',
+            "Programming Language :: Python :: 3",
             "Programming Language :: Python :: 3.6",
             "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
