@@ -114,7 +114,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
     else: # no sorting
         sort_vals = np.zeros(len_ind)
         ind = np.arange(len_ind)
-
+    
     for i in range(len_ind):
         sp = ind[i] 
         if labels[sp] >= 0:
