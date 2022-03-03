@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ClassixClustering
-Version: 0.4.0
+Version: 0.4.2
 Summary: Fast and explainable clustering based on sorting
 Home-page: https://github.com/nla-group/CLASSIX.git
 Author: Xinye Chen, Stefan Güttel
@@ -24,7 +24,7 @@ Description-Content-Type: text/markdown
 License-File: LICENSE
 
 <h1 align="center">
-  CLASSIX 🐝
+  CLASSIX :honeybee:
   
   
    
@@ -33,8 +33,6 @@ License-File: LICENSE
 
 <h3 align="center">
   <strong> Fast and explainable clustering based on sorting </strong>  
-  
- 🐲  👼 👀 👍 🌰 🌲
 </h3>
 
 
@@ -51,7 +49,7 @@ License-File: LICENSE
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/ClassixClustering.svg)](https://pypi.python.org/pypi/ClassixClustering/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6207093.svg)](https://doi.org/10.5281/zenodo.6207093)
 
-## ✨ Features
+## :sparkles: Features
 
 CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
 
@@ -70,9 +68,9 @@ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here ar
 [<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png width=520 />](https://www.youtube.com/watch?v=K94zgRjFEYo)
  
 
-A detailed documentation (still in progress), including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/). 
+A detailed documentation, including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/). 
 
-## 🚀 Install
+## :rocket: Install
 
 CLASSIX has the following dependencies for its clustering functionality:
 
@@ -86,15 +84,15 @@ and requires the following packages for data visualization:
 - matplotlib
 - pandas
 
-To ensure successful Cython compiling, please update your NumPy to the latest version 1.22.0.  
+To ensure successful Cython compilation, please update your NumPy installation to the latest version 1.22.0.  
 
-To install the current release via PIP use:
+To install the current CLASSIX release via PIP use:
 ```
 pip install ClassixClustering
 ```
 
 
-To check the installation you can use:
+To check the CLASSIX installation you can use:
 ```
 python -m pip show ClassixClustering
 ```
@@ -105,7 +103,7 @@ $ git clone https://github.com/nla-group/classix.git
 ```
 
 
-##  🏁 Quick start
+##  :checkered_flag: Quick start
 
 ```Python
 from sklearn import datasets
@@ -127,7 +125,7 @@ plt.scatter(X[:,0], X[:,1], c=clx.labels_)
 plt.show()
 ```
 
-## 🎓 The explain method
+## :mortar_board: The explain method
 
 CLASSIX provides an API for the easy visualization of clusters, and to explain the assignment of data points to their clusters. To get an overview of the data points, the location of starting points, and their associated groups, simply type:
 
@@ -187,9 +185,9 @@ There is no path of overlapping groups between these clusters.
 ```
 
 
-## 🎨 Reproducible experiment
-All empirical data in the paper are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
-Before running, ensure the dependency package `scikit-learn` and `hdbscan` are installed, and compile ``Quickshift++`` code (obtained in [Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)). After configuring all of these, run the commands below. 
+## :art: Reproducible experiment
+All experiment in the paper referenced below are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
+Before running, ensure the dependencies `scikit-learn` and `hdbscan` are installed, and compile the ``Quickshift++`` code ([Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)). After configuring all of these, run the commands below. 
 
 ```
 cd exp
@@ -199,7 +197,7 @@ python3 run exp_main.py
 All results will be stored on ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
 
 
-## ✨⭐ Citation 
+## :star: Citation 
 
 ```bibtex
 @techreport{CG22b,
@@ -216,7 +214,7 @@ All results will be stored on ["exp/results"](https://github.com/nla-group/class
 ```
 
 
-## 📝 License
+## :memo: License
 This project is licensed under the terms of the [MIT license](https://github.com/nla-group/classix/blob/master/LICENSE).
 
 
