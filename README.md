@@ -1,5 +1,5 @@
 <h1 align="center">
-  CLASSIX 🐝
+  CLASSIX `:honeybee:`
   
   
    
