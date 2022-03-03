@@ -27,7 +27,13 @@
 try:
     # # %load_ext Cython
     # !python3 setup.py build_ext --inplace
-    from .aggregation_cm import aggregate # cython with memory view
+    import scipy
+    if scipy.__version__ == '1.8.0':
+        from .aggregation_c import aggregate 
+        # cython without memory view, solve the error from scipy ``TypeError: type not understood``
+    else:
+        from .aggregation_cm import aggregate
+        # cython with memory view
     from .merging_cm import * 
 except ModuleNotFoundError:
     from .aggregation import aggregate 

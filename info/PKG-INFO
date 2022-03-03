@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: ClassixClustering
-Version: 0.3.7
+Version: 0.3.8
 Summary: Fast and explainable clustering based on sorting
 Home-page: https://github.com/nla-group/CLASSIX.git
 Author: Xinye Chen, Stefan Güttel
@@ -23,21 +23,35 @@ Classifier: Programming Language :: Python :: 3.9
 Description-Content-Type: text/markdown
 License-File: LICENSE
 
-# CLASSIX
+<h1 align="center">
+  CLASSIX 🐝
+  
+  
+   
 
-#### Fast and explainable clustering based on sorting
+</h1>
+
+<h3 align="center">
+  <strong> Fast and explainable clustering based on sorting </strong>  
+  
+ 🐲  👼 👀 👍 🌰 🌲
+</h3>
+
+
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
 [![Build Status](https://app.travis-ci.com/nla-group/classix.svg?token=SziD2n1qxpnRwysssUVq&branch=master)](https://app.travis-ci.com/nla-group/classix)
 [![codecov](https://codecov.io/gh/nla-group/classix/branch/master/graph/badge.svg?token=D4MQZS67H1)](https://codecov.io/gh/nla-group/classix)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PyPI pyversions](https://img.shields.io/pypi/pyversions/ClassixClustering.svg)](https://pypi.python.org/pypi/ClassixClustering/)
 [![!pypi](https://img.shields.io/pypi/v/ClassixClustering?color=orange)](https://pypi.org/project/ClassixClustering/)
+[![Download Status](https://static.pepy.tech/badge/ClassixClustering)](https://pypi.org/project/ClassixClustering/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation Status](https://readthedocs.org/projects/classix/badge/?version=latest)](https://classix.readthedocs.io/en/latest/?badge=latest)
 [![Anaconda-Server Badge](https://anaconda.org/nla.stefan.xinye/classix/badges/version.svg)](https://anaconda.org/nla.stefan.xinye/classix)
-[![Download Status](https://static.pepy.tech/badge/ClassixClustering)](https://pypi.org/project/ClassixClustering/)
-[![Anaconda-Server Badge](https://anaconda.org/nla.stefan.xinye/classix/badges/latest_release_date.svg)](https://anaconda.org/nla.stefan.xinye/classix)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/nla-group/classix/HEAD)
+[![Anaconda-Server Badge](https://anaconda.org/nla.stefan.xinye/classix/badges/latest_release_date.svg)](https://anaconda.org/nla.stefan.xinye/classix)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/ClassixClustering.svg)](https://pypi.python.org/pypi/ClassixClustering/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6207093.svg)](https://doi.org/10.5281/zenodo.6207093)
+
+## ✨ Features
 
 CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
 
@@ -47,21 +61,23 @@ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here ar
 - Full reproducibility of all tests in the accompanying paper.
 - Support of Cython compilation.
 
+
+
 ``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter ``radius`` for the group aggregation and a ``minPts`` parameter controlling the minimal cluster size. 
 
-Here is a video abstract of CLASSIX: 
+**Here is a video abstract of CLASSIX:** 
 
 [<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png width=520 />](https://www.youtube.com/watch?v=K94zgRjFEYo)
  
 
 A detailed documentation (still in progress), including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/). 
 
-## Install
+## 🚀 Install
 
 CLASSIX has the following dependencies for its clustering functionality:
 
 - cython>=0.29.4
-- numpy>=1.20.0
+- numpy>=1.22.0
 - scipy>1.6.0
 - requests
 
@@ -70,20 +86,17 @@ and requires the following packages for data visualization:
 - matplotlib
 - pandas
 
+To ensure successful Cython compiling, please update your NumPy to the latest version 1.22.0.  
+
 To install the current release via PIP use:
 ```
 pip install ClassixClustering
 ```
 
-To install this package with conda run:
-```
-conda install -c nla.stefan.xinye classix
-```
 
-To check the installation you can use either of commands (the second is for conda users)
+To check the installation you can use:
 ```
 python -m pip show ClassixClustering
-conda list classix
 ```
 
 Download this repository via:
@@ -92,7 +105,7 @@ $ git clone https://github.com/nla-group/classix.git
 ```
 
 
-## Quick start
+##  🏁 Quick start
 
 ```Python
 from sklearn import datasets
@@ -114,7 +127,7 @@ plt.scatter(X[:,0], X[:,1], c=clx.labels_)
 plt.show()
 ```
 
-## The explain method
+## 🎓 The explain method
 
 CLASSIX provides an API for the easy visualization of clusters, and to explain the assignment of data points to their clusters. To get an overview of the data points, the location of starting points, and their associated groups, simply type:
 
@@ -174,7 +187,7 @@ There is no path of overlapping groups between these clusters.
 ```
 
 
-## Reproducible experiment
+## 🎨 Reproducible experiment
 All empirical data in the paper are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
 Before running, ensure the dependency package `scikit-learn` and `hdbscan` are installed, and compile ``Quickshift++`` code (obtained in [Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)). After configuring all of these, run the commands below. 
 
@@ -186,7 +199,8 @@ python3 run exp_main.py
 All results will be stored on ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
 
 
-## Citation
+## ✨⭐ Citation 
+
 ```bibtex
 @techreport{CG22b,
   title   = {Fast and explainable clustering based on sorting},
@@ -202,7 +216,14 @@ All results will be stored on ["exp/results"](https://github.com/nla-group/class
 ```
 
 
-## License
+## 📝 License
 This project is licensed under the terms of the [MIT license](https://github.com/nla-group/classix/blob/master/LICENSE).
+
+
+<p align="left">
+  <a>
+    <img alt="CLASSIX" src="https://raw.githubusercontent.com/nla-group/classix/master/docs/_images/nla_group.png" width="240" />
+  </a>
+</p>
 
 
