@@ -9,7 +9,7 @@ setuptools.setup(
     name="ClassixClustering",
     packages=["classix"],
     version="0.4.3",
-    setup_requires=["cython>=0.29.4", "numpy>=1.22.0", "scipy>1.6.0", "matplotlib"],
+    setup_requires=["cython>=0.29.4", "numpy>=1.22.0", "scipy>=1.2.1", "matplotlib"],
     install_requires=["numpy>=1.22.0", "pandas", "matplotlib"],
     ext_modules=cythonize(["classix/*.pyx"], include_path=["classix"]),
     package_data={"classix": ["aggregation_c.pyx",
@@ -30,7 +30,8 @@ setuptools.setup(
             "Programming Language :: Python :: 3.6",
             "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
-            "Programming Language :: Python :: 3.9"
+            "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3.10"
             ],
     long_description=long_description,
     author="Xinye Chen, Stefan Güttel",
