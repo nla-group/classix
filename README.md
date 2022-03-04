@@ -172,7 +172,7 @@ python3 run exp_main.py
 All results will be stored on ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
 
 
-## :star: Citation 
+## :paperclip: Citation 
 
 ```bibtex
 @techreport{CG22b,
