@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Main Parameters &mdash; CLASSIX 0.0.2 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/_.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Aggregation Parameters" href="agg_parameters.html" />
+    <link rel="prev" title="classix.merging" href="_autosummary/classix.merging.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CLASSIX
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Get Started with CLASSIX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Performance Comparison</a></li>
+<li class="toctree-l1"><a class="reference internal" href="clustering_tutorial.html">Clustering Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explainable_clustering.html">Explainable Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outlier_detection.html">Outlier Detection</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Main Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="agg_parameters.html">Aggregation Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg_parameters.html">Merging Parameters</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgement.html">Acknowledgement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CLASSIX</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Main Parameters</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/main_parameters.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="main-parameters">
+<h1>Main Parameters<a class="headerlink" href="#main-parameters" title="Permalink to this headline"></a></h1>
+<p>Major classe is <code class="xref py py-class docutils literal notranslate"><span class="pre">CLASSIX</span></code>, which include clustering and visualization.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="classix.clustering.CLASSIX">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">classix.clustering.</span></span><span class="sig-name descname"><span class="pre">CLASSIX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sorting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minPts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_merging</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'distance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_alloc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classix/clustering.html#CLASSIX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classix.clustering.CLASSIX" title="Permalink to this definition"></a></dt>
+<dd><p>CLASSIX: Fast and explainable clustering based on sorting.</p>
+<p>The user only need to concern the hyperparameters of <code class="docutils literal notranslate"><span class="pre">sorting</span></code>, <code class="docutils literal notranslate"><span class="pre">radius</span></code>, and <code class="docutils literal notranslate"><span class="pre">minPts</span></code> in the most cases.
+If want a flexible clustering, might consider other hyperparameters such as <code class="docutils literal notranslate"><span class="pre">group_merging'',</span> <span class="pre">``scale</span></code>, and <code class="docutils literal notranslate"><span class="pre">post_alloc</span></code>.</p>
+<dl>
+<dt>sorting<span class="classifier">str, {‘pca’, ‘norm-mean’, ‘norm-orthant’, None}，default=’pca’</span></dt><dd><p>Sorting method used for the aggregation phase.</p>
+<ul class="simple">
+<li><p>‘pca’: sort data points by their first principal component</p></li>
+<li><p>‘norm-mean’: shift data to have zero mean and then sort by 2-norm values</p></li>
+<li><p>‘norm-orthant’: shift data to positive orthant and then sort by 2-norm values</p></li>
+<li><p>None: aggregate the raw data without any sorting</p></li>
+</ul>
+</dd>
+<dt>radius<span class="classifier">float, default=0.5</span></dt><dd><p>Tolerance to control the aggregation. If the distance between a starting point 
+and an object is less than or equal to the tolerance, the object will be allocated 
+to the group which the starting point belongs to. For details, we refer users to [1].</p>
+</dd>
+<dt>group_merging<span class="classifier">str, {‘density’, ‘distance’}, default=’distance’</span></dt><dd><p>The method for merging the groups.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>‘density’: two groups are merged if the density of data points in their intersection </dt><dd><p>is at least as high the smaller density of both groups. This option uses the disjoint 
+set structure to speedup agglomerate.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘distance’: two groups are merged if the distance of their starting points is at </dt><dd><p>most scale*radius (the parameter above). This option uses the disjoint 
+set structure to speedup agglomerate.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>For more details, we refer to [1].</p>
+</dd>
+<dt>minPts<span class="classifier">int, default=0</span></dt><dd><p>Clusters with less than minPts points are classified as abnormal clusters.  
+The data points in an abnormal cluster will be redistributed to the nearest normal cluster. 
+When set to 0, no redistribution is performed.</p>
+</dd>
+<dt>norm<span class="classifier">boolean, default=True</span></dt><dd><p>If normalize the data associated with the sorting, default as True.</p>
+</dd>
+<dt>scale<span class="classifier">float</span></dt><dd><p>Design for distance-clustering, when distance between the two starting points 
+associated with two distinct groups smaller than scale*radius, then the two groups merge.</p>
+</dd>
+<dt>post_alloc<span class="classifier">boolean, default=True</span></dt><dd><p>If allocate the outliers to the closest groups, hence the corresponding clusters. 
+If False, all outliers will be labeled as -1.</p>
+</dd>
+<dt>verbose<span class="classifier">boolean or int, default=1</span></dt><dd><p>Whether print the logs or not.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt><a href="#id1"><span class="problematic" id="id2">agg_labels_</span></a><span class="classifier">numpy.ndarray</span></dt><dd><p>Groups labels of aggregation.</p>
+</dd>
+<dt><a href="#id3"><span class="problematic" id="id4">splist_</span></a><span class="classifier">numpy.ndarray</span></dt><dd><p>List of starting points formed in the aggregation.</p>
+</dd>
+<dt><a href="#id5"><span class="problematic" id="id6">labels_</span></a><span class="classifier">numpy.ndarray</span></dt><dd><p>Clustering class labels for data objects</p>
+</dd>
+<dt><a href="#id7"><span class="problematic" id="id8">group_outliers_</span></a><span class="classifier">numpy.ndarray</span></dt><dd><p>Indices of outliers (aggregation groups level), 
+i.e., indices of abnormal groups within the clusters with fewer 
+data points than minPts points.</p>
+</dd>
+<dt><a href="#id9"><span class="problematic" id="id10">clean_index_</span></a><span class="classifier">numpy.ndarray</span></dt><dd><p>The data without outliers. Given data X,  the data without outliers 
+can be exported by X_clean = X[<a href="#id11"><span class="problematic" id="id12">classix.clean_index_</span></a>,:] while the outliers can be exported by 
+Outliers = X[~classix.clean_index_,:]</p>
+</dd>
+<dt><a href="#id13"><span class="problematic" id="id14">connected_pairs_</span></a><span class="classifier">list</span></dt><dd><p>List for connected group labels.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>fit(data):</dt><dd><p>Cluster data while the parameters of the model will be saved. The labels can be extracted by calling <code class="docutils literal notranslate"><span class="pre">self.labels_</span></code>.</p>
+</dd>
+<dt>fit_transform(data):</dt><dd><p>Cluster data and return labels. The labels can also be extracted by calling <code class="docutils literal notranslate"><span class="pre">self.labels_</span></code>.</p>
+</dd>
+<dt>predict(data):</dt><dd><p>After clustering the in-sample data, predict the out-sample data.
+Data will be allocated to the clusters with the nearest starting point in the stage of aggregation. Default values.</p>
+</dd>
+<dt>explain(index1, index2): </dt><dd><p>Explain the computed clustering. 
+The indices index1 and index2 are optional parameters (int) corresponding to the 
+indices of the data points.</p>
+</dd>
+</dl>
+<p>[1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="classix.clustering.CLASSIX.clustering">
+<span class="sig-name descname"><span class="pre">clustering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'distance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minPts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classix/clustering.html#CLASSIX.clustering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classix.clustering.CLASSIX.clustering" title="Permalink to this definition"></a></dt>
+<dd><p>Merge groups after aggregation.</p>
+<dl class="simple">
+<dt>data<span class="classifier">numpy.ndarray</span></dt><dd><p>The input that is array-like of shape (n_samples,).</p>
+</dd>
+<dt>agg_labels: numpy.ndarray</dt><dd><p>Groups labels of aggregation.</p>
+</dd>
+<dt>splist: numpy.ndarray</dt><dd><p>List formed in the aggregation storing starting points.</p>
+</dd>
+<dt>sorting<span class="classifier">str</span></dt><dd><p>The sorting way refered for aggregation, 
+default=’pca’, other options: ‘norm-mean’, ‘norm-orthant’, ‘z-pca’, or None.</p>
+</dd>
+<dt>radius<span class="classifier">float, default=0.5</span></dt><dd><p>Tolerance to control the aggregation hence the whole clustering process. For aggregation, 
+if the distance between a starting point and an object is less than or equal to the tolerance, 
+the object will be allocated to the group which the starting point belongs to.</p>
+</dd>
+<dt>method<span class="classifier">str</span></dt><dd><p>The method for groups merging, 
+default=’distance’, other options: ‘density’, ‘mst-distance’, and ‘scc-distance’.</p>
+</dd>
+<dt>minPts<span class="classifier">int, default=0</span></dt><dd><p>The threshold, in the range of [0, infity] to determine the noise degree.
+When assgin it 0, algorithm won’t check noises.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>centers<span class="classifier">numpy.ndarray</span></dt><dd><p>The return centers of clusters</p>
+</dd>
+<dt>clabels<span class="classifier">numpy.ndarray </span></dt><dd><p>The clusters labels of the data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classix.clustering.CLASSIX.explain">
+<span class="sig-name descname"><span class="pre">explain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'NULL'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'NULL'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">showsplist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_colwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">6)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figstyle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ggplot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'k'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_fcolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tomato'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_bbox</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dp_fcolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bisque'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dp_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dp_pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dp_fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dp_bbox</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'red'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connect_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'green'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cline_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'off'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pdf'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classix/clustering.html#CLASSIX.explain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classix.clustering.CLASSIX.explain" title="Permalink to this definition"></a></dt>
+<dd><p>‘self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
+‘self.explain(object1/index1, object2index) # prints an explanation why object1 and object2 are either in the same or distinct clusters</p>
+<dl class="simple">
+<dt>Here we unify the terminology:</dt><dd><p>[-] data points
+[-] groups (made up of data points, formed by aggregation)
+[-] clusters (made up of groups)</p>
+</dd>
+</dl>
+<dl>
+<dt>index1<span class="classifier">int or numpy.ndarray (optional)</span></dt><dd><p>Input object1 [with index ‘index1’] for explanation.</p>
+</dd>
+<dt>index2<span class="classifier">int or numpy.ndarray (optional)</span></dt><dd><p>Input object2 [with index ‘index2’] for explanation, and compare objects [with indices ‘index1’ and ‘index2’].</p>
+</dd>
+<dt>showsplist<span class="classifier">boolean</span></dt><dd><p>Determine if show the starting points information, which include the number of data points (NumPts), 
+corresponding clusters, and associated coordinates. This only applies to both index1 and index2 are “NULL”.
+Default as True.</p>
+</dd>
+<dt>max_colwidth<span class="classifier">int (optional)</span></dt><dd><p>Max width to truncate each column in characters. By default, no limit.</p>
+</dd>
+<dt>replace_name<span class="classifier">str or list (optional)</span></dt><dd><p>Replace the index with name. 
+* For example: as for indices 1 and 1300 we have</p>
+<p><code class="docutils literal notranslate"><span class="pre">classix.explain(1,</span> <span class="pre">1300,</span> <span class="pre">plot=False,</span> <span class="pre">figstyle=&quot;seaborn&quot;)</span> <span class="pre">#</span> <span class="pre">or</span> <span class="pre">classix.explain(obj1,</span> <span class="pre">obj4)</span></code></p>
+<p>The data point 1 is in group 9 and the data point 1300 is in group 8, both of which were merged into cluster #0. 
+These two groups are connected via groups 9 -&gt; 2 -&gt; 8.
+* if we specify the replace name, then the output will be</p>
+<p><code class="docutils literal notranslate"><span class="pre">classix.explain(1,</span> <span class="pre">1300,</span> <span class="pre">replace_name=[&quot;Peter</span> <span class="pre">Meyer&quot;,</span> <span class="pre">&quot;Anna</span> <span class="pre">Fields&quot;],</span> <span class="pre">figstyle=&quot;seaborn&quot;)</span></code></p>
+<p>The data point Peter Meyer is in group 9 and the data point Anna Fields is in group 8, both of which were merged into cluster #0. 
+These two groups are connected via groups 9 -&gt; 2 -&gt; 8.</p>
+</dd>
+<dt>plot<span class="classifier">boolean</span></dt><dd><p>Determine if visulize the explaination. Default as False.</p>
+</dd>
+<dt>figsize<span class="classifier">tuple</span></dt><dd><p>Determine the size of visualization figure. Default as (10, 6).</p>
+</dd>
+<dt>figstyle<span class="classifier">str</span></dt><dd><p>Determine the style of visualization.
+see reference: <a class="reference external" href="https://matplotlib.org/stable/gallery/style_sheets/style_sheets_reference.html">https://matplotlib.org/stable/gallery/style_sheets/style_sheets_reference.html</a></p>
+</dd>
+<dt>savefig<span class="classifier">boolean</span></dt><dd><p>Determine if save figure, the figure will be saved in the folder named “img”.</p>
+</dd>
+<dt>indices_color<span class="classifier">str</span></dt><dd><p>Color for visualization of data with indices index1 and index2. Default as “k”.</p>
+</dd>
+<dt>ind_marker_size<span class="classifier">float), optional:</span></dt><dd><p>Size for visualization of data with indices index1 and index2.</p>
+</dd>
+<dt>sp_fcolor<span class="classifier">str</span></dt><dd><p>The color marked for starting points text box. Default as ‘tomato’.</p>
+</dd>
+<dt>sp_alpha<span class="classifier">float</span></dt><dd><p>The value setting for transprency of text box for starting points. Default as 0.3.</p>
+</dd>
+<dt>sp_pad<span class="classifier">int</span></dt><dd><p>The size of text box for starting points. Default as 2.</p>
+</dd>
+<dt>sp_bbox<span class="classifier">dict</span></dt><dd><p>Dict with properties for patches.FancyBboxPatch for starting points. Default as None.</p>
+</dd>
+<dt>sp_fontsize<span class="classifier">int</span></dt><dd><p>The fontsize for text marked for starting points. Default as None.</p>
+</dd>
+<dt>dp_fcolor<span class="classifier">str</span></dt><dd><p>The color marked for specified data objects text box. Default as ‘tomato’.</p>
+</dd>
+<dt>dp_alpha<span class="classifier">float</span></dt><dd><p>The value setting for transprency of text box for specified data objects. Default as 0.3.</p>
+</dd>
+<dt>dp_pad<span class="classifier">int</span></dt><dd><p>The size of text box for specified data objects. Default as 2.</p>
+</dd>
+<dt>dp_bbox<span class="classifier">dict </span></dt><dd><p>Dict with properties for patches.FancyBboxPatch for specified data objects. Default as None.</p>
+</dd>
+<dt>dp_fontsize<span class="classifier">int</span></dt><dd><p>The fontsize for text marked for specified data objects. Default as None.</p>
+</dd>
+<dt>color<span class="classifier">str</span></dt><dd><p>Color for text of starting points labels in visualization. Default as “k”.</p>
+</dd>
+<dt>alpha<span class="classifier">float</span></dt><dd><p>Scalar or None. Default as 0.5.</p>
+</dd>
+<dt>cline_width<span class="classifier">float</span></dt><dd><p>Set the patch linewidth of circle for starting points. Default as 0.5.</p>
+</dd>
+<dt>figname<span class="classifier">str</span></dt><dd><p>Set the figure name for the image to be saved.</p>
+</dd>
+<dt>fmt<span class="classifier">str</span></dt><dd><p>Specify the format of the image to be saved, default as ‘pdf’, other choice: png.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classix.clustering.CLASSIX.explain_viz">
+<span class="sig-name descname"><span class="pre">explain_viz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(12,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figstyle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ggplot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'alpha':</span> <span class="pre">0.3,</span> <span class="pre">'facecolor':</span> <span class="pre">'tomato',</span> <span class="pre">'pad':</span> <span class="pre">2}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'off'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pdf'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classix/clustering.html#CLASSIX.explain_viz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classix.clustering.CLASSIX.explain_viz" title="Permalink to this definition"></a></dt>
+<dd><p>Visualize the starting point and data points</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classix.clustering.CLASSIX.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classix/clustering.html#CLASSIX.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classix.clustering.CLASSIX.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Cluster the data and return the associated cluster labels.</p>
+<dl class="simple">
+<dt>data<span class="classifier">numpy.ndarray</span></dt><dd><p>The ndarray-like input of shape (n_samples,)</p>
+</dd>
+</dl>
+<p>self</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classix.clustering.CLASSIX.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classix/clustering.html#CLASSIX.fit_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classix.clustering.CLASSIX.fit_transform" title="Permalink to this definition"></a></dt>
+<dd><p>Cluster the data and return the associated cluster labels.</p>
+<dl class="simple">
+<dt>data<span class="classifier">numpy.ndarray</span></dt><dd><p>The ndarray-like input of shape (n_samples,)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>labels<span class="classifier">numpy.ndarray</span></dt><dd><p>Index of the cluster each sample belongs to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classix.clustering.CLASSIX.form_starting_point_clusters_table">
+<span class="sig-name descname"><span class="pre">form_starting_point_clusters_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classix/clustering.html#CLASSIX.form_starting_point_clusters_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classix.clustering.CLASSIX.form_starting_point_clusters_table" title="Permalink to this definition"></a></dt>
+<dd><p>form the columns details for starting points and clusters information</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classix.clustering.CLASSIX.outlier_filter">
+<span class="sig-name descname"><span class="pre">outlier_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classix/clustering.html#CLASSIX.outlier_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classix.clustering.CLASSIX.outlier_filter" title="Permalink to this definition"></a></dt>
+<dd><p>Filter outliers in terms of min_samples</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="classix.clustering.CLASSIX.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/classix/clustering.html#CLASSIX.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#classix.clustering.CLASSIX.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Allocate the data to their nearest clusters.</p>
+<dl class="simple">
+<dt>data<span class="classifier">numpy.ndarray</span></dt><dd><p>The ndarray-like input of shape (n_samples,)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>labels<span class="classifier">numpy.ndarray</span></dt><dd><p>The predicted clustering labels.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="_autosummary/classix.merging.html" class="btn btn-neutral float-left" title="classix.merging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="agg_parameters.html" class="btn btn-neutral float-right" title="Aggregation Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Stefan Güttel, Xinye Chen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

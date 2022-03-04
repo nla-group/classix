@@ -97,6 +97,7 @@ We give two examples to compare the data pair cluster assignment as follows.
     clx.explain(0, 2008,  plot=True, savefig=True, fmt='png')
 
 .. parsed-literal::
+
     The data point 0 is in group 2 and the data point 2008 is in group 4, 
     both of which were merged into cluster #0. 
     These two groups are connected via groups 2 <-> 1 <-> 4.
@@ -129,6 +130,7 @@ we leave the default parameters except setting radius to 1.
 .. admonition:: Note
 
     The method ``load_data`` also supports other typical UCI datasets for clustering, which include ``'vdu_signals'``, `'Iris'``, ``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``, ``'Phoneme'``, and ``'Wine'``.
+
 
 Then, we employ classix model to train the data and record the timing:
 

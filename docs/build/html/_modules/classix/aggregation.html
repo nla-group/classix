@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>classix.aggregation &mdash; CLASSIX 0.0.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/_.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CLASSIX
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Get Started with CLASSIX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../comparison.html">Performance Comparison</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../clustering_tutorial.html">Clustering Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../explainable_clustering.html">Explainable Clustering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../outlier_detection.html">Outlier Detection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../main_parameters.html">Main Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../agg_parameters.html">Aggregation Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mg_parameters.html">Merging Parameters</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../acknowledgement.html">Acknowledgement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact.html">Contact</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CLASSIX</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>classix.aggregation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for classix.aggregation</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># CLASSIX: Fast and explainable clustering based on sorting</span>
+<span class="c1">#</span>
+<span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 Stefan Güttel, Xinye Chen</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+
+<span class="c1"># Python implementation for aggregation</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1"># from sklearn.decomposition import PCA</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">svds</span>
+
+<span class="c1"># python implementation for aggregation</span>
+<div class="viewcode-block" id="aggregate"><a class="viewcode-back" href="../../agg_parameters.html#classix.aggregate">[docs]</a><span class="k">def</span> <span class="nf">aggregate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sorting</span><span class="o">=</span><span class="s2">&quot;pca&quot;</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span> <span class="c1"># , verbose=1</span>
+    <span class="sd">&quot;&quot;&quot;Aggregate the data</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : numpy.ndarray</span>
+<span class="sd">        The input that is array-like of shape (n_samples,).</span>
+
+<span class="sd">    sorting : str</span>
+<span class="sd">        The sorting method for aggregation, default=&#39;pca&#39;, other options: &#39;norm-mean&#39;, &#39;norm-orthant&#39;.</span>
+
+<span class="sd">    tol : float</span>
+<span class="sd">        The tolerance to control the aggregation. if the distance between the starting point </span>
+<span class="sd">        of a group and another data point is less than or equal to the tolerance,</span>
+<span class="sd">        the point is allocated to that group.  </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    labels (numpy.ndarray) : </span>
+<span class="sd">        The group categories of the data after aggregation.</span>
+<span class="sd">    </span>
+<span class="sd">    splist (list) : </span>
+<span class="sd">        The list of the starting points.</span>
+<span class="sd">    </span>
+<span class="sd">    nr_dist (int) :</span>
+<span class="sd">        The number of pairwise distance calculations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">splist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> <span class="c1"># store the starting points</span>
+    <span class="n">len_ind</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">sorting</span> <span class="o">==</span> <span class="s2">&quot;norm-mean&quot;</span> <span class="ow">or</span> <span class="n">sorting</span> <span class="o">==</span> <span class="s2">&quot;norm-orthant&quot;</span><span class="p">:</span> 
+        <span class="n">c_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">sort_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">c_data</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">sort_vals</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">sorting</span> <span class="o">==</span> <span class="s2">&quot;pca&quot;</span><span class="p">:</span>
+        <span class="c1"># pca = PCA(n_components=1) </span>
+        <span class="c1"># sort_vals = pca.fit_transform(data_memview).reshape(-1)</span>
+        <span class="c1"># ind = np.argsort(sort_vals)</span>
+        
+        <span class="c1"># change to svd </span>
+        <span class="c1"># data = data - data.mean(axis=0) -- already done in the clustering.fit_transform</span>
+        <span class="n">c_data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">U1</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">c_data</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">return_singular_vectors</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+            <span class="n">sort_vals</span> <span class="o">=</span> <span class="n">U1</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">s1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># print( U1, s1, _)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sort_vals</span> <span class="o">=</span> <span class="n">c_data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sort_vals</span> <span class="o">=</span> <span class="n">sort_vals</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="o">-</span><span class="n">sort_vals</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># flip to enforce deterministic output</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">sort_vals</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># no sorting</span>
+        <span class="n">sort_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">len_ind</span><span class="p">)</span> <span class="c1"># useless, blankss</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">len_ind</span><span class="p">)</span>
+        
+    <span class="n">lab</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">len_ind</span>
+    <span class="n">nr_dist</span> <span class="o">=</span> <span class="mi">0</span> 
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">len_ind</span><span class="p">):</span> <span class="c1"># tqdm（range(len_ind), disable=not verbose)</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="n">ind</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="c1"># starting point</span>
+        <span class="k">if</span> <span class="n">labels</span><span class="p">[</span><span class="n">sp</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clustc</span> <span class="o">=</span> <span class="n">c_data</span><span class="p">[</span><span class="n">sp</span><span class="p">,:]</span> 
+            <span class="n">labels</span><span class="p">[</span><span class="n">sp</span><span class="p">]</span> <span class="o">=</span> <span class="n">lab</span>
+            <span class="n">num_group</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">ind</span><span class="p">[</span><span class="n">i</span><span class="p">:]:</span>
+            <span class="k">if</span> <span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># sort_val_c = sort_vals[sp]</span>
+            <span class="c1"># sort_val_j = sort_vals[j]</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">sort_vals</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">sort_vals</span><span class="p">[</span><span class="n">sp</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">):</span>
+                <span class="k">break</span>       
+
+            <span class="c1"># dist = np.sum((clustc - data[j,:])**2)    # slow</span>
+
+            <span class="n">dat</span> <span class="o">=</span> <span class="n">clustc</span> <span class="o">-</span> <span class="n">c_data</span><span class="p">[</span><span class="n">j</span><span class="p">,:]</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span>
+            <span class="n">nr_dist</span> <span class="o">+=</span> <span class="mi">1</span>
+                
+            <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="o">**</span><span class="mi">2</span><span class="p">:</span>
+                <span class="n">num_group</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">lab</span>
+
+        <span class="n">splist</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">sp</span><span class="p">,</span> <span class="n">sort_vals</span><span class="p">[</span><span class="n">sp</span><span class="p">],</span> <span class="n">num_group</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">sp</span><span class="p">,:])</span> <span class="p">)</span> <span class="c1"># respectively store starting point</span>
+                                                               <span class="c1"># index, label, number of neighbor objects, center (starting point).</span>
+        <span class="n">lab</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># if verbose == 1:</span>
+    <span class="c1">#    print(&quot;aggregate {} groups&quot;.format(len(np.unique(labels))))</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">splist</span><span class="p">,</span> <span class="n">nr_dist</span></div>
+
+
+
+
+
+<span class="c1"># def calculate_group_centers(data, labels):</span>
+<span class="c1">#     agg_centers = list() </span>
+<span class="c1">#     for c in set(labels):</span>
+<span class="c1">#         # indc = [i for i in range(data.shape[0]) if labels[i] == c]</span>
+<span class="c1">#         indc = np.where(labels==c)</span>
+<span class="c1">#         center = [-1, c] + np.mean(data[indc,:], axis=0).tolist()</span>
+<span class="c1">#         agg_centers.append( center )</span>
+<span class="c1">#     return agg_centers</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Stefan Güttel, Xinye Chen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
