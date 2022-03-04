@@ -1,4 +1,4 @@
-classix.merging
+﻿classix.merging
 ===============
 
 .. automodule:: classix.merging
@@ -17,6 +17,7 @@ classix.merging
       cal_inter_volume
       check_if_overlap
       fast_agglomerate
+      fast_query
       findParent
       merge
    

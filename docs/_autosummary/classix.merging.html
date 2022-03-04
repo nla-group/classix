@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>classix.merging &mdash; CLASSIX 0.0.1 documentation</title>
+  <title>classix.merging &mdash; CLASSIX 0.0.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/_.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -107,10 +107,13 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fast_agglomerate</span></code>(data, splist, radius[, ...])</p></td>
 <td><p>Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">findParent</span></code>(s)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fast_query</span></code>(data, starting_point, sort_vals, tol)</p></td>
+<td><p>Fast query with built in early stopping strategy for merging.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">findParent</span></code>(s)</p></td>
 <td><p>Find parent of node.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge</span></code>(s1, s2)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge</span></code>(s1, s2)</p></td>
 <td><p>Merge the roots of two node.</p></td>
 </tr>
 </tbody>

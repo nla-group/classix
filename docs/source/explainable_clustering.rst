@@ -129,7 +129,7 @@ we leave the default parameters except setting radius to 1.
 
 .. admonition:: Note
 
-    The method ``load_data`` also supports other typical UCI datasets for clustering, which include ``'vdu_signals'``, `'Iris'``, ``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``, ``'Phoneme'``, and ``'Wine'``.
+    The method ``load_data`` also supports other typical UCI datasets for clustering, which include ``'vdu_signals'``, ``'Iris'``, ``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``, ``'Phoneme'``, and ``'Wine'``.
 
 
 Then, we employ classix model to train the data and record the timing:
