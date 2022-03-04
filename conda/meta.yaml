@@ -1,17 +1,17 @@
 package:
   name: classix
-  version: 0.0.9
+  version: 0.1.0
 
 source:
-  fn: ClassixClustering-0.3.5.tar.gz
-  url: https://files.pythonhosted.org/packages/04/55/ba245962599b1f9e35af276e3584be4e2d39b1ab9f61505170f594bfe746/ClassixClustering-0.3.5.tar.gz
-  sha256: fdb5234ea2ad62d8dae0f23a339498682a3b907121c437be8c453c6bb06371d5
+  fn: ClassixClustering-0.4.9.tar.gz
+  url: https://files.pythonhosted.org/packages/1d/b7/801fbd0db4810bae666368007e5fc2764deac6dd830cefa6d64974e42a17/ClassixClustering-0.4.9.tar.gz
+  sha256: e9fb5465cbfb05c1847ae56d6e328f19fc7ba3cbcd07432e158fa4fbb0428a22
 
 requirements:
   host:
     - python
     - pandas
-    - numpy >=1.20.0
+    - numpy 
     - setuptools
     - cython
     - scipy
@@ -21,7 +21,7 @@ requirements:
     - pip
     - python
     - pandas
-    - numpy >=1.20.0
+    - numpy 
     - setuptools
     - cython
     - scipy
