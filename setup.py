@@ -8,9 +8,9 @@ with open("README.rst", 'r') as f:
 setuptools.setup(
     name="ClassixClustering",
     packages=["classix"],
-    version="0.4.5",
-    setup_requires=["cython", "numpy>=1.20.0", "scipy>=1.2.1", "matplotlib"],
-    install_requires=["numpy>=1.20.0", "pandas", "matplotlib"],
+    version="0.4.9",
+    setup_requires=["cython", "numpy>=1.3.0"],
+    install_requires=["numpy>=1.3.0", "scipy>=0.7.0", "pandas", "matplotlib", "requests"],
     ext_modules=cythonize(["classix/*.pyx"], include_path=["classix"]),
     package_data={"classix": ["aggregation_c.pyx",
                               "aggregation_cm.pyx", 

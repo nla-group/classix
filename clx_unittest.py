@@ -170,17 +170,17 @@ class TestClassix(unittest.TestCase):
         )
         checkpoint = 1
         try:
-            clx = CLASSIX(radius=0.2, group_merging='distance', minPts=3)
+            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
             clx.fit_transform(X)
             clx.predict(X)
             clx.explain(plot=True, figsize=(10,10),  savefig=True)
             clx.explain(0,  plot=True, savefig=True)
             clx.explain(3, 2000,  plot=True, savefig=True)
             clx.explain(0, 2008,  plot=True, savefig=True)
-            clx.explain(plot=True, figsize=(10,10), sp_fontsize=10, savefig=False)
-            clx.explain(0,  plot=True, sp_fontsize=10, savefig=False)
-            clx.explain(3, 2000,  plot=True, sp_fontsize=10, savefig=False)
-            clx.explain(0, 2008,  plot=True, sp_fontsize=10, savefig=False)
+            # clx.explain(plot=True, figsize=(10,10), sp_fontsize=10, savefig=False)
+            # clx.explain(0,  plot=True, sp_fontsize=10, savefig=False)
+            # clx.explain(3, 2000,  plot=True, sp_fontsize=10, savefig=False)
+            # clx.explain(0, 2008,  plot=True, sp_fontsize=10, savefig=False)
         except:
             checkpoint = 0
 
