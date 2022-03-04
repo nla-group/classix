@@ -1,4 +1,5 @@
 import numpy
+import logging
 import setuptools
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 
