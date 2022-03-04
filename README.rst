@@ -1,30 +1,3 @@
-Metadata-Version: 2.1
-Name: ClassixClustering
-Version: 0.4.5
-Summary: Fast and explainable clustering based on sorting
-Home-page: https://github.com/nla-group/CLASSIX.git
-Author: Xinye Chen, Stefan Güttel
-Author-email: xinye.chen@manchester.ac.uk, stefan.guettel@manchester.ac.uk
-License: MIT License
-Platform: UNKNOWN
-Classifier: Intended Audience :: Science/Research
-Classifier: Intended Audience :: Developers
-Classifier: Programming Language :: Python
-Classifier: Topic :: Software Development
-Classifier: Topic :: Scientific/Engineering
-Classifier: Operating System :: Microsoft :: Windows
-Classifier: Operating System :: POSIX
-Classifier: Operating System :: Unix
-Classifier: Operating System :: MacOS
-Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.6
-Classifier: Programming Language :: Python :: 3.7
-Classifier: Programming Language :: Python :: 3.8
-Classifier: Programming Language :: Python :: 3.9
-Classifier: Programming Language :: Python :: 3.10
-Description-Content-Type: text/x-rst
-License-File: LICENSE
-
 .. image:: https://codecov.io/gh/nla-group/classix/branch/master/graph/badge.svg?token=D4MQZS67H1
     :target: https://codecov.io/gh/nla-group/classix
     :alt: codecov
@@ -122,4 +95,3 @@ Citation
       type    = {arXiv EPrint},
       url     = {https://arxiv.org/abs/2202.01456}
     }
-

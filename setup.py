@@ -2,15 +2,15 @@ import setuptools
 from Cython.Build import cythonize
 import numpy
 
-with open("README.md", 'r') as f:
+with open("README.rst", 'r') as f:
     long_description = f.read()
 
 setuptools.setup(
     name="ClassixClustering",
     packages=["classix"],
-    version="0.4.3",
-    setup_requires=["cython>=0.29.4", "numpy>=1.22.0", "scipy>=1.2.1", "matplotlib"],
-    install_requires=["numpy>=1.22.0", "pandas", "matplotlib"],
+    version="0.4.5",
+    setup_requires=["cython", "numpy>=1.20.0", "scipy>=1.2.1", "matplotlib"],
+    install_requires=["numpy>=1.20.0", "pandas", "matplotlib"],
     ext_modules=cythonize(["classix/*.pyx"], include_path=["classix"]),
     package_data={"classix": ["aggregation_c.pyx",
                               "aggregation_cm.pyx", 
@@ -37,7 +37,7 @@ setuptools.setup(
     author="Xinye Chen, Stefan Güttel",
     author_email="xinye.chen@manchester.ac.uk, stefan.guettel@manchester.ac.uk",
     description="Fast and explainable clustering based on sorting",
-    long_description_content_type='text/markdown',
+    long_description_content_type='text/x-rst',
     url="https://github.com/nla-group/CLASSIX.git",
     license='MIT License'
 )

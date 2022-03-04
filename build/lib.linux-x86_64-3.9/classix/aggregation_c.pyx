@@ -81,12 +81,12 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
     cdef unsigned int nr_dist = 0 # nr_dist:if necessary, count the distance computation
     cdef unsigned int lab = 0 # lab: class
     cdef double dist # distance 
-    cdef np.ndarray[np.int64_t, ndim=1] labels = np.zeros(len_ind, dtype=int) - 1
+    cdef np.ndarray[np.int64_t, ndim=1] labels = np.zeros(len_ind, dtype=np.int64) - 1
     # cdef list labels = [-1]*len_ind
     cdef list splist = list() # store the starting points
     cdef np.ndarray[np.float64_t, ndim=1] sort_vals = np.empty((len_ind, ), dtype=float)
     cdef np.ndarray[np.float64_t, ndim=1] clustc = np.empty((fdim, ), dtype=float)
-    cdef np.ndarray[np.int64_t, ndim=1] ind = np.empty((len_ind, ), dtype=int)
+    cdef np.ndarray[np.int64_t, ndim=1] ind = np.empty((len_ind, ), dtype=np.int64)
     cdef unsigned int i, j, coord, c
     
     

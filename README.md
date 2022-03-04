@@ -16,7 +16,7 @@
 [![codecov](https://codecov.io/gh/nla-group/classix/branch/master/graph/badge.svg?token=D4MQZS67H1)](https://codecov.io/gh/nla-group/classix)
 [![!pypi](https://img.shields.io/pypi/v/ClassixClustering?color=orange)](https://pypi.org/project/ClassixClustering/)
 [![Download Status](https://static.pepy.tech/badge/ClassixClustering)](https://pypi.org/project/ClassixClustering/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/nla-group/classix/blob/master/LICENSE)
 [![Documentation Status](https://readthedocs.org/projects/classix/badge/?version=latest)](https://classix.readthedocs.io/en/latest/?badge=latest)
 [![Anaconda-Server Badge](https://anaconda.org/nla.stefan.xinye/classix/badges/version.svg)](https://anaconda.org/nla.stefan.xinye/classix)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/nla-group/classix/HEAD)
@@ -49,9 +49,9 @@ A detailed documentation, including tutorials, is available at [![Dev](https://i
 
 CLASSIX has the following dependencies for its clustering functionality:
 
-- cython>=0.29.4
-- numpy>=1.22.0
-- scipy>1.6.0
+- cython
+- numpy>=1.20.0
+- scipy>=1.2.1
 - requests
 
 and requires the following packages for data visualization:
@@ -59,7 +59,7 @@ and requires the following packages for data visualization:
 - matplotlib
 - pandas
 
-To ensure successful Cython compilation, please update your NumPy installation to the latest version 1.22.0.  
+To obtain faster speed, we recommend upgrading the NumPy installation to the version>=1.22.0.  
 
 To install the current CLASSIX release via PIP use:
 ```
@@ -74,11 +74,13 @@ python -m pip show ClassixClustering
 
 Download this repository via:
 ```
-$ git clone https://github.com/nla-group/classix.git
+git clone https://github.com/nla-group/classix.git
 ```
 
 
 ##  :checkered_flag: Quick start
+
+We start with a simple synthetic dataset: 
 
 ```Python
 from sklearn import datasets

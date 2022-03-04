@@ -1,5 +1,5 @@
 LICENSE
-README.md
+README.rst
 setup.py
 ClassixClustering.egg-info/PKG-INFO
 ClassixClustering.egg-info/SOURCES.txt

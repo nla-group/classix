@@ -25,16 +25,17 @@
 # SOFTWARE.
 
 try:
-    # # %load_ext Cython
+    # %load_ext Cython
     # !python3 setup.py build_ext --inplace
-    import scipy
-    if scipy.__version__ == '1.8.0':
+    import scipy, numpy
+    if scipy.__version__ == '1.8.0' or numpy.__version__ < '1.22.0':
         from .aggregation_c import aggregate 
         # cython without memory view, solve the error from scipy ``TypeError: type not understood``
     else:
         from .aggregation_cm import aggregate
         # cython with memory view
     from .merging_cm import * 
+    
 except ModuleNotFoundError:
     from .aggregation import aggregate 
     from .merging import *
@@ -152,7 +153,19 @@ def get_data(current_dir='', name='vdu_signals'):
             
             
 def load_data(name='vdu_signals'):
-    """Obtain the built-in data."""
+    """Obtain the built-in data.
+    
+    Parameters
+    ----------
+    name: str, {'vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 'Phoneme', 'Wine'}, default='vdu_signals'
+        The support build-in datasets for CLASSIX.
+
+    Returns
+    -------
+    X, y: numpy.ndarray
+        Data and ground-truth labels.    
+    """
+    
     current_dir, current_filename = os.path.split(__file__)
     
     if not os.path.isdir(os.path.join(current_dir, 'data')):
