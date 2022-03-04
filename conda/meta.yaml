@@ -4,15 +4,14 @@ package:
 
 
 source:
-  fn: ClassixClustering-0.4.9.tar.gz
-  url: https://files.pythonhosted.org/packages/1d/b7/801fbd0db4810bae666368007e5fc2764deac6dd830cefa6d64974e42a17/ClassixClustering-0.4.9.tar.gz
-  sha256: e9fb5465cbfb05c1847ae56d6e328f19fc7ba3cbcd07432e158fa4fbb0428a22
+  fn: ClassixClustering-0.5.0.tar.gz
+  url: https://files.pythonhosted.org/packages/38/44/1788e0ff819fdff8899cae24c71d807bc59f1c4600b5f3d1714c78e95165/ClassixClustering-0.5.0.tar.gz
+  sha256: d6286be3b62c287d7237a83f1f12fe660bfbea38322acc0be4af7bf5812d426b
 
 
 build:
   noarch: python
   number: 1
-
 
 requirements:
   build:
@@ -41,6 +40,11 @@ requirements:
 test:
   requires:
     - pip
+    - numpy
+    - scipy
+    - requests
+    - pandas
+    - matplotlib
   files:
     - runtest.py
   imports:
