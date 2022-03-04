@@ -1,3 +1,4 @@
+import warnings
 try:
     # %load_ext Cython
     # !python3 setup.py build_ext --inplace
@@ -12,7 +13,7 @@ try:
 except ModuleNotFoundError:
     from .aggregation import aggregate
     from .merging import fast_agglomerate as agglomerate 
-    print("Cython fail.")
+    warnings.warn("This CLASSIX installation is not using Cython.")
     
 from .clustering import CLASSIX
 from .clustering import load_data
