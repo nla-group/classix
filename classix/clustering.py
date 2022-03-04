@@ -24,6 +24,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import warnings
+
 try:
     # %load_ext Cython
     # !python3 setup.py build_ext --inplace
@@ -39,11 +41,10 @@ try:
 except ModuleNotFoundError:
     from .aggregation import aggregate 
     from .merging import *
-    print("Cython fail.")
+    warnings.warn("This CLASSIX installation is not using Cython.")
 
 import os
 import copy
-import warnings
 import requests
 import collections
 import numpy as np
