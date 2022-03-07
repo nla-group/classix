@@ -38,7 +38,7 @@ try:
         # cython with memory view
     from .merging_cm import * 
     
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ValueError):
     from .aggregation import aggregate 
     from .merging import *
     warnings.warn("This CLASSIX installation is not using Cython.")
