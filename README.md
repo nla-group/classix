@@ -49,8 +49,8 @@ A detailed documentation, including tutorials, is available at [![Dev](https://i
 CLASSIX has the following dependencies for its clustering functionality:
 
 - cython
-- numpy
-- scipy
+- numpy (recommended >= 1.20.0)
+- scipy>=1.2.1
 - requests
 
 and requires the following packages for data visualization:
