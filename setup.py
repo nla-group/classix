@@ -13,17 +13,17 @@ with open("README.rst", 'r') as f:
     long_description = f.read()
 
     
-setup_args = {'name'="ClassixClustering",
-        'packages'=["classix"],
-        'version'=_version,
-        'setup_requires'=["cython", "numpy>=1.3.0"],
-        'install_requires'=["numpy>=1.3.0", "scipy>=0.7.0", "pandas", "matplotlib", "requests"],
-        'package_data'={"classix": ["aggregation_c.pyx",
+setup_args = {'name':"ClassixClustering",
+        'packages':["classix"],
+        'version':_version,
+        'setup_requires':["cython", "numpy>=1.3.0"],
+        'install_requires':["numpy>=1.3.0", "scipy>=0.7.0", "pandas", "matplotlib", "requests"],
+        'package_data':{"classix": ["aggregation_c.pyx",
                                 "aggregation_cm.pyx", 
                                 "merging_cm.pyx"]
                     },
-        'include_dirs'=[numpy.get_include()],
-        'classifiers'=["Intended Audience :: Science/Research",
+        'include_dirs':[numpy.get_include()],
+        'classifiers':["Intended Audience :: Science/Research",
                 "Intended Audience :: Developers",
                 "Programming Language :: Python",
                 "Topic :: Software Development",
@@ -39,13 +39,13 @@ setup_args = {'name'="ClassixClustering",
                 "Programming Language :: Python :: 3.9",
                 "Programming Language :: Python :: 3.10"
                 ],
-        'long_description'=long_description,
-        'author'="Xinye Chen, Stefan Güttel",
-        'author_email'="xinye.chen@manchester.ac.uk, stefan.guettel@manchester.ac.uk",
-        'description'="Fast and explainable clustering based on sorting",
-        'long_description_content_type'='text/x-rst',
-        'url'="https://github.com/nla-group/CLASSIX.git",
-        'license'='MIT License'
+        'long_description':long_description,
+        'author':"Xinye Chen, Stefan Güttel",
+        'author_email':"xinye.chen@manchester.ac.uk, stefan.guettel@manchester.ac.uk",
+        'description':"Fast and explainable clustering based on sorting",
+        'long_description_content_type':'text/x-rst',
+        'url':"https://github.com/nla-group/CLASSIX.git",
+        'license':'MIT License'
 }
 
 try:
