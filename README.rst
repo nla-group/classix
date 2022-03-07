@@ -34,8 +34,8 @@ Installing and example
 CLASSIX has the following dependencies for its clustering functionality:
 
 * cython
-* numpy>=1.20.0
-* scipy>=1.2.1
+* numpy
+* scipy
 * requests
 
 and requires the following packages for data visualization:
