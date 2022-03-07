@@ -8,7 +8,7 @@ This documentation will provide you with a beginner-friendly tutorial, and show 
 
 Installation guide
 ------------------------------
-CLASSIX has the following dependencies for its clustering functionality:
+We try to keep the installing requirements as low as possible, to ensure most computers can install CLASSIX. CLASSIX has the following dependencies for its clustering functionality:
 
     * cython (recommend >=0.27)
     * numpy>=1.3.0 (recommend >=1.20)
