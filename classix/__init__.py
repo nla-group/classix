@@ -10,7 +10,7 @@ try:
         from .aggregation_cm import aggregate
         # cython with memory view
     from .merging_cm import fast_agglomerate as agglomerate 
-except ModuleNotFoundError:
+except (ModuleNotFoundError, ValueError):
     from .aggregation import aggregate
     from .merging import fast_agglomerate as agglomerate 
     # warnings.warn("This CLASSIX installation is not using Cython.")
