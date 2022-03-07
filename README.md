@@ -48,8 +48,8 @@ A detailed documentation, including tutorials, is available at [![Dev](https://i
 
 CLASSIX has the following dependencies for its clustering functionality:
 
-- cython (recommended >=0.27)
-- numpy>=1.3.0 (recommended >=1.20.0)
+- cython (recommend >=0.27)
+- numpy>=1.3.0 (recommend >=1.20.0)
 - scipy>=1.2.1
 - requests
 
