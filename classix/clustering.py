@@ -704,6 +704,7 @@ class CLASSIX:
         
         # after this step, the connected pairs (groups) will be transformed into merged clusters, 
         for sublabels in self.merge_groups: # some of aggregated groups might be independent which are not included in self.merge_groups
+            # not labels[sublabels] = maxid !!!
             for j in sublabels:
                 labels[labels == j] = maxid
             maxid = maxid + 1
