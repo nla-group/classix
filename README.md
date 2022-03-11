@@ -58,8 +58,6 @@ and requires the following packages for data visualization:
 - matplotlib
 - pandas
 
-To obtain faster speed, we recommend upgrading the NumPy installation to the version>=1.22.0.  
-
 To install the current CLASSIX release via PIP use:
 ```
 pip install ClassixClustering
