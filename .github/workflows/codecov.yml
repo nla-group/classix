@@ -20,9 +20,7 @@ jobs:
       run: |
         pip install -r requirements.txt
         pip install -U scikit-learn
-        pip install coverage
         pip install pytest-cov
-        python setup.py build_ext --inplace
         pytest clx_unittest.py --cov=classix
         coverage xml
     - name: Upload coverage to Codecov
