@@ -412,7 +412,7 @@ class CLASSIX:
         self.post_alloc = post_alloc
         # self.n_jobs = n_jobs
 
-        self.agg_labels_ = None
+        self.groups_ = None
         self.clean_index_ = None
         self.labels_ = None
         self.connected_pairs_ = None
@@ -477,14 +477,14 @@ class CLASSIX:
             self.data = (data - self._mu) / self._scl
         
         # aggregation
-        self.agg_labels_, self.splist_, self.dist_nr = aggregate(data=self.data, sorting=self.sorting, tol=self.radius) 
+        self.groups_, self.splist_, self.dist_nr = aggregate(data=self.data, sorting=self.sorting, tol=self.radius) 
         self.splist_ = np.array(self.splist_)
         
         self.clean_index_ = np.full(self.data.shape[0], True) # claim clean data indices
         # clustering
         self.labels_ = self.clustering(
             data=self.data,
-            agg_labels=self.agg_labels_, 
+            agg_labels=self.groups_, 
             splist=self.splist_,             
             sorting=self.sorting, 
             radius=self.radius, 
@@ -764,7 +764,7 @@ class CLASSIX:
             self.clean_index_ = labels != maxid
             agln = agg_labels[self.clean_index_]
             # agg_clean_index_ = np.unique(agln) # extract the unique number of aggregation groups.
-            # agg_noise_index = np.unique(self.agg_labels_[self.outliers]) # extract the unique number of aggregation groups.
+            # agg_noise_index = np.unique(self.groups_[self.outliers]) # extract the unique number of aggregation groups.
             # print("aggregation clean index:", agg_clean_index_)
             self.label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
             # print("label change:", self.label_change)
@@ -1057,7 +1057,7 @@ class CLASSIX:
         else: # explain(index1)
             if isinstance(index1, int):
                 object1 = self.x_pca[index1] # self.data has been normalized
-                agg_label1 = self.agg_labels_[index1] # get the group index for object1
+                agg_label1 = self.groups_[index1] # get the group index for object1
             else:
                 object1 = (index1 - self._mu) / self._scl # allow for out-sample data
                 agg_label1 = np.argmin(np.linalg.norm(self.s_pca - object1, axis=1, ord=2)) # get the group index for object1
@@ -1070,7 +1070,7 @@ class CLASSIX:
             
             # explain one object
             # cluster_centers = self.calculate_group_centers(self.data, self.labels_)
-            # print("Starting point list of {} data:".format(len(self.agg_labels_)))
+            # print("Starting point list of {} data:".format(len(self.groups_)))
 
             if index2 == "NULL":
                 if replace_name != None:
@@ -1215,7 +1215,7 @@ class CLASSIX:
             else: # explain(index1, index2)
                 if isinstance(index2, int):
                     object2 = self.x_pca[index2] # self.data has been normalized
-                    agg_label2 = self.agg_labels_[index2] # get the group index for object2
+                    agg_label2 = self.groups_[index2] # get the group index for object2
                 else:
                     object2 = (index2 - self._mu) / self._scl # allow for out-sample data
                     if self.data.shape[1] >= 2:
