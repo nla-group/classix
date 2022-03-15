@@ -243,7 +243,7 @@ So the next step is how we process these outliers, we can either marked as indep
 
 ### How to determine an appropriate value for radius?
 
-In most cases, `radius=0.5` can handle most cases. The higher the dimensionality of the data is, the higher the radius we should use.  For density based merging, the `radius` can be set a bit higher than distance based merging. 
+In most cases, `radius` ranging from 0.1 to 1 can handle most cases. The higher the dimensionality of the data is, the higher the `radius` we should use (better try the `radius` > 1).  For density based merging, the `radius` can be set a bit higher than distance based merging. 
 
 
 ## :art: Reproducible experiment
