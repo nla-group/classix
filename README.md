@@ -222,7 +222,7 @@ The 212 groups were merged into 41 clusters with the following sizes:
       * cluster 39 : 1
       * cluster 40 : 1
 As MinPts is 14, the number of clusters has been further reduced to 3.
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5.png width=720 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5.png /  width=720>
 ```
 
 
