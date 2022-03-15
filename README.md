@@ -174,9 +174,7 @@ clx = CLASSIX(sorting='pca', radius=0.15, group_merging='density', verbose=1, mi
 clx.fit(X)
 ```
 
-We can easily perceive that the appropriate `minPts` is 14, i.e., the clusters that cardinality is smaller than 14 will be treated as outliers.  
-
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5.png  width=360 />
+We can easily perceive that the appropriate `minPts` is 14, i.e., the clusters that cardinality is smaller than 14 will be treated as outliers. 
 
 ```
 CLASSIX(sorting='pca', radius=0.15, minPts=14, group_merging='density')
@@ -227,11 +225,18 @@ The 212 groups were merged into 41 clusters with the following sizes:
 As MinPts is 14, the number of clusters has been further reduced to 3.
 ```
 
+The figure below shows the clustering result with `post_alloc=False`:
+
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5.png  width=360 />
 
 So the next step is how we process these outliers, we can either marked as black (label denote -1) or allocate them to the nearby clusters (each outlier will be assigned a label). If we determine to allow the outliers exist, we can set `post_alloc=False`. Otherwise outliers will be reassigned by setting `post_alloc=True`. The performance of `post_alloc=True` is as below. The post-processing depends on the problem context. 
 
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5_post.png />
 
+
+### How to determine an appropriate value for radius?
+
+In most cases, `radius=0.5` can handle most cases. The higher the dimensionality of the data is, the higher the radius we should use.  For density based merging, the `radius` can be set a bit higher than distance based merging. 
 
 
 ## :art: Reproducible experiment
