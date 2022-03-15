@@ -146,6 +146,7 @@ The data point 0 is in group 2, which has been merged into cluster #0.
 ```
 
 We can also query why two data points ended up in the same cluster, or not: 
+
 ```Python
 clx.explain(0, 2000, plot=True)
 ```
@@ -157,6 +158,78 @@ The data point 0 is in group 2, which has been merged into cluster 0.
 The data point 2000 is in group 10, which has been merged into cluster 1.
 There is no path of overlapping groups between these clusters.
 ```
+
+## :raising_hand: Frequently Asked Questions
+
+### How to tune the `minPts`?
+
+Mostly, `minPts` is not required, though it is very important part in CLASSIX. To obtain a good clustering, users usually use `minPts` accompanying with `verbose=1`. Then, we can specify the minPts to an appropriate level for those isolated clusters. For example, the dataset like 
+
+```Python
+from sklearn import datasets
+X, y = datasets.make_blobs(n_samples=1000, centers=2, n_features=2, random_state=0)
+
+
+clx = CLASSIX(sorting='pca', radius=0.15, group_merging='density', verbose=1, minPts=14, post_alloc=False)
+clx.fit(X)
+```
+
+We can easily perceive that the appropriate `minPts` is 14, i.e., the clusters that cardinality is smaller than 14 will be treated as outliers.  
+```
+CLASSIX(sorting='pca', radius=0.15, minPts=14, group_merging='density')
+The 1000 data points were aggregated into 212 groups.
+In total 5675 comparisons were required (5.67 comparisons per data point). 
+The 212 groups were merged into 41 clusters with the following sizes: 
+      * cluster 0 : 454
+      * cluster 1 : 440
+      * cluster 2 : 13
+      * cluster 3 : 10
+      * cluster 4 : 7
+      * cluster 5 : 7
+      * cluster 6 : 6
+      * cluster 7 : 5
+      * cluster 8 : 5
+      * cluster 9 : 4
+      * cluster 10 : 4
+      * cluster 11 : 4
+      * cluster 12 : 3
+      * cluster 13 : 3
+      * cluster 14 : 3
+      * cluster 15 : 2
+      * cluster 16 : 2
+      * cluster 17 : 2
+      * cluster 18 : 2
+      * cluster 19 : 2
+      * cluster 20 : 2
+      * cluster 21 : 1
+      * cluster 22 : 1
+      * cluster 23 : 1
+      * cluster 24 : 1
+      * cluster 25 : 1
+      * cluster 26 : 1
+      * cluster 27 : 1
+      * cluster 28 : 1
+      * cluster 29 : 1
+      * cluster 30 : 1
+      * cluster 31 : 1
+      * cluster 32 : 1
+      * cluster 33 : 1
+      * cluster 34 : 1
+      * cluster 35 : 1
+      * cluster 36 : 1
+      * cluster 37 : 1
+      * cluster 38 : 1
+      * cluster 39 : 1
+      * cluster 40 : 1
+As MinPts is 14, the number of clusters has been further reduced to 3.
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5.png width=720 />
+```
+
+
+So the next step is how we process these outliers, we can either marked as black (label denote -1) or allocate them to the nearby clusters (each outlier will be assigned a label). If we determine to allow the outliers exist, we can set `post_alloc=False`. Otherwise outliers will be reassigned by setting `post_alloc=True`. The performance of `post_alloc=True` is as below. The post-processing depends on the problem context. 
+
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5_post.png />
+
 
 
 ## :art: Reproducible experiment
