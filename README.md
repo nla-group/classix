@@ -175,6 +175,9 @@ clx.fit(X)
 ```
 
 We can easily perceive that the appropriate `minPts` is 14, i.e., the clusters that cardinality is smaller than 14 will be treated as outliers.  
+
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5.png  width=720 />
+
 ```
 CLASSIX(sorting='pca', radius=0.15, minPts=14, group_merging='density')
 The 1000 data points were aggregated into 212 groups.
@@ -222,7 +225,6 @@ The 212 groups were merged into 41 clusters with the following sizes:
       * cluster 39 : 1
       * cluster 40 : 1
 As MinPts is 14, the number of clusters has been further reduced to 3.
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5.png  width=720 />
 ```
 
 
