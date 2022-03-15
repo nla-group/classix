@@ -14,7 +14,7 @@ outlier detection, we should set ``post_alloc=False``, then the outliers will be
     from classix import CLASSIX
     import matplotlib.pyplot as plt
     X, y = datasets.make_blobs(n_samples=1000, centers=2, n_features=2, random_state=0)
-    clx = CLASSIX(sorting='pca', radius=0.15, verbose=1, minPts=13, post_alloc=False)
+    clx = CLASSIX(sorting='pca', radius=0.15, group_merging='density', verbose=1, minPts=13, post_alloc=False)
     clx.fit(X)
 
     plt.figure(figsize=(8,8))
