@@ -172,6 +172,13 @@ X, y = datasets.make_blobs(n_samples=1000, centers=2, n_features=2, random_state
 # run CLASSIX
 clx = CLASSIX(sorting='pca', radius=0.15, group_merging='density', verbose=1, minPts=14, post_alloc=False)
 clx.fit(X)
+# draw figure
+plt.figure(figsize=(8,8))
+plt.rcParams['axes.facecolor'] = 'white'
+plt.scatter(X[:,0], X[:,1], c=clx.labels_)
+plt.xticks([])
+plt.yticks([])
+plt.show()
 ```
 
 We can easily perceive that the appropriate `minPts` is 14, i.e., the clusters that cardinality is smaller than 14 will be treated as outliers. 
