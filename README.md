@@ -246,6 +246,11 @@ So the next step is how we process these outliers, we can either marked as indep
 In most cases, `radius` ranging from 0.1 to 1 can handle most cases. The higher the dimensionality of the data is, the higher the `radius` we should use (better try the `radius` > 1).  For density based merging, the `radius` can be set a bit higher than distance based merging. 
 
 
+### Does density based merging work better than distance based merging?
+
+It depends. For high dimensional data, distance based merging is recommended. Usually, density based merging works slower than distance based merging. But if data can be dealT with high `radius` for density based merging, density based merging might be faster than the distance based merging with a low `radius` while achiving better performance. 
+
+
 ## :art: Reproducible experiment
 All experiment in the paper referenced below are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
 Before running, ensure the dependencies `scikit-learn` and `hdbscan` are installed, and compile the ``Quickshift++`` code ([Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)). After configuring all of these, run the commands below. 
@@ -256,6 +261,8 @@ python3 run exp_main.py
 ```
 
 All results will be stored on ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
+
+
 
 
 ## :paperclip: Citation 
