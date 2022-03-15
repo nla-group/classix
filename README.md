@@ -161,6 +161,11 @@ There is no path of overlapping groups between these clusters.
 
 ## :raising_hand: Frequently Asked Questions
 
+### Does density based merging work better than distance based merging?
+
+It depends. For high dimensional data, distance based merging is recommended. Usually, density based merging works slower than distance based merging. But if data can be dealT with high `radius` for density based merging, density based merging might be faster than the distance based merging with a low `radius` while achiving better performance. For example, the data in the next question may not be suitable for distance based merging.
+
+
 ### How to tune the `minPts`?
 
 Mostly, `minPts` is not required, though it is very important part in CLASSIX. To obtain a good clustering, users usually use `minPts` accompanying with `verbose=1`. Then, we can specify the minPts to an appropriate level for those isolated clusters. For example, the dataset like 
@@ -246,9 +251,6 @@ So the next step is how we process these outliers, we can either marked as indep
 In most cases, `radius` ranging from 0.1 to 1 can handle most cases. The higher the dimensionality of the data is, the higher the `radius` we should use (better try the `radius` > 1).  For density based merging, the `radius` can be set a bit higher than distance based merging. 
 
 
-### Does density based merging work better than distance based merging?
-
-It depends. For high dimensional data, distance based merging is recommended. Usually, density based merging works slower than distance based merging. But if data can be dealT with high `radius` for density based merging, density based merging might be faster than the distance based merging with a low `radius` while achiving better performance. 
 
 
 ## :art: Reproducible experiment
