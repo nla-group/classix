@@ -202,7 +202,7 @@ Let's take a look at the data distribution and clustering result:
 ```Python
 clx.explain(plot=True, figsize=(2,2), sp_fontsize=12)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz_df.png width=360 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz_df.png width=200 />
 
 ```
 A clustering of 5 data points with 2 features has been performed. 
@@ -232,7 +232,7 @@ clx.explain('Bert', plot=True, sp_fontsize=12)
 
 Output:
 
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneBert.png width=500 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneBert.png width=600 />
 
 The table below indicates group information of Bert, the ``Coordinates`` corresponds to the coordinates of starting points for the group, the values are normalized associated with the sorting way we choose (here is ``sorting='pca'``).
 
@@ -252,7 +252,7 @@ clx.explain(index1='Tom', index2='Bert', plot=True, sp_fontsize=12)
 
 Output:
 
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=500 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=600 />
 
 ```
 ----------------------------------------
