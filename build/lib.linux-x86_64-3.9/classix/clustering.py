@@ -52,6 +52,7 @@ import pandas as pd
 from numpy.linalg import norm
 #import pyximport; pyximport.install()
 from matplotlib import pyplot as plt
+import matplotlib.colors as colors
 from scipy.sparse.linalg import svds
 # from sklearn.decomposition import PCA
 from scipy.sparse import csr_matrix, _sparsetools
@@ -852,11 +853,11 @@ class CLASSIX:
                 plot=False, figsize=(10, 6), figstyle="ggplot", savefig=False, ind_color="k", ind_marker_size=150,
                 sp_fcolor='tomato',  sp_alpha=0.05, sp_pad=0.5, sp_fontsize=None, sp_bbox=None, 
                 dp_fcolor='bisque',  dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
-                color='red', connect_color='green', alpha=0.5, cline_width=0.5, axis='off', 
-                figname=None, fmt='pdf', *argv, **kwargs):
+                cmap='turbo', cmin=0.1, cmax=0.5, color='red', connect_color='green', alpha=0.5, 
+                cline_width=0.5, axis='off', figname=None, fmt='pdf', *argv, **kwargs):
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
-        'self.explain(object1/index1, object2index) # prints an explanation why object1 and object2 are either in the same or distinct clusters
+        'self.explain(object1/index1, object2/index2) # prints an explanation why object1 and object2 are either in the same or distinct clusters
         
         
         Here we unify the terminology:
@@ -867,10 +868,10 @@ class CLASSIX:
         
         Parameters
         ----------
-        index1 : int or numpy.ndarray (optional)
+        index1 : int or numpy.ndarray, optional
             Input object1 [with index 'index1'] for explanation.
         
-        index2 : int or numpy.ndarray (optional)
+        index2 : int or numpy.ndarray, optional
             Input object2 [with index 'index2'] for explanation, and compare objects [with indices 'index1' and 'index2'].
         
         showsplist : boolean
@@ -878,10 +879,10 @@ class CLASSIX:
             corresponding clusters, and associated coordinates. This only applies to both index1 and index2 are "NULL".
             Default as True. 
         
-        max_colwidth : int (optional)
+        max_colwidth : int, optional
             Max width to truncate each column in characters. By default, no limit.
             
-        replace_name : str or list (optional)
+        replace_name : str or list, optional
             Replace the index with name. 
             * For example: as for indices 1 and 1300 we have 
             
@@ -896,65 +897,74 @@ class CLASSIX:
             The data point Peter Meyer is in group 9 and the data point Anna Fields is in group 8, both of which were merged into cluster #0. 
             These two groups are connected via groups 9 -> 2 -> 8.
 
-        plot : boolean
-            Determine if visulize the explaination. Default as False.
+        plot : boolean, default=False
+            Determine if visulize the explaination. 
         
-        figsize : tuple
-            Determine the size of visualization figure. Default as (10, 6).
+        figsize : tuple, default=(10, 6)
+            Determine the size of visualization figure. 
 
-        figstyle : str
+        figstyle : str, default="ggplot"
             Determine the style of visualization.
             see reference: https://matplotlib.org/stable/gallery/style_sheets/style_sheets_reference.html
         
-        savefig : boolean
+        savefig : boolean, default=False
             Determine if save figure, the figure will be saved in the folder named "img".
         
-        indices_color : str
-            Color for visualization of data with indices index1 and index2. Default as "k".
+        indices_color : str, default as 'k'
+            Color for visualization of data with indices index1 and index2.
         
-        ind_marker_size : float), optional:
+        ind_marker_size : float, optional:
             Size for visualization of data with indices index1 and index2.
     
-        sp_fcolor : str
-            The color marked for starting points text box. Default as 'tomato'.
+        sp_fcolor : str, default='tomato'
+            The color marked for starting points text box. 
             
-        sp_alpha : float
-            The value setting for transprency of text box for starting points. Default as 0.3.
+        sp_alpha : float, default=0.3
+            The value setting for transprency of text box for starting points. 
             
-        sp_pad : int
-            The size of text box for starting points. Default as 2.
+        sp_pad : int, default=2
+            The size of text box for starting points. 
         
-        sp_bbox : dict
-            Dict with properties for patches.FancyBboxPatch for starting points. Default as None.
+        sp_bbox : dict, optional
+            Dict with properties for patches.FancyBboxPatch for starting points.
     
-        sp_fontsize : int
-            The fontsize for text marked for starting points. Default as None.
+        sp_fontsize : int, optional
+            The fontsize for text marked for starting points. 
     
-        dp_fcolor : str
-            The color marked for specified data objects text box. Default as 'tomato'.
+        dp_fcolor : str, default='bisque'
+            The color marked for specified data objects text box. 
             
-        dp_alpha : float
-            The value setting for transprency of text box for specified data objects. Default as 0.3.
+        dp_alpha : float, default=0.3
+            The value setting for transprency of text box for specified data objects. 
             
-        dp_pad : int
-            The size of text box for specified data objects. Default as 2.
+        dp_pad : int, default=2
+            The size of text box for specified data objects. 
             
-        dp_bbox : dict 
-            Dict with properties for patches.FancyBboxPatch for specified data objects. Default as None.
+        dp_fontsize : int, optional
+            The fontsize for text marked for specified data objects.    
+                      
+        dp_bbox : dict, optional
+            Dict with properties for patches.FancyBboxPatch for specified data objects.
         
-        dp_fontsize : int
-            The fontsize for text marked for specified data objects. Default as None.    
-            
-        color : str
-            Color for text of starting points labels in visualization. Default as "k".
+        cmap : str, default='turbo'
+            The colormap to be employed.
         
-        alpha : float
-            Scalar or None. Default as 0.5.
+        cmin : int or float, default=0.1
+            The minimum color range.
+         
+        cmax : int or float, default=0.5
+            The maximum color range.
+            
+        color : str, default='red'
+            Color for text of starting points labels in visualization. 
+        
+        alpha : float, default=0.5
+            Scalar or None. 
     
-        cline_width : float
-            Set the patch linewidth of circle for starting points. Default as 0.5.
+        cline_width : float, default=0.5
+            Set the patch linewidth of circle for starting points.
         
-        figname : str
+        figname : str, optional
             Set the figure name for the image to be saved.
             
         fmt : str
@@ -993,12 +1003,20 @@ class CLASSIX:
             
         if dp_fontsize is None and sp_fontsize is not None:
             dp_fontsize = sp_fontsize
-            
-            
+        
         if self.cluster_color is None:
-            self.cluster_color = dict()
-            for i in np.unique(self.labels_):
-                self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
+            _cmap = plt.cm.get_cmap(cmap)
+            _interval = np.linspace(cmin, cmax, len(set(self.labels_))) 
+            self.cluster_color = list()
+            for c in _interval:
+                rgba = _cmap(c) 
+                color_hex = colors.rgb2hex(rgba) 
+                self.cluster_color.append(str(color_hex)) 
+                
+        # if self.cluster_color is None:
+        #     self.cluster_color = dict()
+        #     for i in np.unique(self.labels_):
+        #         self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
                 
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
             self.form_starting_point_clusters_table()
