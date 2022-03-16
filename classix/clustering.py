@@ -245,7 +245,7 @@ class CLASSIX:
     """CLASSIX: Fast and explainable clustering based on sorting.
     
     The user only need to concern the hyperparameters of ``sorting``, ``radius``, and ``minPts`` in the most cases.
-    If want a flexible clustering, might consider other hyperparameters such as ``group_merging'', ``scale``, and ``post_alloc``.
+    If want a flexible clustering, might consider other hyperparameters such as ``group_merging``, ``scale``, and ``post_alloc``.
     
     Parameters
     ----------
@@ -433,9 +433,6 @@ class CLASSIX:
         data : numpy.ndarray
             The ndarray-like input of shape (n_samples,)
         
-        Returns
-        -------
-        self
             
         """
         if isinstance(data, pd.core.frame.DataFrame):
