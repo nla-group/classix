@@ -301,7 +301,7 @@ class CLASSIX:
              
     Attributes
     ----------
-    agg_labels_ : numpy.ndarray
+    groups_ : numpy.ndarray
         Groups labels of aggregation.
     
     splist_ : numpy.ndarray
@@ -412,7 +412,7 @@ class CLASSIX:
         self.post_alloc = post_alloc
         # self.n_jobs = n_jobs
 
-        self.agg_labels_ = None
+        self.groups_ = None
         self.clean_index_ = None
         self.labels_ = None
         self.connected_pairs_ = None
@@ -420,7 +420,9 @@ class CLASSIX:
         if self.verbose:
             print(self)
         self.splist_indices = [None]
-            
+        self.index_data = None
+        
+        
             
     def fit(self, data):
         """ 
@@ -436,13 +438,16 @@ class CLASSIX:
         self
             
         """
+        if isinstance(data, pd.core.frame.DataFrame):
+            self.index_data = data.index
+            
         if not isinstance(data, np.ndarray):
             data = np.array(data)
             if len(data.shape) == 1:
                 data = data.reshape(-1,1)
                 
         if data.dtype !=  'float64':
-            data = data.astype('float64')    
+            data = data.astype('float64')
             
         if self.sorting == "norm-mean":
             # self._mu, self._std = data.mean(axis=0), data.std()
@@ -477,14 +482,14 @@ class CLASSIX:
             self.data = (data - self._mu) / self._scl
         
         # aggregation
-        self.agg_labels_, self.splist_, self.dist_nr = aggregate(data=self.data, sorting=self.sorting, tol=self.radius) 
+        self.groups_, self.splist_, self.dist_nr = aggregate(data=self.data, sorting=self.sorting, tol=self.radius) 
         self.splist_ = np.array(self.splist_)
         
         self.clean_index_ = np.full(self.data.shape[0], True) # claim clean data indices
         # clustering
         self.labels_ = self.clustering(
             data=self.data,
-            agg_labels=self.agg_labels_, 
+            agg_labels=self.groups_, 
             splist=self.splist_,             
             sorting=self.sorting, 
             radius=self.radius, 
@@ -704,6 +709,7 @@ class CLASSIX:
         
         # after this step, the connected pairs (groups) will be transformed into merged clusters, 
         for sublabels in self.merge_groups: # some of aggregated groups might be independent which are not included in self.merge_groups
+            # not labels[sublabels] = maxid !!!
             for j in sublabels:
                 labels[labels == j] = maxid
             maxid = maxid + 1
@@ -763,7 +769,7 @@ class CLASSIX:
             self.clean_index_ = labels != maxid
             agln = agg_labels[self.clean_index_]
             # agg_clean_index_ = np.unique(agln) # extract the unique number of aggregation groups.
-            # agg_noise_index = np.unique(self.agg_labels_[self.outliers]) # extract the unique number of aggregation groups.
+            # agg_noise_index = np.unique(self.groups_[self.outliers]) # extract the unique number of aggregation groups.
             # print("aggregation clean index:", agg_clean_index_)
             self.label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
             # print("label change:", self.label_change)
@@ -845,11 +851,12 @@ class CLASSIX:
     
     
     
-    def explain(self, index1="NULL", index2="NULL", showsplist=True, max_colwidth=None, replace_name=None, 
+    def explain(self, index1=None, index2=None, showsplist=True, max_colwidth=None, replace_name=None, 
                 plot=False, figsize=(10, 6), figstyle="ggplot", savefig=False, ind_color="k", ind_marker_size=150,
                 sp_fcolor='tomato',  sp_alpha=0.3, sp_pad=2, sp_fontsize=None, sp_bbox=None, 
                 dp_fcolor='bisque',  dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
-                color='red', connect_color='green', alpha=0.5, cline_width=0.5, axis='off', figname=None, fmt='pdf'):
+                color='red', connect_color='green', alpha=0.5, cline_width=0.5, axis='off', 
+                figname=None, fmt='pdf', *argv, **kwargs):
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
         'self.explain(object1/index1, object2index) # prints an explanation why object1 and object2 are either in the same or distinct clusters
@@ -1020,13 +1027,13 @@ class CLASSIX:
                 # remove (24/07/2021):
                 # print("This function is restricted to multidimensional (dimension greater than or equal to 2) data.")
                 
-        if index1 == "NULL" and index2 != "NULL":
+        if index1 is None and index2 is not None:
             raise ValueError("Please enter a valid value for index1.")
             
         # pd.options.display.max_colwidth = colwidth
         dash_line = "--------"*5 # "--------"*(self.splist_.shape[1])
             
-        if index1 == "NULL": # analyze in the general way with a global view
+        if index1 is None: # analyze in the general way with a global view
             if plot == True:
                 self.explain_viz(figsize=figsize, figstyle=figstyle, savefig=savefig, fontsize=sp_fontsize, bbox=sp_bbox, axis=axis, fmt=fmt)
                 
@@ -1053,32 +1060,50 @@ class CLASSIX:
             print("""In order to explain the clustering of individual data points, \n"""
                   """use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.""")
             
-        else: # explain(index1)
+        else: # index is not None, explain(index1)
             if isinstance(index1, int):
                 object1 = self.x_pca[index1] # self.data has been normalized
-                agg_label1 = self.agg_labels_[index1] # get the group index for object1
-            else:
+                agg_label1 = self.groups_[index1] # get the group index for object1
+            
+            elif isinstance(index1, str):
+                if index1 in self.index_data:
+                    if len(set(self.index_data)) != len(self.index_data):
+                        warnings.warn("The index of data is duplicate.")
+                        object1 = self.x_pca[np.where(self.index_data == index1)[0]][0]
+                        agg_label1 = self.groups_[np.where(self.index_data == index1)[0][0]]
+                    else:
+                        object1 = self.x_pca[self.index_data == index1][0]
+                        agg_label1 = self.groups_[self.index_data == index1][0]
+                        
+                else:
+                    raise ValueError("Please enter a legal value for index1.")
+                    
+            elif isinstance(index1, list) or isinstance(index1, np.ndarray):
+                index1 = np.array(index1)
                 object1 = (index1 - self._mu) / self._scl # allow for out-sample data
                 agg_label1 = np.argmin(np.linalg.norm(self.s_pca - object1, axis=1, ord=2)) # get the group index for object1
                 if self.data.shape[1] >= 2:
                     object1 = self.pca.transform(object1)
                     
+            else:
+                raise ValueError("Please enter a legal value for index1.")
+                
             plt.style.use('default')
             plt.style.use(style=figstyle)
             
             
             # explain one object
             # cluster_centers = self.calculate_group_centers(self.data, self.labels_)
-            # print("Starting point list of {} data:".format(len(self.agg_labels_)))
+            # print("Starting point list of {} data:".format(len(self.groups_)))
 
-            if index2 == "NULL":
-                if replace_name != None:
+            if index2 is None:
+                if replace_name is not None:
                     if isinstance(replace_name, list):
-                        index1_name = replace_name[0]
+                        index1 = replace_name[0]
                     else:
-                        index1_name = replace_name
+                        index1 = replace_name
                 else:
-                    index1_name = index1
+                    index1 = index1
 
                 cluster_label1 = self.label_change[agg_label1]
                 sp_str = self.splist_[agg_label1, 3:]
@@ -1094,11 +1119,12 @@ class CLASSIX:
                     ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", c=self.cluster_color[cluster_label1])
                     # ax.scatter(x_pca[:, 0], x_pca[:, 1], marker="*", c='pink')
                     ax.scatter(s_pca[:, 0], s_pca[:, 1], marker="p")
-                
+                    
+                    
                     if dp_fontsize is None:
-                        ax.text(object1[0], object1[1], s=str(index1_name), bbox=dp_bbox, color=ind_color)
+                        ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=ind_color)
                     else:
-                        ax.text(object1[0], object1[1], s=str(index1_name), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
+                        ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                     
                     ax.scatter(object1[0], object1[1], marker="*", s=ind_marker_size)
                     
@@ -1119,6 +1145,7 @@ class CLASSIX:
                             )
                     ax.plot()
                     ax.axis('off') # the axis here may not be consistent, so hide.
+                    
                     if savefig:
                         if not os.path.exists("img"):
                             os.mkdir("img")
@@ -1129,6 +1156,7 @@ class CLASSIX:
                         else:
                             plt.savefig('img/' + str(figname) + str(index1) +'.'+fmt, bbox_inches='tight')
                         print("successfully save")
+                    
                     plt.show()
                     
                     # deprecated (24/07/2021):
@@ -1191,8 +1219,16 @@ class CLASSIX:
                     #             print("successfully save")
                     #     plt.show()
                 
+                if showsplist:
+                    # print(f"A list of information for {index1} is shown below.")
+                    select_sp_info = self.sp_info.iloc[[agg_label1]].copy(deep=True)
+                    select_sp_info.loc[:, 'Label'] = index1
+                    print(dash_line)
+                    print(select_sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
+                    print(dash_line)       
+
                 print(
-                    """The data point %(index1)i is in group %(agg_id)i, which has been merged into cluster #%(m_c)i."""% {
+                    """The data point %(index1)s is in group %(agg_id)i, which has been merged into cluster #%(m_c)i."""% {
                         "index1":index1, "agg_id":agg_label1, "m_c":cluster_label1
                     }
                 )
@@ -1214,23 +1250,49 @@ class CLASSIX:
             else: # explain(index1, index2)
                 if isinstance(index2, int):
                     object2 = self.x_pca[index2] # self.data has been normalized
-                    agg_label2 = self.agg_labels_[index2] # get the group index for object2
-                else:
+                    agg_label2 = self.groups_[index2] # get the group index for object2
+                    
+                elif isinstance(index2, str):
+                    if index2 in self.index_data:
+                        if len(set(self.index_data)) != len(self.index_data):
+                            warnings.warn("The index of data is duplicate.")
+                            object2 = self.x_pca[np.where(self.index_data == index2)[0][0]][0]
+                            agg_label2 = self.groups_[np.where(self.index_data == index2)[0][0]]
+                        else:
+                            object2 = self.x_pca[self.index_data == index2][0]
+                            agg_label2 = self.groups_[self.index_data == index2][0]
+                    else:
+                        raise ValueError("Please enter a legal value for index2.")
+                        
+                elif isinstance(index2, list) or isinstance(index2, np.ndarray):
+                    index2 = np.array(index2)
                     object2 = (index2 - self._mu) / self._scl # allow for out-sample data
                     if self.data.shape[1] >= 2:
                         object2 = self.pca.transform(object2)
                     agg_label2 = np.argmin(np.linalg.norm(self.s_pca - object2, axis=1, ord=2)) # get the group index for object2
-
-                if replace_name != None:
-                    if isinstance(replace_name, list):
-                        index1_name = replace_name[0]
-                        index2_name = replace_name[1]
-                    else:
-                        index1_name = replace_name[0]
-                        index2_name = index2
+                
                 else:
-                    index1_name = index1
-                    index2_name = index2
+                    raise ValueError("Please enter a legal value for index2.")
+
+                if showsplist:
+                    # print(f"A list of information for {index1} is shown below.")
+                    select_sp_info = self.sp_info.iloc[[agg_label1, agg_label2]].copy(deep=True)
+                    select_sp_info.loc[:, 'Label'] = [index1, index2]
+                    print(dash_line)
+                    print(select_sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
+                    print(dash_line)       
+
+                if replace_name is not None:
+                    if isinstance(replace_name, list) or isinstance(replace_name, np.ndarray):
+                        try:
+                            index1 = replace_name[0]
+                            index2 = replace_name[1]
+                        except:
+                            index1 = replace_name[0]
+                            
+                else:
+                    index1 = index1
+                    index2 = index2
 
                 cluster_label1, cluster_label2 = self.label_change[agg_label1], self.label_change[agg_label2]
 
@@ -1349,11 +1411,11 @@ class CLASSIX:
                     ax.scatter(s_pca[:,0], s_pca[:,1], marker="p")
                     
                     if dp_fontsize is None:
-                        ax.text(object1[0], object1[1], s=str(index1_name), bbox=dp_bbox, color=ind_color)
-                        ax.text(object2[0], object2[1], s=str(index2_name), bbox=dp_bbox, color=ind_color)
+                        ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=ind_color)
+                        ax.text(object2[0], object2[1], s=str(index2), bbox=dp_bbox, color=ind_color)
                     else:
-                        ax.text(object1[0], object1[1], s=str(index1_name), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
-                        ax.text(object2[0], object2[1], s=str(index2_name), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
+                        ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
+                        ax.text(object2[0], object2[1], s=str(index2), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                     
                     ax.scatter(object1[0], object1[1], marker="*", s=ind_marker_size)
                     ax.scatter(object2[0], object2[1], marker="*", s=ind_marker_size)
