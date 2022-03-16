@@ -99,6 +99,8 @@ plt.scatter(X[:,0], X[:,1], c=clx.labels_)
 plt.show()
 ```
 
+You can also load the aggregation groups via ``clx.groups_`` (version >=0.5.5).
+
 ## :mortar_board: The explain method
 
 CLASSIX provides an API for the easy visualization of clusters, and to explain the assignment of data points to their clusters. To get an overview of the data points, the location of starting points, and their associated groups, simply type:
@@ -156,6 +158,102 @@ Output:
 ```
 The data point 0 is in group 2, which has been merged into cluster 0.
 The data point 2000 is in group 10, which has been merged into cluster 1.
+There is no path of overlapping groups between these clusters.
+```
+
+
+Besides, CLASSIX allows the dataframes input and explain the corresponding index, we give an example as below.
+Similarly, first step is to generate data and apply CLASSIX.
+
+```Python
+X, _ = make_blobs(n_samples=5, centers=2, n_features=2, cluster_std=1.5, random_state=1)
+X = pd.DataFrame(X, index=['Anna', 'Bert', 'Carl', 'Tom', 'Bob'])
+```
+
+We obtain the dataframe look like:
+
+|  | 0 | 1 |
+| ----------- | ----------- ||
+| 'Anna'   | -7.804551 | -7.043560|
+| 'Bert'   | -9.519154 | -4.327404|
+| 'Carl'   | -0.361448 | 0.954182|
+| 'Tom'    | 0.957658 | 3.264680|
+| 'Bob'    | -2.451818 | 2.797037|
+
+```Python
+clx = CLASSIX(radius=0.5, group_merging='distance')
+clx.fit_transform(X)
+```
+
+```
+CLASSIX(sorting='pca', radius=0.5, minPts=0, group_merging='distance')
+The 5 data points were aggregated into 4 groups.
+In total 3 comparisons were required (0.60 comparisons per data point). 
+The 4 groups were merged into 2 clusters with the following sizes: 
+      * cluster 0 : 3
+      * cluster 1 : 2
+Try the .explain() method to explain the clustering.
+```
+
+
+```Python
+clx.explain(plot=True, figsize=(2,2), sp_fontsize=12)
+```
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz_df.png width=720 />
+
+Output:
+
+```
+A clustering of 5 data points with 2 features has been performed. 
+The radius parameter was set to 0.50 and MinPts was set to 0. 
+As the provided data has been scaled by a factor of 1/6.33,
+data points within a radius of R=0.50*6.33=3.17 were aggregated into groups. 
+In total 3 comparisons were required (0.60 comparisons per data point). 
+This resulted in 4 groups, each uniquely associated with a starting point. 
+These 4 groups were subsequently merged into 2 clusters. 
+A list of all starting points is shown below.
+----------------------------------------
+ Group  NrPts  Cluster  Coordinates 
+   0      1       1     -0.63 -0.97 
+   1      1       1      -0.9 -0.55 
+   2      2       0       0.22 0.58 
+   3      1       0       0.76 0.65 
+----------------------------------------
+In order to explain the clustering of individual data points, 
+use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
+```
+
+```Python
+clx.explain(index1='Bert', plot=True, sp_fontsize=12)
+```
+
+Output:
+
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneBert.png width=500 />
+
+```
+----------------------------------------
+ Group  NrPts  Cluster Coordinates  Label
+   1      1       1     -0.9 -0.55   Bert
+----------------------------------------
+The data point Bert is in group 1, which has been merged into cluster #1.
+```
+
+```Python
+clx.explain(index1='Tom', index2='Bert', plot=True, sp_fontsize=12)
+```
+Output:
+
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=500 />
+
+```
+----------------------------------------
+ Group  NrPts  Cluster Coordinates  Label
+   3      1       0      0.76 0.65    Tom
+   1      1       1     -0.9 -0.55   Bert
+----------------------------------------
+The data point Tom is in group 3, which has been merged into cluster 0.
+The data point Bert is in group 1, which has been merged into cluster 1.
 There is no path of overlapping groups between these clusters.
 ```
 
