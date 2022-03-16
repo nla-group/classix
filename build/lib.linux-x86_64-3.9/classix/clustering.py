@@ -245,7 +245,7 @@ class CLASSIX:
     """CLASSIX: Fast and explainable clustering based on sorting.
     
     The user only need to concern the hyperparameters of ``sorting``, ``radius``, and ``minPts`` in the most cases.
-    If want a flexible clustering, might consider other hyperparameters such as ``group_merging'', ``scale``, and ``post_alloc``.
+    If want a flexible clustering, might consider other hyperparameters such as ``group_merging``, ``scale``, and ``post_alloc``.
     
     Parameters
     ----------
@@ -433,9 +433,6 @@ class CLASSIX:
         data : numpy.ndarray
             The ndarray-like input of shape (n_samples,)
         
-        Returns
-        -------
-        self
             
         """
         if isinstance(data, pd.core.frame.DataFrame):
@@ -853,7 +850,7 @@ class CLASSIX:
     
     def explain(self, index1=None, index2=None, showsplist=True, max_colwidth=None, replace_name=None, 
                 plot=False, figsize=(10, 6), figstyle="ggplot", savefig=False, ind_color="k", ind_marker_size=150,
-                sp_fcolor='tomato',  sp_alpha=0.3, sp_pad=2, sp_fontsize=None, sp_bbox=None, 
+                sp_fcolor='tomato',  sp_alpha=0.05, sp_pad=0.5, sp_fontsize=None, sp_bbox=None, 
                 dp_fcolor='bisque',  dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
                 color='red', connect_color='green', alpha=0.5, cline_width=0.5, axis='off', 
                 figname=None, fmt='pdf', *argv, **kwargs):
@@ -1022,7 +1019,7 @@ class CLASSIX:
                 self.x_pca = np.ones((len(self.data.copy()), 2))
                 self.x_pca = self.data[:, 0]
                 self.s_pca = np.ones((len(self.splist_), 2))
-                self.s_pca[:, 1] = self.data[self.splist_[:, 0].astype(int)] # self.splist_[:, 2]
+                self.s_pca[:, 1] = self.data[self.splist_[:, 0].astype(int)].reshape(-1) # self.splist_[:, 2]
                 
                 # remove (24/07/2021):
                 # print("This function is restricted to multidimensional (dimension greater than or equal to 2) data.")
@@ -1543,11 +1540,12 @@ class CLASSIX:
             self.cluster_color = dict()
             for i in np.unique(self.labels_):
                 self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
-        plt.style.use('default') # clear the privous figure style
-        plt.style.use(style=figstyle)
-        plt.figure(figsize=figsize)
-        plt.rcParams['axes.facecolor'] = 'whitesmoke'
+
         if self.data.shape[1] >= 2:
+            plt.style.use('default') # clear the privous figure style
+            plt.style.use(style=figstyle)
+            plt.figure(figsize=figsize)
+            plt.rcParams['axes.facecolor'] = 'whitesmoke'
             plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker="p")
             for i in np.unique(self.labels_):
                 x_pca_part = self.x_pca[self.labels_ == i,:]
@@ -1558,23 +1556,28 @@ class CLASSIX:
                         plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), bbox=bbox)
                     else:
                         plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), fontsize=fontsize, bbox=bbox)
+                        
             plt.axis(axis) # the axis here may not be consistent, so hide.
             plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
             plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
+            
+            if savefig:
+                if not os.path.exists("img"):
+                    os.mkdir("img")
+                if fmt == 'pdf':
+                    plt.savefig('img/explain_viz.pdf', bbox_inches='tight')
+                elif fmt == 'png':
+                    plt.savefig('img/explain_viz.png', bbox_inches='tight')
+                else:
+                    plt.savefig('img/explain_viz.'+fmt, bbox_inches='tight')
+                print("successfully save")
+                
+            plt.show()
+            
         else:
             print("Visualization is restricted to multidimensional (dimension greater than or equal to 2) data.")
             
-        if savefig:
-            if not os.path.exists("img"):
-                os.mkdir("img")
-            if fmt == 'pdf':
-                plt.savefig('img/explain_viz.pdf', bbox_inches='tight')
-            elif fmt == 'png':
-                plt.savefig('img/explain_viz.png', bbox_inches='tight')
-            else:
-                plt.savefig('img/explain_viz.'+fmt, bbox_inches='tight')
-            print("successfully save")
-        plt.show()
+
         
         return
         
