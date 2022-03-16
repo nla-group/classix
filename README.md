@@ -103,6 +103,7 @@ You can also load the aggregation groups via ``clx.groups_`` (version >=0.5.5).
 
 ## :mortar_board: The explain method
 
+#### Example 1.
 CLASSIX provides an API for the easy visualization of clusters, and to explain the assignment of data points to their clusters. To get an overview of the data points, the location of starting points, and their associated groups, simply type:
 
 ```Python
@@ -160,10 +161,10 @@ The data point 0 is in group 2, which has been merged into cluster 0.
 The data point 2000 is in group 10, which has been merged into cluster 1.
 There is no path of overlapping groups between these clusters.
 ```
-
+#### Example 2.
 
 Besides, CLASSIX allows the dataframes input and explain the corresponding index, we give an example as below.
-Similarly, first step is to generate data and apply CLASSIX.
+Similarly, first step is to generate data and apply CLASSIX. For simplicity, we just use 5 data objects to illustrate.
 
 ```Python
 X, _ = make_blobs(n_samples=5, centers=2, n_features=2, cluster_std=1.5, random_state=1)
@@ -202,7 +203,7 @@ Let's take a look at the data distribution and clustering result:
 ```Python
 clx.explain(plot=True, figsize=(2,2), sp_fontsize=12)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz_df.png width=200 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz_df.png width=180 />
 
 ```
 A clustering of 5 data points with 2 features has been performed. 
