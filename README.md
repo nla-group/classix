@@ -135,7 +135,7 @@ In order to explain the clustering of individual data points,
 use .explain(ind1) or .explain(ind1, ind2) with indices of the data points. 
 ```
 
-In the above table, *Group* denotes the group label, *NrPts* denotes the number of data points in the group, *Cluster* is the cluster label assigned to the group, and the final column shows the *Coordinates* of the starting point. In order to explain the cluster assignment of a particular data point, we provide its index to the explain method:
+In the above table, *Group* denotes the group label, *NrPts* denotes the number of data points in the group, *Cluster* is the cluster label assigned to the group, and the final column shows the normalized *Coordinates* of the starting point. In order to explain the cluster assignment of a particular data point, we provide its index to the explain method:
 
 ```Python
 clx.explain(0, plot=True)
@@ -180,11 +180,14 @@ We obtain the dataframe look like:
 | 'Tom'    | 0.957658 | 3.264680|
 | 'Bob'    | -2.451818 | 2.797037|
 
+
+Then, run CLASSIX with ``radius`` of 0.5:
 ```Python
 clx = CLASSIX(radius=0.5, group_merging='distance')
 clx.fit_transform(X)
 ```
 
+Output:
 ```
 CLASSIX(sorting='pca', radius=0.5, minPts=0, group_merging='distance')
 The 5 data points were aggregated into 4 groups.
@@ -195,13 +198,11 @@ The 4 groups were merged into 2 clusters with the following sizes:
 Try the .explain() method to explain the clustering.
 ```
 
-
+Let's take a look at the data distribution and clustering result:
 ```Python
 clx.explain(plot=True, figsize=(2,2), sp_fontsize=12)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz_df.png width=720 />
-
-Output:
 
 ```
 A clustering of 5 data points with 2 features has been performed. 
@@ -223,13 +224,17 @@ In order to explain the clustering of individual data points,
 use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
 ```
 
+If we want to check individual data object, just use:
+
 ```Python
-clx.explain(index1='Bert', plot=True, sp_fontsize=12)
+clx.explain('Bert', plot=True, sp_fontsize=12)
 ```
 
 Output:
 
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneBert.png width=500 />
+
+The table below indicates group information of Bert, the ``Coordinates`` corresponds to the coordinates of starting points for the group, the values are normalized associated with the sorting way we choose (here is ``sorting='pca'``).
 
 ```
 ----------------------------------------
@@ -239,9 +244,12 @@ Output:
 The data point Bert is in group 1, which has been merged into cluster #1.
 ```
 
+Similarly, we can track the pair of objects and ccompare them:
+
 ```Python
 clx.explain(index1='Tom', index2='Bert', plot=True, sp_fontsize=12)
 ```
+
 Output:
 
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=500 />
