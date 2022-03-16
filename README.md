@@ -173,7 +173,7 @@ X = pd.DataFrame(X, index=['Anna', 'Bert', 'Carl', 'Tom', 'Bob'])
 
 We obtain the dataframe look like:
 ```
-          0    |    1
+           0    |    1
 Anna |-7.804551 | -7.043560
 Bert |-9.519154 | -4.327404
 Carl |-0.361448 | 0.954182
