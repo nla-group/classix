@@ -202,7 +202,7 @@ Let's take a look at the data distribution and clustering result:
 ```Python
 clx.explain(plot=True, figsize=(2,2), sp_fontsize=12)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz_df.png width=720 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz_df.png width=360 />
 
 ```
 A clustering of 5 data points with 2 features has been performed. 
