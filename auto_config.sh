@@ -21,6 +21,7 @@ fi
 if [[ ! -z "$3" ]] ; then
     if [ "$3" == true ] ; then
         rm -r .ipynb_checkpoints
+        rm -r classix/.ipynb_checkpoints
         mv 'ClassixClustering.egg-info' info
     fi
 fi

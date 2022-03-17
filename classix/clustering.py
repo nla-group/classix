@@ -1004,14 +1004,14 @@ class CLASSIX:
         if dp_fontsize is None and sp_fontsize is not None:
             dp_fontsize = sp_fontsize
         
-        if self.cluster_color is None:
-            _cmap = plt.cm.get_cmap(cmap)
-            _interval = np.linspace(cmin, cmax, len(set(self.labels_))) 
-            self.cluster_color = list()
-            for c in _interval:
-                rgba = _cmap(c) 
-                color_hex = colors.rgb2hex(rgba) 
-                self.cluster_color.append(str(color_hex)) 
+        # if self.cluster_color is None:
+        _cmap = plt.cm.get_cmap(cmap)
+        _interval = np.linspace(cmin, cmax, len(set(self.labels_))) 
+        self.cluster_color = list()
+        for c in _interval:
+            rgba = _cmap(c) 
+            color_hex = colors.rgb2hex(rgba) 
+            self.cluster_color.append(str(color_hex)) 
                 
         # if self.cluster_color is None:
         #     self.cluster_color = dict()
@@ -1035,9 +1035,9 @@ class CLASSIX:
 
             else: # when data is one-dimensional, no PCA transform
                 self.x_pca = np.ones((len(self.data.copy()), 2))
-                self.x_pca = self.data[:, 0]
+                self.x_pca[:, 0] = self.data[:, 0]
                 self.s_pca = np.ones((len(self.splist_), 2))
-                self.s_pca[:, 1] = self.data[self.splist_[:, 0].astype(int)].reshape(-1) # self.splist_[:, 2]
+                self.s_pca[:, 0] = self.data[self.splist_[:, 0].astype(int)].reshape(-1) # self.splist_[:, 2]
                 
                 # remove (24/07/2021):
                 # print("This function is restricted to multidimensional (dimension greater than or equal to 2) data.")
@@ -1559,44 +1559,42 @@ class CLASSIX:
             for i in np.unique(self.labels_):
                 self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
 
-        if self.data.shape[1] >= 2:
-            plt.style.use('default') # clear the privous figure style
-            plt.style.use(style=figstyle)
-            plt.figure(figsize=figsize)
-            plt.rcParams['axes.facecolor'] = 'whitesmoke'
-            plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker="p")
-            for i in np.unique(self.labels_):
-                x_pca_part = self.x_pca[self.labels_ == i,:]
-                plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="*", c=self.cluster_color[i])
-                # plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="*", c='#%06X' % np.random.randint(0, 0xFFFFFF))
-                for j in range(self.s_pca.shape[0]):
-                    if fontsize is None:
-                        plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), bbox=bbox)
-                    else:
-                        plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), fontsize=fontsize, bbox=bbox)
-                        
-            plt.axis(axis) # the axis here may not be consistent, so hide.
-            plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
-            plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
-            
-            if savefig:
-                if not os.path.exists("img"):
-                    os.mkdir("img")
-                if fmt == 'pdf':
-                    plt.savefig('img/explain_viz.pdf', bbox_inches='tight')
-                elif fmt == 'png':
-                    plt.savefig('img/explain_viz.png', bbox_inches='tight')
+        # if self.data.shape[1] >= 2:
+        plt.style.use('default') # clear the privous figure style
+        plt.style.use(style=figstyle)
+        plt.figure(figsize=figsize)
+        plt.rcParams['axes.facecolor'] = 'white'
+        plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker="p")
+        for i in np.unique(self.labels_):
+            x_pca_part = self.x_pca[self.labels_ == i,:]
+            plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="*", c=self.cluster_color[i])
+            # plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="*", c='#%06X' % np.random.randint(0, 0xFFFFFF))
+            for j in range(self.s_pca.shape[0]):
+                if fontsize is None:
+                    plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), bbox=bbox)
                 else:
-                    plt.savefig('img/explain_viz.'+fmt, bbox_inches='tight')
-                print("successfully save")
-                
-            plt.show()
-            
-        else:
-            print("Visualization is restricted to multidimensional (dimension greater than or equal to 2) data.")
-            
+                    plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), fontsize=fontsize, bbox=bbox)
 
-        
+        plt.axis(axis) # the axis here may not be consistent, so hide.
+        plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
+        plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
+
+        if savefig:
+            if not os.path.exists("img"):
+                os.mkdir("img")
+            if fmt == 'pdf':
+                plt.savefig('img/explain_viz.pdf', bbox_inches='tight')
+            elif fmt == 'png':
+                plt.savefig('img/explain_viz.png', bbox_inches='tight')
+            else:
+                plt.savefig('img/explain_viz.'+fmt, bbox_inches='tight')
+            print("successfully save")
+
+        plt.show()
+            
+        # else:
+        #     print("Visualization is restricted to multidimensional (dimension greater than or equal to 2) data.")
+            
         return
         
         
