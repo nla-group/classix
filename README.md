@@ -48,9 +48,9 @@ A detailed documentation, including tutorials, is available at [![Dev](https://i
 
 CLASSIX has the following dependencies for its clustering functionality:
 
-- cython (recommend >=0.27)
-- numpy>=1.3.0 (recommend >=1.20.0)
-- scipy>=1.2.1
+- cython (recommend >= 0.27)
+- numpy>=1.3.0 (recommend >= 1.20.0)
+- scipy >= 1.2.1
 - requests
 
 and requires the following packages for data visualization:
@@ -62,7 +62,6 @@ To install the current CLASSIX release via PIP use:
 ```
 pip install ClassixClustering
 ```
-
 
 To check the CLASSIX installation you can use:
 ```
@@ -87,11 +86,11 @@ from classix import CLASSIX
 X, y = datasets.make_blobs(n_samples=1000, centers=2, n_features=2, random_state=1)
 
 # Employ CLASSIX clustering
-clx = CLASSIX(sorting='pca', radius=0.5, verbose=0)
+clx = CLASSIX(radius=0.5, verbose=0)
 clx.fit(X)
 ```
 
-Get the clustering result by ``clx.labels_`` and visualize the clustering:  
+Get the clustering result by ``clx.labels_`` and visualize the clusters:  
 ```Python
 plt.figure(figsize=(10,10))
 plt.rcParams['axes.facecolor'] = 'white'
@@ -99,19 +98,17 @@ plt.scatter(X[:,0], X[:,1], c=clx.labels_)
 plt.show()
 ```
 
-You can also load the aggregation groups via ``clx.groups_`` (version >=0.5.5).
-
 ## :mortar_board: The explain method
 
 #### Example 1
-CLASSIX provides an API for the easy visualization of clusters, and to explain the assignment of data points to their clusters. To get an overview of the data points, the location of starting points, and their associated groups, simply type:
+CLASSIX provides an API for the easy visualization of clusters and to explain the assignment of data points to their clusters. To get an overview of the data points, the location of starting points, and their associated groups, simply type:
 
 ```Python
 clx.explain(plot=True)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=500 />
 
-The starting points are marked as the small red boxes. The method also returns a textual summary as follows:
+The starting points are marked as the small red boxes. The method also returns a textual summary of the clustering:
 
 ```
 A clustering of 5000 data points with 2 features has been performed. 
@@ -136,7 +133,7 @@ In order to explain the clustering of individual data points,
 use .explain(ind1) or .explain(ind1, ind2) with indices of the data points. 
 ```
 
-In the above table, *Group* denotes the group label, *NrPts* denotes the number of data points in the group, *Cluster* is the cluster label assigned to the group, and the final column shows the normalized *Coordinates* of the starting point. In order to explain the cluster assignment of a particular data point, we provide its index to the explain method:
+In the above table, *Group* denotes the group label, *NrPts* denotes the number of data points in the group, *Cluster* is the cluster label assigned to the group, and the final column shows the normalized *Coordinates* of the starting point. In order to explain the cluster assignment of a particular data point, simply provide its index to the explain method:
 
 ```Python
 clx.explain(0, plot=True)
@@ -163,27 +160,27 @@ There is no path of overlapping groups between these clusters.
 ```
 #### Example 2
 
-Besides, CLASSIX allows the dataframes input and explain the corresponding index, we give an example as below.
-Similarly, first step is to generate data and apply CLASSIX. For simplicity, we just use 5 data objects to illustrate.
+CLASSIX also supports dataframes and using dataframe indices to refer to data points. 
+To illustrate, let's generate a dataframe with some test data:
 
 ```Python
 X, _ = make_blobs(n_samples=5, centers=2, n_features=2, cluster_std=1.5, random_state=1)
 X = pd.DataFrame(X, index=['Anna', 'Bert', 'Carl', 'Tom', 'Bob'])
 ```
 
-We obtain the dataframe look like:
+We obtain the following dataframe:
 ```
-           0    |    1
-Anna |-7.804551 | -7.043560
-Bert |-9.519154 | -4.327404
-Carl |-0.361448 | 0.954182
-Tom  | 0.957658 | 3.264680
-Bob  |-2.451818 | 2.797037
+           0     |     1
+Anna | -7.804551 | -7.043560
+Bert | -9.519154 | -4.327404
+Carl | -0.361448 |  0.954182
+Tom  |  0.957658 |  3.264680
+Bob  | -2.451818 |  2.797037
 ```
 
-Then, run CLASSIX with ``radius`` of 0.5:
+We now run CLASSIX using a ``radius`` parameter of 0.5:
 ```Python
-clx = CLASSIX(radius=0.5, group_merging='distance')
+clx = CLASSIX(radius=0.5)
 clx.fit_transform(X)
 ```
 
@@ -198,7 +195,7 @@ The 4 groups were merged into 2 clusters with the following sizes:
 Try the .explain() method to explain the clustering.
 ```
 
-Let's take a look at the data distribution and clustering result:
+Let's take a look at the data and how it has been clustered:
 ```Python
 clx.explain(plot=True, figsize=(2,2), sp_fontsize=12)
 ```
@@ -224,7 +221,7 @@ In order to explain the clustering of individual data points,
 use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
 ```
 
-If we want to check individual data object, just use:
+To explain the clustering of individual data points, just use:
 
 ```Python
 clx.explain('Bert', plot=True, sp_fontsize=12)
@@ -234,7 +231,7 @@ Output:
 
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneBert.png width=600 />
 
-The table below indicates group information of Bert, the ``Coordinates`` corresponds to the coordinates of starting points for the group, the values are normalized associated with the sorting way we choose (here is ``sorting='pca'``).
+The table below shows information about the data point 'Bert', the group it belongs to, and the ``Coordinates`` of the starting point of that group.
 
 ```
 ----------------------------------------
@@ -244,7 +241,7 @@ The table below indicates group information of Bert, the ``Coordinates`` corresp
 The data point Bert is in group 1, which has been merged into cluster #1.
 ```
 
-Similarly, we can track the pair of objects and ccompare them:
+Similarly, we can explain the cluster assignment of two data points as follows:
 
 ```Python
 clx.explain(index1='Tom', index2='Bert', plot=True, sp_fontsize=12)
@@ -271,10 +268,10 @@ We collect users' feedbacks, and select some typical questions as below.
 
 ### Does density based merging work better than distance based merging?
 
-It depends. For high dimensional data, distance based merging is recommended. Usually, density based merging works slower than distance based merging. But if data can be dealT with high `radius` for density based merging, density based merging might be faster than the distance based merging with a low `radius` while achiving better performance. For example, the data in the next question may not be suitable for distance based merging.
+It depends. For high dimensional data, distance based merging is recommended. Usually, density based merging is slower than distance based merging. But if data can be dealt with high `radius` for density based merging, density based merging might be faster than the distance based merging with a low `radius` while achiving better performance. For example, the data in the next question may not be suitable for distance based merging.
 
 
-### How to tune the `minPts`?
+### How to tune `minPts`?
 
 Mostly, `minPts` is not required, though it is very important part in CLASSIX. To obtain a good clustering, users usually use `minPts` accompanying with `verbose=1`. Then, we can specify the minPts to an appropriate level for those isolated clusters. For example, the dataset like 
 
@@ -360,7 +357,7 @@ In most cases, `radius` ranging from 0.1 to 1 can handle most cases. The higher 
 
 ### The visualization is not clear, is it a bug?
 
-No, it is not a bug. Sometimes, the default setting for visualization may result in a blurry picture, e.g., the boxes of starting points are too large, which hides the data object's color. You can personalize your visualization by specifying parameters for the ``.explain`` method. For example, we may set ``sp_alpha`` smaller to get more transparency for the box of starting points or set ``sp_pad`` smaller to get the box smaller, even we can change the color of that by specifying ``sp_fcolor`` to a shallow color. For more detail, we refer users to the documentation. Also, you can set `cmap` (e.g., `'bmh'`), `cmin` and `cmax` to customize a color map for a decent plot.
+No, it is not a bug. Sometimes the default setting for visualization may result in a blurry picture, e.g., the boxes of starting points are too large, which hides the data object's color. You can personalize your visualization by specifying parameters for the ``.explain`` method. For example, we may set ``sp_alpha`` smaller to get more transparency for the box of starting points or set ``sp_pad`` smaller to get the box smaller, even we can change the color of that by specifying ``sp_fcolor`` to a shallow color. For more detail, we refer users to the documentation. Also, you can set `cmap` (e.g., `'bmh'`), `cmin` and `cmax` to customize a color map for a decent plot.
 
 
 
