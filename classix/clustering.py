@@ -853,7 +853,7 @@ class CLASSIX:
                 plot=False, figsize=(10, 6), figstyle="ggplot", savefig=False, ind_color="k", ind_marker_size=150,
                 sp_fcolor='tomato',  sp_alpha=0.05, sp_pad=0.5, sp_fontsize=None, sp_bbox=None, 
                 dp_fcolor='bisque',  dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
-                cmap='turbo', cmin=0.1, cmax=0.5, color='red', connect_color='green', alpha=0.5, 
+                cmap='turbo', cmin=0.07, cmax=0.97, color='red', connect_color='green', alpha=0.5, 
                 cline_width=0.5, axis='off', figname=None, fmt='pdf', *argv, **kwargs):
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
@@ -949,10 +949,10 @@ class CLASSIX:
         cmap : str, default='turbo'
             The colormap to be employed.
         
-        cmin : int or float, default=0.1
+        cmin : int or float, default=0.07
             The minimum color range.
          
-        cmax : int or float, default=0.5
+        cmax : int or float, default=0.97
             The maximum color range.
             
         color : str, default='red'
