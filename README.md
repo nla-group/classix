@@ -268,7 +268,7 @@ We collect users' feedbacks, and select some typical questions as below.
 
 ### Does density based merging work better than distance based merging?
 
-It depends. For high dimensional data, distance based merging is recommended. Usually, density based merging is slower than distance based merging. But if data can be dealt with high `radius` for density based merging, density based merging might be faster than the distance based merging with a low `radius` while achiving better performance. For example, the data in the next question may not be suitable for distance based merging. However, if you want to use distance based merging on this data, we need to set ``radius`` lower than 0.07, a potential parameter settings for this is ``CLASSIX(group_merging='distance', radius=0.07, minPts=51)``.
+It depends. For high dimensional data, distance based merging is recommended. Usually, density based merging is slower than distance based merging. But if data can be dealt with high `radius` for density based merging, density based merging might be faster than the distance based merging with a low `radius` while achiving better performance. For example, the data in the next question may not be suitable for distance based merging. However, if we  want to use distance based merging on this data, we need to set ``radius`` lower than 0.07, a potential parameter settings for this is ``CLASSIX(group_merging='distance', radius=0.07, minPts=51)``.
 
 
 ### How to tune `minPts`?
