@@ -63,7 +63,7 @@ Download this repository via:
     
     git clone https://github.com/nla-group/CLASSIX.git
 
-If you have any instaling issues, please be free to submit your questions in the `issues <https://github.com/nla-group/classix/issues>`_ .
+If you have any instaling issues, please be free to submit your questions in the `issues <https://github.com/nla-group/classix/issues>`_.
 
 
 Quick start
