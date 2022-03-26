@@ -58,7 +58,7 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
     X = np.concatenate((data_no_outliers, data_outliers))
     print(X.shape) # (100000, 2)
 
-Then we employ the algorithms except CLASSIX on the downsampling data while employ CLASSIX clustering on the whole data, and get their average runtime for comparison:
+Cause other clustering algorithms almost cannot complete this clustering on the full data. So we employ CLASSIX clustering on the whole data while employing other clustering algorithms on down-sampling data, and get their average runtime for comparison:
 
 .. code:: python
     
