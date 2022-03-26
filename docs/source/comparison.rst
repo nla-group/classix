@@ -165,6 +165,9 @@ The runtime bar plot is as below, we can see that CLASSIX achieves the fastest s
 Gaussian blobs
 ##################
 
-To provide another insight for clustering comparison with respect to runtime, we compare these algorithms by fixing optimal parameter setting on synthetic Gaussian blobs data with increasing size and dimension. So as to obtain a fair comparison of their runtime, we hope the clustering accuracy for all algorithms remains the same as much as possible as the data change. On the other hand, this experiment manifests the sensitivity of parameter settings to environmental settings. This Gaussian blobs test can be referred to in CLASSIX's paper. The test is referenced from https://hdbscan.readthedocs.io/en/latest/performance_and_scalability.html
+To provide another insight for clustering comparison with respect to runtime, we compare these algorithms by fixing optimal parameter setting on synthetic Gaussian blobs data with increasing size and dimension. So as to obtain a fair comparison of their runtime, we hope the clustering accuracy for all algorithms remains the same as much as possible as the data change. On the other hand, this experiment manifests the sensitivity of parameter settings to environmental settings. This Gaussian blobs test can be referred to in CLASSIX's paper. The test is referenced from https://hdbscan.readthedocs.io/en/latest/performance_and_scalability.html. 
 
 .. image:: images/performance.png
+
+
+As we see from the figure, CLASSIX compares favorably against other algorithms while achieving the fastest speed and stable runtime among them.  
