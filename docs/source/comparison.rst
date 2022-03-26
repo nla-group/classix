@@ -1,7 +1,7 @@
 Performance Comparison
 ======================================
 
-Here, we can compare CLASSIX with the most typical and well-used density clustering algorithms DBSCAN, HDBSCAN and Quickshift++.
+Here, we compare CLASSIX with the most typical and well-used density clustering algorithms DBSCAN, HDBSCAN and Quickshift++.
 We perform this experiment on Kamil dataset, and synthetic Gaussian blobs clusters.
 
 Built-in Data
