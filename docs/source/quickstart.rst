@@ -8,7 +8,7 @@ This documentation will provide you with a beginner-friendly tutorial, and show 
 
 Installation guide
 ------------------------------
-We try to keep the installing requirements for CLASSIX as low as possible, to ensure most computers can install it. CLASSIX has the following dependencies for its clustering functionality:
+To ensure most computers can install it, We try to keep the installing requirements for CLASSIX as low as possible. CLASSIX has the following dependencies for its clustering functionality:
 
     * cython (recommend >=0.27)
     * numpy>=1.3.0 (recommend >=1.20)
@@ -62,6 +62,8 @@ Download this repository via:
 .. parsed-literal::
     
     git clone https://github.com/nla-group/CLASSIX.git
+
+If you have any instaling issues, please be free to submit your questions in the `issues <https://github.com/nla-group/classix/issues>`_ .
 
 
 Quick start
