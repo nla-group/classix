@@ -15,20 +15,22 @@ build:
 
 requirements:
   build:
-    - pip
     - python >=3.6
+    - pip
+    - setuptools
     - pandas
     - numpy 
-    - setuptools
+    - requests
     - cython
     - scipy
     - matplotlib
 
   host:
     - python >=3.6
+    - setuptools
     - pandas
     - numpy 
-    - setuptools
+    - requests
     - cython
     - scipy
     - matplotlib
