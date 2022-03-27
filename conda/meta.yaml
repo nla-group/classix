@@ -1,12 +1,12 @@
 package:
   name: classix
-  version: 0.1.0
+  version: 0.1.1
 
 
 source:
-  fn: ClassixClustering-0.5.0.tar.gz
-  url: https://files.pythonhosted.org/packages/38/44/1788e0ff819fdff8899cae24c71d807bc59f1c4600b5f3d1714c78e95165/ClassixClustering-0.5.0.tar.gz
-  sha256: d6286be3b62c287d7237a83f1f12fe660bfbea38322acc0be4af7bf5812d426b
+  fn: ClassixClustering-0.5.8.tar.gz
+  url: https://files.pythonhosted.org/packages/6d/24/b1610d481857cf97815e34e366d7c384e4910a07b73510b7d952926699b6/ClassixClustering-0.5.8.tar.gz
+  sha256: 9a4b03d4aa1e47ccc9e92fb7152c9c3c417a7e60867c7df33214e6487f4e2a9a
 
 
 build:
