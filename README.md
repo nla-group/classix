@@ -84,6 +84,8 @@ To show the version you install, use:
 conda list classixclustering
 ```
 
+### Download
+
 Download this repository via:
 ```
 git clone https://github.com/nla-group/classix.git
