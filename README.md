@@ -61,6 +61,7 @@ and requires the following packages for data visualization:
 - matplotlib
 - pandas
 
+### pip 
 To install the current CLASSIX release via PIP use:
 ```
 pip install ClassixClustering
@@ -69,6 +70,18 @@ pip install ClassixClustering
 To check the CLASSIX installation you can use:
 ```
 python -m pip show ClassixClustering
+```
+### conda
+
+You can also use conda simply by
+
+```
+conda install -c conda-forge classixclustering
+```
+
+To show the version you install, use:
+```
+conda list classixclustering
 ```
 
 Download this repository via:
