@@ -20,6 +20,8 @@ and requires the following packages for data visualization:
     * matplotlib
     * pandas
     
+**pip**
+
 To install the current release via PIP use:
 
 .. parsed-literal::
@@ -38,30 +40,33 @@ If you want to uninstall it, you can use:
 
     pip uninstall ClassixClustering
     
+**conda**
 
 For conda users, to install this package with conda run:
 
 .. parsed-literal::
 
-    conda install -c nla.stefan.xinye classix
+    conda install -c conda-forge classixclustering
     
 To check the installation, run:
 
 .. parsed-literal::
     
-    conda list classix 
+    conda list classixclustering 
 
 and uninstall it with 
 
 .. parsed-literal::
 
-    conda uninstall classix
-    
+    conda uninstall classixclustering
+   
+**download**
+
 Download this repository via:
 
 .. parsed-literal::
     
-    git clone https://github.com/nla-group/CLASSIX.git
+    git clone https://github.com/nla-group/classix.git
 
 If you have any instaling issues, please be free to submit your questions in the `issues <https://github.com/nla-group/classix/issues>`_.
 
