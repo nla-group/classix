@@ -20,7 +20,7 @@ and requires the following packages for data visualization:
     * matplotlib
     * pandas
     
-**pip**
+I. **pip**
 
 To install the current release via PIP use:
 
@@ -40,7 +40,7 @@ If you want to uninstall it, you can use:
 
     pip uninstall ClassixClustering
     
-**conda**
+II. **conda**
 
 For conda users, to install this package with conda run:
 
@@ -60,7 +60,7 @@ and uninstall it with
 
     conda uninstall classixclustering
    
-**download**
+III. **download**
 
 Download this repository via:
 
