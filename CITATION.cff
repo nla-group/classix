@@ -1,0 +1,20 @@
+cff-version: 0.5.8
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Chen"
+  given-names: "Xinye"
+  orcid: "0000-0003-1778-393X"
+  affiliation: The University of Manchester
+- family-names: "Stefan"
+  given-names: "Güttel"
+  orcid: "0000-0003-1494-4478"
+  affiliation: The University of Manchester
+title: "Fast and explainable clustering based on sorting"
+doi: 10.48550/ARXIV.2202.01456
+date-released: 2022
+pages: 25
+address: "UK",
+type: "arXiv EPrint",
+url: "https://arxiv.org/abs/2202.01456"
+repository-code: 'https://github.com/nla-group/classix'
+keywords = {Machine Learning (cs.LG), Data Structures and Algorithms (cs.DS), Computation (stat.CO), Machine Learning (stat.ML), FOS: Computer and information sciences, FOS: Computer and information sciences},
