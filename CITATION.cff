@@ -12,8 +12,5 @@ authors:
 title: "Fast and explainable clustering based on sorting"
 doi: 10.48550/ARXIV.2202.01456
 date-released: 2022
-pages: 25
-address: "UK",
-type: "arXiv EPrint",
 url: "https://arxiv.org/abs/2202.01456"
 repository-code: 'https://github.com/nla-group/classix'
