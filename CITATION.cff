@@ -1,10 +1,10 @@
 cff-version: 0.5.8
 title: >-
-  classix: Fast and explainable clustering based on sorting
+  Fast and explainable clustering based on sorting
 message: >-
   If you use this software, please cite it using the
   metadata from this file.
-type: software
+type: article
 authors:
 - family-names: "Chen"
   given-names: "Xinye"
@@ -15,7 +15,10 @@ authors:
   orcid: "0000-0003-1494-4478"
   affiliation: The University of Manchester
 
-doi: 10.5281/zenodo.6329792
-date-released: 2022-02-02
-url: "https://classix.readthedocs.io/en/latest/?badge=latest"
+doi: 10.48550/arxiv.2202.01456
+date-released: 2022
+url: "https://arxiv.org/abs/2202.01456"
+journal: "arXiv EPrint"
+start: 1 
+end: 25
 repository-code: 'https://github.com/nla-group/classix'
