@@ -18,7 +18,7 @@ version: 0.5.8
 doi: 10.5281/zenodo.6329792
 url: "https://github.com/nla-group/classix"
 preferred-citation:
-  type: article
+  type: report
   authors:
   - family-names: "Chen"
     given-names: "Xinye"
