@@ -26,19 +26,19 @@ To install the current release via PIP use:
 
 .. parsed-literal::
     
-    pip install ClassixClustering
+    pip install classixclustering
 
 To check the installation, simply run:
 
 .. parsed-literal::
     
-    python -m pip show ClassixClustering
+    python -m pip show classixclustering
     
 If you want to uninstall it, you can use:
 
 .. parsed-literal::
 
-    pip uninstall ClassixClustering
+    pip uninstall classixclustering
     
 II. **conda**
 
