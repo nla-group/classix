@@ -64,12 +64,12 @@ and requires the following packages for data visualization:
 ### pip 
 To install the current CLASSIX release via PIP use:
 ```
-pip install ClassixClustering
+pip install classixclustering
 ```
 
 To check the CLASSIX installation you can use:
 ```
-python -m pip show ClassixClustering
+python -m pip show classixclustering
 ```
 ### conda
 
