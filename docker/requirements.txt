@@ -1,0 +1,6 @@
+requests
+numpy
+scipy==1.7.3
+pandas
+matplotlib
+classixclustering>=0.5.8
