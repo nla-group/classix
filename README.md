@@ -20,7 +20,7 @@
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/classixclustering/badges/version.svg)](https://anaconda.org/conda-forge/classixclustering)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/classixclustering/badges/platforms.svg)](https://anaconda.org/conda-forge/classixclustering)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/classixclustering/badges/latest_release_date.svg)](https://anaconda.org/conda-forge/classixclustering)
-[![Anaconda-Server Badge](https://anaconda.org/conda-forge/classixclustering/badges/installer/conda.svg)](https://conda.anaconda.org/conda-forge)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/classixclustering/badges/installer/conda.svg)](https://anaconda.org/conda-forge/classixclustering)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/nla-group/classix/HEAD)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6329792.svg)](https://doi.org/10.5281/zenodo.6329792)
 <!---[![PyPI pyversions](https://img.shields.io/pypi/pyversions/ClassixClustering.svg)](https://pypi.python.org/pypi/ClassixClustering/)-->
