@@ -397,7 +397,7 @@ Any form of contribution is welcome. Please be free to post issues and pull requ
 ### Contributor
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/chenxinye"><img src="https://github.com/xinychen.png?size=80" width="80px;" alt="Xinye Chen"/><br /><sub><b>Xinye Chen</b></sub></a><br /><a href="https://github.com/nla-group/classix/commits?author=chenxinye" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/chenxinye"><img src="https://github.com/chenxinye.png?size=80" width="80px;" alt="Xinye Chen"/><br /><sub><b>Xinye Chen</b></sub></a><br /><a href="https://github.com/nla-group/classix/commits?author=chenxinye" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/guettel"><img src="https://github.com/guettel.png?size=80" width="80px;" alt="Stefan Güttel"/><br /><sub><b>Stefan Güttel</b></sub></a><br /><a href="https://github.com/nla-group/classix/commits?author=guettel" title="Code">💻</a></td>
   </tr>
 </table>
