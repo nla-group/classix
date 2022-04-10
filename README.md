@@ -397,8 +397,8 @@ Any form of contribution is welcome. Please be free to post issues and pull requ
 ### Code Contributor
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/guettel"><img src="https://github.com/guettel.png?size=80" width="60px;" alt="Stefan Güttel"/><br /><sub><b>Stefan Güttel</b></sub></a><br /><a href="https://github.com/nla-group/classix/commits?author=guettel" title="Code">:octocat:</a></td>
-    <td align="center"><a href="https://github.com/chenxinye"><img src="https://github.com/chenxinye.png?size=80" width="60px;" alt="Xinye Chen"/><br /><sub><b>Xinye Chen</b></sub></a><br /><a href="https://github.com/nla-group/classix/commits?author=chenxinye" title="Code">:octocat:</a></td>
+    <td align="center"><a href="https://github.com/guettel"><img src="https://github.com/guettel.png?size=80" width="60px;" alt="Stefan Güttel"/><br /><sub><b>Stefan Güttel</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/chenxinye"><img src="https://github.com/chenxinye.png?size=80" width="60px;" alt="Xinye Chen"/><br /><sub><b>Xinye Chen</b></sub></a><br /></td>
   </tr>
 </table>
 
