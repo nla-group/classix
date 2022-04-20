@@ -26,23 +26,6 @@
 
 import warnings
 
-try:
-    # %load_ext Cython
-    # !python3 setup.py build_ext --inplace
-    import scipy, numpy
-    if scipy.__version__ == '1.8.0' or numpy.__version__ < '1.22.0':
-        from .aggregation_c import aggregate 
-        # cython without memory view, solve the error from scipy ``TypeError: type not understood``
-    else:
-        from .aggregation_cm import aggregate
-        # cython with memory view
-    from .merging_cm import * 
-    
-except (ModuleNotFoundError, ValueError):
-    from .aggregation import aggregate 
-    from .merging import *
-    warnings.warn("This CLASSIX installation is not using Cython.")
-
 import os
 import copy
 import requests
@@ -60,7 +43,6 @@ from scipy.sparse import csr_matrix, _sparsetools
 # from scipy.sparse import csr_matrix
 # from scipy.sparse.csgraph import shortest_path
 np.random.seed(0)
-
 
 
 
@@ -418,10 +400,40 @@ class CLASSIX:
         self.labels_ = None
         self.connected_pairs_ = None
         self.cluster_color = None
+        
         if self.verbose:
             print(self)
+        
         self.splist_indices = [None]
         self.index_data = None
+        
+        from . import __enable_cython__
+        self.__enable_cython__ = __enable_cython__
+        
+        if self.__enable_cython__:
+            try:
+                # %load_ext Cython
+                # !python3 setup.py build_ext --inplace
+                import scipy, numpy
+                if scipy.__version__ == '1.8.0' or numpy.__version__ < '1.22.0':
+                    from .aggregation_c import aggregate 
+                    # cython without memory view, solve the error from scipy ``TypeError: type not understood``
+                else:
+                    from .aggregation_cm import aggregate
+                    # cython with memory view
+                from .merging_cm import fast_agglomerate
+
+            except (ModuleNotFoundError, ValueError):
+                from .aggregation import aggregate 
+                from .merging import fast_agglomerate
+                warnings.warn("This CLASSIX installation is not using Cython.")
+        else:
+            from .aggregation import aggregate 
+            from .merging import fast_agglomerate
+            warnings.warn("This CLASSIX is not using Cython.")
+
+        self.aggregate = aggregate
+        self.fast_agglomerate = fast_agglomerate
         
         
             
@@ -480,7 +492,7 @@ class CLASSIX:
             self.data = (data - self._mu) / self._scl
         
         # aggregation
-        self.groups_, self.splist_, self.dist_nr = aggregate(data=self.data, sorting=self.sorting, tol=self.radius) 
+        self.groups_, self.splist_, self.dist_nr = self.aggregate(data=self.data, sorting=self.sorting, tol=self.radius) 
         self.splist_ = np.array(self.splist_)
         
         self.clean_index_ = np.full(self.data.shape[0], True) # claim clean data indices
@@ -649,19 +661,19 @@ class CLASSIX:
                 
         # if sorting == "pca": # mean-shift normalization + pca sorting
             # data, parameters = self.normalize(data, shift='mean')
-        #     labels, splist, self.dist_c = aggregate(data=data, sorting=sorting, tol=radius)
+        #     labels, splist, self.dist_c = self.aggregate(data=data, sorting=sorting, tol=radius)
         # elif sorting == "norm-mean": # mean-shift normalization + norm sorting
             # data, parameters = self.normalize(data, shift='mean')
-        #     labels, splist, self.dist_c = aggregate(data=data, sorting=sorting, tol=radius)
+        #     labels, splist, self.dist_c = self.aggregate(data=data, sorting=sorting, tol=radius)
         # elif sorting == "norm-orthant": # min-shift normalization + norm sorting
             # data, parameters = self.normalize(data, shift='min')
-        #     labels, splist, self.dist_c = aggregate(data=data, sorting=sorting, tol=radius)
+        #     labels, splist, self.dist_c = self.aggregate(data=data, sorting=sorting, tol=radius)
         # elif sorting == "z-pca": # z-score normalization + pca sorting
             # data, parameters = self.normalize(data, shift='z-score')
-        #    labels, splist, self.dist_c = aggregate(data=data, sorting="pca", tol=radius)
+        #    labels, splist, self.dist_c = self.aggregate(data=data, sorting="pca", tol=radius)
         # else: # z-score normalization without sorting
             # data, parameters = self.normalize(data, shift='z-score')
-        #     labels, splist, self.dist_c = aggregate(data=data, sorting=sorting, tol=radius)     
+        #     labels, splist, self.dist_c = self.aggregate(data=data, sorting=sorting, tol=radius)     
         
 
         #print('splist:\n', splist)
@@ -695,14 +707,14 @@ class CLASSIX:
         
         # else:
             # print("clusters merging initialize...")
-            # self.merge_groups, self.connected_pairs_ = fast_agglomerate(data, splist, radius, method, scale=self.scale)
+            # self.merge_groups, self.connected_pairs_ = self.fast_agglomerate(data, splist, radius, method, scale=self.scale)
             # self.check_labels = labels
             # reassign lalels, start from 0, since the cluster number not start with 0.
 
             # we employ an intutive and simple way to implement merging groups, resulting in a fast clustering
             # self.merge_groups = merge_pairs(self.connected_pairs_)
         
-        self.merge_groups, self.connected_pairs_ = fast_agglomerate(data, splist, radius, method, scale=self.scale)
+        self.merge_groups, self.connected_pairs_ = self.fast_agglomerate(data, splist, radius, method, scale=self.scale)
         maxid = max(labels) + 1
         
         # after this step, the connected pairs (groups) will be transformed into merged clusters, 
@@ -853,7 +865,7 @@ class CLASSIX:
                 plot=False, figsize=(10, 6), figstyle="ggplot", savefig=False, ind_color="k", ind_marker_size=150,
                 sp_fcolor='tomato',  sp_alpha=0.05, sp_pad=0.5, sp_fontsize=None, sp_bbox=None, 
                 dp_fcolor='bisque',  dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
-                cmap='turbo', cmin=0.1, cmax=0.5, color='red', connect_color='green', alpha=0.5, 
+                cmap='turbo', cmin=0.07, cmax=0.97, color='red', connect_color='green', alpha=0.5, 
                 cline_width=0.5, axis='off', figname=None, fmt='pdf', *argv, **kwargs):
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
@@ -949,10 +961,10 @@ class CLASSIX:
         cmap : str, default='turbo'
             The colormap to be employed.
         
-        cmin : int or float, default=0.1
+        cmin : int or float, default=0.07
             The minimum color range.
          
-        cmax : int or float, default=0.5
+        cmax : int or float, default=0.97
             The maximum color range.
             
         color : str, default='red'

@@ -13,7 +13,7 @@ with open("README.rst", 'r') as f:
     long_description = f.read()
 
     
-setup_args = {'name':"ClassixClustering",
+setup_args = {'name':"classixclustering",
         'packages':["classix"],
         'version':_version,
         'install_requires':["numpy>=1.3.0", "scipy>=0.7.0", "pandas", "matplotlib", "requests"],
