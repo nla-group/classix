@@ -1033,6 +1033,7 @@ class CLASSIX:
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
             self.form_starting_point_clusters_table()
             if self.data.shape[1] > 2:
+                warnings.warn("The group radius in the visualization might not be accurate.")
                 # self.pca = PCA(n_components=2)
                 # self.x_pca = self.pca.fit_transform(self.data)
                 # self.s_pca = self.pca.transform(self.data[self.splist_[:, 0].astype(int)])
