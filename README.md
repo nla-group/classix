@@ -294,6 +294,7 @@ Mostly, `minPts` is not required, though it is very important part in CLASSIX. T
 
 ```Python
 from sklearn import datasets
+from classixclustering import CLASSIX
 # generate synthetic data
 X, y = datasets.make_blobs(n_samples=1000, centers=2, n_features=2, random_state=0)
 # run CLASSIX
