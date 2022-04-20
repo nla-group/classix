@@ -16,7 +16,6 @@ with open("README.rst", 'r') as f:
 setup_args = {'name':"ClassixClustering",
         'packages':["classix"],
         'version':_version,
-        'setup_requires':["cython", "numpy>=1.3.0"],
         'install_requires':["numpy>=1.3.0", "scipy>=0.7.0", "pandas", "matplotlib", "requests"],
         'package_data':{"classix": ["aggregation_c.pyx",
                                 "aggregation_cm.pyx", 
@@ -52,6 +51,7 @@ try:
     from Cython.Build import cythonize
     
     setuptools.setup(
+        setup_requires=["cython", "numpy>=1.3.0"],
         ext_modules=cythonize(["classix/*.pyx"], include_path=["classix"]),
         **setup_args
     )
@@ -61,7 +61,7 @@ except ext_errors as ext:
     log.warn(ext)
     log.warn("The C extension could not be compiled.")
 
-    setuptools.setup(**setup_args)
+    setuptools.setup(setup_requires=["numpy>=1.3.0"], **setup_args)
     log.info("Plain-Python installation succeeded.")
     
     
