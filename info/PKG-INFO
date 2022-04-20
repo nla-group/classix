@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: classixclustering
-Version: 0.5.9
+Version: 0.6.0
 Summary: Fast and explainable clustering based on sorting
 Home-page: https://github.com/nla-group/CLASSIX.git
 Author: Xinye Chen, Stefan Güttel
@@ -75,13 +75,13 @@ To install the current CLASSIX release via PIP use:
 
 .. code:: bash
     
-    pip install ClassixClustering
+    pip install classixclustering
 
 To check the CLASSIX installation you can use:
 
 .. code:: bash
     
-    python -m pip show ClassixClustering
+    python -m pip show classixclustering
 
 
 Download the repository via:
