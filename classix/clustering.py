@@ -136,7 +136,7 @@ def get_data(current_dir='', name='vdu_signals'):
             handler.write(y)
             
             
-def load_data(name='vdu_signals'):
+def loadData(name='vdu_signals'):
     """Obtain the built-in data.
     
     Parameters
