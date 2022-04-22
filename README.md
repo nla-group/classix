@@ -115,6 +115,15 @@ plt.scatter(X[:,0], X[:,1], c=clx.labels_)
 plt.show()
 ```
 
+
+If you want to disable Cython, or compare the runtime between Cython and Python, you can simply set by 
+```Python
+import classix
+classix.__enable_cython__ = False
+```
+And then your following CLASSIX implementation will disable Cython compiling. If you can Cython back, just set ```classix.__enable_cython__ = True```. 
+
+
 ## :mortar_board: The explain method
 
 #### Example 1
