@@ -70,15 +70,16 @@ Download this repository via:
 
 If you have any instaling issues, please be free to submit your questions in the `issues <https://github.com/nla-group/classix/issues>`_.
 
+.. admonition:: Note
 
-If you want to disable Cython, or compare the runtime between Cython and Python, you can simply set by 
-.. code:: python
-
+   If you want to disable Cython, or compare the runtime between Cython and Python, you can simply set by 
+  
+   ```
    import classix
    classix.__enable_cython__ = False
-
-
-And then your following CLASSIX implementation will disable Cython compiling. If you can Cython back, just set ```classix.__enable_cython__ = True```. 
+   ```
+   
+   And then your following CLASSIX implementation will disable Cython compiling. If you can Cython back, just set ```classix.__enable_cython__ = True```. 
 
 
 Quick start
