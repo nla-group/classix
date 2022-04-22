@@ -60,7 +60,7 @@ and requires the following packages for data visualization:
 - matplotlib
 - pandas
 
-### pip 
+### pip (recommend)
 To install the current CLASSIX release via PIP use:
 
 ```pip install classixclustering```
