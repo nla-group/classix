@@ -430,7 +430,7 @@ class CLASSIX:
         else:
             from .aggregation import aggregate 
             from .merging import fast_agglomerate
-            warnings.warn("This CLASSIX is not using Cython.")
+            warnings.warn("This run of CLASSIX is not using Cython.")
 
         self.aggregate = aggregate
         self.fast_agglomerate = fast_agglomerate
