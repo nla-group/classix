@@ -22,7 +22,7 @@ Then we load the data:
 
 .. code:: python
 
-    data = load_data('vdu_signals') # load the data
+    data = loadData('vdu_signals') # load the data
     print(data.shape) # (2028780, 2)
 
 This data has more than 2 million objects, which is very challenging for most clustering algorithm. Our experiments were runing on the environment settings:
