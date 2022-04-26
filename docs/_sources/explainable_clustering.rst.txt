@@ -124,12 +124,12 @@ we leave the default parameters except setting radius to 1.
 
 .. code:: python
 
-    data = classix.load_data('vdu_signals')
+    data = classix.loadData('vdu_signals')
     clx = classix.CLASSIX(radius=1, group_merging='distance')
 
 .. admonition:: Note
 
-    The method ``load_data`` also supports other typical UCI datasets for clustering, which include ``'vdu_signals'``, ``'Iris'``, ``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``, ``'Phoneme'``, and ``'Wine'``.
+    The method ``loadData`` also supports other typical UCI datasets for clustering, which include ``'vdu_signals'``, ``'Iris'``, ``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``, ``'Phoneme'``, and ``'Wine'``.
 
 
 Then, we employ classix model to train the data and record the timing:
