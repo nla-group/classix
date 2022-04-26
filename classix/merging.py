@@ -90,8 +90,8 @@ def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
         volume = None
         
     for i in range(splist.shape[0]):
-        sp1 = splist[int(i), 3:]
-        neigbor_sp = splist[i+1:, 3:] # deprecated: splist[i+1:, :] 
+        sp1 =  data[int(splist[i, 0])] # splist[int(i), 3:]
+        neigbor_sp = data[splist[i+1:, 0].astype(int)] # splist[i+1:, 3:] # deprecated: splist[i+1:, :] 
         select_stps = np.arange(i+1, splist.shape[0], dtype=int)
         sort_vals = splist[i:, 1]
         
@@ -113,8 +113,8 @@ def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
             c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
             den1 = np.count_nonzero(c1) / volume
             # den1 = splist[int(i), 2] / volume # density(splist[int(i), 2], volume = volume) 
-            for j in select_stps:
-                sp2 = splist[int(j), 3:]
+            for j in select_stps.astype(int):
+                sp2 = data[splist[j, 0]] # splist[int(j), 3:]
 
                 c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
                 den2 = np.count_nonzero(c2) / volume

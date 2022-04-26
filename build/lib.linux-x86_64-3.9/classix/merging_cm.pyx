@@ -108,8 +108,8 @@ cpdef fast_agglomerate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.floa
         volume = 0.0 # no need for distance-based method
     
     for i in range(splist.shape[0]):
-        sp1 = splist[i, 3:]
-        neigbor_sp = splist[i+1:, 3:]
+        sp1 = data[int(splist[i, 0])] # splist[i, 3:]
+        neigbor_sp = data[splist[i+1:, 0].astype(int)] # splist[i+1:, 3:]
         
         select_stps = np.arange(i+1, splist.shape[0], dtype=int)
         sort_vals = splist[i:, 1]
@@ -123,8 +123,8 @@ cpdef fast_agglomerate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.floa
             # neigbor_sp = neigbor_sp[index_overlap]
             c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
             den1 = np.count_nonzero(c1) / volume
-            for j in select_stps:
-                sp2 = splist[j, 3:]
+            for j in select_stps.astype(int):
+                sp2 = data[int(splist[j, 0])] # splist[j, 3:]
                 c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
                 den2 = np.count_nonzero(c2) / volume
                 if check_if_overlap(sp1, sp2, radius=radius): 

@@ -27,6 +27,7 @@
 import warnings
 
 import os
+import re
 import copy
 import requests
 import collections
@@ -136,7 +137,7 @@ def get_data(current_dir='', name='vdu_signals'):
             handler.write(y)
             
             
-def load_data(name='vdu_signals'):
+def loadData(name='vdu_signals'):
     """Obtain the built-in data.
     
     Parameters
@@ -430,7 +431,7 @@ class CLASSIX:
         else:
             from .aggregation import aggregate 
             from .merging import fast_agglomerate
-            warnings.warn("This CLASSIX is not using Cython.")
+            warnings.warn("This run of CLASSIX is not using Cython.")
 
         self.aggregate = aggregate
         self.fast_agglomerate = fast_agglomerate
@@ -573,7 +574,8 @@ class CLASSIX:
         
         data = (data - self._mu) / self._scl
         for i in range(len(data)):
-            splabel = np.argmin(np.linalg.norm(self.splist_[:,3:] - data[i], axis=1, ord=2))
+            splabel = np.argmin(np.linalg.norm(data[self.splist_[:,0]] - data[i], axis=1, ord=2)) 
+            #  np.argmin(np.linalg.norm(self.splist_[:,3:] - data[i], axis=1, ord=2))
             labels.append(self.label_change[splabel])
 
         # else:
@@ -791,7 +793,8 @@ class CLASSIX:
             # splist_outliers = splist[self.group_outliers_] 
             if self.post_alloc:
                 for nsp in self.group_outliers_:
-                    alloc_class = np.argmin(np.linalg.norm(splist_clean[:, 3:] - splist[nsp, 3:], axis=1, ord=2))
+                    alloc_class = np.argmin(np.linalg.norm(data[splist_clean[:, 0].astype(int)] - data[int(splist[nsp, 0])], axis=1, ord=2))
+                    # alloc_class = np.argmin(np.linalg.norm(splist_clean[:, 3:] - splist[nsp, 3:], axis=1, ord=2))
                     labels[agg_labels == nsp] = self.label_change[unique_agln[alloc_class]]
             else:
                 labels[np.isin(agg_labels, self.group_outliers_)] = -1
@@ -862,7 +865,7 @@ class CLASSIX:
     
     
     def explain(self, index1=None, index2=None, showsplist=True, max_colwidth=None, replace_name=None, 
-                plot=False, figsize=(10, 6), figstyle="ggplot", savefig=False, ind_color="k", ind_marker_size=150,
+                plot=False, figsize=(11, 6), figstyle="ggplot", savefig=False, ind_color="k", ind_marker_size=150,
                 sp_fcolor='tomato',  sp_alpha=0.05, sp_pad=0.5, sp_fontsize=None, sp_bbox=None, 
                 dp_fcolor='bisque',  dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
                 cmap='turbo', cmin=0.07, cmax=0.97, color='red', connect_color='green', alpha=0.5, 
@@ -1031,7 +1034,7 @@ class CLASSIX:
         #         self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
                 
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
-            self.form_starting_point_clusters_table()
+            
             if self.data.shape[1] > 2:
                 warnings.warn("The group radius in the visualization might not be accurate.")
                 # self.pca = PCA(n_components=2)
@@ -1054,13 +1057,19 @@ class CLASSIX:
                 
                 # remove (24/07/2021):
                 # print("This function is restricted to multidimensional (dimension greater than or equal to 2) data.")
-                
+            
+            self.form_starting_point_clusters_table()
+            
         if index1 is None and index2 is not None:
             raise ValueError("Please enter a valid value for index1.")
-            
+        
+        
         # pd.options.display.max_colwidth = colwidth
         dash_line = "--------"*5 # "--------"*(self.splist_.shape[1])
             
+        indexlist = [i for i in kwargs.keys() if 'index' in re.split('(\d+)',i)]
+
+        
         if index1 is None: # analyze in the general way with a global view
             if plot == True:
                 self.explain_viz(figsize=figsize, figstyle=figstyle, savefig=savefig, fontsize=sp_fontsize, bbox=sp_bbox, axis=axis, fmt=fmt)
@@ -1134,12 +1143,12 @@ class CLASSIX:
                     index1 = index1
 
                 cluster_label1 = self.label_change[agg_label1]
-                sp_str = self.splist_[agg_label1, 3:]
+                sp_str = self.s_pca[agg_label1] # self.splist_[agg_label1, 3:]
                 
                 if plot == True:
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
-                    plt.rcParams['axes.facecolor'] = 'whitesmoke'
+                    plt.rcParams['axes.facecolor'] = 'white'
                     # select indices
                     x_pca = self.x_pca[self.labels_ == cluster_label1]
                     s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
@@ -1178,12 +1187,16 @@ class CLASSIX:
                         if not os.path.exists("img"):
                             os.mkdir("img")
                         if fmt == 'pdf':
-                            plt.savefig('img/' + str(figname) + str(index1) +'.pdf', bbox_inches='tight')
+                            fm = 'img/' + str(figname) + str(index1) +'.pdf'
+                            plt.savefig(fm, bbox_inches='tight')
                         elif fmt == 'png':
-                            plt.savefig('img/' + str(figname) + str(index1) +'.png', bbox_inches='tight')
+                            fm = 'img/' + str(figname) + str(index1) +'.png'
+                            plt.savefig(fm, bbox_inches='tight')
                         else:
-                            plt.savefig('img/' + str(figname) + str(index1) +'.'+fmt, bbox_inches='tight')
-                        print("successfully save")
+                            fm = 'img/' + str(figname) + str(index1) +'.'+fmt
+                            plt.savefig(fm, bbox_inches='tight')
+                        
+                        print("image successfully save as", fm)
                     
                     plt.show()
                     
@@ -1275,7 +1288,107 @@ class CLASSIX:
                 
 
             # explain two objects relationship
-            else: # explain(index1, index2)
+            
+            else: # explain(index1, index2, ...)
+
+                if len(indexlist) > 0: # A more general case, index1=.., index2=.., index3=..
+                    kwargs['index1'] = index1
+                    kwargs['index2'] = index2
+                    indexlist = ['index1', 'index2'] + indexlist
+                    group_labels_m = np.array([int(self.groups_[kwargs[i]]) for i in indexlist])
+                    cluster_labels_m = np.array([self.label_change[i] for i in group_labels_m])
+ 
+                    # group_ind = np.zeros(self.data.shape[0])
+                    # group_ind[list(set(group_labels_m))] = 1
+
+                    plt.style.use(style=figstyle)
+                    fig, ax = plt.subplots(figsize=figsize)
+                    plt.rcParams['axes.facecolor'] = 'white'
+                    
+                    for i in set(cluster_labels_m):
+                        x_pca = self.x_pca[self.labels_ == i, :]
+                        ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", c=self.cluster_color[i])
+                    
+                    for i in set(group_labels_m):
+                        s_pca = self.s_pca[i]
+                        ax.scatter(s_pca[0], s_pca[1], marker="p")
+                        ax.add_patch(plt.Circle((s_pca[0], s_pca[1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                        
+                    if dp_fontsize is None:
+                        for index in indexlist:
+                            _index = kwargs[index]
+                            if isinstance(_index, int):
+                                _object = self.x_pca[_index] # self.data has been normalized
+
+                            elif isinstance(_index, str):
+                                if _index in self.index_data:
+                                    if len(set(self.index_data)) != len(self.index_data):
+                                        warnings.warn("The index of data is duplicate.")
+                                        _object = self.x_pca[np.where(self.index_data == _index)[0][0]][0]
+                                    else:
+                                        _object = self.x_pca[self.index_data == _index][0]
+                                else:
+                                    raise ValueError("Please enter a legal value for index.")
+
+                            elif isinstance(_index, list) or isinstance(_index, np.ndarray):
+                                _index = np.array(_index)
+                                _object = (_index - self._mu) / self._scl # allow for out-sample data
+                                if self.data.shape[1] >= 2:
+                                    _object = self.pca.transform(_object)
+                            else:
+                                raise ValueError("Please enter a legal value for index.")
+                        
+                            # _object = self.x_pca[index]
+                            ax.text(_object[0], _object[1], s=str(_index), bbox=dp_bbox, color=ind_color)
+                            ax.scatter(_object[0], _object[1], marker="*", s=ind_marker_size)
+                    else:
+                        for index in indexlist:
+                            _index = kwargs[index]
+                            if isinstance(_index, int):
+                                _object = self.x_pca[_index] # self.data has been normalized
+
+                            elif isinstance(_index, str):
+                                if _index in self.index_data:
+                                    if len(set(self.index_data)) != len(self.index_data):
+                                        warnings.warn("The index of data is duplicate.")
+                                        _object = self.x_pca[np.where(self.index_data == _index)[0][0]][0]
+                                    else:
+                                        _object = self.x_pca[self.index_data == _index][0]
+                                else:
+                                    raise ValueError("Please enter a legal value for index.")
+
+                            elif isinstance(_index, list) or isinstance(_index, np.ndarray):
+                                _index = np.array(_index)
+                                _object = (_index - self._mu) / self._scl # allow for out-sample data
+                                if self.data.shape[1] >= 2:
+                                    _object = self.pca.transform(_object)
+                            else:
+                                raise ValueError("Please enter a legal value for index.")
+                                
+                            ax.text(_object[0], _object[1], s=str(_index), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
+                            ax.scatter(_object[0], _object[1], marker="*", s=ind_marker_size)
+                    
+
+                    ax.axis('off') # the axis here may not be consistent, so hide.
+                    ax.plot()
+                    if savefig:
+                        if not os.path.exists("img"):
+                            os.mkdir("img")
+                        if fmt == 'pdf':
+                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'_m.pdf'
+                            plt.savefig(fm, bbox_inches='tight')
+                        elif fmt == 'png':
+                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'_m.png'
+                            plt.savefig(fm, bbox_inches='tight')
+                        else:
+                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'_m.'+fmt
+                            plt.savefig(fm, bbox_inches='tight')
+                        
+                        print("image successfully save as ",fm)
+                    
+                    plt.show()
+                    return 
+                
                 if isinstance(index2, int):
                     object2 = self.x_pca[index2] # self.data has been normalized
                     agg_label2 = self.groups_[index2] # get the group index for object2
@@ -1341,8 +1454,8 @@ class CLASSIX:
                     )
                     connected_paths = [agg_label1]
                 else:
-                    sp1_str = self.splist_[agg_label1, 3:]
-                    sp2_str = self.splist_[agg_label2, 3:]
+                    sp1_str = self.s_pca[agg_label1] # self.splist_[agg_label1, 3:]
+                    sp2_str = self.s_pca[agg_label2] # self.splist_[agg_label2, 3:]
                     # print("""The two objects are assigned to different groups through aggregation.""")
 
                     # print(
@@ -1356,7 +1469,8 @@ class CLASSIX:
                     # })
                     
                     if self.connected_pairs_ is None:
-                        distm = pairwise_distances(self.splist_[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs)
+                        # distm = pairwise_distances(self.splist_[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs)
+                        distm = pairwise_distances(self.s_pca, Y=None, metric='euclidean', n_jobs=n_jobs)
                         distm = (distm <= radius*scale).astype(int)
                         self.connected_pairs_ = return_csr_matrix_indices(csr_matrix(distm)).tolist() # list
                         
@@ -1408,6 +1522,7 @@ class CLASSIX:
                         # print("""\nThe data point %(index2)s is in group %(agg_id2)i, which has been merged into cluster %(c_id2)s via connected groups %(connected2)s.""" % {
                         #     "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2, "connected2": connected_groups["object 2"]
                         # })
+                        
                         connected_paths = []
                         print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
                             "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1})
@@ -1420,7 +1535,7 @@ class CLASSIX:
                 if plot == True:
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
-                    plt.rcParams['axes.facecolor'] = 'whitesmoke'
+                    plt.rcParams['axes.facecolor'] = 'white'
                     # select indices
                     union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
                     x_pca1 = self.x_pca[self.labels_ == cluster_label1]
@@ -1470,12 +1585,17 @@ class CLASSIX:
                         if not os.path.exists("img"):
                             os.mkdir("img")
                         if fmt == 'pdf':
-                            plt.savefig('img/' + str(figname) + str(index1) + '_' + str(index2) +'.pdf', bbox_inches='tight')
+                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'.pdf'
+                            plt.savefig(fm, bbox_inches='tight')
                         elif fmt == 'png':
-                            plt.savefig('img/' + str(figname) + str(index1) + '_' + str(index2) +'.png', bbox_inches='tight')
+                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'.png'
+                            plt.savefig(fm, bbox_inches='tight')
                         else:
-                            plt.savefig('img/' + str(figname) + str(index1) + '_' + str(index2) +'.'+fmt, bbox_inches='tight')
-                        print("image successfully save.")
+                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'.'+fmt
+                            plt.savefig(fm, bbox_inches='tight')
+                            
+                        print("image successfully save as", fm)
+                        
                     plt.show()
                     
                     # deprecated (24/07/2021):
@@ -1564,9 +1684,8 @@ class CLASSIX:
     
     
     def explain_viz(self, figsize=(12, 8), figstyle="ggplot", savefig=False, fontsize=None, bbox={'facecolor': 'tomato', 'alpha': 0.3, 'pad': 2}, axis='off', fmt='pdf'):
-        """
-            Visualize the starting point and data points
-        """
+        """Visualize the starting point and data points"""
+        
         if self.cluster_color is None:
             self.cluster_color = dict()
             for i in np.unique(self.labels_):
@@ -1596,11 +1715,15 @@ class CLASSIX:
             if not os.path.exists("img"):
                 os.mkdir("img")
             if fmt == 'pdf':
-                plt.savefig('img/explain_viz.pdf', bbox_inches='tight')
+                fm = 'img/explain_viz.pdf'
+                plt.savefig(fm, bbox_inches='tight')
             elif fmt == 'png':
-                plt.savefig('img/explain_viz.png', bbox_inches='tight')
+                fm = 'img/explain_viz.png'
+                plt.savefig(fm, bbox_inches='tight')
             else:
-                plt.savefig('img/explain_viz.'+fmt, bbox_inches='tight')
+                fm = 'img/explain_viz.'+fmt
+                plt.savefig(fm, bbox_inches='tight')
+                
             print("successfully save")
 
         plt.show()
@@ -1614,12 +1737,14 @@ class CLASSIX:
 
     def form_starting_point_clusters_table(self, aggregate=False):
         """form the columns details for starting points and clusters information"""
+        
         # won't change the original order of self.splist_
         cols = ["Group", "NrPts"]
         coord = list()
         
         if aggregate:
-            for i in np.around(self.splist_[:, 3:], 2).tolist():
+            # for i in np.around(self.splist_[:, 3:], 2).tolist():
+            for i in np.around(self.s_pca, 2).tolist():
                 fill = ""
                 if len(i) <= 5:
                     for j in i:
@@ -1657,16 +1782,49 @@ class CLASSIX:
         
         
     
-    def visualize_linkage(self, scale=1.5, figsize=(8,8), labelsize=24, norm=True, markersize=320, plot_boundary=False,
-                                             bound_color='red', path='.', fmt='pdf'):
+    def visualize_linkage(self, scale=1.5, 
+                          figsize=(8,8),
+                          labelsize=24, 
+                          markersize=320,
+                          plot_boundary=False,
+                          bound_color='red', path='.', fmt='pdf'):
+        """Visualize the linkage in the distance clustering.
         
-        distm, n_components, labels = visualize_connections(self.splist_, radius=self.radius, scale=round(scale,2))
+        
+        Parameters
+        ----------
+        scale : float
+            Design for distance-clustering, when distance between the two starting points 
+            associated with two distinct groups smaller than scale*radius, then the two groups merge.
+        
+        labelsize : int 
+            The fontsize of ticks. 
+            
+        markersize : int 
+            The size of the markers for starting points.
+            
+        plot_boundary : boolean
+            If it is true, will plot the boundary of groups for the starting points.
+            
+        bound_color : str
+            The color for the boundary for groups with the specified radius.
+            
+        path : str
+            Relative file location for figure storage.
+            
+        fmt : str
+            Specify the format of the image to be saved, default as 'pdf', other choice: png.
+        
+        """
+        
+        distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(scale,2))
         # plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = 'white'
-        if norm:
-            P = self.splist_[:, 3:]
-        else:
-            P = self.splist_[:, 3:]*self._scl + self._mu
+        # if norm:
+        #     P = self.splist_[:, 3:]
+        # else:
+        #     P = self.splist_[:, 3:]*self._scl + self._mu
+        P = self.data[self.splist[:, 0]]
         link_list = return_csr_matrix_indices(csr_matrix(distm))
         
         fig, ax = plt.subplots(figsize=figsize)
@@ -2064,9 +2222,9 @@ def pairwise_distances(X):
 
 
 
-def visualize_connections(splist, radius=0.5, scale=1.5):
+def visualize_connections(data, splist, radius=0.5, scale=1.5):
     """Calculate the connected components for graph constructed by starting points given radius and scale."""
-    distm = pairwise_distances(splist[:,3:])
+    distm = pairwise_distances(data[splist[:,0].astype(int)])
     tol = radius*scale
     distm = (distm <= tol).astype(int)
     n_components, labels = connected_components(csgraph=distm, directed=False, return_labels=True)

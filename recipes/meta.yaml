@@ -1,7 +1,7 @@
 # For conda-forge
 
 {% set name = "classixclustering" %}
-{% set version = "0.6.0" %}
+{% set version = "0.6.1" %}
 
 package:
   name: {{ name|lower }}
@@ -11,7 +11,7 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 9a4b03d4aa1e47ccc9e92fb7152c9c3c417a7e60867c7df33214e6487f4e2a9a
+  sha256: d064395b3192019aebbb7fed9e69f715b55711eaf8a942154393b10847da2d61
 
 
 build:

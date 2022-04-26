@@ -1,6 +1,6 @@
 import warnings
 
-__version__ = '0.6.0'                  
+__version__ = '0.6.1'                  
 __enable_cython__ = True 
 
 # if __enable_cython__:
@@ -27,7 +27,7 @@ __enable_cython__ = True
     
 
 from .clustering import CLASSIX
-from .clustering import load_data
+from .clustering import loadData
 from .clustering import calculate_cluster_centers
 from .clustering import novel_normalization
 
