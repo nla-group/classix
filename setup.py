@@ -7,7 +7,7 @@ _version="0.6.1"
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
-ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError, IOError, SystemExit)
+ext_errors = (CCompilerError, ModuleNotFoundError, DistutilsExecError, DistutilsPlatformError, IOError, SystemExit)
 
 with open("README.rst", 'r') as f:
     long_description = f.read()
