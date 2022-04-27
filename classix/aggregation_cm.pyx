@@ -138,7 +138,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
                 num_group += 1
                 labels[j] = lab
                 
-        splist.append([sp, sort_vals[sp], num_group]) # respectively store index, sorting values, number of neighbor objects.
+        splist.append([sp, sort_vals[sp], num_group])  # list of [ starting point index of current group, sorting key, and number of group elements ]
         
         lab += 1
         
