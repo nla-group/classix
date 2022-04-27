@@ -1,15 +1,11 @@
 <h1 align="center">
   CLASSIX :honeybee:
-  
-  
-   
 
 </h1>
 
 <h3 align="center">
   <strong> Fast and explainable clustering based on sorting </strong>  
 </h3>
-
 
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
 [![License: MIT](https://anaconda.org/conda-forge/classixclustering/badges/license.svg)](https://github.com/nla-group/classix/blob/master/LICENSE)
@@ -35,15 +31,12 @@ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here ar
 - Full reproducibility of all tests in the accompanying paper.
 - Support of Cython compilation.
 
-
-
 ``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter ``radius`` for the group aggregation and a ``minPts`` parameter controlling the minimal cluster size. 
 
 **Here is a video abstract of CLASSIX:** 
 
 [<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png width=600 />](https://www.youtube.com/watch?v=K94zgRjFEYo)
  
-
 A detailed documentation (work in progress), including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/). 
 
 ## :rocket: Install
@@ -51,20 +44,19 @@ A detailed documentation (work in progress), including tutorials, is available a
 CLASSIX has the following dependencies for its clustering functionality:
 
 - cython (recommend >= 0.27)
-- numpy>=1.3.0 (recommend >= 1.20.0)
+- numpy >=1.3.0 (recommend >= 1.20.0)
 - scipy >= 1.2.1
 - requests
 
-and requires the following packages for data visualization:
+and it requires the following packages for data visualization:
 
 - matplotlib
 - pandas
 
-### pip (recommend)
+### pip (recommended)
 To install the current CLASSIX release via PIP use:
 
 ```pip install classixclustering```
-
 
 To check the CLASSIX installation you can use:
 
@@ -72,16 +64,13 @@ To check the CLASSIX installation you can use:
 
 ### conda
 
-You can also use conda simply by
-
+To install CLASSIX using conda use:
 
 ```conda install -c conda-forge classixclustering```
 
-
-To show the version you install, use:
+To show the installed version use:
 
 ```conda list classixclustering```
-
 
 ### Download
 
@@ -89,11 +78,9 @@ Download this repository via:
 
 ```git clone https://github.com/nla-group/classix.git```
 
-
-
 ##  :checkered_flag: Quick start
 
-We start with a simple synthetic dataset: 
+Here is an example clustering a synthetic dataset: 
 
 ```Python
 from sklearn import datasets
@@ -102,12 +89,12 @@ from classix import CLASSIX
 # Generate synthetic data
 X, y = datasets.make_blobs(n_samples=1000, centers=2, n_features=2, random_state=1)
 
-# Employ CLASSIX clustering
+# Call CLASSIX
 clx = CLASSIX(radius=0.5, verbose=0)
 clx.fit(X)
 ```
 
-Get the clustering result by ``clx.labels_`` and visualize the clusters:  
+The cluster labels of each data point are available in ``clx.labels_``:
 ```Python
 plt.figure(figsize=(10,10))
 plt.rcParams['axes.facecolor'] = 'white'
@@ -115,26 +102,17 @@ plt.scatter(X[:,0], X[:,1], c=clx.labels_)
 plt.show()
 ```
 
-
-If you want to disable Cython, or compare the runtime between Cython and Python, you can simply set by 
-```Python
-import classix
-classix.__enable_cython__ = False
-```
-And then your following CLASSIX implementation will disable Cython compiling. If you can Cython back, just set ```classix.__enable_cython__ = True```. 
-
-
 ## :mortar_board: The explain method
 
 #### Example 1
-CLASSIX provides an API for the easy visualization of clusters and to explain the assignment of data points to their clusters. To get an overview of the data points, the location of starting points, and their associated groups, simply type:
+CLASSIX provides an API for the easy visualization of clusters and to explain the assignment of data points to their clusters. To get an overview of the data, the location of starting points, and their associated groups, type:
 
 ```Python
 clx.explain(plot=True)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=500 />
 
-The starting points are marked as the small red boxes. The method also returns a textual summary of the clustering:
+The starting points, shown as the small red boxes, can be seen as a coarse representation of the data. Each starting point is associated with a group of data points, and groups are merged into clusters. The `explain` method returns a textual summary of the clustering giving more details:
 
 ```
 A clustering of 5000 data points with 2 features has been performed. 
@@ -184,28 +162,23 @@ The data point 0 is in group 2, which has been merged into cluster 0.
 The data point 2000 is in group 10, which has been merged into cluster 1.
 There is no path of overlapping groups between these clusters.
 ```
+
 #### Example 2
 
-CLASSIX also supports dataframes and using dataframe indices to refer to data points. 
-To illustrate, let's generate a dataframe with some test data:
+CLASSIX also supports dataframes and using dataframe indices to refer to data points:
 
 ```Python
 X, _ = make_blobs(n_samples=5, centers=2, n_features=2, cluster_std=1.5, random_state=1)
 X = pd.DataFrame(X, index=['Anna', 'Bert', 'Carl', 'Tom', 'Bob'])
-```
 
-We obtain the following dataframe:
-```
            0     |     1
 Anna | -7.804551 | -7.043560
 Bert | -9.519154 | -4.327404
 Carl | -0.361448 |  0.954182
 Tom  |  0.957658 |  3.264680
 Bob  | -2.451818 |  2.797037
-```
 
-We now run CLASSIX using a ``radius`` parameter of 0.5:
-```Python
+
 clx = CLASSIX(radius=0.5)
 clx.fit_transform(X)
 ```
@@ -227,54 +200,12 @@ clx.explain(plot=True, figsize=(2,2), sp_fontsize=12)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz_df.png width=180 />
 
-```
-A clustering of 5 data points with 2 features has been performed. 
-The radius parameter was set to 0.50 and MinPts was set to 0. 
-As the provided data has been scaled by a factor of 1/6.33,
-data points within a radius of R=0.50*6.33=3.17 were aggregated into groups. 
-In total 3 comparisons were required (0.60 comparisons per data point). 
-This resulted in 4 groups, each uniquely associated with a starting point. 
-These 4 groups were subsequently merged into 2 clusters. 
-A list of all starting points is shown below.
-----------------------------------------
- Group  NrPts  Cluster  Coordinates 
-   0      1       1     -0.63 -0.97 
-   1      1       1      -0.9 -0.55 
-   2      2       0       0.22 0.58 
-   3      1       0       0.76 0.65 
-----------------------------------------
-In order to explain the clustering of individual data points, 
-use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
-```
-
-To explain the clustering of individual data points, just use:
-
-```Python
-clx.explain('Bert', plot=True, sp_fontsize=12)
-```
-
-Output:
-
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneBert.png width=600 />
-
-The table below shows information about the data point 'Bert', the group it belongs to, and the ``Coordinates`` of the starting point of that group.
-
-```
-----------------------------------------
- Group  NrPts  Cluster Coordinates  Label
-   1      1       1     -0.9 -0.55   Bert
-----------------------------------------
-The data point Bert is in group 1, which has been merged into cluster #1.
-```
-
-Similarly, we can explain the cluster assignment of two data points as follows:
-
+As before, we can explain the clustering of individual data points:
 ```Python
 clx.explain(index1='Tom', index2='Bert', plot=True, sp_fontsize=12)
 ```
 
 Output:
-
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=600 />
 
 ```
@@ -290,24 +221,18 @@ There is no path of overlapping groups between these clusters.
 
 ## :raising_hand: Frequently Asked Questions
 
-We collect users' feedbacks, and select some typical questions as below.
+### How to tune the parameters `radius` and `minPts`?
 
-### Does density based merging work better than distance based merging?
+Generally, we recommend first running CLASSIX with a relatively large `radius=1` parameter and `minPts=0`. It also helps to use `verbose=1` to get more detailed feedback from the method. Typically, the larger the `radius` parameter, the faster the method performs and the smaller the number of resulting clusters. If the number of clusters is too small, successively reduce the `radius` parameter until a ``good`` (depending on context) number of meaningful clusters is obtained. If there are unwanted noise clusters with just a small number of data points, increase the `minPts` parameter to remove them. If, for example, `minPts=3`, all clusters with fewer than three data points will be reassigned to larger clusters. 
 
-It depends. For high dimensional data, distance based merging is recommended. Usually, density based merging is slower than distance based merging. But if data can be dealt with high `radius` for density based merging, density based merging might be faster than the distance based merging with a low `radius` while achiving better performance. For example, the data in the next question may not be suitable for distance based merging. However, if we  want to use distance based merging on this data, we need to set ``radius`` lower than 0.07, a potential parameter settings for this is ``CLASSIX(group_merging='distance', radius=0.07, minPts=51)``.
-
-
-### How to tune `minPts`?
-
-Mostly, `minPts` is not required, though it is very important part in CLASSIX. To obtain a good clustering, users usually use `minPts` accompanying with `verbose=1`. Then, we can specify the minPts to an appropriate level for those isolated clusters. For example, the dataset like 
-
+Here is an example that demonstrates the effect of `minPts`:
 ```Python
 from sklearn import datasets
 from classix import CLASSIX
 # generate synthetic data
 X, y = datasets.make_blobs(n_samples=1000, centers=2, n_features=2, random_state=0)
 # run CLASSIX
-clx = CLASSIX(sorting='pca', radius=0.15, group_merging='density', verbose=1, minPts=14, post_alloc=False)
+clx = CLASSIX(sorting='pca', radius=0.15, group_merging='density', verbose=1, minPts=14)
 clx.fit(X)
 # draw figure
 plt.figure(figsize=(8,8))
@@ -318,8 +243,7 @@ plt.yticks([])
 plt.show()
 ```
 
-We can easily perceive that the appropriate `minPts` is 14, i.e., the clusters that cardinality is smaller than 14 will be treated as outliers. 
-
+As we can see, there are two core clusters and many smaller ones with 14 or less data points. By chosing `minPts=14` we can reassign these noise clusters to the core clusters. 
 ```
 CLASSIX(sorting='pca', radius=0.15, minPts=14, group_merging='density')
 The 1000 data points were aggregated into 212 groups.
@@ -386,9 +310,7 @@ In most cases, `radius` ranging from 0.1 to 1 can handle most cases. The higher 
 
 No, it is not a bug. Sometimes the default setting for visualization may result in a blurry picture, e.g., the boxes of starting points are too large, which hides the data object's color. You can personalize your visualization by specifying parameters for the ``.explain`` method. For example, we may set ``sp_alpha`` smaller to get more transparency for the box of starting points or set ``sp_pad`` smaller to get the box smaller, even we can change the color of that by specifying ``sp_fcolor`` to a shallow color. For more detail, we refer users to the documentation. Also, you can set `cmap` (e.g., `'bmh'`), `cmin` and `cmax` to customize a color map for a decent plot.
 
-
-
-## :art: Reproducible experiment
+## :art: Reproducibility 
 All experiment in the paper referenced below are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
 Before running, ensure the dependencies `scikit-learn` and `hdbscan` are installed, and compile the ``Quickshift++`` code ([Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)). After configuring all of these, run the commands below. 
 
