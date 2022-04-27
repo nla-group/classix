@@ -210,7 +210,7 @@ from classix import CLASSIX
 # generate synthetic data
 X, y = datasets.make_blobs(n_samples=1000, centers=2, n_features=2, random_state=0)
 # run CLASSIX
-clx = CLASSIX(sorting='pca', radius=0.15, group_merging='density', verbose=1, minPts=14)
+clx = CLASSIX(sorting='pca', radius=0.15, group_merging='density', verbose=1, minPts=14, post_alloc=False)
 clx.fit(X)
 # draw figure
 plt.figure(figsize=(8,8))
@@ -221,7 +221,7 @@ plt.yticks([])
 plt.show()
 ```
 
-As we can see, there are two core clusters and many smaller ones with 14 or less data points. By chosing `minPts=14` we can reassign these noise clusters to the core clusters. 
+Output:
 ```
 CLASSIX(sorting='pca', radius=0.15, minPts=14, group_merging='density')
 The 1000 data points were aggregated into 212 groups.
@@ -239,11 +239,9 @@ The 212 groups were merged into 41 clusters with the following sizes:
 As MinPts is 14, the number of clusters has been further reduced to 3.
 ```
 
-The figure below shows the clustering result with `post_alloc=False`:
-
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5.png  width=360 />
 
-So the next step is how we process these outliers, we can either marked as independent color as the figure above shows (the labels for outliers denote -1) or allocate them to the nearby clusters (each outlier will be assigned a label). If we determine to allow the outliers exist, we can set `post_alloc=False`. Otherwise outliers will be reassigned by setting `post_alloc=True`. The performance of `post_alloc=True` is as below. The post-processing depends on the problem context. 
+Note that there are many clusters with fewer than 14 data points. Because `minPts=14` and `post_alloc=False` all of these tiny clusters are labelled as noise with the label `-1`. We can also reallocate noisy clusters to their respective nearby clusters by setting `post_alloc=True` (which is the default value). In this case we get the following clustering:
 
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5_post.png />
 
