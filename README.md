@@ -404,14 +404,6 @@ All results will be stored on ["exp/results"](https://github.com/nla-group/class
 ## :hammer: Contribution
 Any form of contribution is welcome. Please be free to post issues and pull requests if you want to assist in documentation or code. To contribute, please fork the project and pull a request for your changes. We will strive to work through any issues and requests and get your code merged into the main branch. For those contributors, we will acknowledge their names in the release notes. 
 
-### Code Contributor
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/guettel"><img src="https://github.com/guettel.png?size=80" width="60px;" alt="Stefan Güttel"/><br /><sub><b>Stefan Güttel</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/chenxinye"><img src="https://github.com/chenxinye.png?size=80" width="60px;" alt="Xinye Chen"/><br /><sub><b>Xinye Chen</b></sub></a><br /></td>
-  </tr>
-</table>
-
 
 ###  Star & Fork
 [![Stargazers repo roster for @nla-group/classix](https://reporoster.com/stars/nla-group/classix)](https://github.com/nla-group/classix/stargazers)
