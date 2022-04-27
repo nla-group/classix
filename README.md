@@ -84,7 +84,7 @@ from sklearn import datasets
 from classix import CLASSIX
 
 # Generate synthetic data
-X, y = datasets.make_blobs(n_samples=1000, centers=2, n_features=2, random_state=1)
+X, y = datasets.make_blobs(n_samples=5000, centers=2, n_features=2, random_state=1)
 
 # Call CLASSIX
 clx = CLASSIX(radius=0.5, verbose=0)
@@ -165,44 +165,25 @@ There is no path of overlapping groups between these clusters.
 CLASSIX also supports dataframes and using dataframe indices to refer to data points:
 
 ```Python
-X, _ = make_blobs(n_samples=5, centers=2, n_features=2, cluster_std=1.5, random_state=1)
+from sklearn import datasets
+from classix import CLASSIX
+import pandas as pd 
+
+X, _ = datasets.make_blobs(n_samples=5, centers=2, n_features=2, cluster_std=1.5, random_state=1)
 X = pd.DataFrame(X, index=['Anna', 'Bert', 'Carl', 'Tom', 'Bob'])
 
-           0     |     1
-Anna | -7.804551 | -7.043560
-Bert | -9.519154 | -4.327404
-Carl | -0.361448 |  0.954182
-Tom  |  0.957658 |  3.264680
-Bob  | -2.451818 |  2.797037
-
+#            0     |     1
+# Anna | -7.804551 | -7.043560
+# Bert | -9.519154 | -4.327404
+# Carl | -0.361448 |  0.954182
+# Tom  |  0.957658 |  3.264680
+# Bob  | -2.451818 |  2.797037
 
 clx = CLASSIX(radius=0.5)
 clx.fit_transform(X)
-```
-
-Output:
-```
-CLASSIX(sorting='pca', radius=0.5, minPts=0, group_merging='distance')
-The 5 data points were aggregated into 4 groups.
-In total 3 comparisons were required (0.60 comparisons per data point). 
-The 4 groups were merged into 2 clusters with the following sizes: 
-      * cluster 0 : 3
-      * cluster 1 : 2
-Try the .explain() method to explain the clustering.
-```
-
-Let's take a look at the data and how it has been clustered:
-```Python
-clx.explain(plot=True, figsize=(2,2), sp_fontsize=12)
-```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz_df.png width=180 />
-
-As before, we can explain the clustering of individual data points:
-```Python
 clx.explain(index1='Tom', index2='Bert', plot=True, sp_fontsize=12)
 ```
 
-Output:
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=600 />
 
 ```
@@ -220,7 +201,7 @@ There is no path of overlapping groups between these clusters.
 
 ### How to tune the parameters `radius` and `minPts`?
 
-Generally, we recommend first running CLASSIX with a relatively large `radius` parameter, such as `radius=1`, and `minPts=0`. It also helps to use `verbose=1` to get more detailed feedback from the method. Typically, the larger the `radius` parameter, the faster the method performs and the smaller the number of computed clusters. If the number of clusters is too small, successively reduce the `radius` parameter until a ``good`` (depending on context) number of meaningful clusters is obtained. If there are unwanted noise clusters containing just a small number of data points, increase the `minPts` parameter to remove them. If, for example, `minPts=14`, all clusters with fewer than 14 data points will be reassigned to larger clusters. 
+Generally, we recommend first running CLASSIX with a relatively large `radius` parameter, such as `radius=1`, and `minPts=0`. It also helps to use `verbose=1` to get more detailed feedback from the method. Typically, the larger the `radius` parameter, the faster the method performs and the smaller the number of computed clusters. If the number of clusters is too small, successively reduce the `radius` parameter until a "good" (depending on context) number of meaningful clusters is obtained. If there are unwanted "noise" clusters containing just a small number of data points, increase the `minPts` parameter to remove them. If, for example, `minPts=14`, all clusters with fewer than 14 data points will be reassigned to larger clusters. 
 
 Here is an example that demonstrates the effect of `minPts`:
 ```Python
@@ -266,9 +247,9 @@ So the next step is how we process these outliers, we can either marked as indep
 
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5_post.png />
 
-### The visualization is not clear, is it a bug?
+### How to interprete and modify the visualizations?
 
-No, it is not a bug. Sometimes the default setting for visualization may result in a blurry picture, e.g., the boxes of starting points are too large, which hides the data object's color. You can personalize your visualization by specifying parameters for the ``.explain`` method. For example, we may set ``sp_alpha`` smaller to get more transparency for the box of starting points or set ``sp_pad`` smaller to get the box smaller, even we can change the color of that by specifying ``sp_fcolor`` to a shallow color. For more detail, we refer users to the documentation. Also, you can set `cmap` (e.g., `'bmh'`), `cmin` and `cmax` to customize a color map for a decent plot.
+When there are many data points, the vizualisations produced by the `.explain` method might be difficult to interprete. There are several options that help producing better plots, e.g. when the boxes of starting points are too large so that they hide the data points. In this case, we may set ``sp_alpha`` smaller to get more transparency for the box of starting points or set ``sp_pad`` smaller to get the box smaller, or we can change the color of that by specifying ``sp_fcolor`` to a more shallow color. For more detail, we refer users to the documentation. Also, you can set `cmap` (e.g., `'bmh'`), `cmin` and `cmax` to customize a color map of the clusters.
 
 ## :art: Reproducibility 
 All experiment in the paper referenced below are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
