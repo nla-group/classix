@@ -41,15 +41,12 @@ A detailed documentation (work in progress), including tutorials, is available a
 
 ## :rocket: Install
 
-CLASSIX has the following dependencies for its clustering functionality:
+CLASSIX has the following dependencies:
 
 - cython (recommend >= 0.27)
 - numpy >=1.3.0 (recommend >= 1.20.0)
 - scipy >= 1.2.1
 - requests
-
-and it requires the following packages for data visualization:
-
 - matplotlib
 - pandas
 
@@ -58,7 +55,7 @@ To install the current CLASSIX release via PIP use:
 
 ```pip install classixclustering```
 
-To check the CLASSIX installation you can use:
+To check the CLASSIX installation use:
 
 ```python -m pip show classixclustering```
 
@@ -96,8 +93,8 @@ clx.fit(X)
 
 The cluster labels of each data point are available in ``clx.labels_``:
 ```Python
+import matplotlib.pyplot as plt
 plt.figure(figsize=(10,10))
-plt.rcParams['axes.facecolor'] = 'white'
 plt.scatter(X[:,0], X[:,1], c=clx.labels_)
 plt.show()
 ```
@@ -112,7 +109,7 @@ clx.explain(plot=True)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=500 />
 
-The starting points, shown as the small red boxes, can be seen as a coarse representation of the data. Each starting point is associated with a group of data points, and groups are merged into clusters. The `explain` method returns a textual summary of the clustering giving more details:
+The starting points, shown as the small red boxes, can be thought of as a coarse representation of the data. Each starting point is associated with a group of data points, and groups are merged into clusters. The `explain` method returns a textual summary of the clustering:
 
 ```
 A clustering of 5000 data points with 2 features has been performed. 
@@ -223,7 +220,7 @@ There is no path of overlapping groups between these clusters.
 
 ### How to tune the parameters `radius` and `minPts`?
 
-Generally, we recommend first running CLASSIX with a relatively large `radius=1` parameter and `minPts=0`. It also helps to use `verbose=1` to get more detailed feedback from the method. Typically, the larger the `radius` parameter, the faster the method performs and the smaller the number of resulting clusters. If the number of clusters is too small, successively reduce the `radius` parameter until a ``good`` (depending on context) number of meaningful clusters is obtained. If there are unwanted noise clusters with just a small number of data points, increase the `minPts` parameter to remove them. If, for example, `minPts=3`, all clusters with fewer than three data points will be reassigned to larger clusters. 
+Generally, we recommend first running CLASSIX with a relatively large `radius` parameter, such as `radius=1`, and `minPts=0`. It also helps to use `verbose=1` to get more detailed feedback from the method. Typically, the larger the `radius` parameter, the faster the method performs and the smaller the number of computed clusters. If the number of clusters is too small, successively reduce the `radius` parameter until a ``good`` (depending on context) number of meaningful clusters is obtained. If there are unwanted noise clusters containing just a small number of data points, increase the `minPts` parameter to remove them. If, for example, `minPts=14`, all clusters with fewer than 14 data points will be reassigned to larger clusters. 
 
 Here is an example that demonstrates the effect of `minPts`:
 ```Python
@@ -254,39 +251,7 @@ The 212 groups were merged into 41 clusters with the following sizes:
       * cluster 2 : 13
       * cluster 3 : 10
       * cluster 4 : 7
-      * cluster 5 : 7
-      * cluster 6 : 6
-      * cluster 7 : 5
-      * cluster 8 : 5
-      * cluster 9 : 4
-      * cluster 10 : 4
-      * cluster 11 : 4
-      * cluster 12 : 3
-      * cluster 13 : 3
-      * cluster 14 : 3
-      * cluster 15 : 2
-      * cluster 16 : 2
-      * cluster 17 : 2
-      * cluster 18 : 2
-      * cluster 19 : 2
-      * cluster 20 : 2
-      * cluster 21 : 1
-      * cluster 22 : 1
-      * cluster 23 : 1
-      * cluster 24 : 1
-      * cluster 25 : 1
-      * cluster 26 : 1
-      * cluster 27 : 1
-      * cluster 28 : 1
-      * cluster 29 : 1
-      * cluster 30 : 1
-      * cluster 31 : 1
-      * cluster 32 : 1
-      * cluster 33 : 1
-      * cluster 34 : 1
-      * cluster 35 : 1
-      * cluster 36 : 1
-      * cluster 37 : 1
+    --- lines omitted ---
       * cluster 38 : 1
       * cluster 39 : 1
       * cluster 40 : 1
@@ -300,11 +265,6 @@ The figure below shows the clustering result with `post_alloc=False`:
 So the next step is how we process these outliers, we can either marked as independent color as the figure above shows (the labels for outliers denote -1) or allocate them to the nearby clusters (each outlier will be assigned a label). If we determine to allow the outliers exist, we can set `post_alloc=False`. Otherwise outliers will be reassigned by setting `post_alloc=True`. The performance of `post_alloc=True` is as below. The post-processing depends on the problem context. 
 
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5_post.png />
-
-
-### How to determine an appropriate value for radius?
-
-In most cases, `radius` ranging from 0.1 to 1 can handle most cases. The higher the dimensionality of the data is, the higher the `radius` we should use (better try the `radius` > 1).  For density based merging, the `radius` can be set a bit higher than distance based merging. 
 
 ### The visualization is not clear, is it a bug?
 
