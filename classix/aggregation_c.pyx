@@ -144,8 +144,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
                 num_group = num_group + 1
                 labels[j] = lab
 
-        splist.append([sp, sort_vals[sp], num_group]) # respectively store starting point
-                                                                # index, label, number of neighbor objects, center (starting point).
+        splist.append([sp, sort_vals[sp], num_group]) # respectively store index, sorting values, number of neighbor objects.
         lab += 1
 
     # cdef np.ndarray[np.float64_t, ndim=2] agg_centers = np.empty((lab, 2 + fdim), dtype=float)
