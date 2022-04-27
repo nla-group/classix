@@ -107,7 +107,7 @@ CLASSIX provides an API for the easy visualization of clusters and to explain th
 ```Python
 clx.explain(plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=500 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=450 />
 
 The starting points, shown as the small red boxes, can be thought of as a coarse representation of the data. Each starting point is associated with a group of data points, and groups are merged into clusters. The `explain` method returns a textual summary of the clustering:
 
@@ -139,7 +139,7 @@ In the above table, *Group* denotes the group label, *NrPts* denotes the number 
 ```Python
 clx.explain(0, plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0.png width=720 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0.png width=500 />
 Output:
 
 ```
@@ -151,7 +151,7 @@ We can also query why two data points ended up in the same cluster, or not:
 ```Python
 clx.explain(0, 2000, plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0_2000.png width=720 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0_2000.png width=550 />
 Output:
 
 ```
@@ -184,7 +184,7 @@ clx.fit_transform(X)
 clx.explain(index1='Tom', index2='Bert', plot=True, sp_fontsize=12)
 ```
 
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=600 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=500 />
 
 ```
 ----------------------------------------
@@ -201,9 +201,10 @@ There is no path of overlapping groups between these clusters.
 
 ### How to tune the parameters `radius` and `minPts`?
 
-Generally, we recommend first running CLASSIX with a relatively large `radius` parameter, such as `radius=1`, and `minPts=0`. It also helps to use `verbose=1` to get more detailed feedback from the method. Typically, the larger the `radius` parameter, the faster the method performs and the smaller the number of computed clusters. If the number of clusters is too small, successively reduce the `radius` parameter until a "good" (depending on context) number of meaningful clusters is obtained. If there are unwanted "noise" clusters containing just a small number of data points, increase the `minPts` parameter to remove them. If, for example, `minPts=14`, all clusters with fewer than 14 data points will be reassigned to larger clusters. 
+Generally, we recommend first running CLASSIX with a relatively large `radius` parameter, such as `radius=1`, and `minPts=0`. It also helps to use `verbose=1` to get more detailed feedback from the method. Typically, the larger the `radius` parameter, the faster the method performs and the smaller the number of computed clusters. If the number of clusters is too small, successively reduce the `radius` parameter until a "good" (depending on context) number of meaningful clusters is obtained. 
 
-Here is an example that demonstrates the effect of `minPts`:
+If there are unwanted "noise" clusters containing just a small number of data points, increase the `minPts` parameter to remove them. If, for example, `minPts=14`, all clusters with fewer than 14 data points will be reassigned to larger clusters. Here is an example that demonstrates the effect of `minPts`:
+
 ```Python
 from sklearn import datasets
 from classix import CLASSIX
@@ -243,27 +244,37 @@ As MinPts is 14, the number of clusters has been further reduced to 3.
 
 Note that there are many clusters with fewer than 14 data points. Because `minPts=14` and `post_alloc=False` all of these tiny clusters are labelled as noise with the label `-1`. We can also reallocate noisy clusters to their respective nearby clusters by setting `post_alloc=True` (which is the default value). In this case we get the following clustering:
 
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5_post.png />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5_post.png width=400 />
+
+### Distance or density based merging?
+
+The second phase of CLASSIX consists of merging groups into clusters and there are two options for doing so, depending on the `group_merging` parameter. 
+
+If `group_merging='distance'` (the default value), two groups will be merged if their associated starting points are within `scl*radius` distance from each other. The scaling parameter defaults to `scl=1.5` if not modified. Distance-based merging is very fast and works in most cases.
+
+If `group_merging='density'`, two groups will be merged only if there are sufficiently many data points in their overlap. This merging procedure requires more computation and might be slow, but it can prove useful in cases of tightly packed clusters such in the above Gaussian blob example. 
+
 
 ### How to interprete and modify the visualizations?
 
 When there are many data points, the vizualisations produced by the `.explain` method might be difficult to interprete. There are several options that help producing better plots, e.g. when the boxes of starting points are too large so that they hide the data points. In this case, we may set ``sp_alpha`` smaller to get more transparency for the box of starting points or set ``sp_pad`` smaller to get the box smaller, or we can change the color of that by specifying ``sp_fcolor`` to a more shallow color. For more detail, we refer users to the documentation. Also, you can set `cmap` (e.g., `'bmh'`), `cmin` and `cmax` to customize a color map of the clusters.
 
+
 ## :art: Reproducibility 
-All experiment in the paper referenced below are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
-Before running, ensure the dependencies `scikit-learn` and `hdbscan` are installed, and compile the ``Quickshift++`` code ([Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)). After configuring all of these, run the commands below. 
+All experiments in the paper referenced below are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
+Before running, ensure the dependencies `scikit-learn` and `hdbscan` are installed and the ``Quickshift++`` code ([Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)) is compiled. After configuring all of these, run the following commands:
 
 ```
 cd exp
 python3 run exp_main.py
 ```
 
-All results will be stored on ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
+All results will be written to the folder ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
 
 
 
 ## :hammer: Contribution
-Any form of contribution is welcome. Please be free to post issues and pull requests if you want to assist in documentation or code. To contribute, please fork the project and pull a request for your changes. We will strive to work through any issues and requests and get your code merged into the main branch. For those contributors, we will acknowledge their names in the release notes. 
+Any form of contribution is welcome. Please be free to post issues and pull requests if you want to assist in documentation or code. To contribute, please fork the project and pull a request for your changes. We will strive to work through any issues and requests and get your code merged into the main branch. Contributors will be acknowledged in the release notes. 
 
 
 ###  Star & Fork
