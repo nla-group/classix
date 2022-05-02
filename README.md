@@ -240,7 +240,7 @@ The 212 groups were merged into 41 clusters with the following sizes:
 As MinPts is 14, the number of clusters has been further reduced to 3.
 ```
 
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5.png  width=360 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/demo5.png  width=400 />
 
 Note that there are many clusters with fewer than 14 data points. Because `minPts=14` and `post_alloc=False` all of these tiny clusters are labelled as noise with the label `-1`. We can also reallocate noisy clusters to their respective nearby clusters by setting `post_alloc=True` (which is the default value). In this case we get the following clustering:
 
