@@ -60,6 +60,58 @@ and uninstall it with
 
     conda uninstall classixclustering
    
+   
+
+Installing `classixclustering` from the `conda-forge` channel can also be achieved by adding `conda-forge` to your channels with:
+
+.. parsed-literal::
+
+   conda config --add channels conda-forge
+   conda config --set channel_priority strict
+
+Once the `conda-forge` channel has been enabled, `classixclustering` can be installed with `conda`:
+
+.. parsed-literal::
+
+   conda install classixclustering
+
+
+or with `mamba`:
+
+.. parsed-literal::
+
+   mamba install classixclustering
+
+
+It is possible to list all of the versions of `classixclustering` available on your platform with `conda`:
+
+.. parsed-literal::
+
+   conda search classixclustering --channel conda-forge
+
+
+or with `mamba`:
+
+.. parsed-literal::
+
+   mamba search classixclustering --channel conda-forge
+
+
+Alternatively, `mamba repoquery` may provide more information:
+
+.. parsed-literal::
+
+   # Search all versions available on your platform:
+   mamba repoquery search classixclustering --channel conda-forge
+
+   # List packages depending on `classixclustering`:
+   mamba repoquery whoneeds classixclustering --channel conda-forge
+
+   # List dependencies of `classixclustering`:
+   mamba repoquery depends classixclustering --channel conda-forge
+
+
+
 III. **download**
 
 Download this repository via:
