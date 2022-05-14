@@ -122,8 +122,7 @@ def aggregate(data, sorting="pca", tol=0.5): # , verbose=1
                 num_group += 1
                 labels[j] = lab
 
-        splist.append([sp, sort_vals[sp], num_group]) # respectively store starting point
-                                                               # index, label, number of neighbor objects, center (starting point).
+        splist.append([sp, sort_vals[sp], num_group])  # list of [ starting point index of current group, sorting key, and number of group elements ]
         lab += 1
 
     # if verbose == 1:

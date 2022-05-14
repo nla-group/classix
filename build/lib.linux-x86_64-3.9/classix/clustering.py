@@ -48,94 +48,6 @@ np.random.seed(0)
 
 
 
-def get_data(current_dir='', name='vdu_signals'):
-    """Download the built-in data."""
-    if name == 'vdu_signals':
-        url_parent = "https://github.com/nla-group/classix/raw/master/classix/source/vdu_signals.npy"
-        vdu_signals = requests.get(url_parent).content
-        with open(os.path.join(current_dir, 'data/vdu_signals.npy'), 'wb') as handler:
-            handler.write(vdu_signals)
-         
-    elif name == 'Iris':
-        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Irirs.npy"
-        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Irirs.npy"
-        x = requests.get(url_parent_x).content
-        y = requests.get(url_parent_y).content
-        with open(os.path.join(current_dir, 'data/X_Irirs.npy'), 'wb') as handler:
-            handler.write(x)
-        with open(os.path.join(current_dir, 'data/y_Irirs.npy'), 'wb') as handler:
-            handler.write(y)
-            
-    elif name == 'Dermatology':
-        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Dermatology.npy"
-        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Dermatology.npy"
-        x = requests.get(url_parent_x).content
-        y = requests.get(url_parent_y).content
-        with open(os.path.join(current_dir, 'data/X_Dermatology.npy'), 'wb') as handler:
-            handler.write(x)
-        with open(os.path.join(current_dir, 'data/y_Dermatology.npy'), 'wb') as handler:
-            handler.write(y)
-    
-    elif name == 'Ecoli':
-        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Ecoli.npy"
-        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Ecoli.npy"
-        x = requests.get(url_parent_x).content
-        y = requests.get(url_parent_y).content
-        with open(os.path.join(current_dir, 'data/X_Ecoli.npy'), 'wb') as handler:
-            handler.write(x)
-        with open(os.path.join(current_dir, 'data/y_Ecoli.npy'), 'wb') as handler:
-            handler.write(y)
-    
-    elif name == 'Glass':
-        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Glass.npy"
-        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Glass.npy"
-        x = requests.get(url_parent_x).content
-        y = requests.get(url_parent_y).content
-        with open(os.path.join(current_dir, 'data/X_Glass.npy'), 'wb') as handler:
-            handler.write(x)
-        with open(os.path.join(current_dir, 'data/y_Glass.npy'), 'wb') as handler:
-            handler.write(y)
-    
-    elif name == 'Banknote':
-        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Banknote.npy"
-        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Banknote.npy"
-        x = requests.get(url_parent_x).content
-        y = requests.get(url_parent_y).content
-        with open(os.path.join(current_dir, 'data/X_Banknote.npy'), 'wb') as handler:
-            handler.write(x)
-        with open(os.path.join(current_dir, 'data/y_Banknote.npy'), 'wb') as handler:
-            handler.write(y)
-    
-    elif name == 'Seeds':
-        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Seeds.npy"
-        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Seeds.npy"
-        x = requests.get(url_parent_x).content
-        y = requests.get(url_parent_y).content
-        with open(os.path.join(current_dir, 'data/X_Seeds.npy'), 'wb') as handler:
-            handler.write(x)
-        with open(os.path.join(current_dir, 'data/y_Seeds.npy'), 'wb') as handler:
-            handler.write(y)
-            
-    elif name == 'Phoneme':
-        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Phoneme.npy"
-        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Phoneme.npy"
-        x = requests.get(url_parent_x).content
-        y = requests.get(url_parent_y).content
-        with open(os.path.join(current_dir, 'data/X_Phoneme.npy'), 'wb') as handler:
-            handler.write(x)
-        with open(os.path.join(current_dir, 'data/y_Phoneme.npy'), 'wb') as handler:
-            handler.write(y)
-    
-    elif name == 'Wine':
-        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Wine.npy"
-        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Wine.npy"
-        x = requests.get(url_parent_x).content
-        y = requests.get(url_parent_y).content
-        with open(os.path.join(current_dir, 'data/X_Wine.npy'), 'wb') as handler:
-            handler.write(x)
-        with open(os.path.join(current_dir, 'data/y_Wine.npy'), 'wb') as handler:
-            handler.write(y)
-            
             
 def loadData(name='vdu_signals'):
     """Obtain the built-in data.
@@ -223,7 +135,95 @@ def loadData(name='vdu_signals'):
 
 
         
-        
+
+def get_data(current_dir='', name='vdu_signals'):
+    """Download the built-in data."""
+    if name == 'vdu_signals':
+        url_parent = "https://github.com/nla-group/classix/raw/master/classix/source/vdu_signals.npy"
+        vdu_signals = requests.get(url_parent).content
+        with open(os.path.join(current_dir, 'data/vdu_signals.npy'), 'wb') as handler:
+            handler.write(vdu_signals)
+         
+    elif name == 'Iris':
+        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Irirs.npy"
+        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Irirs.npy"
+        x = requests.get(url_parent_x).content
+        y = requests.get(url_parent_y).content
+        with open(os.path.join(current_dir, 'data/X_Irirs.npy'), 'wb') as handler:
+            handler.write(x)
+        with open(os.path.join(current_dir, 'data/y_Irirs.npy'), 'wb') as handler:
+            handler.write(y)
+            
+    elif name == 'Dermatology':
+        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Dermatology.npy"
+        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Dermatology.npy"
+        x = requests.get(url_parent_x).content
+        y = requests.get(url_parent_y).content
+        with open(os.path.join(current_dir, 'data/X_Dermatology.npy'), 'wb') as handler:
+            handler.write(x)
+        with open(os.path.join(current_dir, 'data/y_Dermatology.npy'), 'wb') as handler:
+            handler.write(y)
+    
+    elif name == 'Ecoli':
+        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Ecoli.npy"
+        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Ecoli.npy"
+        x = requests.get(url_parent_x).content
+        y = requests.get(url_parent_y).content
+        with open(os.path.join(current_dir, 'data/X_Ecoli.npy'), 'wb') as handler:
+            handler.write(x)
+        with open(os.path.join(current_dir, 'data/y_Ecoli.npy'), 'wb') as handler:
+            handler.write(y)
+    
+    elif name == 'Glass':
+        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Glass.npy"
+        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Glass.npy"
+        x = requests.get(url_parent_x).content
+        y = requests.get(url_parent_y).content
+        with open(os.path.join(current_dir, 'data/X_Glass.npy'), 'wb') as handler:
+            handler.write(x)
+        with open(os.path.join(current_dir, 'data/y_Glass.npy'), 'wb') as handler:
+            handler.write(y)
+    
+    elif name == 'Banknote':
+        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Banknote.npy"
+        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Banknote.npy"
+        x = requests.get(url_parent_x).content
+        y = requests.get(url_parent_y).content
+        with open(os.path.join(current_dir, 'data/X_Banknote.npy'), 'wb') as handler:
+            handler.write(x)
+        with open(os.path.join(current_dir, 'data/y_Banknote.npy'), 'wb') as handler:
+            handler.write(y)
+    
+    elif name == 'Seeds':
+        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Seeds.npy"
+        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Seeds.npy"
+        x = requests.get(url_parent_x).content
+        y = requests.get(url_parent_y).content
+        with open(os.path.join(current_dir, 'data/X_Seeds.npy'), 'wb') as handler:
+            handler.write(x)
+        with open(os.path.join(current_dir, 'data/y_Seeds.npy'), 'wb') as handler:
+            handler.write(y)
+            
+    elif name == 'Phoneme':
+        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Phoneme.npy"
+        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Phoneme.npy"
+        x = requests.get(url_parent_x).content
+        y = requests.get(url_parent_y).content
+        with open(os.path.join(current_dir, 'data/X_Phoneme.npy'), 'wb') as handler:
+            handler.write(x)
+        with open(os.path.join(current_dir, 'data/y_Phoneme.npy'), 'wb') as handler:
+            handler.write(y)
+    
+    elif name == 'Wine':
+        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Wine.npy"
+        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Wine.npy"
+        x = requests.get(url_parent_x).content
+        y = requests.get(url_parent_y).content
+        with open(os.path.join(current_dir, 'data/X_Wine.npy'), 'wb') as handler:
+            handler.write(x)
+        with open(os.path.join(current_dir, 'data/y_Wine.npy'), 'wb') as handler:
+            handler.write(y)
+                    
 # ******************************************** the main wrapper ********************************************
 class CLASSIX:
     """CLASSIX: Fast and explainable clustering based on sorting.
