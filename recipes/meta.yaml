@@ -1,36 +1,33 @@
-# For conda-forge
-
 {% set name = "classixclustering" %}
-{% set version = "0.6.1" %}
+{% set version = "0.6.2" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
-
-
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: d064395b3192019aebbb7fed9e69f715b55711eaf8a942154393b10847da2d61
-
+  sha256: 54266026b25e3f8271ec7b5945b5f39b89195d338516fe56953999d1084446a2
 
 build:
   noarch: python
-  number: 0
-  script: "{{ PYTHON }} -m pip install . -vv"
-    
+  number: 1
+  script: {{ PYTHON }} -m pip install . -vv
+
 requirements:
   build:
+    - {{ compiler('c') }}
+  host:
     - python >=3.6
     - pip
-    - numpy 
+    - numpy
     - cython
 
   run:
     - python >=3.6
     - pandas
     - requests
-    - numpy
+    - {{ pin_compatible('numpy') }}
     - scipy ==1.7.2
     - matplotlib-base
 
@@ -38,10 +35,9 @@ test:
   imports:
     - classix
 
-
 about:
   home: https://github.com/nla-group/classix
-  summary: 'CLASSIX is a fast and explainable clustering algorithm based on sorting.'
+  summary: CLASSIX is a fast and explainable clustering algorithm based on sorting.
   license: MIT
   license_family: MIT
   license_file: LICENSE
@@ -49,5 +45,5 @@ about:
 
 extra:
   recipe-maintainers:
+     - guettel
     - chenxinye
-    - guettel
