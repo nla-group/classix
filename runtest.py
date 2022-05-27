@@ -24,7 +24,7 @@
 
 
 import numpy as np
-from classix import CLASSIX, load_data
+from classix import CLASSIX, loadData
 
 vdu_signals = load_data('vdu_signals')
 
