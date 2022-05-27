@@ -29,10 +29,11 @@
 
 cimport cython
 import numpy as np
-cimport numpy as np 
+cimport numpy as np
+from scipy.linalg import get_blas_funcs, eigh
 # from cython.parallel import prange
 # from sklearn.decomposition import PCA
-from scipy.sparse.linalg import svds
+# from scipy.sparse.linalg import svds
 # from libc.string cimport strcmp
 np.import_array()
 
@@ -71,9 +72,9 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
 
     cdef Py_ssize_t fdim = data.shape[1] # feature dimension
     cdef Py_ssize_t len_ind = data.shape[0] # size of data
-    cdef double[:] sort_vals
+    cdef double[:] sort_vals, _
     cdef double[:, :] c_data = np.empty((len_ind, fdim), dtype=np.float64)
-    cdef double[:, :] U1, _  # = np.empty((len_ind, ), dtype=float)
+    cdef double[:, :] U1 # , _  # = np.empty((len_ind, ), dtype=float)
     cdef long long[:] ind # = np.empty((len_ind, ), dtype=int)
     cdef Py_ssize_t sp # starting point index
     cdef unsigned int lab=0, nr_dist=0, num_group
@@ -97,8 +98,11 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
         # data = data - data.mean(axis=0) -- already done in the clustering.fit_transform
         c_data = data - np.mean(data, axis=0)
         if data.shape[1]>1:
-            U1, s1, _ = svds(c_data, k=1, return_singular_vectors="u")
-            sort_vals = U1[:,0]*s1[0]
+            gemm = get_blas_funcs("gemm", [c_data.T, c_data])
+            _, U1 = eigh(gemm(1, c_data.T, c_data), subset_by_index=[fdim-1, fdim-1])
+            sort_vals = c_data@U1.reshape(-1)
+            # U1, s1, _ = svds(c_data, k=1, return_singular_vectors="u")
+            # sort_vals = U1[:,0]*s1[0]
         else:
             sort_vals = c_data[:,0]
         sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
