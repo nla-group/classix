@@ -1,6 +1,6 @@
 import warnings
 
-__version__ = '0.6.2'                  
+__version__ = '0.6.4'                  
 __enable_cython__ = True 
 
 # if __enable_cython__:

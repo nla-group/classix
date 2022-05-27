@@ -29,7 +29,8 @@
 
 import numpy as np
 # from sklearn.decomposition import PCA
-from scipy.sparse.linalg import svds
+# from scipy.sparse.linalg import svds
+from scipy.linalg import get_blas_funcs, eigh
 
 # python implementation for aggregation
 def aggregate(data, sorting="pca", tol=0.5, early_stopping=False): # , verbose=1
@@ -62,7 +63,8 @@ def aggregate(data, sorting="pca", tol=0.5, early_stopping=False): # , verbose=1
     
     splist = list() # store the starting points
     len_ind = data.shape[0]
-
+    fdim = data.shape[1]
+    
     if sorting == "norm-mean" or sorting == "norm-orthant": 
         c_data = data.copy()
         sort_vals = np.linalg.norm(c_data, ord=2, axis=1)
@@ -71,8 +73,9 @@ def aggregate(data, sorting="pca", tol=0.5, early_stopping=False): # , verbose=1
     elif sorting == "pca":
         c_data = data - data.mean(axis=0)
         if data.shape[1]>1:
-            U1, s1, _ = svds(c_data, k=1, return_singular_vectors="u")
-            sort_vals = U1[:,0]*s1[0]
+            gemm = get_blas_funcs("gemm", [c_data.T, c_data])
+            _, U1 = eigh(gemm(1, c_data.T, c_data), subset_by_index=[fdim-1, fdim-1])
+            sort_vals = c_data@U1.reshape(-1)
             # print( U1, s1, _)
         else:
             sort_vals = c_data[:,0]
