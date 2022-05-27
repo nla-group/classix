@@ -23,7 +23,7 @@
 import unittest
 import numpy as np
 import sklearn.datasets as data
-from classix import CLASSIX, load_data
+from classix import CLASSIX, loadData
 from classix import aggregation_test, novel_normalization
 
 
@@ -38,7 +38,7 @@ def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
 class TestClassix(unittest.TestCase):
 
     def test_distance_cluster(self):
-        vdu_signals = load_data('vdu_signals')
+        vdu_signals = loadData('vdu_signals')
 
         for tol in np.arange(0.8, 1, 0.1):
             clx = CLASSIX(radius=tol, group_merging='distance', verbose=0)
@@ -54,7 +54,7 @@ class TestClassix(unittest.TestCase):
 
             
     def test_density_cluster(self):
-        vdu_signals = load_data('vdu_signals')
+        vdu_signals = loadData('vdu_signals')
 
         for tol in np.arange(0.8, 1, 0.1):
             clx = CLASSIX(radius=tol, group_merging='density', verbose=0)
@@ -191,7 +191,7 @@ class TestClassix(unittest.TestCase):
         checkpoint = 1
         try:
             for dn in ['vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 'Phoneme', 'Wine']:
-                load_data(name=dn)
+                loadData(name=dn)
         except:
             checkpoint = 0
             
