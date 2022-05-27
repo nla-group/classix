@@ -26,7 +26,7 @@
 import numpy as np
 from classix import CLASSIX, loadData
 
-vdu_signals = load_data('vdu_signals')
+vdu_signals = loadData('vdu_signals')
 
 for tol in np.arange(0.5,1.1,0.1):
     clx = CLASSIX(radius=tol, verbose=0)
