@@ -77,8 +77,11 @@ def aggregate(data, sorting="pca", tol=0.5): # , verbose=1
         # data = data - data.mean(axis=0) -- already done in the clustering.fit_transform
         c_data = data - data.mean(axis=0)
         if data.shape[1]>1:
-            U1, s1, _ = svds(c_data, k=1, return_singular_vectors="u")
-            sort_vals = U1[:,0]*s1[0]
+            gemm = get_blas_funcs("gemm", [c_data.T, c_data])
+            _, v = eigh(gemm(1, c_data.T, c_data), subset_by_index=[c_data.shape[1]-1, c_data.shape[1]-1])
+            sort_vals = c_data@v.reshape(-1)
+            # U1, s1, _ = svds(c_data, k=1, return_singular_vectors="u")
+            # sort_vals = U1[:,0]*s1[0]
             # print( U1, s1, _)
         else:
             sort_vals = c_data[:,0]
