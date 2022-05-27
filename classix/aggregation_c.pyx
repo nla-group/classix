@@ -77,6 +77,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
     cdef unsigned int fdim = data.shape[1] # feature dimension
     cdef unsigned int len_ind = data.shape[0] # size of data
     cdef np.ndarray[np.float64_t, ndim=2] c_data = np.empty((len_ind, fdim), dtype=np.float64)
+    cdef np.ndarray[np.float64_t, ndim=2] U1
     cdef unsigned int sp # sp: starting point
     cdef unsigned int nr_dist = 0 # nr_dist:if necessary, count the distance computation
     cdef unsigned int lab = 0 # lab: class
@@ -104,8 +105,11 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
         # data = data - data.mean(axis=0) -- already done in the clustering.fit_transform
         c_data = data - np.mean(data, axis=0)
         if data.shape[1]>1:
-            U1, s1, _ = svds(c_data, k=1, return_singular_vectors="u")
-            sort_vals = U1[:,0]*s1[0]
+            gemm = get_blas_funcs("gemm", [c_data.T, c_data])
+            _, U1 = eigh(gemm(1, c_data.T, c_data), subset_by_index=[fdim-1, fdim-1])
+            sort_vals = c_data@U1.reshape(-1)
+            # U1, s1, _ = svds(c_data, k=1, return_singular_vectors="u")
+            # sort_vals = U1[:,0]*s1[0]
         else:
             sort_vals = c_data[:,0]
         sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
