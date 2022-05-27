@@ -35,9 +35,10 @@
 cimport cython
 import numpy as np
 cimport numpy as np 
+from scipy.linalg import get_blas_funcs, eigh
 # from cython.parallel import prange
 # from sklearn.decomposition import PCA
-from scipy.sparse.linalg import svds
+# from scipy.sparse.linalg import svds
 # from libc.string cimport strcmp
 np.import_array()
 
