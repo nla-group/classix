@@ -249,7 +249,7 @@ class CLASSIX:
         and an object is less than or equal to the tolerance, the object will be allocated 
         to the group which the starting point belongs to. For details, we refer users to [1].
     
-    group_merging : str, {'density', 'distance'}, default='distance'
+    group_merging : str, {'density', 'distance', None}, default='distance'
         The method for merging the groups. 
         
         - 'density': two groups are merged if the density of data points in their intersection 
@@ -261,6 +261,7 @@ class CLASSIX:
            set structure to speedup agglomerate.
         
         For more details, we refer to [1].
+        If the users set group_merging to None, the clustering will only return the labels formed by aggregation as cluster labels.
     
     minPts : int, default=0
         Clusters with less than minPts points are classified as abnormal clusters.  
@@ -498,15 +499,21 @@ class CLASSIX:
         
         self.clean_index_ = np.full(self.data.shape[0], True) # claim clean data indices
         # clustering
-        self.labels_ = self.clustering(
-            data=self.data,
-            agg_labels=self.groups_, 
-            splist=self.splist_,             
-            sorting=self.sorting, 
-            radius=self.radius, 
-            method=self.group_merging, # eta=self.eta, distance_scale=self.distance_scale, 
-            minPts=self.minPts # percent=self.noise_percent, noise_scale=self.noise_scale,
-        ) 
+        
+        if self.group_merging is None:
+            self.labels_ = copy.deepcopy(self.groups_) 
+        elif self.group_merging.lower()=='none':
+            self.labels_ = copy.deepcopy(self.groups_) 
+        else:
+            self.labels_ = self.clustering(
+                data=self.data,
+                agg_labels=self.groups_, 
+                splist=self.splist_,             
+                sorting=self.sorting, 
+                radius=self.radius, 
+                method=self.group_merging, # eta=self.eta, distance_scale=self.distance_scale, 
+                minPts=self.minPts # percent=self.noise_percent, noise_scale=self.noise_scale,
+            ) 
         return self
 
 
@@ -2009,7 +2016,7 @@ class CLASSIX:
             raise TypeError('Expected a float or int type')
         if value <= 0:
             raise ValueError(
-                "Please feed an correct value (>0) for tolerance")
+                "Please feed an correct value (>0) for tolerance.")
         # if value > 1:
         #     warnings.warn("Might lead to bad aggregation", DeprecationWarning)
         self._radius = value
@@ -2028,7 +2035,7 @@ class CLASSIX:
             raise TypeError('Expected a string type')
         if value not in ['pca', 'norm-mean', 'norm-orthant'] and value != None:
             raise ValueError(
-                "Please refer to an correct sorting way, namely 'pca', 'norm-mean' and 'norm-orthant'")
+                "Please refer to an correct sorting way, namely 'pca', 'norm-mean' and 'norm-orthant'.")
         self._sorting = value
 
         
@@ -2041,11 +2048,14 @@ class CLASSIX:
     
     @group_merging.setter
     def group_merging(self, value):
-        if not isinstance(value, str):
-            raise TypeError('Expected a string type')
-        if value not in ['density', 'distance']: # 'mst-distance', 'scc-distance', 'trivial-distance', 'trivial-density'
-            raise ValueError(
-                "Please refer to an correct sorting way, namely 'density' and 'distance'"
+        if not isinstance(value, str) and not isinstance(None, type(None)):
+            raise TypeError('Expected a string type or None.')
+        if value not in ['density', 
+                         'distance'
+                        ] and value is not None: # 'mst-distance', 'scc-distance', 'trivial-distance', 'trivial-density'
+            if value.lower()!='none':
+                raise ValueError(
+                "Please refer to an correct sorting way, namely 'density' and 'distance' or None."
                 ) # 'scc-distance' and 'mst-distance'
         self._group_merging = value
         
@@ -2112,7 +2122,7 @@ class CLASSIX:
         if not isinstance(value, float) and not isinstance(value,int):
             raise TypeError('Expected a float or int type')
         if value < 0 or (0 < value & value < 1):
-            raise ValueError('Noise_scale must be 0 or greater than 1')
+            raise ValueError('Noise_scale must be 0 or greater than 1.')
         self._minPts = value
     
     

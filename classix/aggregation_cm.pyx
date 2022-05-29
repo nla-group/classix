@@ -99,7 +99,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
     else: # no sorting
         sort_vals = np.zeros(len_ind)
         ind = np.arange(len_ind)
-    
+
     for i in range(len_ind): 
         sp = ind[i] # starting point
         
