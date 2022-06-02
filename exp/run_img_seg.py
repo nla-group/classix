@@ -6,9 +6,9 @@ import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import matplotlib.pyplot as plt
 from sklearn.cluster import DBSCAN
-from src.clustering import CLASSIX
+from classix import CLASSIX
 from quickshift.QuickshiftPP import *
-from src.aggregation_cm import aggregate
+from classix.aggregation_cm import aggregate
 from classix.clustering import calculate_cluster_centers, novel_normalization
 
 imagePaths1 = [
