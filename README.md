@@ -51,6 +51,8 @@ CLASSIX has the following dependencies:
 - matplotlib
 - pandas
 
+Note: using numpy>=1.22, CLASSIX will support memoryview, it's even faster. 
+
 ### pip (recommended)
 To install the current CLASSIX release via PIP use:
 
