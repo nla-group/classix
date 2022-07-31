@@ -284,21 +284,7 @@ Any form of contribution is welcome. Please be free to post issues and pull requ
 [![Stargazers repo roster for @nla-group/classix](https://reporoster.com/stars/nla-group/classix)](https://github.com/nla-group/classix/stargazers)
 [![Forkers repo roster for @nla-group/classix](https://reporoster.com/forks/nla-group/classix)](https://github.com/nla-group/classix/network/members)
 
-## :paperclip: Citation 
 
-```bibtex
-@techreport{CG22b,
-  title   = {Fast and explainable clustering based on sorting},
-  author  = {Chen, Xinye and G\"{u}ttel, Stefan},
-  year    = {2022},
-  number  = {arXiv:2202.01456},
-  pages   = {25},
-  institution = {The University of Manchester},
-  address = {UK},
-  type    = {arXiv EPrint},
-  url     = {https://arxiv.org/abs/2202.01456}
-}
-```
 
 
 ## :memo: License
