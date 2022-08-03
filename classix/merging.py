@@ -114,7 +114,7 @@ def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
             den1 = np.count_nonzero(c1) / volume
             # den1 = splist[int(i), 2] / volume # density(splist[int(i), 2], volume = volume) 
             for j in select_stps.astype(int):
-                sp2 = data[splist[j, 0]] # splist[int(j), 3:]
+                sp2 = data[int(splist[j, 0])] # splist[int(j), 3:]
 
                 c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
                 den2 = np.count_nonzero(c2) / volume
