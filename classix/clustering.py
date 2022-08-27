@@ -1048,8 +1048,8 @@ class CLASSIX:
                 # self.x_pca = self.pca.fit_transform(self.data)
                 # self.s_pca = self.pca.transform(self.data[self.splist_[:, 0].astype(int)])
                 scaled_data = self.data - self.data.mean(axis=0)
-                _U, _s, self._V = svds(scaled_data, k=2, return_singular_vectors="u")
-                self.x_pca = np.matmul(scaled_data, self._V[np.argsort(_s)].T)
+                _U, self._s, self._V = svds(scaled_data, k=2, return_singular_vectors="u")
+                self.x_pca = np.matmul(scaled_data, self._V[np.argsort(self._s)].T)
                 self.s_pca = self.x_pca[self.splist_[:, 0].astype(int)]
                 
             elif self.data.shape[1] == 2:
@@ -1125,6 +1125,7 @@ class CLASSIX:
             elif isinstance(index1, list) or isinstance(index1, np.ndarray):
                 index1 = np.array(index1)
                 object1 = (index1 - self._mu) / self._scl # allow for out-sample data
+                object1 = np.matmul(object1, self._V[np.argsort(self._s)].T)
                 agg_label1 = np.argmin(np.linalg.norm(self.s_pca - object1, axis=1, ord=2)) # get the group index for object1
                 if self.data.shape[1] >= 2:
                     object1 = self.pca.transform(object1)
@@ -1415,6 +1416,7 @@ class CLASSIX:
                 elif isinstance(index2, list) or isinstance(index2, np.ndarray):
                     index2 = np.array(index2)
                     object2 = (index2 - self._mu) / self._scl # allow for out-sample data
+                    object2 = np.matmul(object2, self._V[np.argsort(self._s)].T)
                     if self.data.shape[1] >= 2:
                         object2 = self.pca.transform(object2)
                     agg_label2 = np.argmin(np.linalg.norm(self.s_pca - object2, axis=1, ord=2)) # get the group index for object2
