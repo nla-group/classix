@@ -407,7 +407,7 @@ class CLASSIX:
             print(self)
         
         self.splist_indices = [None]
-        self.index_data = None
+        self.index_data = []
         
         from . import __enable_cython__
         self.__enable_cython__ = __enable_cython__
@@ -994,19 +994,6 @@ class CLASSIX:
         
         """
         
-        # deprecated (24/07/2021)
-        # cols = ["NrPts"] 
-        # for i in range(self.splist_.shape[1] - 2):
-        #     cols = cols + ["feat." + str(i + 1)]
-        
-        # deprecated (24/07/2021)
-        # -----------------------------alternative method--------------------------------
-        # if self.splist_.shape[1] - 2 !=2:
-        #     pca = PCA(n_components=2)
-        #     x_pca = pca.fit_transform(self.splist_[:, 3:])
-        #     spdisplay = pd.DataFrame(np.hstack((self.splist_[:, 0:2], x_pca)), columns=cols)
-        # else:
-        #     spdisplay = pd.DataFrame(self.splist_[:, 1:], columns=cols)
         
         # -----------------------------second method--------------------------------
         if sp_bbox is None:
@@ -1027,26 +1014,23 @@ class CLASSIX:
             dp_fontsize = sp_fontsize
         
         # if self.cluster_color is None:
-        _cmap = plt.cm.get_cmap(cmap)
-        _interval = np.linspace(cmin, cmax, len(set(self.labels_))) 
-        self.cluster_color = list()
-        for c in _interval:
-            rgba = _cmap(c) 
-            color_hex = colors.rgb2hex(rgba) 
-            self.cluster_color.append(str(color_hex)) 
-                
-        # if self.cluster_color is None:
-        #     self.cluster_color = dict()
-        #     for i in np.unique(self.labels_):
-        #         self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
+        if cmap is not None:
+            _cmap = plt.cm.get_cmap(cmap)
+            _interval = np.linspace(cmin, cmax, len(set(self.labels_))) 
+            self.cluster_color = list()
+            for c in _interval:
+                rgba = _cmap(c) 
+                color_hex = colors.rgb2hex(rgba) 
+                self.cluster_color.append(str(color_hex)) 
+        else:
+            self.cluster_color = dict()
+            for i in np.unique(self.labels_):
+                self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
                 
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
             
             if self.data.shape[1] > 2:
                 warnings.warn("The group radius in the visualization might not be accurate.")
-                # self.pca = PCA(n_components=2)
-                # self.x_pca = self.pca.fit_transform(self.data)
-                # self.s_pca = self.pca.transform(self.data[self.splist_[:, 0].astype(int)])
                 scaled_data = self.data - self.data.mean(axis=0)
                 _U, self._s, self._V = svds(scaled_data, k=2, return_singular_vectors="u")
                 self.x_pca = np.matmul(scaled_data, self._V[np.argsort(self._s)].T)
@@ -1075,7 +1059,7 @@ class CLASSIX:
         dash_line = "--------"*5 # "--------"*(self.splist_.shape[1])
             
         indexlist = [i for i in kwargs.keys() if 'index' in re.split('(\d+)',i)]
-
+        indexvalues = [i for i in kwargs.values()]
         
         if index1 is None: # analyze in the general way with a global view
             if plot == True:
@@ -1125,10 +1109,13 @@ class CLASSIX:
             elif isinstance(index1, list) or isinstance(index1, np.ndarray):
                 index1 = np.array(index1)
                 object1 = (index1 - self._mu) / self._scl # allow for out-sample data
-                object1 = np.matmul(object1, self._V[np.argsort(self._s)].T)
+                
+                if self.data.shape[1] > 2:
+                    object1 = np.matmul(object1, self._V[np.argsort(self._s)].T)
+                    
                 agg_label1 = np.argmin(np.linalg.norm(self.s_pca - object1, axis=1, ord=2)) # get the group index for object1
-                if self.data.shape[1] >= 2:
-                    object1 = self.pca.transform(object1)
+                # if self.data.shape[1] >= 2:
+                #     object1 = self.pca.transform(object1)
                     
             else:
                 raise ValueError("Please enter a legal value for index1.")
@@ -1208,70 +1195,11 @@ class CLASSIX:
                     
                     plt.show()
                     
-                    # deprecated (24/07/2021):
-                    # if self.data.shape[1] != 2:
-                    #     pca = PCA(n_components=2)
-                    #     x_pca = pca.fit_transform(self.data)
-                    #     s_pca = pca.transform(self.splist_[:, 3:])
-                    #     
-                    #     # select indices
-                    #     x_pca = x_pca[self.labels_ == cluster_label1]
-                    #     s_pca = s_pca[self.sp_info.Cluster == cluster_label1]
-                    #     
-                    #     ax.scatter(x_pca[:, 0], x_pca[:, 1],
-                    #                 marker="*", c=self.labels_[self.labels_ == cluster_label1])
-                    #     ax.scatter(s_pca[:,0], s_pca[:,1], marker="p")
-                    #     
-                    #     ax.scatter(object1[0],  object1[1], marker="*", s=ind_marker_size)
-                    #     ax.text(object1[0], object1[1], s=str(index1), color=ind_color)
-                    #     
-                    #     for i in range(s_pca.shape[0]):
-                    #         ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
-                    #         ax.set_aspect('equal', adjustable='datalim')
-                    #         ax.text(s_pca[i, 0], s_pca[i, 1],
-                    #                  s=self.splist_[self.sp_info.Cluster == cluster_label1,1][i].astype(int).astype(str), 
-                    #                  bbox=sp_bbox)
-                    #     ax.plot()
-                    #     if savefig:
-                    #         if not os.path.exists("img"):
-                    #             os.mkdir("img")
-                    #             plt.savefig('img/ind1.pdf')
-                    #             print("successfully save")
-                    #     plt.show()
-                        
-                    # elif self.data.shape[1] == 2:
-                    #     x_pca = self.data.copy()
-                    #     s_pca = self.splist_[:, 3:].copy()
-                    #     
-                    #     # select indices
-                    #     x_pca = x_pca[self.labels_ == cluster_label1]
-                    #     s_pca = s_pca[self.sp_info.Cluster == cluster_label1]
-                    #     
-                    #     ax.scatter(x_pca[:,0], x_pca[:,1], 
-                    #                 marker="*", c=self.labels_[self.labels_ == cluster_label1])
-                    #     ax.scatter(s_pca[:, 0], s_pca[:, 1], marker="p")
-                    #     
-                    #     ax.scatter(object1[0],  object1[1], marker="*", s=ind_marker_size)
-                    #     ax.text(object1[0], object1[1], s=str(index1), color=ind_color)
-                    #     
-                    #     for i in range(s_pca.shape[0]):
-                    #         ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
-                    #         ax.set_aspect('equal', adjustable='datalim')
-                    #         plt.text(s_pca[i, 0], s_pca[i, 1],
-                    #                  s=self.splist_[self.sp_info.Cluster == cluster_label1,1][i].astype(int).astype(str), 
-                    #                  bbox=sp_bbox)
-                    #     ax.plot() 
-                    #     if savefig:
-                    #         if not os.path.exists("img"):
-                    #             os.mkdir("img")
-                    #             plt.savefig('img/ind1.pdf')
-                    #             print("successfully save")
-                    #     plt.show()
                 
                 if showsplist:
                     # print(f"A list of information for {index1} is shown below.")
                     select_sp_info = self.sp_info.iloc[[agg_label1]].copy(deep=True)
-                    select_sp_info.loc[:, 'Label'] = index1
+                    select_sp_info.loc[:, 'Label'] = str(np.round(index1,3))
                     print(dash_line)
                     print(select_sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
                     print(dash_line)       
@@ -1282,32 +1210,57 @@ class CLASSIX:
                     }
                 )
 
-                #  print("then assigned to cluster %(m_c)i." % {
-                #      "m_c":cluster_label1
-                # })
-
-                # if showsplist:
-                #     print(dash_line)
-                #     spdisplay = self.sp_info.iloc[[agg_label1],:]
-                #     spdisplay["Data points"] = [str(index1)]
-                #     spdisplay = spdisplay[["Data points", "Group", "NrPts", "Cluster", "Coordinates"]] 
-                #     print(spdisplay.to_string(justify='center', index=False, max_colwidth=max_colwidth))
-                #     print(dash_line)
-                
-
             # explain two objects relationship
             
             else: # explain(index1, index2, ...)
 
                 if len(indexlist) > 0: # A more general case, index1=.., index2=.., index3=..
+                                        # need to ensure all index input are with the same style, either index or data values
                     kwargs['index1'] = index1
                     kwargs['index2'] = index2
                     indexlist = ['index1', 'index2'] + indexlist
-                    group_labels_m = np.array([int(self.groups_[kwargs[i]]) for i in indexlist])
+                    indexvalues = [index1, index2] + indexvalues
+                    
+                    if isinstance(index1, int):
+                        objects = np.array([self.x_pca[kwargs[i]] for i in indexlist]) # self.data has been normalized
+                        group_labels_m = np.array([int(self.groups_[kwargs[i]]) for i in indexlist])
+                        
+                    elif isinstance(index1, str):
+                        objects = list()
+                        group_labels_m = list()
+                        
+                        for _index in indexlist:
+                            if _index in self.index_data:
+                                if len(set(self.index_data)) != len(self.index_data):
+                                    warnings.warn("The index of data is duplicate.")
+                                    _object = self.x_pca[np.where(self.index_data == index1)[0]][0]
+                                    temp_label = self.groups_(np.where(self.index_data == _index)[0][0])
+                                else:
+                                    _object = self.x_pca[self.index_data == index1][0]
+                                    temp_label = self.groups_(self.index_data == _index)
+                                    
+                                objects.append(_object)
+                                group_labels_m.append(temp_label)
+                                
+                            else:
+                                raise ValueError("Please enter a legal value for index.")
+                        
+                        objects = np.array(objects)
+                        group_labels_m = np.array(group_labels_m)
+                        
+                        
+                    elif isinstance(index1, list) or isinstance(index1, np.ndarray):
+                        objects = np.array([np.array((kwargs[i] - self._mu) / self._scl) for i in indexlist])
+
+                        if self.data.shape[1] > 2:
+                            objects = np.array([np.matmul(ii, self._V[np.argsort(self._s)].T) for ii in objects])
+
+                        group_labels_m = np.array([np.argmin(np.linalg.norm(self.s_pca - ii, axis=1, ord=2)) for ii in objects]) # get the group index for object1
+                        
+                    else:
+                        raise ValueError("Please enter a legal value for index.")
+                                
                     cluster_labels_m = np.array([self.label_change[i] for i in group_labels_m])
- 
-                    # group_ind = np.zeros(self.data.shape[0])
-                    # group_ind[list(set(group_labels_m))] = 1
 
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
@@ -1323,56 +1276,70 @@ class CLASSIX:
                         ax.add_patch(plt.Circle((s_pca[0], s_pca[1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
                         
                     if dp_fontsize is None:
-                        for index in indexlist:
-                            _index = kwargs[index]
-                            if isinstance(_index, int):
-                                _object = self.x_pca[_index] # self.data has been normalized
+                        # for index in indexlist:
+                        #     _index = kwargs[index]
+                        #     if isinstance(_index, int):
+                        #         _object = self.x_pca[_index] # self.data has been normalized
 
-                            elif isinstance(_index, str):
-                                if _index in self.index_data:
-                                    if len(set(self.index_data)) != len(self.index_data):
-                                        warnings.warn("The index of data is duplicate.")
-                                        _object = self.x_pca[np.where(self.index_data == _index)[0][0]][0]
-                                    else:
-                                        _object = self.x_pca[self.index_data == _index][0]
-                                else:
-                                    raise ValueError("Please enter a legal value for index.")
+                        #     elif isinstance(_index, str):
+                        #         if _index in self.index_data:
+                        #             if len(set(self.index_data)) != len(self.index_data):
+                        #                 warnings.warn("The index of data is duplicate.")
+                        #                 _object = self.x_pca[np.where(self.index_data == _index)[0][0]][0]
+                        #             else:
+                        #                 _object = self.x_pca[self.index_data == _index][0]
+                        #         else:
+                        #             raise ValueError("Please enter a legal value for index.")
 
-                            elif isinstance(_index, list) or isinstance(_index, np.ndarray):
-                                _index = np.array(_index)
-                                _object = (_index - self._mu) / self._scl # allow for out-sample data
-                                if self.data.shape[1] >= 2:
-                                    _object = self.pca.transform(_object)
+                        #     elif isinstance(_index, list) or isinstance(_index, np.ndarray):
+                        #         _index = np.array(_index)
+                        #         _object = (_index - self._mu) / self._scl # allow for out-sample data
+                        #         if self.data.shape[1] > 2:
+                        #             _object = np.matmul(_object, self._V[np.argsort(self._s)].T)
+                                    # _object = self.pca.transform(_object)
+                        #     else:
+                        #         raise ValueError("Please enter a legal value for index.")
+                        for ii in range(len(indexlist)):
+                            if isinstance(index1, int) or isinstance(index1, str):
+                                _index = indexvalues[ii]
                             else:
-                                raise ValueError("Please enter a legal value for index.")
-                        
-                            # _object = self.x_pca[index]
+                                _index = indexlist[ii]
+                                
+                            _object = objects[ii]
+                            
                             ax.text(_object[0], _object[1], s=str(_index), bbox=dp_bbox, color=ind_color)
                             ax.scatter(_object[0], _object[1], marker="*", s=ind_marker_size)
                     else:
-                        for index in indexlist:
-                            _index = kwargs[index]
-                            if isinstance(_index, int):
-                                _object = self.x_pca[_index] # self.data has been normalized
+                        # for index in indexlist:
+                        #     _index = kwargs[index]
+                        #     if isinstance(_index, int):
+                        #         _object = self.x_pca[_index] # self.data has been normalized
 
-                            elif isinstance(_index, str):
-                                if _index in self.index_data:
-                                    if len(set(self.index_data)) != len(self.index_data):
-                                        warnings.warn("The index of data is duplicate.")
-                                        _object = self.x_pca[np.where(self.index_data == _index)[0][0]][0]
-                                    else:
-                                        _object = self.x_pca[self.index_data == _index][0]
-                                else:
-                                    raise ValueError("Please enter a legal value for index.")
+                        #     elif isinstance(_index, str):
+                        #         if _index in self.index_data:
+                        #             if len(set(self.index_data)) != len(self.index_data):
+                        #                 warnings.warn("The index of data is duplicate.")
+                        #                 _object = self.x_pca[np.where(self.index_data == _index)[0][0]][0]
+                        #             else:
+                        #                 _object = self.x_pca[self.index_data == _index][0]
+                        #         else:
+                        #             raise ValueError("Please enter a legal value for index.")
 
-                            elif isinstance(_index, list) or isinstance(_index, np.ndarray):
-                                _index = np.array(_index)
-                                _object = (_index - self._mu) / self._scl # allow for out-sample data
-                                if self.data.shape[1] >= 2:
-                                    _object = self.pca.transform(_object)
+                        #     elif isinstance(_index, list) or isinstance(_index, np.ndarray):
+                        #         _index = np.array(_index)
+                        #         _object = (_index - self._mu) / self._scl # allow for out-sample data
+                        #         if self.data.shape[1] >= 2:
+                        #             _object = np.matmul(object_, self._V[np.argsort(self._s)].T)
+                                    # _object = self.pca.transform(_object)
+                        #     else:
+                        #         raise ValueError("Please enter a legal value for index.")
+                        
+                        for ii in range(len(indexlist)):
+                            if isinstance(index1, int) or isinstance(index1, str):
+                                _index = indexvalues[ii]
                             else:
-                                raise ValueError("Please enter a legal value for index.")
-                                
+                                _index = indexlist[ii]
+                            
                             ax.text(_object[0], _object[1], s=str(_index), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                             ax.scatter(_object[0], _object[1], marker="*", s=ind_marker_size)
                     
@@ -1416,9 +1383,12 @@ class CLASSIX:
                 elif isinstance(index2, list) or isinstance(index2, np.ndarray):
                     index2 = np.array(index2)
                     object2 = (index2 - self._mu) / self._scl # allow for out-sample data
-                    object2 = np.matmul(object2, self._V[np.argsort(self._s)].T)
-                    if self.data.shape[1] >= 2:
-                        object2 = self.pca.transform(object2)
+                    
+                    if self.data.shape[1] > 2:
+                        object2 = np.matmul(object2, self._V[np.argsort(self._s)].T)
+                    
+                    # if self.data.shape[1] >= 2:
+                    #     object2 = self.pca.transform(object2)
                     agg_label2 = np.argmin(np.linalg.norm(self.s_pca - object2, axis=1, ord=2)) # get the group index for object2
                 
                 else:
@@ -1427,7 +1397,11 @@ class CLASSIX:
                 if showsplist:
                     # print(f"A list of information for {index1} is shown below.")
                     select_sp_info = self.sp_info.iloc[[agg_label1, agg_label2]].copy(deep=True)
-                    select_sp_info.loc[:, 'Label'] = [index1, index2]
+                    if isinstance(index1, int) or isinstance(index1, str):
+                        select_sp_info.loc[:, 'Label'] = [index1, index2]
+                    else:
+                        select_sp_info.loc[:, 'Label'] = [str(np.round(index1,3)), str(np.round(index2, 3))]
+                        
                     print(dash_line)
                     print(select_sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
                     print(dash_line)       
@@ -1465,17 +1439,6 @@ class CLASSIX:
                 else:
                     sp1_str = self.s_pca[agg_label1] # self.splist_[agg_label1, 3:]
                     sp2_str = self.s_pca[agg_label2] # self.splist_[agg_label2, 3:]
-                    # print("""The two objects are assigned to different groups through aggregation.""")
-
-                    # print(
-                    # """The first object is aggregated to group %(agg_id)i associated with starting point %(sp)s with respect to radius %(radius)s, then assigned to cluster label %(m_c)i.""" % {
-                    #     "agg_id":agg_label1, "sp":sp1_str, "radius":self.radius, "m_c":cluster_label1
-                    # })
-
-                    # print(
-                    # """The second object is aggregated to group %(agg_id)i associated with starting point %(sp)s with respect to radius %(radius)s, then assigned to cluster label %(m_c)i.""" % {
-                    #     "agg_id":agg_label2, "sp":sp2_str, "radius":self.radius, "m_c":cluster_label2
-                    # })
                     
                     if self.connected_pairs_ is None:
                         # distm = pairwise_distances(self.splist_[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs)
@@ -1512,25 +1475,6 @@ class CLASSIX:
                                "connected":connected_paths_vis}
                         )
                     else: 
-                        # alternative expression 1
-                        # print("The two objects are allocated to two different cluster.")
-                        # print(
-                        # """The first object is allocated to the cluster %(c_id1)s via %(connected1)s with cluster center %(cen1)s
-                        # while the second object is allocated to the cluster %(c_id2)s via %(connected2)s with cluster center %(cen2)s""" % {
-                        # "c_id1":cluster_label1, "connected1": connected_groups["object 1"], "cen1":cen1_str,
-                        # "c_id2":cluster_label2, "connected2": connected_groups["object 2"], "cen1":cen2_str
-                        #     }
-                        # )
-                        # print("The two objects are allocated to two different cluster.")
-                        
-                        # alternative expression 2
-                        # print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s via connected groups %(connected1)s.""" % {
-                        #     "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1, "connected1": connected_groups["object 1"]
-                        # })
-
-                        # print("""\nThe data point %(index2)s is in group %(agg_id2)i, which has been merged into cluster %(c_id2)s via connected groups %(connected2)s.""" % {
-                        #     "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2, "connected2": connected_groups["object 2"]
-                        # })
                         
                         connected_paths = []
                         print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
@@ -1562,12 +1506,22 @@ class CLASSIX:
                     
                     ax.scatter(s_pca[:,0], s_pca[:,1], marker="p")
                     
-                    if dp_fontsize is None:
-                        ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=ind_color)
-                        ax.text(object2[0], object2[1], s=str(index2), bbox=dp_bbox, color=ind_color)
+                    if isinstance(index1, int) or isinstance(index1, str):
+                        if dp_fontsize is None:
+                            ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=ind_color)
+                            ax.text(object2[0], object2[1], s=str(index2), bbox=dp_bbox, color=ind_color)
+                        else:
+                            ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
+                            ax.text(object2[0], object2[1], s=str(index2), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                     else:
-                        ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
-                        ax.text(object2[0], object2[1], s=str(index2), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
+                        if dp_fontsize is None:
+                            ax.text(object1[0], object1[1], s='index 1', bbox=dp_bbox, color=ind_color)
+                            ax.text(object2[0], object2[1], s='index 2', bbox=dp_bbox, color=ind_color)
+                        else:
+                            ax.text(object1[0], object1[1], s='index 1', fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
+                            ax.text(object2[0], object2[1], s='index 2', fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
+                        
+
                     
                     ax.scatter(object1[0], object1[1], marker="*", s=ind_marker_size)
                     ax.scatter(object2[0], object2[1], marker="*", s=ind_marker_size)
@@ -1607,87 +1561,6 @@ class CLASSIX:
                         
                     plt.show()
                     
-                    # deprecated (24/07/2021):
-                    # if self.data.shape[1] > 2:
-                    #     pca = PCA(n_components=2)
-                    #     x_pca = pca.fit_transform(self.data)
-                    #     s_pca = pca.transform(self.splist_[:, 3:])
-                    #     
-                    #     # select indices
-                    #     x_pca = x_pca[(self.labels_ == cluster_label1) | (self.labels_ == cluster_label2)]
-                    #     s_pca = s_pca[(self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2)]
-                    #     
-                    #     ax.scatter(x_pca[:, 0], x_pca[:, 1],
-                    #                 marker="*", c=self.labels_[(self.labels_ == cluster_label1) | (self.labels_ == cluster_label2)])
-                    #     ax.scatter(s_pca[:,0], s_pca[:,1], marker="p")
-                    #     
-                    #     ax.scatter(object1[0],  object1[1], marker="*", s=ind_marker_size)
-                    #     ax.text(object1[0], object1[1], s=str(index1), color=ind_color)
-                    #     
-                    #     ax.scatter(object2[0],  object2[1], marker="*", s=ind_marker_size)
-                    #     ax.text(object2[0], object2[1], s=str(index2), color=ind_color)
-                    #         
-                    #     for i in range(s_pca.shape[0]):
-                    #         ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
-                    #         ax.set_aspect('equal', adjustable='datalim')
-                    #         ax.text(s_pca[i, 0], s_pca[i, 1], 
-                    #             s=self.sp_info.Group[(self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2)].values[i].astype(int).astype(str),
-                    #             bbox=sp_bbox)
-                    #     
-                    #     ax.plot()
-                    #     if savefig:
-                    #         if not os.path.exists("img"):
-                    #             os.mkdir("img")
-                    #             plt.savefig('img/ind1_ind2.pdf')
-                    #             print("successfully save")
-                    #     plt.show()
-                    #     
-                    # elif self.data.shape[1] == 2:
-                    #     x_pca = self.data.copy()
-                    #     s_pca = self.splist_[:, 3:].copy()
-                    #     
-                    #     # select indices
-                    #     x_pca = x_pca[(self.labels_ == cluster_label1) | (self.labels_ == cluster_label2)]
-                    #     s_pca = s_pca[(self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2)]
-                    #     
-                    #     ax.scatter(x_pca[:,0], x_pca[:,1], 
-                    #                 marker="*", c=self.labels_[(self.labels_ == cluster_label1) | (self.labels_ == cluster_label2)])
-                    #     ax.scatter(s_pca[:, 0], s_pca[:, 1], marker="p")
-                    #     
-                    #     ax.scatter(object1[0],  object1[1], marker="*", s=ind_marker_size)
-                    #     ax.text(object1[0], object1[1], str(index1), color=ind_color)
-                    #     
-                    #     ax.scatter(object2[0],  object2[1], marker="*", s=ind_marker_size)
-                    #     ax.text(object2[0], object2[1], str(index2), color=ind_color)
-                    #     
-                    #     for i in range(s_pca.shape[0]):
-                    #         ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
-                    #         ax.set_aspect('equal', adjustable='datalim')
-                    #         ax.text(s_pca[i, 0], s_pca[i, 1],
-                    #             s=self.sp_info.Group[(self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2)].values[i].astype(int).astype(str), 
-                    #             bbox=sp_bbox)
-                    #     
-                    #     ax.plot()
-                    #     if savefig:
-                    #         if not os.path.exists("img"):
-                    #             os.mkdir("img")
-                    #             plt.savefig('img/ind1_ind2.pdf')
-                    #             print("successfully save")
-                    #     plt.show()
-                    #     
-                    # else:
-                    #     print("This function is restricted to multidimensional (dimension greater than or equal to 2) data.")
-                        
-
-                        
-                # if showsplist:
-                #     print(dash_line)
-                #     spdisplay = self.sp_info.iloc[[agg_label1, agg_label2],:]
-                #     spdisplay["Data points"] = [str(index1), str(index2)]
-                #     spdisplay = spdisplay[["Data points", "Group", "NrPts", "Cluster", "Coordinates"]] 
-                #     print(spdisplay.to_string(justify='center', index=False, max_colwidth=max_colwidth))
-                #     print(dash_line)
-                
         return 
     
     
