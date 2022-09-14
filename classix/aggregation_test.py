@@ -66,24 +66,26 @@ def aggregate(data, sorting="pca", tol=0.5, early_stopping=False): # , verbose=1
     fdim = data.shape[1]
     
     if sorting == "norm-mean" or sorting == "norm-orthant": 
-        c_data = data.copy()
-        sort_vals = np.linalg.norm(c_data, ord=2, axis=1)
+        sort_vals = np.linalg.norm(data, ord=2, axis=1)
         ind = np.argsort(sort_vals)
 
     elif sorting == "pca":
-        c_data = data - data.mean(axis=0)
         if data.shape[1]>1:
-            gemm = get_blas_funcs("gemm", [c_data.T, c_data])
-            _, U1 = eigh(gemm(1, c_data.T, c_data), subset_by_index=[fdim-1, fdim-1])
-            sort_vals = c_data@U1.reshape(-1)
-            # print( U1, s1, _)
+            if fdim <= 3: # memory inefficient
+                gemm = get_blas_funcs("gemm", [data.T, data])
+                _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
+                sort_vals = data@U1.reshape(-1)
+            else:
+                U1, s1, _ = svds(data, k=1, return_singular_vectors="u")
+                sort_vals = U1[:,0]*s1[0]
+
         else:
-            sort_vals = c_data[:,0]
+            sort_vals = data[:,0]
         sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
         ind = np.argsort(sort_vals)
 
     else: # no sorting
-        sort_vals = np.zeros(len_ind) # useless, blank
+        sort_vals = np.zeros(len_ind) 
         ind = np.arange(len_ind)
         
     lab = 0
@@ -95,7 +97,7 @@ def aggregate(data, sorting="pca", tol=0.5, early_stopping=False): # , verbose=1
         if labels[sp] >= 0:
             continue
         else:
-            clustc = c_data[sp,:] 
+            clustc = data[sp,:] 
             labels[sp] = lab
             num_group = 1
 
@@ -107,7 +109,7 @@ def aggregate(data, sorting="pca", tol=0.5, early_stopping=False): # , verbose=1
                 if (sort_vals[j] - sort_vals[sp] > tol):
                     break       
 
-            dat = clustc - c_data[j,:]
+            dat = clustc - data[j,:]
             dist = np.inner(dat, dat)
             nr_dist += 1
                 
@@ -117,9 +119,6 @@ def aggregate(data, sorting="pca", tol=0.5, early_stopping=False): # , verbose=1
 
         splist.append([sp, lab] + [num_group] + list(data[sp,:]) ) 
         lab += 1
-
-    # if verbose == 1:
-    #    print("aggregate {} groups".format(len(np.unique(labels))))
 
     return np.array(labels), splist, nr_dist
 

@@ -34,18 +34,11 @@ import collections
 import numpy as np
 import pandas as pd
 from numpy.linalg import norm
-#import pyximport; pyximport.install()
 from matplotlib import pyplot as plt
 import matplotlib.colors as colors
 from scipy.sparse.linalg import svds
-# from sklearn.decomposition import PCA
+from scipy.sparse.csgraph import connected_components
 from scipy.sparse import csr_matrix, _sparsetools
-# from .merging import minimum_spanning_tree_agglomerate 
-# from scipy.sparse import csr_matrix
-# from scipy.sparse.csgraph import shortest_path
-np.random.seed(0)
-
-
 
 
             
@@ -580,9 +573,9 @@ class CLASSIX:
         # elif method == "agg_sps": 
         
         data = (data - self._mu) / self._scl
+        indices = self.splist_[:,0].astype(int)
         for i in range(len(data)):
-            splabel = np.argmin(np.linalg.norm(data[self.splist_[:,0]] - data[i], axis=1, ord=2)) 
-            #  np.argmin(np.linalg.norm(self.splist_[:,3:] - data[i], axis=1, ord=2))
+            splabel = np.argmin(np.linalg.norm(data[indices] - data[i], axis=1, ord=2))
             labels.append(self.label_change[splabel])
 
         # else:
@@ -1706,7 +1699,7 @@ class CLASSIX:
         #     P = self.splist_[:, 3:]
         # else:
         #     P = self.splist_[:, 3:]*self._scl + self._mu
-        P = self.data[self.splist[:, 0]]
+        P = self.data[self.splist_[:, 0].astype(int)]
         link_list = return_csr_matrix_indices(csr_matrix(distm))
         
         fig, ax = plt.subplots(figsize=figsize)
