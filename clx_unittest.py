@@ -36,7 +36,18 @@ def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
 
 
 class TestClassix(unittest.TestCase):
-
+    
+    def test_data_loader(self):
+        checkpoint = 1
+        for dname in ['Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 'Phoneme', 'Wine']:
+            try:
+                _, _ = loadData(name=dname)
+            except:
+                checkpoint = 0
+                
+        self.assertEqual(checkpoint, 1)
+            
+            
     def test_distance_cluster(self):
         vdu_signals = loadData('vdu_signals')
 
@@ -51,7 +62,7 @@ class TestClassix(unittest.TestCase):
             checkpoint = np.load('classix/data/checkpoint_distance_' + str(np.round(tol,2)) + '.npy')
             comp = clx.labels_ == checkpoint
             assert(comp.all())
-
+    
             
     def test_density_cluster(self):
         vdu_signals = loadData('vdu_signals')
@@ -139,7 +150,7 @@ class TestClassix(unittest.TestCase):
 
         
     def test_agg_early_stop(self):
-        X, y = data.make_blobs(n_samples=1000, centers=10, n_features=2, random_state=0)
+        X, y = data.make_blobs(n_samples=1000, centers=10, n_features=5, random_state=0)
 
         for TOL in np.arange(0.1, 1, 0.1):
             ort_nr_dist_true, ort_labels_true = exp_aggregate_nr_dist(X, tol=TOL, sorting='norm-orthant', early_stopping=True)
