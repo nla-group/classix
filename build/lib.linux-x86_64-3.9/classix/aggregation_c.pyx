@@ -120,7 +120,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
         labels[sp] = lab
         num_group = 1
 
-        for j in ind[i:]:
+        for j in ind[i+1:]:
             if labels[j] != -1:
                 continue
             

@@ -107,7 +107,7 @@ def aggregate(data, sorting="pca", tol=0.5): # , verbose=1
             labels[sp] = lab
             num_group = 1
 
-        for j in ind[i:]:
+        for j in ind[i+1:]:
             if labels[j] >= 0:
                 continue
 
