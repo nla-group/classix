@@ -98,7 +98,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
         labels[sp] = lab
         num_group = 1
             
-        for ii in range(i, len_ind): 
+        for ii in range(i+1, len_ind): 
             j = ind[ii]
                     
             if labels[j] != -1:
