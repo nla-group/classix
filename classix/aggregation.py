@@ -29,7 +29,7 @@
 
 import numpy as np
 # from sklearn.decomposition import PCA
-# from scipy.sparse.linalg import svds
+from scipy.sparse.linalg import svds
 from scipy.linalg import get_blas_funcs, eigh
 
 # python implementation for aggregation
