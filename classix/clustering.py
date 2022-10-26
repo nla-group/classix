@@ -1747,7 +1747,7 @@ class CLASSIX:
         for c in set(labels):
             indc = [i for i in range(data.shape[0]) if labels[i] == c]
             indc = (labels==c)
-            center = [-1, c] + np.mean(data[indc,:], axis=1).tolist()
+            center = [-1, c] + np.mean(data[indc,:], axis=0).tolist()
             centers.append( center )
         return centers
 
