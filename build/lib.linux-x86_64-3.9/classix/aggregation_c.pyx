@@ -99,11 +99,12 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
                 _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
                 sort_vals = data@U1.reshape(-1)
             else:
-                U1, s1, _ = svds(data, k=1, return_singular_vectors="u")
+                U1, s1, _ = svds(data, k=1, return_singular_vectors=True)
                 sort_vals = U1[:,0]*s1[0]
 
         else:
             sort_vals = data[:,0]
+            
         sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
         ind = np.argsort(sort_vals)
 

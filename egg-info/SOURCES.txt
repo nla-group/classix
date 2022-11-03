@@ -35,6 +35,12 @@ classix/__pycache__/aggregation_test.cpython-39.pyc
 classix/__pycache__/clustering.cpython-39.pyc
 classix/__pycache__/merging.cpython-39.pyc
 classix/data/.gitattributes
+classix/data/checkpoint_density_0.5.npy
+classix/data/checkpoint_density_0.6.npy
+classix/data/checkpoint_density_0.7.npy
+classix/data/checkpoint_density_0.8.npy
+classix/data/checkpoint_density_0.9.npy
+classix/data/checkpoint_density_1.0.npy
 classix/data/checkpoint_distance_0.5.npy
 classix/data/checkpoint_distance_0.6.npy
 classix/data/checkpoint_distance_0.7.npy
