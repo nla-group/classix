@@ -17,7 +17,7 @@ Built-in Data
     from sklearn import metrics
     from sklearn.cluster import DBSCAN
     import matplotlib.pyplot as plt
-    from classix import CLASSIX, load_data
+    from classix import CLASSIX, loadData
     from quickshift.QuickshiftPP import * # download from https://github.com/google/quickshift
 
 Then we load the data:

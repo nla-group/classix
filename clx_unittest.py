@@ -20,24 +20,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import classix
 import unittest
 import numpy as np
 import sklearn.datasets as data
-from classix import CLASSIX, loadData
+from classix import CLASSIX, loadData, cython_is_available
+from classix.clustering import calculate_cluster_centers
 from classix import aggregation_test, novel_normalization
 
 
 def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
     data, (_mu, _scl) = novel_normalization(data, sorting)
-    labels, splist, nr_dist = aggregation_test.aggregate(data, sorting=sorting,
-                                                     tol=tol, early_stopping=early_stopping
+    labels, splist, nr_dist = aggregation_test.aggregate(
+                         data, 
+                         sorting=sorting,
+                         tol=tol, 
+                         early_stopping=early_stopping
     )
     return nr_dist, labels
 
 
 class TestClassix(unittest.TestCase):
     
-                    
+    def test_cython_check(self):
+        checkpoint = 1
+        try:
+            cython_is_available()
+        except:
+            checkpoint = 0
+        self.assertEqual(checkpoint, 1)
+        
+        
     def test_distance_cluster(self):
         vdu_signals = loadData('vdu_signals')
 
@@ -69,7 +82,47 @@ class TestClassix(unittest.TestCase):
             comp = clx.labels_ == checkpoint
             assert(comp.all())
 
-            
+    def non_cython_version(self):
+        classix.__enable_cython__ = False
+        checkpoint = 1
+        for dim in range(1, 5):
+            try:
+                X, _ = data.make_blobs(n_samples=200, 
+                                     centers=3, n_features=dim, 
+                                     random_state=42
+                                    )
+                clx = CLASSIX(sorting='pca', group_merging='density')
+                clx.fit_transform(X)
+                
+                clx = CLASSIX(sorting='pca', group_merging='distance')
+                clx.fit_transform(X)
+            except:
+                checkpoint = 0
+                break
+        
+        self.assertEqual(checkpoint, 1)
+    
+    def cython_version(self):
+        classix.__enable_cython__ = True
+        checkpoint = 1
+        for dim in range(1, 5):
+            try:
+                X, _ = data.make_blobs(n_samples=200, 
+                                     centers=3, n_features=dim, 
+                                     random_state=42
+                                    )
+                clx = CLASSIX(sorting='pca', group_merging='density')
+                clx.fit_transform(X)
+                
+                clx = CLASSIX(sorting='pca', group_merging='distance')
+                clx.fit_transform(X)
+            except:
+                checkpoint = 0
+                break
+        
+        self.assertEqual(checkpoint, 1)
+        
+        
     def test_scale_linkage(self):
         TOL = 0.1 
         random_state = 1
@@ -189,11 +242,49 @@ class TestClassix(unittest.TestCase):
         self.assertEqual(checkpoint, 1)
    
 
+    def test_explain_hdim(self):
+        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=20, 
+                               cluster_std=1.5, random_state=1
+        )
+        checkpoint = 1
+        try:
+            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
+            clx.fit_transform(X)
+            clx.predict(X)
+            clx.explain(plot=True, figsize=(10,10),  savefig=True)
+            clx.explain(0,  plot=True, savefig=True)
+            clx.explain(3, 2000,  plot=True, savefig=False)
+            clx.explain(0, 2008,  plot=True, savefig=True)
+            clx.explain(index1=0, index2=2008, index3=100,  plot=True, savefig=True)
+            # clx.explain(plot=True, figsize=(10,10), sp_fontsize=10, savefig=False)
+            # clx.explain(0,  plot=True, sp_fontsize=10, savefig=False)
+            # clx.explain(3, 2000,  plot=True, sp_fontsize=10, savefig=False)
+            # clx.explain(0, 2008,  plot=True, sp_fontsize=10, savefig=False)
+        except:
+            checkpoint = 0
+
+        self.assertEqual(checkpoint, 1)
+
+        
     def test_built_in_data(self):
         checkpoint = 1
         try:
             for dn in ['vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 'Phoneme', 'Wine']:
                 loadData(name=dn)
+        except:
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+        
+        
+    def test_misc(self):
+        checkpoint = 1
+        try:
+            X, y = data.make_blobs(n_samples=200, 
+                                     centers=3, n_features=2, 
+                                     random_state=42
+                                    )
+            centers = calculate_cluster_centers(X, y)
         except:
             checkpoint = 0
             

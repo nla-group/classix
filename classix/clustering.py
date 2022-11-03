@@ -41,7 +41,34 @@ from scipy.sparse.csgraph import connected_components
 from scipy.sparse import csr_matrix, _sparsetools
 
 
-            
+def cython_is_available():
+    "Check if CLASSIX is using cython."
+    from . import __enable_cython__
+    if __enable_cython__:
+        try:
+            # %load_ext Cython
+            # !python3 setup.py build_ext --inplace
+            import scipy, numpy
+            if scipy.__version__ == '1.8.0' or numpy.__version__ < '1.22.0':
+                from .aggregation_c import aggregate 
+                # cython without memory view, solve the error from scipy ``TypeError: type not understood``
+            else:
+                from .aggregation_cm import aggregate
+                # cython with memory view
+            from .merging_cm import fast_agglomerate
+            return True
+
+        except (ModuleNotFoundError, ValueError):
+            from .aggregation import aggregate 
+            from .merging import fast_agglomerate
+            warnings.warn("This CLASSIX installation is not using Cython.")
+            return False
+    else:
+        
+        warnings.warn("This CLASSIX installation is not using Cython. Please try to set __enable_cython__ to True to enable Cython if needed.")
+        return False
+    
+    
 def loadData(name='vdu_signals'):
     """Obtain the built-in data.
     
@@ -2143,11 +2170,10 @@ def novel_normalization(data, base):
 
 def calculate_cluster_centers(data, labels):
     """Calculate the mean centers of clusters from given data."""
-    ulabels = set(labels)
-    centers = np.zeros((len(ulabels), data.shape[1]))
-    for c in ulabels:
-        indc = (labels==c)
-        centers[c] = np.mean(data[indc,:], axis=0)
+    classes = np.unique(labels)
+    centers = np.zeros((len(classes), data.shape[1]))
+    for c in classes:
+        centers[c] = np.mean(data[labels==c,:], axis=0)
     return centers
 
 
