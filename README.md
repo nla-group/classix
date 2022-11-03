@@ -53,7 +53,7 @@ CLASSIX has the following dependencies:
 
 Note: using numpy>=1.22, CLASSIX will support memoryview, it's even faster.  
 
-If you want to compare the speed with clustering algorithms in scikit-learn or other packages combined with Cython, please use CLASSIX of Cython installation for a fair comparison.  To double check, if you successfully get Cython installation, please use:
+If you want to compare the speed with other clustering algorithms in scikit-learn or other packages combined with Cython, please use CLASSIX of Cython installation for a fair comparison.  To double check, if you successfully get Cython installation, please use:
 
 ```Python
 import classix
