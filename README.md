@@ -59,6 +59,12 @@ If you want to compare the speed with other clustering algorithms in scikit-lear
 import classix
 classix.cython_is_available()
 ```
+Also, you can disable Cython easily using
+
+
+```Python
+classix.__enable_cython__ = False
+```
 
 ### pip (recommended)
 To install the current CLASSIX release via PIP use:
