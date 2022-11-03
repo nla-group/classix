@@ -1052,7 +1052,7 @@ class CLASSIX:
             if self.data.shape[1] > 2:
                 warnings.warn("The group radius in the visualization might not be accurate.")
                 scaled_data = self.data - self.data.mean(axis=0)
-                _U, self._s, self._V = svds(scaled_data, k=2, return_singular_vectors="u")
+                _U, self._s, self._V = svds(scaled_data, k=2, return_singular_vectors=True)
                 self.x_pca = np.matmul(scaled_data, self._V[np.argsort(self._s)].T)
                 self.s_pca = self.x_pca[self.splist_[:, 0].astype(int)]
                 
