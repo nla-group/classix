@@ -251,11 +251,11 @@ class TestClassix(unittest.TestCase):
             clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
             clx.fit_transform(X)
             clx.predict(X)
-            clx.explain(plot=True, figsize=(10,10),  savefig=True)
-            clx.explain(0,  plot=True, savefig=True)
+            clx.explain(plot=True, figsize=(10,10),  savefig=False)
+            clx.explain(0,  plot=True, savefig=False)
             clx.explain(3, 2000,  plot=True, savefig=False)
-            clx.explain(0, 2008,  plot=True, savefig=True)
-            clx.explain(index1=0, index2=2008, index3=100,  plot=True, savefig=True)
+            clx.explain(0, 2008,  plot=True, savefig=False)
+            clx.explain(index1=0, index2=2008, index3=100,  plot=True, savefig=False)
             
         except:
             checkpoint = 0
