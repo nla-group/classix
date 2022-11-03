@@ -49,7 +49,7 @@ def cython_is_available():
             # %load_ext Cython
             # !python3 setup.py build_ext --inplace
             import scipy, numpy
-            if scipy.__version__ == '1.8.0' or numpy.__version__ < '1.22.0':
+            if scipy.__version__ >= '1.8.0' or numpy.__version__ >= '1.22.0':
                 from .aggregation_c import aggregate 
                 # cython without memory view, solve the error from scipy ``TypeError: type not understood``
             else:
@@ -437,7 +437,7 @@ class CLASSIX:
                 # %load_ext Cython
                 # !python3 setup.py build_ext --inplace
                 import scipy, numpy
-                if scipy.__version__ == '1.8.0' or numpy.__version__ < '1.22.0':
+                if scipy.__version__ >= '1.8.0' or numpy.__version__ >= '1.22.0':
                     from .aggregation_c import aggregate 
                     # cython without memory view, solve the error from scipy ``TypeError: type not understood``
                 else:

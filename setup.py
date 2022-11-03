@@ -3,7 +3,7 @@ import logging
 import setuptools
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 
-_version="0.7.2"
+_version="0.7.3"
 logging.basicConfig()
 log = logging.getLogger(__file__)
 

@@ -76,6 +76,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
     if sorting == "norm-mean" or sorting == "norm-orthant":
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
         ind = np.argsort(sort_vals)
+    
     elif sorting == "pca":
         if data.shape[1]>1:
             U1, s1, _ = svds(data, k=1, return_singular_vectors="u")
@@ -84,6 +85,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
             sort_vals = data[:,0]
         sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
         ind = np.argsort(sort_vals)
+    
     else: # no sorting
         sort_vals = np.zeros(len_ind)
         ind = np.arange(len_ind)
