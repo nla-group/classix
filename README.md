@@ -103,7 +103,7 @@ from classix import CLASSIX
 X, y = datasets.make_blobs(n_samples=5000, centers=2, n_features=2, random_state=1)
 
 # Call CLASSIX
-clx = CLASSIX(radius=0.5, verbose=0)
+clx = CLASSIX(radius=0.35, verbose=0)
 clx.fit(X)
 ```
 
