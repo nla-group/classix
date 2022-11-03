@@ -246,16 +246,20 @@ class TestClassix(unittest.TestCase):
         X, y = data.make_blobs(n_samples=5000, centers=2, n_features=20, 
                                cluster_std=1.5, random_state=1
         )
+        checkpoint = 1
+        try:
+            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
+            clx.fit_transform(X)
+            clx.predict(X)
+            clx.explain(plot=True, figsize=(10,10),  savefig=False)
+            clx.explain(0,  plot=True, savefig=False)
+            clx.explain(3, 2000,  plot=True, savefig=False)
+            clx.explain(0, 2008,  plot=True, savefig=False)
+            clx.explain(index1=0, index2=2008, index3=100,  plot=True, savefig=False)
+        except:
+            checkpoint = 0
 
-        clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
-        clx.fit_transform(X)
-        clx.predict(X)
-        clx.explain(plot=True, figsize=(10,10),  savefig=False)
-        clx.explain(0,  plot=True, savefig=False)
-        clx.explain(3, 2000,  plot=True, savefig=False)
-        clx.explain(0, 2008,  plot=True, savefig=False)
-        clx.explain(index1=0, index2=2008, index3=100,  plot=True, savefig=False)
-            
+        self.assertEqual(checkpoint, 1)
 
         
     def test_built_in_data(self):
