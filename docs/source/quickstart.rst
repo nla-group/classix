@@ -11,7 +11,7 @@ Installation guide
 To ensure most users can install it on their local machine, we try to keep the installing requirements for CLASSIX as low as possible. CLASSIX has the following dependencies for its clustering functionality:
 
     * cython (recommend >=0.27)
-    * numpy>=1.3.0 (recommend >=1.20)
+    * numpy>=1.7.2 (recommend >=1.20)
     * scipy
     * requests
     
@@ -20,6 +20,11 @@ and requires the following packages for data visualization:
     * matplotlib
     * pandas
     
+ 
+**If you want to compare the speed with other clustering algorithms in scikit-learn or other packages combined with Cython, please use CLASSIX of Cython installation for a fair comparison.**
+
+Note: using numpy<=1.22, CLASSIX will support Cython with memoryview, it's even faster.  
+
 I. **pip**
 
 To install the current release via PIP use:
@@ -124,11 +129,18 @@ If you have any instaling issues, please be free to submit your questions in the
 
 .. admonition:: Note
 
+   You can check if you Cython is installed properly:
+   
+   ``import classix; classix.cython_is_available()``
+
    If you want to disable Cython, or compare the runtime between Cython and Python, you can simply set by 
   
    ``import classix; classix.__enable_cython__ = False``
    
    And then your following CLASSIX implementation will disable Cython compiling. If you can Cython back, just set ``classix.__enable_cython__ = True``. 
+
+   
+
 
 
 Quick start
