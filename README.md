@@ -33,6 +33,7 @@ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here ar
 
 ``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter ``radius`` for the group aggregation and a ``minPts`` parameter controlling the minimal cluster size. 
 
+
 **Here is a video abstract of CLASSIX:** 
 
 [<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png width=600 />](https://www.youtube.com/watch?v=K94zgRjFEYo)
@@ -44,15 +45,17 @@ A detailed documentation (work in progress), including tutorials, is available a
 CLASSIX has the following dependencies:
 
 - cython (recommend >= 0.27)
-- numpy >=1.3.0 (recommend >= 1.20.0)
+- numpy >=1.7.3 (recommend >= 1.20.0)
 - scipy >= 1.2.1
 - requests
 - matplotlib
 - pandas
 
-Note: using numpy>=1.22, CLASSIX will support memoryview, it's even faster.  
 
 **If you want to compare the speed with other clustering algorithms in scikit-learn or other packages combined with Cython, please use CLASSIX of Cython installation for a fair comparison.  To double check, if you successfully get Cython installation, please use:**
+
+Note: using numpy<=1.22, CLASSIX will support Cython with memoryview, it's even faster.  
+
 
 ```Python
 import classix
