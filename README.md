@@ -52,7 +52,7 @@ CLASSIX has the following dependencies:
 - pandas
 
 
-**If you want to compare the speed with other clustering algorithms in scikit-learn or other packages combined with Cython, please use CLASSIX of Cython installation for a fair comparison.  To double check, if you successfully get Cython installation, please use:**
+**If you want to compare the speed with other clustering algorithms in scikit-learn or other packages combined with Cython, please use CLASSIX of Cython installation for a fair comparison.  To double check whether you successfully get Cython installation or not, please use:**
 
 Note: using numpy<=1.22, CLASSIX will support Cython with memoryview, it's even faster.  
 
