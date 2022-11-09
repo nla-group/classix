@@ -41,7 +41,7 @@ from scipy.sparse.csgraph import connected_components
 from scipy.sparse import csr_matrix, _sparsetools
 
 
-def cython_is_available(verbose=1):
+def cython_is_available(verbose=0):
     "Check if CLASSIX is using cython."
     
     __cython_type__ = "momoryview"

@@ -41,8 +41,11 @@ from scipy.sparse.csgraph import connected_components
 from scipy.sparse import csr_matrix, _sparsetools
 
 
-def cython_is_available():
+def cython_is_available(verbose=0):
     "Check if CLASSIX is using cython."
+    
+    __cython_type__ = "momoryview"
+    
     from . import __enable_cython__
     if __enable_cython__:
         try:
@@ -51,21 +54,31 @@ def cython_is_available():
             import scipy, numpy
             if scipy.__version__ >= '1.8.0' or numpy.__version__ >= '1.22.0':
                 from .aggregation_c import aggregate 
+                __cython_type__ =  "trivial"
                 # cython without memory view, solve the error from scipy ``TypeError: type not understood``
             else:
                 from .aggregation_cm import aggregate
                 # cython with memory view
+                # Typed memoryviews allow efficient access to memory buffers, such as those underlying NumPy arrays, without incurring any Python overhead. 
+                
+            if verbose:
+                if __cython_type__ == "momoryview":
+                    print("This CLASSIX is using Cython memoryview.")
+                else:
+                    print("This CLASSIX is not using Cython memoryview.")
+                    
             from .merging_cm import fast_agglomerate
             return True
 
         except (ModuleNotFoundError, ValueError):
             from .aggregation import aggregate 
             from .merging import fast_agglomerate
-            warnings.warn("This CLASSIX installation is not using Cython.")
+            if verbose:
+                print("This CLASSIX is not using Cython.")
             return False
     else:
-        
-        warnings.warn("This CLASSIX installation is not using Cython. Please try to set __enable_cython__ to True to enable Cython if needed.")
+        if verbose:
+            print("Currently, the Cython implementation is disabled. Please try to set ``__enable_cython__`` to True to enable Cython if needed.")
         return False
     
     

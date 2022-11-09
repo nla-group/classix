@@ -1,9 +1,9 @@
-import numpy
 import logging
 import setuptools
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
+from Cython import Distutils
 
-_version="0.7.4"
+_version="0.7.5"
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
@@ -12,7 +12,16 @@ ext_errors = (CCompilerError, ModuleNotFoundError, DistutilsExecError, Distutils
 with open("README.rst", 'r') as f:
     long_description = f.read()
 
-    
+
+class CustomBuildExtCommand(Distutils.build_ext):
+    """build_ext command for use when numpy headers are needed."""
+
+    def run(self):
+        import numpy
+        self.include_dirs.append(numpy.get_include())
+        Distutils.build_ext.run(self)
+        
+        
 setup_args = {'name':"classixclustering",
         'packages':["classix"],
         'version':_version,
@@ -25,7 +34,7 @@ setup_args = {'name':"classixclustering",
                                 "aggregation_cm.pyx", 
                                 "merging_cm.pyx"]
                     },
-        'include_dirs':[numpy.get_include()],
+        'cmdclass': {'build_ext': CustomBuildExtCommand},
         'classifiers':["Intended Audience :: Science/Research",
                 "Intended Audience :: Developers",
                 "Programming Language :: Python",
