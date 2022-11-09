@@ -63,9 +63,9 @@ def cython_is_available(verbose=1):
                 
             if verbose:
                 if __cython_type__ == "momoryview":
-                    print("This CLASSIX installation is using Cython memoryview.")
+                    print("This CLASSIX is using Cython memoryview.")
                 else:
-                    print("This CLASSIX installation is not using Cython memoryview.")
+                    print("This CLASSIX is not using Cython memoryview.")
                     
             from .merging_cm import fast_agglomerate
             return True
@@ -73,10 +73,12 @@ def cython_is_available(verbose=1):
         except (ModuleNotFoundError, ValueError):
             from .aggregation import aggregate 
             from .merging import fast_agglomerate
-            warnings.warn("This CLASSIX installation is not using Cython.")
+            if verbose:
+                print("This CLASSIX is not using Cython.")
             return False
     else:
-        warnings.warn("This CLASSIX installation is not using Cython. Please try to set __enable_cython__ to True to enable Cython if needed.")
+        if verbose:
+            print("Currently, the Cython implementation is disabled. Please try to set ``__enable_cython__`` to True to enable Cython if needed.")
         return False
     
     
