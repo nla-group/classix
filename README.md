@@ -59,7 +59,7 @@ Note: using numpy<=1.22, CLASSIX will support Cython with memoryview, it's even 
 
 ```Python
 import classix
-classix.cython_is_available()
+classix.cython_is_available(verbose=1)
 ```
 Also, you can disable Cython easily using
 
