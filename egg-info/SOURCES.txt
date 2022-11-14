@@ -7,6 +7,7 @@ CODE_OF_CONDUCT.md
 LICENSE
 README.md
 README.rst
+clx_unittest.py
 coverage.xml
 precompile.sh
 record.txt

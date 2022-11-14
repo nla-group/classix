@@ -1,6 +1,9 @@
+import warnings
 import logging
 import setuptools
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
+from setuptools import Extension
+
 cython_is_installed = True 
 
 try:
@@ -10,7 +13,7 @@ except ImportError as e:
     from setuptools.command.build_ext import build_ext
     cython_is_installed = False
     
-_version="0.7.5"
+_version="0.7.7"
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
@@ -37,10 +40,11 @@ setup_args = {'name':"classixclustering",
         'packages':["classix"],
         'version':_version,
         'install_requires':requirements(),
-        'package_data':{"classix": ["aggregation_c.pyx",
-                                "aggregation_cm.pyx", 
-                                "merging_cm.pyx"]
-                    },
+        # 'package_data':{"classix": ["aggregation_c.pyx",
+        #                         "aggregation_cm.pyx", 
+        #                         "merging_cm.pyx"]
+        #             },
+        'packages': ['classix', 'classix.data'],
         'cmdclass': {'build_ext': CustomBuildExtCommand},
         'classifiers':["Intended Audience :: Science/Research",
                 "Intended Audience :: Developers",
@@ -67,12 +71,25 @@ setup_args = {'name':"classixclustering",
         'license':'MIT License'
 }
 
+aggregation_c = Extension('classix.aggregation_c',
+                        sources=['classix/aggregation_c.pyx'])
+
+aggregation_cm = Extension('classix.aggregation_cm',
+                        sources=['classix/aggregation_cm.pyx'])
+
+merging_cm = Extension('classix.merging_cm',
+                        sources=['classix/merging_cm.pyx'])
+
 try:
-    from Cython.Build import cythonize
+    # from Cython.Build import cythonize
     
     setuptools.setup(
         setup_requires=["cython", "numpy>=1.17.3"],
-        ext_modules=cythonize(["classix/*.pyx"], include_path=["classix"]),
+        # ext_modules=cythonize(["classix/*.pyx"], include_path=["classix"]),
+        ext_modules=[aggregation_c,
+                     aggregation_cm,
+                     merging_cm
+                    ],
         **setup_args
     )
 
