@@ -1,8 +1,15 @@
 import logging
 import setuptools
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
-from Cython import Distutils
+cython_is_installed = True 
 
+try:
+    from Cython.Distutils import build_ext
+except ImportError as e:
+    warnings.warn(e.args[0])
+    from setuptools.command.build_ext import build_ext
+    cython_is_installed = False
+    
 _version="0.7.5"
 logging.basicConfig()
 log = logging.getLogger(__file__)
@@ -12,24 +19,24 @@ ext_errors = (CCompilerError, ModuleNotFoundError, DistutilsExecError, Distutils
 with open("README.rst", 'r') as f:
     long_description = f.read()
 
-
-class CustomBuildExtCommand(Distutils.build_ext):
+def requirements():
+    # The dependencies are the same as the contents of requirements.txt
+    with open('requirements.txt') as f:
+        return [line.strip() for line in f if line.strip()]
+    
+class CustomBuildExtCommand(build_ext):
     """build_ext command for use when numpy headers are needed."""
 
     def run(self):
         import numpy
         self.include_dirs.append(numpy.get_include())
-        Distutils.build_ext.run(self)
+        build_ext.run(self)
         
         
 setup_args = {'name':"classixclustering",
         'packages':["classix"],
         'version':_version,
-        'install_requires':["numpy>=1.17.3",
-                            "scipy>=0.7.0",
-                            "pandas", 
-                            "matplotlib>=3.5",
-                            "requests"],
+        'install_requires':requirements(),
         'package_data':{"classix": ["aggregation_c.pyx",
                                 "aggregation_cm.pyx", 
                                 "merging_cm.pyx"]
