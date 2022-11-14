@@ -1,6 +1,6 @@
-requests
-cython
-numpy>=1.7.3
+cython>=0.27
+numpy>=1.17.3
 scipy>=0.7.0
 pandas
-matplotlib
+matplotlib>=3.5
+requests
