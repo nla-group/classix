@@ -4,14 +4,11 @@ import setuptools
 from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
 from setuptools import Extension
 
-cython_is_installed = True 
-
 try:
     from Cython.Distutils import build_ext
 except ImportError as e:
     warnings.warn(e.args[0])
     from setuptools.command.build_ext import build_ext
-    cython_is_installed = False
     
 _version="0.7.7"
 logging.basicConfig()
