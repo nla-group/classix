@@ -25,11 +25,11 @@
 
 CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
 
-- Ability to cluster low and high-dimensional data of arbitrary shape efficiently.
-- Ability to detect and deal with outliers in the data.
-- Ability to provide textual explanations for the generated clusters.
-- Full reproducibility of all tests in the accompanying paper.
-- Support of Cython compilation.
+- Ability to cluster low and high-dimensional data of arbitrary shape efficiently
+- Ability to detect and deal with outliers in the data
+- Ability to provide textual explanations for the generated clusters
+- Full reproducibility of all tests in the accompanying paper
+- Support of Cython compilation
 
 ``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter ``radius`` for the group aggregation and a ``minPts`` parameter controlling the minimal cluster size. 
 
@@ -52,17 +52,14 @@ CLASSIX has the following dependencies:
 - pandas
 
 
-**If you want to compare the speed with other clustering algorithms in scikit-learn or other packages combined with Cython, please use CLASSIX of Cython installation for a fair comparison.  To double check whether you successfully get Cython installation or not, please use:**
-
-Note: using numpy<=1.22, CLASSIX will support Cython with memoryview, it's even faster.  
-
+**If you want to compare the speed with other clustering algorithms in scikit-learn or other packages using Cython, please also use CLASSIX with Cython for a fair comparison.  To double check whether you are using the Cython installation or not, please use:**
 
 ```Python
 import classix
 classix.cython_is_available(verbose=1)
 ```
-Also, you can disable Cython easily using
 
+If needed, you can disable Cython  using
 
 ```Python
 classix.__enable_cython__ = False
@@ -79,7 +76,7 @@ To check the CLASSIX installation use:
 
 ### conda
 
-To install CLASSIX using conda use:
+To install CLASSIX via conda use:
 
 ```conda install -c conda-forge classixclustering```
 
