@@ -1,11 +1,12 @@
 Performance Comparison
 ======================================
 
-Here, we compare CLASSIX with the most typical and well-used density clustering algorithms DBSCAN, HDBSCAN and Quickshift++.
-We perform this experiment on Kamil dataset, and synthetic Gaussian blobs clusters.
+In this tutorial we compare CLASSIX with some other widely used density clustering algorithms like DBSCAN,HDBSCAN and Quickshift++. We perform this experiment on the VDU (Vacuum Distillation Unit) dataset that comes with the CLASSIX installation and for synthetic Gaussian blobs.
 
-Built-in Data
+Example 1: VDU Data
 ##################
+
+We first import the required modules and load the data:
 
 .. code:: python
 
@@ -19,15 +20,11 @@ Built-in Data
     import matplotlib.pyplot as plt
     from classix import CLASSIX, loadData
     from quickshift.QuickshiftPP import * # download from https://github.com/google/quickshift
-
-Then we load the data:
-
-.. code:: python
-
+    
     data = loadData('vdu_signals') # load the data
     print(data.shape) # (2028780, 2)
 
-This data has more than 2 million objects, which is very challenging for most clustering algorithm. Our experiments were runing on the environment settings:
+The data set has more than 2 million data points. Despite being only two-dimensional, this is challenging for many clustering algorithms as we will see. The timings reported below were obtained in this computational environment:
 
     * Dell PowerEdge R740 Server
     * 2x Intel Xeon Silver 4114 2.2G (total 20 cores, 40 threads)
