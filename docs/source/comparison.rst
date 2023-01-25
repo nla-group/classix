@@ -34,8 +34,8 @@ The data set has more than 2 million data points. Despite being only two-dimensi
     * 1.5 TB RAM (=1536 GB RAM)
     * 1.8 TB disk space (expandable)
 
-The DBSCAN, HDBSCAN, Quickshift++ fail in this experiment (runtime > 24 hr) while CLASSIX use around 1.2 seconds for clustering of whole data.
-Therefore, to compare the the four algorithms (ensure they can finish clustering within a day), we need to preprocess the data for downsampling:
+The DBSCAN, HDBSCAN, Quickshift++ fail in this experiment (runtime > 24 hr) while CLASSIX use around 1.5 seconds for clustering of whole data.
+Therefore, to compare the the four algorithms (ensure they can finish clustering within a day), we need to select 5% of the data (downsampling and remove the noises) for the competing algorithms -  DBSCAN, HDBSCAN, and Quickshift++:
 
 .. code:: python
     
@@ -59,11 +59,12 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
     X = np.concatenate((data_no_outliers, data_outliers))
     print(X.shape)
 
-Cause other clustering algorithms almost cannot complete this clustering on the full data. So we employ CLASSIX clustering on the whole data while employing other clustering algorithms on down-sampling data, and get their average runtime for comparison:
+
+Because other clustering algorithms almost cannot complete this clustering on the full data. So we employ CLASSIX clustering on the whole data while employing other clustering algorithms on down-sampling data. We repeatedly perform each algorithm 10 times and get their average runtime for comparison. All algorithm is run with a single thread and the parameter settings for each algorithm are tuned to the best visual performance (to show the superiority of CLASSIX, we only set its parameter `radius` to an appropriate value, which is less strenuous to tune compared to other algorithms' double parameter settings). 
 
 .. code:: python
     
-    sample_size = 10 # repeats each algorithm's performing for 10 times.
+    sample_size = 10 # repeats each algorithm's performing 10 times.
 
     sum_time = 0
     timing = []
