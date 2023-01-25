@@ -11,10 +11,12 @@ We first import the required modules and load the data:
 .. code:: python
 
     import time
+    import math
     import hdbscan
     import warnings
     import numpy as np
     import pandas as pd
+    import seaborn as sns
     from sklearn import metrics
     from sklearn.cluster import DBSCAN
     import matplotlib.pyplot as plt
@@ -38,15 +40,15 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
 .. code:: python
     
     # This block of code is provided by Kamil Oster
-    final_len = 100000
-    outliers_position = np.where(X_pca[:,0] > 7.5)[0]
-    no_outliers_position = np.delete(np.arange(0, len(X_pca[:,0])), outliers_position, axis=0)
+    final_len = 0.05 * data.shape[0] % use 5% selected data
+    outliers_position = np.where(data[:,0] > 7.5)[0]
+    no_outliers_position = np.delete(np.arange(0, len(data[:,0])), outliers_position, axis=0)
 
     outlier_len = len(outliers_position)
     data_no_outliers_length = int(final_len - outlier_len)
 
-    data_outliers = X_pca[outliers_position, :]
-    data_no_outliers = np.delete(X_pca, outliers_position, axis=0)
+    data_outliers = data[outliers_position, :]
+    data_no_outliers = np.delete(data, outliers_position, axis=0)
 
     random_integers = np.arange(0, len(no_outliers_position))
     np.random.shuffle(random_integers)
@@ -55,13 +57,13 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
     data_no_outliers =  data_no_outliers[random_integers[:data_no_outliers_length],:]
 
     X = np.concatenate((data_no_outliers, data_outliers))
-    print(X.shape) # (100000, 2)
+    print(X.shape)
 
 Cause other clustering algorithms almost cannot complete this clustering on the full data. So we employ CLASSIX clustering on the whole data while employing other clustering algorithms on down-sampling data, and get their average runtime for comparison:
 
 .. code:: python
     
-    sample_size = 10 # each algorithm's running repeats for 10 times
+    sample_size = 10 # repeats each algorithm's performing for 10 times.
 
     sum_time = 0
     timing = []
@@ -70,7 +72,7 @@ Cause other clustering algorithms almost cannot complete this clustering on the 
         st = time.time()
         dbscan = DBSCAN(eps=0.7, min_samples=6)
         dbscan.fit(X)
-        et = time.time() 
+        et = time.time()
         sum_time = sum_time + et - st
 
     timing.append(sum_time/sample_size)
@@ -79,13 +81,12 @@ Cause other clustering algorithms almost cannot complete this clustering on the 
     plt.scatter(X[:,0], X[:,1], c=dbscan.labels_, cmap='jet')
     plt.tick_params(axis='both',  labelsize=15)
     plt.title('DBSCAN',  fontsize=20)
-    plt.savefig('DBSCAN.png', bbox_inches='tight')
     plt.show()
 
     sum_time = 0
-    for i in range(sample_size): 
+    for i in range(sample_size):
         st = time.time()
-        _hdbscan = hdbscan.HDBSCAN(min_cluster_size=1000, core_dist_n_jobs=1)
+        _hdbscan = hdbscan.HDBSCAN(min_cluster_size=1100, core_dist_n_jobs=1)
         hdbscan_labels = _hdbscan.fit_predict(X)
         et = time.time()
         sum_time = sum_time + et - st
@@ -96,13 +97,12 @@ Cause other clustering algorithms almost cannot complete this clustering on the 
     plt.scatter(X[:,0], X[:,1], c=hdbscan_labels, cmap='jet')
     plt.tick_params(axis='both',  labelsize=15)
     plt.title('HDBSCAN',  fontsize=20)
-    plt.savefig('HDBSCAN.png', bbox_inches='tight')
     plt.show()
 
     sum_time = 0
     for i in range(sample_size):
         st = time.time()
-        quicks = QuickshiftPP(k=800, beta=0.7)
+        quicks = QuickshiftPP(k=450, beta=0.75)
         quicks.fit(X.copy(order='C'))
         quicks_labels = quicks.memberships
         et = time.time()
@@ -114,26 +114,24 @@ Cause other clustering algorithms almost cannot complete this clustering on the 
     plt.scatter(X[:,0], X[:,1], c=quicks_labels, cmap='jet')
     plt.tick_params(axis='both',  labelsize=15)
     plt.title('Quickshift++',  fontsize=20)
-    plt.savefig('Quickshiftpp.png', bbox_inches='tight')
     plt.show()
 
     sum_time = 0
     for i in range(sample_size):
         st = time.time()
-        clx = CLASSIX(sorting='pca', radius=0.3, verbose=0,  group_merging='distance')
+        clx = CLASSIX(sorting='pca', radius=0.45, verbose=0, group_merging='distance')
         clx.fit_transform(data)
         et = time.time()
         sum_time = sum_time + et - st
-    
+
     timing.append(sum_time/sample_size)
     print("Average consume time: ", sum_time/sample_size)
     plt.figure(figsize=(24,10))
     plt.scatter(data[:,0], data[:,1], c=clx.labels_, cmap='jet')
     plt.tick_params(axis='both',  labelsize=15)
     plt.title('CLASSIX',  fontsize=20)
-    plt.savefig('CLASSIX.png', bbox_inches='tight')
     plt.show()
-
+    
 .. image:: images/DBSCAN_kamil.png
 .. image:: images/HDBSCAN_kamil.png
 .. image:: images/Quickshiftpp_kamil.png
@@ -143,20 +141,33 @@ We can simply visualize the runtime:
 
 .. code:: python
 
-    import seaborn as sns
+    bardf = pd.DataFrame()
+    names = ['DBSCAN \n(5%)', 'HDBSCAN \n(5%)', 'Quickshift++ \n(5%)', 'CLASSIX \n(100%)']
+    bardf['clustering'] = names
+    bardf['runtime'] = timing
 
-    data = pd.DataFrame()
-    data['clustering'] = ['DBSCAN', 'HDBSCAN', 'Quickshift++', 'CLASSIX']
-    data['runtime'] = timing
+    def colors_from_values(values, palettes):
+        norm = (values - min(values)) / (max(values) - min(values))
+        indices = np.round(norm * (len(values) - 1)).astype(np.int32)
+        palettes = sns.color_palette(palettes, len(values))
+        return np.array(palettes).take(indices, axis=0)
 
-    plt.figure(figsize=(12,6))
-    sns.set(font_scale=2, style="whitegrid")
-    ax = sns.barplot(x="clustering", y="runtime", data=data)
-    plt.savefig('results/runtime.png', bbox_inches='tight')
+
+    pvals = np.array([0.1,0.2,0.4,0.6]) # np.array(timing)/np.sum(timing)
+    plt.figure(figsize=(14, 9))
+    sns.set(font_scale=1.5, style="whitegrid")
+    ax = sns.barplot(x="clustering", y="runtime", data=bardf, width=0.6, 
+                     palette=colors_from_values(pvals, 'Set1'))
+
+    ax.bar_label(ax.containers[0], fmt='%.2f s')
+    ax.set(xlabel=None)
+    ax.set_ylabel("runtime", fontsize=28)
+    plt.tick_params(axis='both', labelsize=19)
+    plt.show()
 
 The runtime bar plot is as below, we can see that CLASSIX achieves the fastest speed even if it runs with the whole data.
 
-.. image:: images/runtime_kamil.png
+.. image:: images/runtime.png
 
 
 Gaussian blobs
