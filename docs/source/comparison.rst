@@ -60,7 +60,7 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
     print(X.shape)
 
 
-Because other clustering algorithms almost cannot complete this clustering on the full data. So we employ CLASSIX clustering on the whole data while employing other clustering algorithms on down-sampling data. We repeatedly perform each algorithm 10 times and get their average runtime for comparison. All algorithm is run with a single thread and the parameter settings for each algorithm are tuned to the best visual performance (to show the superiority of CLASSIX, we only set its parameter `radius` to an appropriate value, which is less strenuous to tune compared to other algorithms' double parameter settings). 
+Because other clustering algorithms almost cannot complete this clustering on the full data. So we employ CLASSIX clustering on the whole data while employing other clustering algorithms on down-sampling data. We repeatedly perform each algorithm 10 times and get their average runtime for comparison. All algorithm is run with a single thread and the parameter settings for each algorithm are tuned to the best visual performance (to show the superiority of CLASSIX, we only set its parameter `radius` to an appropriate value, which is less strenuous to tune compared to double parameter settings of other algorithms - except HDBSCAN). 
 
 .. code:: python
     
