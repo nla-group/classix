@@ -132,10 +132,10 @@ Cause other clustering algorithms almost cannot complete this clustering on the 
     plt.title('CLASSIX',  fontsize=20)
     plt.show()
     
-.. image:: images/DBSCAN_kamil.png
-.. image:: images/HDBSCAN_kamil.png
-.. image:: images/Quickshiftpp_kamil.png
-.. image:: images/CLASSIX_kamil.png
+.. image:: images/DBSCAN.png
+.. image:: images/HDBSCAN.png
+.. image:: images/Quickshiftpp.png
+.. image:: images/CLASSIX.png
 
 We can simply visualize the runtime:
 
