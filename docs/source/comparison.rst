@@ -1,7 +1,7 @@
 Performance Comparison
 ======================================
 
-In this tutorial we compare CLASSIX with some other widely used density clustering algorithms like DBSCAN,HDBSCAN and Quickshift++. We perform this experiment on the VDU (Vacuum Distillation Unit) dataset that comes with the CLASSIX installation and for synthetic Gaussian blobs.
+In this tutorial we compare CLASSIX with some widely used density-based clustering algorithms like DBSCAN, HDBSCAN and Quickshift++. We perform experiments on the VDU (Vacuum Distillation Unit) dataset that comes with the CLASSIX installation and with synthetically generated Gaussian blobs.
 
 Example 1: VDU Data
 ##################
@@ -34,13 +34,12 @@ The data set has more than 2 million data points. Despite being only two-dimensi
     * 1.5 TB RAM (=1536 GB RAM)
     * 1.8 TB disk space (expandable)
 
-The DBSCAN, HDBSCAN, Quickshift++ fail in this experiment (runtime > 24 hr) while CLASSIX use around 1.5 seconds for clustering of whole data.
-Therefore, to compare the the four algorithms (ensure they can finish clustering within a day), we need to select 5% of the data (downsampling and remove the noises) for the competing algorithms -  DBSCAN, HDBSCAN, and Quickshift++:
+When run on the full data set, DBSCAN, HDBSCAN, Quickshift++ fail in this experiment (runtime > 24 hr) while CLASSIX requires around 1.5 seconds for the clustering of whole data. Therefore, to compare the four algorithms (and ensure they finish their computation within a day), we select 5% of the data for all competing algorithms except CLASSIX:
 
 .. code:: python
     
     # This block of code is provided by Kamil Oster
-    final_len = 0.05 * data.shape[0] % use 5% selected data
+    final_len = 0.05 * data.shape[0] % select 5% of the data, removing some outliers
     outliers_position = np.where(data[:,0] > 7.5)[0]
     no_outliers_position = np.delete(np.arange(0, len(data[:,0])), outliers_position, axis=0)
 
@@ -60,11 +59,11 @@ Therefore, to compare the the four algorithms (ensure they can finish clustering
     print(X.shape)
 
 
-Because other clustering algorithms almost cannot complete this clustering on the full data. So we employ CLASSIX clustering on the whole data while employing other clustering algorithms on down-sampling data. We repeatedly perform each algorithm 10 times and get their average runtime for comparison. All algorithm is run with a single thread and the parameter settings for each algorithm are tuned to the best visual performance (to show the superiority of CLASSIX, we only set its parameter `radius` to an appropriate value, which is less strenuous to tune compared to double parameter settings of other algorithms - except HDBSCAN). 
+We repeatedly run each algorithm 10 times and get the average runtime for comparison. All algorithms run on a single thread and the parameter settings for each algorithm are tuned for the best visual clustering result. 
 
 .. code:: python
     
-    sample_size = 10 # repeats each algorithm's performing 10 times.
+    sample_size = 10 # run each algorithm 10 times.
 
     sum_time = 0
     timing = []
@@ -138,7 +137,7 @@ Because other clustering algorithms almost cannot complete this clustering on th
 .. image:: images/Quickshiftpp.png
 .. image:: images/CLASSIX.png
 
-We can simply visualize the runtime:
+The runtime of all algorithms is visualized in the below bar chart. Recall that CLASSIX has been run on the full data set, while the other algorithms were run only on 5 percent of the data.
 
 .. code:: python
 
@@ -166,17 +165,12 @@ We can simply visualize the runtime:
     plt.tick_params(axis='both', labelsize=19)
     plt.show()
 
-The runtime bar plot is as below, we can see that CLASSIX achieves the fastest speed even if it runs with the whole data.
-
 .. image:: images/runtime.png
 
 
 Example 2: Gaussian blobs
 ##################
 
-To provide another insight for clustering comparison with respect to runtime, we compare these algorithms by fixing optimal parameter setting on synthetic Gaussian blobs data with increasing size and dimension. So as to obtain a fair comparison of their runtime, we hope the clustering accuracy for all algorithms remains the same as much as possible as the data change. On the other hand, this experiment manifests the sensitivity of parameter settings to environmental settings. This Gaussian blobs test can be referred to in CLASSIX's paper. The test is referenced from https://hdbscan.readthedocs.io/en/latest/performance_and_scalability.html. 
+We now compare the algorithms on synthetic Gaussian blobs with increasing number of data points and dimension. Further details on this experiment can be found in the CLASSIX paper (https://arxiv.org/abs/2202.01456).  
 
 .. image:: images/performance.png
-
-
-As we see from the figure, CLASSIX compares favorably against other algorithms while achieving the fastest speed and stable runtime among them.  
