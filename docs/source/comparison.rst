@@ -160,6 +160,7 @@ We now compare the algorithms on synthetic Gaussian blobs with increasing number
 
 
 .. code:: python
+
     import time
     import hdbscan
     import warnings
