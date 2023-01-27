@@ -38,24 +38,9 @@ When run on the full data set, DBSCAN, HDBSCAN, Quickshift++ fail in this experi
 
 .. code:: python
     
-    # This block of code is provided by Kamil Oster
-    final_len = 0.05 * data.shape[0] % select 5% of the data, removing some outliers
-    outliers_position = np.where(data[:,0] > 7.5)[0]
-    no_outliers_position = np.delete(np.arange(0, len(data[:,0])), outliers_position, axis=0)
-
-    outlier_len = len(outliers_position)
-    data_no_outliers_length = int(final_len - outlier_len)
-
-    data_outliers = data[outliers_position, :]
-    data_no_outliers = np.delete(data, outliers_position, axis=0)
-
-    random_integers = np.arange(0, len(no_outliers_position))
-    np.random.shuffle(random_integers)
-
-    data_no_outliers_out = data_no_outliers[random_integers[data_no_outliers_length:],:]
-    data_no_outliers =  data_no_outliers[random_integers[:data_no_outliers_length],:]
-
-    X = np.concatenate((data_no_outliers, data_outliers))
+    np.random.seed(0)
+    sample = np.random.choice(data.shape[0], size=int(np.round(0.05*data.shape[0])))
+    X = data[sample]
     print(X.shape)
 
 
@@ -64,13 +49,12 @@ We repeatedly run each algorithm 10 times and get the average runtime for compar
 .. code:: python
     
     sample_size = 10 # run each algorithm 10 times.
-
-    sum_time = 0
     timing = []
-
+    
+    sum_time = 0
     for i in range(sample_size):
         st = time.time()
-        dbscan = DBSCAN(eps=0.7, min_samples=6)
+        dbscan = DBSCAN(eps=0.6, min_samples=12)
         dbscan.fit(X)
         et = time.time()
         sum_time = sum_time + et - st
@@ -83,10 +67,11 @@ We repeatedly run each algorithm 10 times and get the average runtime for compar
     plt.title('DBSCAN',  fontsize=20)
     plt.show()
 
+
     sum_time = 0
     for i in range(sample_size):
         st = time.time()
-        _hdbscan = hdbscan.HDBSCAN(min_cluster_size=1100, core_dist_n_jobs=1)
+        _hdbscan = hdbscan.HDBSCAN(min_cluster_size=420, core_dist_n_jobs=1)
         hdbscan_labels = _hdbscan.fit_predict(X)
         et = time.time()
         sum_time = sum_time + et - st
@@ -98,11 +83,11 @@ We repeatedly run each algorithm 10 times and get the average runtime for compar
     plt.tick_params(axis='both',  labelsize=15)
     plt.title('HDBSCAN',  fontsize=20)
     plt.show()
-
+    
     sum_time = 0
     for i in range(sample_size):
         st = time.time()
-        quicks = QuickshiftPP(k=450, beta=0.75)
+        quicks = QuickshiftPP(k=450, beta=0.85)
         quicks.fit(X.copy(order='C'))
         quicks_labels = quicks.memberships
         et = time.time()
@@ -119,7 +104,7 @@ We repeatedly run each algorithm 10 times and get the average runtime for compar
     sum_time = 0
     for i in range(sample_size):
         st = time.time()
-        clx = CLASSIX(sorting='pca', radius=0.45, verbose=0, group_merging='distance')
+        clx = CLASSIX(sorting='pca', radius=1, verbose=0, group_merging='distance')
         clx.fit_transform(data)
         et = time.time()
         sum_time = sum_time + et - st
