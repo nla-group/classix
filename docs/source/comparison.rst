@@ -293,6 +293,8 @@ We show the result as follows, we can see CLASSIX still performs significantly f
 Example 2: Gaussian blobs
 ##################
 
+We perform clustering algorithms on the Gaussian blob data, and provide three experimental examples with minor modifications that satisfies various parameter settings. 
+
 2.1 Original paper experiment
 ~~~~~~~~~~~~~~~~~~~~~~
 We now compare the algorithms on synthetic Gaussian blobs with increasing number of data points and dimension. Further details on this experiment can be found in the CLASSIX paper (https://arxiv.org/abs/2202.01456).  
