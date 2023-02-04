@@ -293,8 +293,21 @@ We show the result as follows, we can see CLASSIX still performs significantly f
 Example 2: Gaussian blobs
 ##################
 
+2.1 Original paper experiment
+~~~~~~~~~~~~~~~~~~~~~~
 We now compare the algorithms on synthetic Gaussian blobs with increasing number of data points and dimension. Further details on this experiment can be found in the CLASSIX paper (https://arxiv.org/abs/2202.01456).  
 
+
+
+2.2 Varying cluster sizes of 5 and 20
+~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+2.2 Additional test script
+~~~~~~~~~~~~~~~~~~~~~~
+
+This test shows the averaging result with varying cluster size, researchers of interest can copy the following code and change the corresponding paramters, e.g., the ```dataset_n_clusters```.
 
 .. code:: python
 
