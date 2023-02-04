@@ -414,6 +414,110 @@ We can run separate test for cluster size of 5 and 20.
         
         
 
+    def run_gassian_plot():
+        # -------------------------------dim
+        k_means_time = pd.read_csv("results/exp1/gs_kmeans_time1.csv")
+        dbscan_kdtree_time = pd.read_csv("results/exp1/gs_dbscan_kdtree_time1.csv")
+        dbscan_btree_time = pd.read_csv("results/exp1/gs_dbscan_btree_time1.csv")
+        hdbscan_time = pd.read_csv("results/exp1/gs_hdbscan_time1.csv")
+        classix_time = pd.read_csv("results/exp1/gs_classix_time1.csv")
+        quicks_time = pd.read_csv("results/exp1/gs_quicks_time1.csv")
+
+        k_means_ar = pd.read_csv("results/exp1/gs_kmeans_ar1.csv")
+        dbscan_kdtree_ar = pd.read_csv("results/exp1/gs_dbscan_kdtree_ar1.csv")
+        dbscan_btree_ar = pd.read_csv("results/exp1/gs_dbscan_btree_ar1.csv")
+        hdbscan_ar = pd.read_csv("results/exp1/gs_hdbscan_ar1.csv")
+        classix_ar = pd.read_csv("results/exp1/gs_classix_ar1.csv")
+        quicks_ar = pd.read_csv("results/exp1/gs_quicks_ar1.csv")
+
+        plt.figure(figsize=(12,8))
+        plt.style.use('bmh')
+        sns.set(font_scale=1.8)
+        sns.set_style("whitegrid")
+        plt.rcParams['axes.facecolor'] = 'white'
+        # plt.rc('font', family='serif')
+
+        ax = sns.lineplot(data=k_means_time, x="x", y="y", marker='v', markersize=13, label='k-means++', linestyle="-", linewidth=6)
+        ax = sns.lineplot(data=dbscan_kdtree_time, x="x", y="y", marker='s', markersize=13, label='DBSCAN ($k$-d tree)', linestyle="--", linewidth=6)
+        ax = sns.lineplot(data=dbscan_btree_time, x="x", y="y", marker='o', markersize=13, label='DBSCAN (balltree)', linestyle=":", linewidth=6)
+        ax = sns.lineplot(data=hdbscan_time, x="x", y="y", marker='<', markersize=13, label='HDBSCAN', linestyle="-", linewidth=6)
+        ax = sns.lineplot(data=quicks_time, x="x", y="y", marker='p', markersize=17, label='Quickshift++', linestyle=(0, (3, 1, 1, 1, 1, 1)), linewidth=6)
+        ax = sns.lineplot(data=classix_time, x="x", y="y", marker='*', markersize=17, label='CLASSIX', linestyle="--", linewidth=6)
+
+        ax.set(xlabel='data size', ylabel='time (s)', title="Gaussian blobs (clusters = 5)")
+        plt.tick_params(axis='both',  labelsize=22)
+        plt.savefig('results/exp1/gaussian_size_time1.pdf', bbox_inches='tight')
+
+        plt.figure(figsize=(12,8))
+        plt.style.use('bmh')
+        sns.set(font_scale=1.8)
+        sns.set_style("whitegrid")
+        plt.rcParams['axes.facecolor'] = 'white'
+        # plt.rc('font', family='serif')
+
+        ax = sns.lineplot(data=k_means_ar, x="x", y="y", marker='v', markersize=13, label='k-means++', linestyle="-", linewidth=6)
+        ax = sns.lineplot(data=dbscan_kdtree_ar, x="x", y="y", marker='s', markersize=13, label='DBSCAN ($k$-d tree)', linestyle="--", linewidth=6)
+        ax = sns.lineplot(data=dbscan_btree_ar, x="x", y="y", marker='o', markersize=13, label='DBSCAN (balltree)', linestyle=":", linewidth=6)
+        ax = sns.lineplot(data=hdbscan_ar, x="x", y="y", marker='<', markersize=13, label='HDBSCAN', linestyle="-", linewidth=6)
+        ax = sns.lineplot(data=quicks_ar, x="x", y="y", marker='p', markersize=17, label='Quickshift++', linestyle=(0, (3, 1, 1, 1, 1, 1)), linewidth=6)
+        ax = sns.lineplot(data=classix_ar, x="x", y="y", marker='*', markersize=17, label='CLASSIX', linestyle="--", linewidth=6)
+
+        ax.set(xlabel='data size', ylabel='adjusted Rand index', title="Gaussian blobs (clusters = 5)")
+        ax.set(ylim=(-.1, 1.1))
+        plt.tick_params(axis='both',  labelsize=22)
+        plt.savefig('results/exp1/gaussian_size_ar1.pdf', bbox_inches='tight')
+
+        # -------------------------------size
+        k_means_time = pd.read_csv("results/exp1/gs_kmeans_time2.csv")
+        dbscan_kdtree_time = pd.read_csv("results/exp1/gs_dbscan_kdtree_time2.csv")
+        dbscan_btree_time = pd.read_csv("results/exp1/gs_dbscan_btree_time2.csv")
+        hdbscan_time = pd.read_csv("results/exp1/gs_hdbscan_time2.csv")
+        classix_time = pd.read_csv("results/exp1/gs_classix_time2.csv")
+        quicks_time = pd.read_csv("results/exp1/gs_quicks_time2.csv")
+
+        k_means_ar = pd.read_csv("results/exp1/gs_kmeans_ar2.csv")
+        dbscan_kdtree_ar = pd.read_csv("results/exp1/gs_dbscan_kdtree_ar2.csv")
+        dbscan_btree_ar = pd.read_csv("results/exp1/gs_dbscan_btree_ar2.csv")
+        hdbscan_ar = pd.read_csv("results/exp1/gs_hdbscan_ar2.csv")
+        classix_ar = pd.read_csv("results/exp1/gs_classix_ar2.csv")
+        quicks_ar = pd.read_csv("results/exp1/gs_quicks_ar2.csv")
+
+        plt.figure(figsize=(12,8))
+        plt.style.use('bmh')
+        sns.set(font_scale=1.8)
+        sns.set_style("whitegrid")
+        plt.rcParams['axes.facecolor'] = 'white'
+
+        ax = sns.lineplot(data=k_means_time, x="x", y="y", marker='v', markersize=13, label='k-means++', linestyle="-", linewidth=6)
+        ax = sns.lineplot(data=dbscan_kdtree_time, x="x", y="y", marker='s', markersize=13, label='DBSCAN ($k$-d tree)', linestyle="--", linewidth=6)
+        ax = sns.lineplot(data=dbscan_btree_time, x="x", y="y", marker='o', markersize=13, label='DBSCAN (balltree)', linestyle=":", linewidth=6)
+        ax = sns.lineplot(data=hdbscan_time, x="x", y="y", marker='<', markersize=13, label='HDBSCAN', linestyle="-", linewidth=6)
+        ax = sns.lineplot(data=quicks_time, x="x", y="y", marker='p', markersize=17, label='Quickshift++', linestyle=(0, (3, 1, 1, 1, 1, 1)), linewidth=6)
+        ax = sns.lineplot(data=classix_time, x="x", y="y", marker='*', markersize=17, label='CLASSIX', linestyle="--", linewidth=6)
+
+        ax.set(xlabel='data size', ylabel='time (s)', title="Gaussian blobs (clusters = 20)")
+        plt.tick_params(axis='both',  labelsize=22)
+        plt.savefig('results/exp1/gaussian_size_time2.pdf', bbox_inches='tight')
+
+        plt.figure(figsize=(12,8))
+        plt.style.use('bmh')
+        sns.set(font_scale=1.8)
+        sns.set_style("whitegrid")
+        plt.rcParams['axes.facecolor'] = 'white'
+
+        ax = sns.lineplot(data=k_means_ar, x="x", y="y", marker='v', markersize=13, label='k-means++', linestyle="-", linewidth=6)
+        ax = sns.lineplot(data=dbscan_kdtree_ar, x="x", y="y", marker='s', markersize=13, label='DBSCAN ($k$-d tree)', linestyle="--", linewidth=6)
+        ax = sns.lineplot(data=dbscan_btree_ar, x="x", y="y", marker='o', markersize=13, label='DBSCAN (balltree)', linestyle=":", linewidth=6)
+        ax = sns.lineplot(data=hdbscan_ar, x="x", y="y", marker='<', markersize=13, label='HDBSCAN', linestyle="-", linewidth=6)
+        ax = sns.lineplot(data=quicks_ar, x="x", y="y", marker='p', markersize=17, label='Quickshift++', linestyle=(0, (3, 1, 1, 1, 1, 1)), linewidth=6)
+        ax = sns.lineplot(data=classix_ar, x="x", y="y", marker='*', markersize=17, label='CLASSIX', linestyle="--", linewidth=6)
+
+        ax.set(xlabel='data size', ylabel='adjusted Rand index', title="Gaussian blobs (clusters = 20)")
+        ax.set(ylim=(0, 1.1))
+        plt.tick_params(axis='both',  labelsize=22)
+        plt.savefig('results/exp1/gaussian_size_ar2.pdf', bbox_inches='tight')
+        
+        
     if __name__ == '__main__':
         k_means_time1, dbscan_kdtree_time1, dbscan_btree_time1, hdbscan_time1, classix_time1, quicks_time1, k_means_ar1, dbscan_kdtree_ar1, dbscan_btree_ar1, hdbscan_ar1, classix_ar1, quicks_ar1 = rn_gaussian_size(dataset_n_clusters=5)
 
@@ -431,25 +535,28 @@ We can run separate test for cluster size of 5 and 20.
         classix_ar1.to_csv("results/exp1/gs_classix_ar1.csv",index=False)
         quicks_ar1.to_csv("results/exp1/gs_quicks_ar1.csv",index=False)
         
-        k_means_time2, dbscan_kdtree_time2, dbscan_btree_time2, hdbscan_time2, classix_time2, quicks_time2, k_means_ar2, dbscan_kdtree_ar2, dbscan_btree_ar2, hdbscan_ar2, classix_ar2, quicks_ar2 = rn_gaussian_size(dataset_n_clusters=5)
+        k_means_time2, dbscan_kdtree_time2, dbscan_btree_time2, hdbscan_time2, classix_time2, quicks_time2, k_means_ar2, dbscan_kdtree_ar2, dbscan_btree_ar2, hdbscan_ar2, classix_ar2, quicks_ar2 = rn_gaussian_size(dataset_n_clusters=20)
 
-        k_means_time2.to_csv("results/exp1/gs_kmeans_time1.csv",index=False)
-        dbscan_kdtree_time2.to_csv("results/exp1/gs_dbscan_kdtree_time1.csv",index=False)
-        dbscan_btree_time2.to_csv("results/exp1/gs_dbscan_btree_time1.csv",index=False)
-        hdbscan_time2.to_csv("results/exp1/gs_hdbscan_time1.csv",index=False)
-        classix_time2.to_csv("results/exp1/gs_classix_time1.csv",index=False)
-        quicks_time2.to_csv("results/exp1/gs_quicks_time1.csv",index=False)
+        k_means_time2.to_csv("results/exp1/gs_kmeans_time2.csv",index=False)
+        dbscan_kdtree_time2.to_csv("results/exp1/gs_dbscan_kdtree_time2.csv",index=False)
+        dbscan_btree_time2.to_csv("results/exp1/gs_dbscan_btree_time2.csv",index=False)
+        hdbscan_time2.to_csv("results/exp1/gs_hdbscan_time2.csv",index=False)
+        classix_time2.to_csv("results/exp1/gs_classix_time2.csv",index=False)
+        quicks_time2.to_csv("results/exp1/gs_quicks_time2.csv",index=False)
 
-        k_means_ar2.to_csv("results/exp1/gs_kmeans_ar1.csv",index=False)
-        dbscan_kdtree_ar2.to_csv("results/exp1/gs_dbscan_kdtree_ar1.csv",index=False)
-        dbscan_btree_ar2.to_csv("results/exp1/gs_dbscan_btree_ar1.csv",index=False)
-        hdbscan_ar2.to_csv("results/exp1/gs_hdbscan_ar1.csv",index=False)
-        classix_ar2.to_csv("results/exp1/gs_classix_ar1.csv",index=False)
-        quicks_ar2.to_csv("results/exp1/gs_quicks_ar1.csv",index=False)
-         
-         
- 
-2.2 Additional test script
+        k_means_ar2.to_csv("results/exp1/gs_kmeans_ar2.csv",index=False)
+        dbscan_kdtree_ar2.to_csv("results/exp1/gs_dbscan_kdtree_ar2.csv",index=False)
+        dbscan_btree_ar2.to_csv("results/exp1/gs_dbscan_btree_ar2.csv",index=False)
+        hdbscan_ar2.to_csv("results/exp1/gs_hdbscan_ar2.csv",index=False)
+        classix_ar2.to_csv("results/exp1/gs_classix_ar2.csv",index=False)
+        quicks_ar2.to_csv("results/exp1/gs_quicks_ar2.csv",index=False)
+
+        
+        run_gassian_plot()
+
+    
+    
+2.3 Additional test script
 ~~~~~~~~~~~~~~~~~~~~~~
 
 This test shows the averaging result with varying cluster size, researchers of interest can copy the following code and change the corresponding paramters, e.g., the ```dataset_n_clusters```.
