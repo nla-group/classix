@@ -410,25 +410,42 @@ We can run separate test for cluster size of 5 and 20.
 
 
 
-
+        return k_means_time, dbscan_kdtree_time, dbscan_btree_time, hdbscan_time, classix_time, quicks_time, k_means_ar, dbscan_kdtree_ar, dbscan_btree_ar, hdbscan_ar, classix_ar, quicks_ar
+        
+        
 
     if __name__ == '__main__':
-         rn_gaussian_size(dataset_n_clusters=5)
-         
-        k_means_time.to_csv("results/exp1/gs_kmeans_time1.csv",index=False)
-        dbscan_kdtree_time.to_csv("results/exp1/gs_dbscan_kdtree_time1.csv",index=False)
-        dbscan_btree_time.to_csv("results/exp1/gs_dbscan_btree_time1.csv",index=False)
-        hdbscan_time.to_csv("results/exp1/gs_hdbscan_time1.csv",index=False)
-        classix_time.to_csv("results/exp1/gs_classix_time1.csv",index=False)
-        quicks_time.to_csv("results/exp1/gs_quicks_time1.csv",index=False)
+        k_means_time1, dbscan_kdtree_time1, dbscan_btree_time1, hdbscan_time1, classix_time1, quicks_time1, k_means_ar1, dbscan_kdtree_ar1, dbscan_btree_ar1, hdbscan_ar1, classix_ar1, quicks_ar1 = rn_gaussian_size(dataset_n_clusters=5)
 
-        k_means_ar.to_csv("results/exp1/gs_kmeans_ar1.csv",index=False)
-        dbscan_kdtree_ar.to_csv("results/exp1/gs_dbscan_kdtree_ar1.csv",index=False)
-        dbscan_btree_ar.to_csv("results/exp1/gs_dbscan_btree_ar1.csv",index=False)
-        hdbscan_ar.to_csv("results/exp1/gs_hdbscan_ar1.csv",index=False)
-        classix_ar.to_csv("results/exp1/gs_classix_ar1.csv",index=False)
-        quicks_ar.to_csv("results/exp1/gs_quicks_ar1.csv",index=False)
-         rn_gaussian_size(dataset_n_clusters=20)
+        k_means_time1.to_csv("results/exp1/gs_kmeans_time1.csv",index=False)
+        dbscan_kdtree_time1.to_csv("results/exp1/gs_dbscan_kdtree_time1.csv",index=False)
+        dbscan_btree_time1.to_csv("results/exp1/gs_dbscan_btree_time1.csv",index=False)
+        hdbscan_time1.to_csv("results/exp1/gs_hdbscan_time1.csv",index=False)
+        classix_time1.to_csv("results/exp1/gs_classix_time1.csv",index=False)
+        quicks_time1.to_csv("results/exp1/gs_quicks_time1.csv",index=False)
+
+        k_means_ar1.to_csv("results/exp1/gs_kmeans_ar1.csv",index=False)
+        dbscan_kdtree_ar1.to_csv("results/exp1/gs_dbscan_kdtree_ar1.csv",index=False)
+        dbscan_btree_ar1.to_csv("results/exp1/gs_dbscan_btree_ar1.csv",index=False)
+        hdbscan_ar1.to_csv("results/exp1/gs_hdbscan_ar1.csv",index=False)
+        classix_ar1.to_csv("results/exp1/gs_classix_ar1.csv",index=False)
+        quicks_ar1.to_csv("results/exp1/gs_quicks_ar1.csv",index=False)
+        
+        k_means_time2, dbscan_kdtree_time2, dbscan_btree_time2, hdbscan_time2, classix_time2, quicks_time2, k_means_ar2, dbscan_kdtree_ar2, dbscan_btree_ar2, hdbscan_ar2, classix_ar2, quicks_ar2 = rn_gaussian_size(dataset_n_clusters=5)
+
+        k_means_time2.to_csv("results/exp1/gs_kmeans_time1.csv",index=False)
+        dbscan_kdtree_time2.to_csv("results/exp1/gs_dbscan_kdtree_time1.csv",index=False)
+        dbscan_btree_time2.to_csv("results/exp1/gs_dbscan_btree_time1.csv",index=False)
+        hdbscan_time2.to_csv("results/exp1/gs_hdbscan_time1.csv",index=False)
+        classix_time2.to_csv("results/exp1/gs_classix_time1.csv",index=False)
+        quicks_time2.to_csv("results/exp1/gs_quicks_time1.csv",index=False)
+
+        k_means_ar2.to_csv("results/exp1/gs_kmeans_ar1.csv",index=False)
+        dbscan_kdtree_ar2.to_csv("results/exp1/gs_dbscan_kdtree_ar1.csv",index=False)
+        dbscan_btree_ar2.to_csv("results/exp1/gs_dbscan_btree_ar1.csv",index=False)
+        hdbscan_ar2.to_csv("results/exp1/gs_hdbscan_ar1.csv",index=False)
+        classix_ar2.to_csv("results/exp1/gs_classix_ar1.csv",index=False)
+        quicks_ar2.to_csv("results/exp1/gs_quicks_ar1.csv",index=False)
          
          
  
