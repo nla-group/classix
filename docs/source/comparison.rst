@@ -553,7 +553,11 @@ We can run separate test for cluster size of 5 and 20.
 
         
         run_gassian_plot()
-
+    
+   
+ The performance is illustrated in the following figure. 
+    
+.. image:: images/performance.png
     
     
 2.3 Additional test script
