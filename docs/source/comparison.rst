@@ -1065,19 +1065,19 @@ This test shows the averaging result with varying cluster size, researchers of i
             classix_time, classix_ar, classix_ami = benchmark_algorithm_tdim(dataset_dimensions, cluster_function='CLASSIX')
 
 
-        k_means_time.to_csv("results/exp1/gd_kmeans_time.csv",index=False)
-        dbscan_kdtree_time.to_csv("results/exp1/gd_dbscan_kdtree_time.csv",index=False)
-        dbscan_btree_time.to_csv("results/exp1/gd_dbscan_btree_time.csv",index=False)
-        hdbscan_time.to_csv("results/exp1/gd_hdbscan_time.csv",index=False)
-        classix_time.to_csv("results/exp1/gd_classix_time.csv",index=False)
-        quicks_time.to_csv("results/exp1/gd_quicks_time.csv",index=False)
+        k_means_time.to_csv("gd_kmeans_time.csv",index=False)
+        dbscan_kdtree_time.to_csv("gd_dbscan_kdtree_time.csv",index=False)
+        dbscan_btree_time.to_csv("gd_dbscan_btree_time.csv",index=False)
+        hdbscan_time.to_csv("gd_hdbscan_time.csv",index=False)
+        classix_time.to_csv("gd_classix_time.csv",index=False)
+        quicks_time.to_csv("gd_quicks_time.csv",index=False)
 
-        k_means_ar.to_csv("results/exp1/gd_kmeans_ar.csv",index=False)
-        dbscan_kdtree_ar.to_csv("results/exp1/gd_dbscan_kdtree_ar.csv",index=False)
-        dbscan_btree_ar.to_csv("results/exp1/gd_dbscan_btree_ar.csv",index=False)
-        hdbscan_ar.to_csv("results/exp1/gd_hdbscan_ar.csv",index=False)
-        classix_ar.to_csv("results/exp1/gd_classix_ar.csv",index=False)
-        quicks_ar.to_csv("results/exp1/gd_quicks_ar.csv",index=False)
+        k_means_ar.to_csv("gd_kmeans_ar.csv",index=False)
+        dbscan_kdtree_ar.to_csv("gd_dbscan_kdtree_ar.csv",index=False)
+        dbscan_btree_ar.to_csv("gd_dbscan_btree_ar.csv",index=False)
+        hdbscan_ar.to_csv("gd_hdbscan_ar.csv",index=False)
+        classix_ar.to_csv("gd_classix_ar.csv",index=False)
+        quicks_ar.to_csv("gd_quicks_ar.csv",index=False)
 
 
 
@@ -1110,19 +1110,19 @@ This test shows the averaging result with varying cluster size, researchers of i
             quicks_time, quicks_ar, quicks_ami = benchmark_algorithm_tsize(dataset_sizes, quicks, (), {}, algorithm='Quickshift++')
 
 
-        k_means_time.to_csv("results/exp1/gs_kmeans_time.csv",index=False)
-        dbscan_kdtree_time.to_csv("results/exp1/gs_dbscan_kdtree_time.csv",index=False)
-        dbscan_btree_time.to_csv("results/exp1/gs_dbscan_btree_time.csv",index=False)
-        hdbscan_time.to_csv("results/exp1/gs_hdbscan_time.csv",index=False)
-        classix_time.to_csv("results/exp1/gs_classix_time.csv",index=False)
-        quicks_time.to_csv("results/exp1/gs_quicks_time.csv",index=False)
+        k_means_time.to_csv("gs_kmeans_time.csv",index=False)
+        dbscan_kdtree_time.to_csv("gs_dbscan_kdtree_time.csv",index=False)
+        dbscan_btree_time.to_csv("gs_dbscan_btree_time.csv",index=False)
+        hdbscan_time.to_csv("gs_hdbscan_time.csv",index=False)
+        classix_time.to_csv("gs_classix_time.csv",index=False)
+        quicks_time.to_csv("gs_quicks_time.csv",index=False)
 
-        k_means_ar.to_csv("results/exp1/gs_kmeans_ar.csv",index=False)
-        dbscan_kdtree_ar.to_csv("results/exp1/gs_dbscan_kdtree_ar.csv",index=False)
-        dbscan_btree_ar.to_csv("results/exp1/gs_dbscan_btree_ar.csv",index=False)
-        hdbscan_ar.to_csv("results/exp1/gs_hdbscan_ar.csv",index=False)
-        classix_ar.to_csv("results/exp1/gs_classix_ar.csv",index=False)
-        quicks_ar.to_csv("results/exp1/gs_quicks_ar.csv",index=False)
+        k_means_ar.to_csv("gs_kmeans_ar.csv",index=False)
+        dbscan_kdtree_ar.to_csv("gs_dbscan_kdtree_ar.csv",index=False)
+        dbscan_btree_ar.to_csv("gs_dbscan_btree_ar.csv",index=False)
+        hdbscan_ar.to_csv("gs_hdbscan_ar.csv",index=False)
+        classix_ar.to_csv("gs_classix_ar.csv",index=False)
+        quicks_ar.to_csv("gs_quicks_ar.csv",index=False)
 
 
 
@@ -1158,7 +1158,6 @@ This test shows the averaging result with varying cluster size, researchers of i
 
         ax.set(xlabel='dimension', ylabel='time (s)', title="Gaussian blobs ($n$=10000)")
         plt.tick_params(axis='both',  labelsize=22)
-        plt.savefig('results/exp1/gaussian_dim_time_mod.pdf', bbox_inches='tight')
 
         plt.figure(figsize=(12,8))
         plt.style.use('bmh')
@@ -1177,22 +1176,20 @@ This test shows the averaging result with varying cluster size, researchers of i
         ax.set(xlabel='dimension', ylabel='adjusted Rand index', title="Gaussian blobs ($n$=10000)")
         ax.set(ylim=(-.1, 1.1))
         plt.tick_params(axis='both',  labelsize=22)
-        plt.savefig('results/exp1/gaussian_dim_ar_mod.pdf', bbox_inches='tight')
 
-        k_means_time = pd.read_csv("results/exp1/gs_kmeans_time.csv")
-        dbscan_kdtree_time = pd.read_csv("results/exp1/gs_dbscan_kdtree_time.csv")
-        dbscan_btree_time = pd.read_csv("results/exp1/gs_dbscan_btree_time.csv")
-        hdbscan_time = pd.read_csv("results/exp1/gs_hdbscan_time.csv")
-        classix_time = pd.read_csv("results/exp1/gs_classix_time.csv")
-        quicks_time = pd.read_csv("results/exp1/gs_quicks_time.csv")
+        k_means_time = pd.read_csv("gs_kmeans_time.csv")
+        dbscan_kdtree_time = pd.read_csv("gs_dbscan_kdtree_time.csv")
+        dbscan_btree_time = pd.read_csv("gs_dbscan_btree_time.csv")
+        hdbscan_time = pd.read_csv("gs_hdbscan_time.csv")
+        classix_time = pd.read_csv("gs_classix_time.csv")
+        quicks_time = pd.read_csv("gs_quicks_time.csv")
 
-
-        k_means_ar = pd.read_csv("results/exp1/gs_kmeans_ar.csv")
-        dbscan_kdtree_ar = pd.read_csv("results/exp1/gs_dbscan_kdtree_ar.csv")
-        dbscan_btree_ar = pd.read_csv("results/exp1/gs_dbscan_btree_ar.csv")
-        hdbscan_ar = pd.read_csv("results/exp1/gs_hdbscan_ar.csv")
-        classix_ar = pd.read_csv("results/exp1/gs_classix_ar.csv")
-        quicks_ar = pd.read_csv("results/exp1/gs_quicks_ar.csv")
+        k_means_ar = pd.read_csv("gs_kmeans_ar.csv")
+        dbscan_kdtree_ar = pd.read_csv("gs_dbscan_kdtree_ar.csv")
+        dbscan_btree_ar = pd.read_csv("gs_dbscan_btree_ar.csv")
+        hdbscan_ar = pd.read_csv("gs_hdbscan_ar.csv")
+        classix_ar = pd.read_csv("gs_classix_ar.csv")
+        quicks_ar = pd.read_csv("gs_quicks_ar.csv")
 
 
         plt.figure(figsize=(12,8))
@@ -1210,7 +1207,6 @@ This test shows the averaging result with varying cluster size, researchers of i
 
         ax.set(xlabel='data size', ylabel='time (s)', title="Gaussian blobs ($d$=10)")
         plt.tick_params(axis='both',  labelsize=22)
-        plt.savefig('results/exp1/gaussian_size_time.pdf', bbox_inches='tight')
 
         plt.figure(figsize=(12,8))
         plt.style.use('bmh')
@@ -1228,7 +1224,6 @@ This test shows the averaging result with varying cluster size, researchers of i
         ax.set(xlabel='data size', ylabel='adjusted Rand index', title="Gaussian blobs ($d$=10)")
         ax.set(ylim=(0, 1.1))
         plt.tick_params(axis='both',  labelsize=22)
-        plt.savefig('results/exp1/gaussian_size_ar.pdf', bbox_inches='tight')
     
     
     if __name__ == '__main__':
