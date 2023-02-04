@@ -828,7 +828,8 @@ We show how to run test for cluster size of 5 and 20 with increasing data size, 
         
         
     if __name__ == '__main__':
-        k_means_time1, dbscan_kdtree_time1, dbscan_btree_time1, hdbscan_time1, classix_time1, quicks_time1, k_means_ar1, dbscan_kdtree_ar1, dbscan_btree_ar1, hdbscan_ar1, classix_ar1, quicks_ar1 = rn_gaussian_size(dataset_n_clusters=5)
+        result1  = rn_gaussian_size(dataset_n_clusters=5)
+        k_means_time1, dbscan_kdtree_time1, dbscan_btree_time1, hdbscan_time1, classix_time1, quicks_time1, k_means_ar1, dbscan_kdtree_ar1, dbscan_btree_ar1, hdbscan_ar1, classix_ar1, quicks_ar1 = result1
 
         k_means_time1.to_csv("gs_kmeans_time1.csv",index=False)
         dbscan_kdtree_time1.to_csv("gs_dbscan_kdtree_time1.csv",index=False)
@@ -844,8 +845,9 @@ We show how to run test for cluster size of 5 and 20 with increasing data size, 
         classix_ar1.to_csv("gs_classix_ar1.csv",index=False)
         quicks_ar1.to_csv("gs_quicks_ar1.csv",index=False)
         
-        k_means_time2, dbscan_kdtree_time2, dbscan_btree_time2, hdbscan_time2, classix_time2, quicks_time2, k_means_ar2, dbscan_kdtree_ar2, dbscan_btree_ar2, hdbscan_ar2, classix_ar2, quicks_ar2 = rn_gaussian_size(dataset_n_clusters=20)
-
+        result2 = rn_gaussian_size(dataset_n_clusters=20)
+        k_means_time2, dbscan_kdtree_time2, dbscan_btree_time2, hdbscan_time2, classix_time2, quicks_time2, k_means_ar2, dbscan_kdtree_ar2, dbscan_btree_ar2, hdbscan_ar2, classix_ar2, quicks_ar2 = result2
+        
         k_means_time2.to_csv("gs_kmeans_time2.csv",index=False)
         dbscan_kdtree_time2.to_csv("gs_dbscan_kdtree_time2.csv",index=False)
         dbscan_btree_time2.to_csv("gs_dbscan_btree_time2.csv",index=False)
