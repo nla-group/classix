@@ -557,7 +557,7 @@ We can run separate test for cluster size of 5 and 20.
    
  The performance is illustrated in the following figure. 
     
-.. image:: images/performance.png
+.. image:: images/performance2.png
     
     
 2.3 Additional test script
