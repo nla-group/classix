@@ -6,7 +6,7 @@ In this tutorial we compare CLASSIX with some widely used density-based clusteri
 Example 1: VDU Data
 ##################
 
-Uniform sampling
+1.1 Uniform sampling
 ~~~~~~~~~~~~~~~~~~~~~~
 
 We first import the required modules and load the data:
@@ -156,7 +156,7 @@ The runtime of all algorithms is visualized in the below bar chart. Recall that 
 .. image:: images/runtime.png
 
 
-Kamil's sampling
+1.2 Kamil's sampling
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The sampling method for VDU dataset is proposed by Kamil Oster. This sampling method can make the visualization performance for our sampling data better.  For complete code example, we refer to `classix/exp/timing_appendix.ipynb <https://github.com/nla-group/classix/blob/master/exp/timing_appendix.ipynb>`_ Here we do simple illustration for it.
@@ -297,13 +297,141 @@ Example 2: Gaussian blobs
 ~~~~~~~~~~~~~~~~~~~~~~
 We now compare the algorithms on synthetic Gaussian blobs with increasing number of data points and dimension. Further details on this experiment can be found in the CLASSIX paper (https://arxiv.org/abs/2202.01456).  
 
-
+.. code:: python
 
 2.2 Varying cluster sizes of 5 and 20
 ~~~~~~~~~~~~~~~~~~~~~~
 
+We can run separate test for cluster size of 5 and 20.
+
+.. code:: python
+
+    import time
+    import hdbscan
+    import warnings
+    import sklearn.cluster
+    import scipy.cluster
+    import sklearn.datasets
+    import numpy as np
+    import pandas as pd
+    import seaborn as sns
+    from numpy.linalg import norm
+    from classix.aggregation_test import aggregate
+    from classix import CLASSIX
+    from quickshift.QuickshiftPP import *
+    from sklearn import metrics
+    import matplotlib.pyplot as plt
+    from threadpoolctl import threadpool_limits
+    np.random.seed(0)
+
+    def benchmark_algorithm_tsize(dataset_sizes, cluster_function, function_args, function_kwds,
+                            dataset_dimension=10, dataset_n_clusters=5, max_time=45, sample_size=10, algorithm=None):
+
+        # Initialize the result with NaNs so that any unfilled entries
+        # will be considered NULL when we convert to a pandas dataframe at the end
+        result_time = np.nan * np.ones((len(dataset_sizes), sample_size))
+        result_ar = np.nan * np.ones((len(dataset_sizes), sample_size))
+        result_ami = np.nan * np.ones((len(dataset_sizes), sample_size))
+
+        for index, size in enumerate(dataset_sizes):
+            for s in range(sample_size):
+                # Use sklearns make_blobs to generate a random dataset with specified size
+                # dimension and number of clusters
+                # set cluster_std=0.1 to ensure clustering rely less on tuning parameters.
+                data, labels = sklearn.datasets.make_blobs(n_samples=size,
+                                                           n_features=dataset_dimension,
+                                                           centers=dataset_n_clusters, 
+                                                           cluster_std=1) 
+
+                # Start the clustering with a timer
+                start_time = time.time()
+                cluster_function.fit(data, *function_args, **function_kwds)
+                time_taken = time.time() - start_time
+                if algorithm == "Quickshift++":
+                    preds = cluster_function.memberships
+                else:
+                    preds = cluster_function.labels_
+                # print("labels num:", len(np.unique(preds))) 
+                ar = metrics.adjusted_rand_score(labels, preds)
+                ami = metrics.adjusted_mutual_info_score(labels, preds)
+                # If we are taking more than max_time then abort -- we don't
+                # want to spend excessive time on slow algorithms
+                if time_taken > max_time: # Luckily, it won't happens in our experiment.
+                    result_time[index, s] = time_taken
+                    result_ar[index, s] = ar
+                    result_ami[index, s] = ami
+                    return pd.DataFrame(np.vstack([dataset_sizes.repeat(sample_size), result_time.flatten()]).T, columns=['x','y']), \
+                           pd.DataFrame(np.vstack([dataset_sizes.repeat(sample_size), result_ar.flatten()]).T, columns=['x','y']), \
+                           pd.DataFrame(np.vstack([dataset_sizes.repeat(sample_size), result_ami.flatten()]).T, columns=['x','y'])
+                else:
+                    result_time[index, s] = time_taken
+                    result_ar[index, s] = ar
+                    result_ami[index, s] = ami
+
+        # Return the result as a dataframe for easier handling with seaborn afterwards
+        return pd.DataFrame(np.vstack([dataset_sizes.repeat(sample_size), result_time.flatten()]).T, columns=['x','y']), \
+               pd.DataFrame(np.vstack([dataset_sizes.repeat(sample_size), result_ar.flatten()]).T, columns=['x','y']), \
+               pd.DataFrame(np.vstack([dataset_sizes.repeat(sample_size), result_ami.flatten()]).T, columns=['x','y'])
 
 
+    def rn_gaussian_size(dataset_n_clusters=5):
+        warnings.filterwarnings("ignore")
+        sns.set_context('poster')
+        sns.set_palette('Paired', 10)
+        sns.set_color_codes()
+        np.random.seed(0)
+        dataset_sizes = np.hstack([np.arange(1, 11) * 5000])
+
+        np.random.seed(0)
+        with threadpool_limits(limits=1, user_api='blas'):
+            k_means = sklearn.cluster.KMeans(n_clusters=5, init='k-means++')
+            k_means_time, k_means_ar, k_means_ami = benchmark_algorithm_tsize(dataset_sizes, k_means, (), {}, 
+                                                                              dataset_n_clusters=dataset_n_clusters)
+
+            dbscan = sklearn.cluster.DBSCAN(eps=3, min_samples=1, n_jobs=1, algorithm='ball_tree')
+            dbscan_btree_time, dbscan_btree_ar, dbscan_btree_ami = benchmark_algorithm_tsize(dataset_sizes, dbscan, (), {},
+                                                                              dataset_n_clusters=dataset_n_clusters)
+
+            dbscan = sklearn.cluster.DBSCAN(eps=3, min_samples=1, n_jobs=1, algorithm='kd_tree')
+            dbscan_kdtree_time, dbscan_kdtree_ar, dbscan_kdtree_ami = benchmark_algorithm_tsize(dataset_sizes, dbscan, (), {},
+                                                                              dataset_n_clusters=dataset_n_clusters)
+
+            hdbscan_ = hdbscan.HDBSCAN(algorithm='best', core_dist_n_jobs=1)
+            hdbscan_time, hdbscan_ar, hdbscan_ami = benchmark_algorithm_tsize(dataset_sizes, hdbscan_, (), {}, 
+                                                                              dataset_n_clusters=dataset_n_clusters)
+
+            classix = CLASSIX(sorting='pca', radius=0.3, minPts=5, group_merging='distance', verbose=0) 
+            classix_time, classix_ar, classix_ami = benchmark_algorithm_tsize(dataset_sizes, classix, (), {}, 
+                                                                              dataset_n_clusters=dataset_n_clusters)
+
+            quicks = QuickshiftPP(k=20, beta=0.7)
+            quicks_time, quicks_ar, quicks_ami = benchmark_algorithm_tsize(dataset_sizes, quicks, (), {}, 
+                                                            dataset_n_clusters=dataset_n_clusters, algorithm='Quickshift++')
+
+
+
+
+
+    if __name__ == '__main__':
+         rn_gaussian_size(dataset_n_clusters=5)
+         
+        k_means_time.to_csv("results/exp1/gs_kmeans_time1.csv",index=False)
+        dbscan_kdtree_time.to_csv("results/exp1/gs_dbscan_kdtree_time1.csv",index=False)
+        dbscan_btree_time.to_csv("results/exp1/gs_dbscan_btree_time1.csv",index=False)
+        hdbscan_time.to_csv("results/exp1/gs_hdbscan_time1.csv",index=False)
+        classix_time.to_csv("results/exp1/gs_classix_time1.csv",index=False)
+        quicks_time.to_csv("results/exp1/gs_quicks_time1.csv",index=False)
+
+        k_means_ar.to_csv("results/exp1/gs_kmeans_ar1.csv",index=False)
+        dbscan_kdtree_ar.to_csv("results/exp1/gs_dbscan_kdtree_ar1.csv",index=False)
+        dbscan_btree_ar.to_csv("results/exp1/gs_dbscan_btree_ar1.csv",index=False)
+        hdbscan_ar.to_csv("results/exp1/gs_hdbscan_ar1.csv",index=False)
+        classix_ar.to_csv("results/exp1/gs_classix_ar1.csv",index=False)
+        quicks_ar.to_csv("results/exp1/gs_quicks_ar1.csv",index=False)
+         rn_gaussian_size(dataset_n_clusters=20)
+         
+         
+ 
 2.2 Additional test script
 ~~~~~~~~~~~~~~~~~~~~~~
 
