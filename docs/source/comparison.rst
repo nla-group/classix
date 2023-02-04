@@ -323,17 +323,12 @@ We now compare the algorithms on synthetic Gaussian blobs with increasing number
     def benchmark_algorithm_tdim(dataset_dimensions, cluster_function, function_args, function_kwds,
                             dataset_size=10000, dataset_n_clusters=10, max_time=45, sample_size=10, algorithm=None):
 
-        # Initialize the result with NaNs so that any unfilled entries
-        # will be considered NULL when we convert to a pandas dataframe at the end
         result_time = np.nan * np.ones((len(dataset_dimensions), sample_size))
         result_ar = np.nan * np.ones((len(dataset_dimensions), sample_size))
         result_ami = np.nan * np.ones((len(dataset_dimensions), sample_size))
 
         for index, dimension in enumerate(dataset_dimensions):
             for s in range(sample_size):
-                # Use sklearns make_blobs to generate a random dataset with specified size
-                # dimension and number of clusters
-                # set cluster_std=0.1 to ensure clustering rely less on tuning parameters.
                 data, labels = sklearn.datasets.make_blobs(n_samples=dataset_size,
                                                            n_features=dimension,
                                                            centers=dataset_n_clusters, 
@@ -374,17 +369,12 @@ We now compare the algorithms on synthetic Gaussian blobs with increasing number
     def benchmark_algorithm_tsize(dataset_sizes, cluster_function, function_args, function_kwds,
                             dataset_dimension=10, dataset_n_clusters=10, max_time=45, sample_size=10, algorithm=None):
 
-        # Initialize the result with NaNs so that any unfilled entries
-        # will be considered NULL when we convert to a pandas dataframe at the end
         result_time = np.nan * np.ones((len(dataset_sizes), sample_size))
         result_ar = np.nan * np.ones((len(dataset_sizes), sample_size))
         result_ami = np.nan * np.ones((len(dataset_sizes), sample_size))
 
         for index, size in enumerate(dataset_sizes):
             for s in range(sample_size):
-                # Use sklearns make_blobs to generate a random dataset with specified size
-                # dimension and number of clusters
-                # set cluster_std=0.1 to ensure clustering rely less on tuning parameters.
                 data, labels = sklearn.datasets.make_blobs(n_samples=size,
                                                            n_features=dataset_dimension,
                                                            centers=dataset_n_clusters, 
@@ -997,35 +987,26 @@ This test shows the averaging result with varying cluster size, researchers of i
     def benchmark_algorithm_tsize(dataset_sizes, cluster_function, function_args, function_kwds,
                             dataset_dimension=10, dataset_n_clusters=10, max_time=45, sample_size=10, algorithm=None):
 
-        # Initialize the result with NaNs so that any unfilled entries
-        # will be considered NULL when we convert to a pandas dataframe at the end
         result_time = np.nan * np.ones((len(dataset_sizes), sample_size))
         result_ar = np.nan * np.ones((len(dataset_sizes), sample_size))
         result_ami = np.nan * np.ones((len(dataset_sizes), sample_size))
 
         for index, size in enumerate(dataset_sizes):
             for s in range(sample_size):
-                # Use sklearns make_blobs to generate a random dataset with specified size
-                # dimension and number of clusters
-                # set cluster_std=0.1 to ensure clustering rely less on tuning parameters.
                 data, labels = sklearn.datasets.make_blobs(n_samples=size,
                                                            n_features=dataset_dimension,
                                                            centers=dataset_n_clusters, 
                                                            cluster_std=1) 
 
-                # Start the clustering with a timer
                 start_time = time.time()
                 cluster_function.fit(data, *function_args, **function_kwds)
                 time_taken = time.time() - start_time
                 if algorithm == "Quickshift++":
                     preds = cluster_function.memberships
                 else:
-                    preds = cluster_function.labels_
-                # print("labels num:", len(np.unique(preds))) 
+                    preds = cluster_function.labels_ 
                 ar = metrics.adjusted_rand_score(labels, preds)
                 ami = metrics.adjusted_mutual_info_score(labels, preds)
-                # If we are taking more than max_time then abort -- we don't
-                # want to spend excessive time on slow algorithms
                 if time_taken > max_time: # Luckily, it won't happens in our experiment.
                     result_time[index, s] = time_taken
                     result_ar[index, s] = ar
@@ -1038,7 +1019,6 @@ This test shows the averaging result with varying cluster size, researchers of i
                     result_ar[index, s] = ar
                     result_ami[index, s] = ami
 
-        # Return the result as a dataframe for easier handling with seaborn afterwards
         return pd.DataFrame(np.vstack([dataset_sizes.repeat(sample_size), result_time.flatten()]).T, columns=['x','y']), \
                pd.DataFrame(np.vstack([dataset_sizes.repeat(sample_size), result_ar.flatten()]).T, columns=['x','y']), \
                pd.DataFrame(np.vstack([dataset_sizes.repeat(sample_size), result_ami.flatten()]).T, columns=['x','y'])
@@ -1056,7 +1036,6 @@ This test shows the averaging result with varying cluster size, researchers of i
         np.random.seed(0)
 
         with threadpool_limits(limits=1, user_api='blas'):
-
             k_means_time, k_means_ar, k_means_ami = benchmark_algorithm_tdim(dataset_dimensions, cluster_function='k-means++')
             dbscan_kdtree_time, dbscan_kdtree_ar, dbscan_kdtree_ami = benchmark_algorithm_tdim(dataset_dimensions, cluster_function='DBSCAN (kd-tree)')
             dbscan_btree_time, dbscan_btree_ar, dbscan_btree_ami = benchmark_algorithm_tdim(dataset_dimensions, cluster_function='DBSCAN (ball-tree)')
