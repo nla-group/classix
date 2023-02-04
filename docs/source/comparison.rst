@@ -159,7 +159,7 @@ The runtime of all algorithms is visualized in the below bar chart. Recall that 
 1.2 Kamil's sampling
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The sampling method for VDU dataset is proposed by Kamil Oster. This sampling method can make the visualization performance for our sampling data better.  For complete code example, we refer to `classix/exp/timing_appendix.ipynb <https://github.com/nla-group/classix/blob/master/exp/timing_appendix.ipynb>`_ Here we do simple illustration for it.
+The sampling method for VDU dataset is proposed by Kamil Oster. This sampling method can make the visualization results of various clustering algorithms more unified.  For complete code example, we refer to `classix/exp/timing_appendix.ipynb <https://github.com/nla-group/classix/blob/master/exp/timing_appendix.ipynb>`_ Here we do simple illustration for it.
 
 .. code:: python
 
