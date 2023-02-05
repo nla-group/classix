@@ -292,9 +292,6 @@ All results will be written to the folder ["exp/results"](https://github.com/nla
 Any form of contribution is welcome. Please be free to post issues and pull requests if you want to assist in documentation or code. To contribute, please fork the project and pull a request for your changes. We will strive to work through any issues and requests and get your code merged into the main branch. Contributors will be acknowledged in the release notes. 
 
 
-###  Star & Fork
-[![Stargazers repo roster for @nla-group/classix](https://reporoster.com/stars/nla-group/classix)](https://github.com/nla-group/classix/stargazers)
-[![Forkers repo roster for @nla-group/classix](https://reporoster.com/forks/nla-group/classix)](https://github.com/nla-group/classix/network/members)
 
 
 ## :paperclip: Citation 
