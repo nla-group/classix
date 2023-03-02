@@ -13,6 +13,7 @@
 [![azure](https://dev.azure.com/conda-forge/feedstock-builds/_apis/build/status/classixclustering-feedstock?branchName=main)](https://dev.azure.com/conda-forge/feedstock-builds/_build/latest?definitionId=15797&branchName=main)
 [![!pypi](https://img.shields.io/pypi/v/classixclustering?color=orange)](https://pypi.org/project/classixclustering/)
 [![Download Status](https://static.pepy.tech/badge/classixclustering)](https://pypi.org/project/classixclustering/)
+[![Download Status](https://img.shields.io/pypi/dm/classixclustering.svg?label=PyPI%20downloads)](https://pypi.org/project/classixclustering/)
 [![Documentation Status](https://readthedocs.org/projects/classix/badge/?version=latest)](https://classix.readthedocs.io/en/latest/?badge=latest)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/classixclustering/badges/version.svg)](https://anaconda.org/conda-forge/classixclustering)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/classixclustering/badges/platforms.svg)](https://anaconda.org/conda-forge/classixclustering)
