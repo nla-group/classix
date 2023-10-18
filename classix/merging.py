@@ -28,12 +28,7 @@
 
 import collections
 import numpy as np
-# from tqdm import tqdm 
 from scipy.special import betainc, gamma
-# from sklearn.metrics import pairwise_distances # for scc algorithm
-from scipy.sparse.csgraph import connected_components
-from scipy.sparse import csr_matrix, _sparsetools
-# from scipy.sparse.csgraph import minimum_spanning_tree
 
 
 def blas_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1.5):
@@ -50,14 +45,20 @@ def blas_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale
 
     splist : numpy.ndarray
         Represent the list of starting points information formed in the aggregation. 
-        list of [ starting point index of current group, sorting values, and number of group elements ]
+        list of [ starting point index of current group, sorting values, and number of group elements ].
+
+    ind : numpy.ndarray
+        Sort values.
 
     radius : float
         The tolerance to control the aggregation. If the distance between the starting point 
         of a group and another data point is less than or equal to the tolerance,
         the point is allocated to that group. For details, we refer users to [1].
 
-    
+    minPts : int, default=0
+        The threshold, in the range of [0, infity] to determine the noise degree.
+        When assgin it 0, algorithm won't check noises.
+
     scale : float, default 1.5
         Design for distance-clustering, when distance between the two starting points 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
@@ -74,7 +75,9 @@ def blas_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale
     splist_indices = splist[:, 0].astype(int)
 
     spdata = data[splist_indices]
-    xxt = np.einsum('ij,ij->i', spdata, spdata)
+    xxt = np.einsum('ij,ij->i', spdata, spdata) 
+    # np.einsum('ij,ij->i', data, data) <-> np.sum(data * data, axis=1)
+
     sp_cluster_label = labels[splist_indices]
 
     for i in range(splist.shape[0]):
@@ -100,20 +103,21 @@ def blas_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale
 
     old_cluster_count = collections.Counter(labels)
     cid = np.nonzero(cs < minPts)[0]
+    SIZE_NOISE_LABELS = cid.size
 
-    if cid.size > 0:
+    if SIZE_NOISE_LABELS > 0:
         copy_sp_cluster_label = sp_cluster_label.copy()
         
         for i in cid:
-            ii = np.nonzero(copy_sp_label==i)[0] # find all tiny groups with that label
+            ii = np.nonzero(copy_sp_cluster_label==i)[0] # find all tiny groups with that label
             for iii in ii:
                 xi = spdata[iii, :]    # starting point of one tiny group
 
                 dist = euclid(xxt, spdata, xi)
                 merge_ind = np.argsort(dist)
                 for j in merge_ind:
-                    if cs[copy_sp_label(j)] >= minPts:
-                        sp_cluster_label[iii] = copy_sp_label[j]
+                    if cs[copy_sp_cluster_label[j]] >= minPts:
+                        sp_cluster_label[iii] = copy_sp_cluster_label[j]
                         break
 
         ul = np.unique(sp_cluster_label)
@@ -128,7 +132,7 @@ def blas_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale
         sort_ind = np.argsort(ind)
         labels = labels[sort_ind]
 
-    return labels, old_cluster_count
+    return labels, old_cluster_count, SIZE_NOISE_LABELS
 
 
 
@@ -179,17 +183,18 @@ def agglomerate(data, splist, radius, method='distance', scale=1.5):
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
 
     """
-    # connected_pairs = list()
+    
     connected_pairs = [SET(i) for i in range(splist.shape[0])]
     connected_pairs_store = []
+    
     if method == "density":
         volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
     else:
         volume = None
         
     for i in range(splist.shape[0]):
-        sp1 =  data[int(splist[i, 0])] # splist[int(i), 3:]
-        neigbor_sp = data[splist[i+1:, 0].astype(int)] # splist[i+1:, 3:] # deprecated: splist[i+1:, :] 
+        sp1 =  data[int(splist[i, 0])]
+        neigbor_sp = data[splist[i+1:, 0].astype(int)] 
         select_stps = np.arange(i+1, splist.shape[0], dtype=int)
         sort_vals = splist[i:, 1]
         
@@ -204,49 +209,36 @@ def agglomerate(data, splist, radius, method='distance', scale=1.5):
             if not np.any(index_overlap):
                 continue
 
-            # if len(index_overlap[0]) <= 0:  # -> [for np.where, removed],  make sure the neighbors is not empty
-            #     continue
-
-            # neigbor_sp = neigbor_sp[index_overlap,:] # calculate their neighbor ...2)
             c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
             den1 = np.count_nonzero(c1) / volume
-            # den1 = splist[int(i), 2] / volume # density(splist[int(i), 2], volume = volume) 
+            
             for j in select_stps.astype(int):
                 sp2 = data[int(splist[j, 0])] # splist[int(j), 3:]
 
                 c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
                 den2 = np.count_nonzero(c2) / volume
-                #den2 = splist[int(j), 2] / volume # density(splist[int(j), 2], volume = volume)
-                if check_if_overlap(sp1, sp2, radius=radius): # , scale=distance_scale
-                    # interdata = np.linalg.norm(data[agg_labels==i] - sp2, ord=2, axis=-1)
-                    # internum = len(interdata[interdata <= 2*radius])
+
+                if check_if_overlap(sp1, sp2, radius=radius): 
                     internum = np.count_nonzero(c1 & c2)
                     cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
-                    if cid >= den1 or cid >= den2: # eta*cid >= den1 or eta*cid >= den2:
-                        # connected_pairs.append([i,j]) # store connected groups
+                    if cid >= den1 or cid >= den2: 
                         merge(connected_pairs[i], connected_pairs[j])
                         connected_pairs_store.append([i, j])
 
-        else: # "distance": 
+        else: 
             # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
             # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
             # AGGREGATION.
-            # index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  # 2*distance_scale*radius
             index_overlap = fast_query(neigbor_sp, sp1, sort_vals, scale*radius)
             select_stps = select_stps[index_overlap]
             if not np.any(index_overlap): # calculate their neighbors ...1)
                 continue
     
-            # neigbor_sp = neigbor_sp[index_overlap] # calculate their neighbor ...2)
             for j in select_stps:
                 # two groups merge when their starting points distance is smaller than 1.5*radius
                 # connected_pairs.append([i,j]) # store connected groups
                 merge(connected_pairs[i], connected_pairs[j])
                 connected_pairs_store.append([i, j])
-        # else:
-        #     raise ValueError(
-        #         f"The method '{method}' does not exist,"
-        #         f"please assign a new value")
         
     labels = [findParent(i).data for i in connected_pairs]
     labels_set = list()
@@ -278,44 +270,6 @@ def fast_query(data, starting_point, sort_vals, tol):
 def euclid(xxt, X, v):
     return (xxt + np.inner(v,v).ravel() -2*X.dot(v)).astype(float)
     
-# def scc_agglomerate(splist, radius=0.5, scale=1.5, n_jobs=-1): # limited to distance-based method
-#     """
-#     Implement CLASSIX's merging with strongly connected components finding algorithm in undirected graph.
-#     """
-# 
-#     distm = pairwise_distances(splist[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs)
-#     index_set = []
-#     distm = (distm <= radius*scale).astype(int)
-# 
-#     n_components, labels = connected_components(csgraph=csr_matrix(distm), directed=False, return_labels=True)
-#     labels_set = list()
-#     for i in np.unique(labels):
-#         labels_set.append(np.where(labels == i)[0].tolist())
-#     return labels_set
-
-
-
-# def minimum_spanning_tree_agglomerate(splist, radius=0.5, scale=1.5):
-#     """
-#     Implement CLASSIX's merging with minimum spanning tree clustering.
-#     """
-#     # distm = pairwise_distances(splist[:,3:], Y=None, metric='euclidean', n_jobs=-1)
-#     # min_span = minimum_spanning_tree(csr_matrix(distm))
-#     # print(min_span)
-#     # min_span = csr_matrix((min_span.todense()<=radius*scale).astype(int))
-#     # link_list = [list(pair)for pair in csr_matrix_indices(min_span)]
-#     # return link_list
-#     from mst_clustering import MSTClustering
-# 
-#     # predict the labels with the MST algorithm
-#     model = MSTClustering(cutoff_scale=radius*scale)
-#     labels = model.fit_predict(splist[:, 3:])
-#     labels_set = list()
-#     for i in np.unique(labels):
-#         labels_set.append(np.where(labels == i)[0].tolist())
-#     return labels_set
-
-
 
 
 class SET:
@@ -343,63 +297,6 @@ def merge(s1, s2):
         findParent(s1).parent = parent_of_s2
         
         
-        
-# def merge_pairs(pairs):
-#     """Transform connected pairs to connected groups (list)"""
-#     
-#     len_p = len(pairs)
-#     ulabels = np.full(len_p, -1, dtype=int)
-#     labels = list()
-#     maxid = 0
-#     for i in range(len_p):
-#         if ulabels[i] == -1:
-#             sub = pairs[i]
-#             ulabels[i] = maxid
-# 
-#             for j in range(i+1, len_p):
-#                 com = pairs[j]
-#                 if set(sub).intersection(com) != set():
-#                     sub = sub + com
-#                     if ulabels[j] == -1:
-#                         ulabels[j] = maxid
-#                     else:
-#                         ulabels[ulabels == maxid] = ulabels[j]
-# 
-#             maxid = maxid + 1
-# 
-#     for i in np.unique(ulabels):
-#         sub = list()
-#         for j in [p for p in range(len_p) if ulabels[p] == i]: # np.where(ulabels == i)[0] 
-#             sub = sub + pairs[int(j)]
-#         labels.append(list(set(sub)))
-#     return labels
-
-
-
-# deprecated (24/07/2021)
-# def density(num, volume):
-#     ''' Calculate the density
-#     num: number of objects inside the cluster
-#     volume: the area of the cluster
-#     '''
-#     return num / volume
-
-
-# deprecated (24/07/2021)
-# def csr_matrix_indices(S):
-#     """
-#     Return a list of the indices of nonzero entries of a csr_matrix S
-#     """
-#     major_dim, minor_dim = S.shape
-#     minor_indices = S.indices
-# 
-#     major_indices = np.empty(len(minor_indices), dtype=S.indices.dtype)
-#     _sparsetools.expandptr(major_dim, S.indptr, major_indices)
-# 
-#     return zip(major_indices, minor_indices)
-
-
-
 
 def check_if_overlap(starting_point, spo, radius, scale = 1):
     """Check if two groups formed by aggregation overlap
@@ -413,16 +310,6 @@ def cal_inter_density(starting_point, spo, radius, num):
     """
     in_volume = cal_inter_volume(starting_point, spo, radius)
     return num / in_volume
-
-
-
-# deprecated (24/07/2021)
-# def cal_inter_area(starting_point, spo, radius):
-#     """Calculate the area of intersection (lens)
-#     """
-#     
-#     area = 2 * (radius**2) * np.arccos(dist / (2 * radius)) - dist * np.sqrt(4*radius**2 - dist**2) / 2
-#     return area    
 
 
 
@@ -443,92 +330,3 @@ def cal_inter_volume(starting_point, spo, radius):
     c = dist / 2
     return np.pi**(dim/2)/gamma(dim/2 + 1)*(radius**dim)*betainc((dim + 1)/2, 1/2, 1 - c**2/radius**2)
 
-
-
-#====================================================================================================================#
-# ------------------------------------------------------------------------------------------------------------------
-
-# Deprecated function
-# def agglomerate_trivial(data, splist, radius, method="distance", scale=1.5):
-#     connected_pairs = list()
-#     for i in range(splist.shape[0]):
-#         sp1 = splist[int(i), 3:]
-#         neigbor_sp = splist[i+1:, 3:]
-#         select_stps = np.arange(i+1, splist.shape[0], dtype=int)
-#         if method == "density":                    # calculate the density
-#             volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
-#             index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= radius # 2*distance_scale*radius
-#             # index_overlap = np.where(np.linalg.norm(splist[:,3:] - sp1, ord=2, axis=-1) <= 2*radius)  # -> [for np.where, removed], 2*distance_scale*radius
-#             select_stps = select_stps[index_overlap]
-#             neigbor_sp = neigbor_sp[index_overlap,:] # calculate their neighbor ...2)
-#             # calculate their neighbors ...1)
-#             # later decide whether sps should merge with neighbors
-#             if not np.any(index_overlap):
-#                 continue
-#             # neigbor_sp = neigbor_sp[index_overlap]
-
-#             c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
-#             den1 = np.count_nonzero(c1) / volume
-#             # den1 = splist[int(i), 2] / volume # density(splist[int(i), 2], volume = volume) 
-#             for j in select_stps:
-#                 sp2 = splist[int(j), 3:]
-# 
-#                 c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
-#                 den2 = np.count_nonzero(c2) / volume
-#                 #den2 = splist[int(j), 2] / volume # density(splist[int(j), 2], volume = volume)
-#                 if check_if_overlap(sp1, sp2, radius=radius): # , scale=distance_scale
-#                     # interdata = np.linalg.norm(data[agg_labels==i] - sp2, ord=2, axis=-1)
-#                     # internum = len(interdata[interdata <= 2*radius])
-#                     internum = np.count_nonzero(c1 & c2)
-#                     cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
-#                     if cid >= den1 or cid >= den2: # eta*cid >= den1 or eta*cid >= den2:
-#                         connected_pairs.append([i,j]) # store connected groups
-
-#         else:#  "distance": 
-#             index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  # 2*distance_scale*radius
-#             select_stps = select_stps[index_overlap]
-#             if not np.any(index_overlap): # calculate their neighbors ...1)
-#                 continue
-
-#             # neigbor_sp = neigbor_sp[index_overlap] # calculate their neighbor ...2)
-#             for j in select_stps:
-#                 # two groups merge when their starting points distance is smaller than 1.5*radius
-#                 connected_pairs.append([i,j]) # store connected groups
-#         
-#     return connected_pairs
-
-
-
-# Deprecated function
-# def merge_pairs_dr(pairs):
-#     """Transform connected pairs to connected groups (list)"""
-#     
-#     len_p = len(pairs)
-#     ulabels = np.full(len_p, -1, dtype=int)
-#     labels = list()
-#     maxid = 0
-#     for i in range(len_p):
-#         if ulabels[i] == -1:
-#             sub = pairs[i]
-#             ulabels[i] = maxid
-# 
-#             for j in range(i+1, len_p):
-#                 com = pairs[j]
-#                 if set(sub).intersection(com) != set():
-#                     sub = sub + com
-#                     if ulabels[j] == -1:
-#                         ulabels[j] = maxid
-#                     else:
-#                         ulabels[ulabels == maxid] = ulabels[j]
-# 
-#             maxid = maxid + 1
-# 
-#     for i in np.unique(ulabels):
-#         sub = list()
-#         for j in [p for p in range(len_p) if ulabels[p] == i]: # np.where(ulabels == i)[0] 
-#             sub = sub + list(pairs[int(j)])
-#         labels.append(list(set(sub)))
-#     return labels
-
-# ------------------------------------------------------------------------------------------------------------------
-#====================================================================================================================#

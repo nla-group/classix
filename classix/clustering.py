@@ -317,8 +317,15 @@ class CLASSIX:
     post_alloc : boolean, default=True
         If allocate the outliers to the closest groups, hence the corresponding clusters. 
         If False, all outliers will be labeled as -1.
-    
 
+    algorithm : str, default='blas'
+        Algorithm to merge connected groups
+
+        - 'blas': Use BLAS routines to speed up the merging of connected groups.
+        
+        - 'set': Use disjoint set structure to merge connected groups.
+
+        
     verbose : boolean or int, default=1
         Whether print the logs or not.
              
@@ -370,71 +377,23 @@ class CLASSIX:
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
     """
         
-    # deprecated descriptions
-    # group_merging : str, {'density', 'distance', 'scc-distance', 'mst-distance'}, default='distance'
-    #     The method for merging the groups. 
-    #     - 'density': two groups are merged if the density of data points in their intersection 
-    #        is at least as high the smaller density of both groups. This option uses the disjoint 
-    #        set structure to speedup agglomerate.
-    #     - 'distance': two groups are merged if the distance of their starting points is at 
-    #        most scale*radius (the parameter above). This option uses the disjoint 
-    #        set structure to speedup agglomerate.
-    #     - 'scc-distance': calculate the distance-based merging by Tarjan's algorithm for finding
-    #        strongly connected components.
-    #     - 'mst-distance': it is also a distance based group_merging, but use minimum spanning tree instead
-    #        in the second stage with cutoff_scale scale*radius.
-    # n_jobs : int, default=-1
-    #     This parameter only works for method called 'scc-distance', which refers to the
-    #     number of jobs to use for the computation by breaking down the pairwise matrix into n_jobs 
-    #     even slices and computing them in parallel.
-        
-    def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, algorithm='fast', verbose=1): 
-        
-        # deprecated parameter (15/07/2021): noise_percent=0, distance_scale=1, eta=1, cython=True
-        # eta (deprecated): float, default=1.0
-        #     the value for the density-based groups merging, the groups will 
-        #     merge together if their starting points p1 and p2 satisy both:
-        #     (1) "density in of intersection between p1 or p2 * eta < density in p1" and "density in of intersection between p1 and p2 * eta <     density in p2"
-        #     (2) "distance between p1 and p1" < 2*radius (tolerance)
-        # 
-        # if distance_scale > 1 and group_merging == "density": # since there is no intersection.
-        #     raise ValueError(
-        #         "Please feed an correct value for distance_scale for density group merging.")
-        # 
-        # distance_scale (deprecated): float, default=1.0
-        #     The value for the distance-based groups merging, the groups will 
-        #     merge together if their starting points  distance is less than or equal to 2*distance_scale*radius (tolerance)
-        #     The higher it is, the higher possibility the groups will merge together.
-        #     *Note that for density group merging, distance_scale can not be higher than 1, otherwise there is no intersection between two groups.
-        #   
-        # noise_percent (deprecated): int, default=50
-        #     The threshold, in the range of [0,100) to determine the noise degree.
-        #     Decide 'noise_percent' percentile of the number of data in clusters as outliers threshold. 
-        #     The intuition is that if the number of the objects in a cluster is very small, 
-        #     the cluster is very likely to be a abnormal cluster.
+    def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, algorithm='set', verbose=1): 
+
 
         self.verbose = verbose
         self.minPts = minPts
 
-        # if self.minPts == 0:
-        #     if self.verbose:
-        #         print("No anomaly detection setting.")
-        # else:
-        #     if self.verbose:
-        #        print("Noises check with minPts:{:.6f}".format(minPts))
 
         self.sorting = sorting
         self.radius = radius
         self.group_merging = group_merging
         self.sp_to_c_info = False # combine with visualization and data analysis, ensure call PCA and form groups information table only once
-        # self.cython = cython
-        # self.eta = eta
-        # self.distance_scale = distance_scale
+
         self.centers = None
         self.norm = norm # usually, we do not use this parameter
         self.scale = scale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
-        # self.n_jobs = n_jobs
+
 
         self.groups_ = None
         self.clean_index_ = None
@@ -502,7 +461,6 @@ class CLASSIX:
             data = data.astype('float64')
             
         if self.sorting == "norm-mean":
-            # self._mu, self._std = data.mean(axis=0), data.std()
             self._mu = data.mean(axis=0)
             self.data = data - self._mu
             self._scl = self.data.std()
@@ -520,7 +478,6 @@ class CLASSIX:
             self.data = self.data / self._scl # now 50% of data are in unit ball 
             
         elif self.sorting == "norm-orthant":
-            # self._mu, self._std = data.min(axis=0), data.std()
             self._mu = data.min(axis=0)
             self.data = data - self._mu
             self._scl = self.data.std()
@@ -529,12 +486,14 @@ class CLASSIX:
             self.data = self.data / self._scl
             
         else:
-            # self._mu, self._std = data.mean(axis=0), data.std(axis=0) # z-score
             self._mu, self._scl = 0, 1 # no normalization
             self.data = (data - self._mu) / self._scl
         
         # aggregation
-        self.groups_, self.splist_, self.dist_nr, ind = self.aggregate(data=self.data, sorting=self.sorting, tol=self.radius) 
+        self.groups_, self.splist_, self.dist_nr, ind = self.aggregate(data=self.data,
+                                                                       sorting=self.sorting, 
+                                                                       tol=self.radius
+                                                                    ) 
         self.splist_ = np.array(self.splist_)
         
         self.clean_index_ = np.full(self.data.shape[0], True) # claim clean data indices
@@ -542,8 +501,10 @@ class CLASSIX:
         
         if self.group_merging is None:
             self.labels_ = copy.deepcopy(self.groups_) 
+        
         elif self.group_merging.lower()=='none':
             self.labels_ = copy.deepcopy(self.groups_) 
+        
         else:
             self.labels_ = self.clustering(
                 data=self.data,
@@ -552,8 +513,8 @@ class CLASSIX:
                 ind=ind,           
                 sorting=self.sorting, 
                 radius=self.radius, 
-                method=self.group_merging, # eta=self.eta, distance_scale=self.distance_scale, 
-                minPts=self.minPts, # percent=self.noise_percent, noise_scale=self.noise_scale,
+                method=self.group_merging, 
+                minPts=self.minPts,
                 algorithm=self.algorithm
             ) 
         return self
@@ -580,15 +541,15 @@ class CLASSIX:
         
         
         
-    def predict(self, data, mode="fast"):
+    def predict(self, data, mode="blas"):
         """
         Allocate the data to their nearest clusters.
         
         - data : numpy.ndarray
             The ndarray-like input of shape (n_samples,)
 
-        - mode : str
-            - "fast": default, use BLAS to speedup the query
+        - mode : str, default="blas"
+            - "blas": default, use BLAS to speedup the query
 
             - "trivial": use memory efficient to perform query 
 
@@ -597,41 +558,14 @@ class CLASSIX:
         labels : numpy.ndarray
             The predicted clustering labels.
         """
-        # deprecated documentation (24/07/2021):    
-        # 
-        # method : str, {'centers', 'agg_centers', 'agg_sps'}, default='agg_centers'
-        #     the way chosen for data been allocated to the corresponding way. 
-        # 
-        #     1) 'centers': data will be allocated to the clusters with the nearest center. 
-        #     May lead to misallocation
-        # 
-        #     2) 'agg_centers': data will be allocated to the clusters with the nearest center
-        #     in the stage of aggregation.  May lead to misallocation
-        #     
-        #     3) 'agg_sps': data will be allocated to the clusters with the nearest starting point 
-        #     in the stage of aggregation. Default values (Recommended).
-            
         labels = list()
-        
-        # if method == "agg_centers":
-        #     agg_centers = self.calculate_group_centers(self.data, self.labels_)
-        #     data = (data - self._mu) / self._std
-        #     for i in range(len(data)):
-        #         agglabel = np.argmin(np.linalg.norm(agg_centers[:,3:] - data[i], axis=1, ord=2))
-        #         labels.append(self.label_change[agglabel])
-                
-        # elif method == "centers": # may lead to misallocation! avoid using it
-        #     for i in range(len(data)):
-        #         labels.append(np.argmin(np.linalg.norm(self.centers - data[i], axis=1, ord=2)))
-
-        # elif method == "agg_sps": 
 
         data = (np.asarray(data) - self._mu) / self._scl
         indices = self.splist_[:,0].astype(int)
         splist = data[indices]
         num_of_points = data.shape[0]
 
-        if mode == "fast":
+        if mode == "blas":
             xxt = np.einsum('ij,ij->i', splist, splist)
             for i in range(num_of_points):
                 splabel = np.argmin(euclid(xxt, splist, data[i]))
@@ -642,14 +576,12 @@ class CLASSIX:
                 splabel = np.argmin(np.linalg.norm(splist - data[i], axis=1, ord=2))
                 labels.append(self.label_change[splabel])
 
-        # else:
-        #     raise ValueError("Please refer to an correct value for 'group_merging'")
             
         return labels
     
     
     
-    def clustering(self, data, agg_labels, ind, splist, sorting="pca", radius=0.5, method="distance", minPts=0, algorithm='fast'):
+    def clustering(self, data, agg_labels, ind, splist, sorting="pca", radius=0.5, method="distance", minPts=0, algorithm='set'):
         """
         Merge groups after aggregation. 
 
@@ -681,12 +613,12 @@ class CLASSIX:
             The threshold, in the range of [0, infity] to determine the noise degree.
             When assgin it 0, algorithm won't check noises.
 
-        algorithm : str, default='fast'
+        algorithm : str, default='set'
             Algorithm to merge connected groups
  
-            - 'fast': Use BLAS routine to speed up the merging of connected groups.
+            - 'blas': Use BLAS routines to speed up the merging of connected groups.
 
-            - 'ds': Use disjoint set structure to merge connected groups.
+            - 'set': Use disjoint set structure to merge connected groups.
 
 
 
@@ -701,7 +633,7 @@ class CLASSIX:
 
         labels = copy.deepcopy(agg_labels) 
         
-        if method == 'density' or algorithm == 'ds':
+        if method == 'density' or algorithm == 'set':
             self.merge_groups, self.connected_pairs_ = self.agglomerate(data, splist, radius, method, scale=self.scale)
             maxid = max(labels) + 1
             
@@ -726,7 +658,7 @@ class CLASSIX:
             self.old_cluster_count = collections.Counter(labels)
             
             if minPts >= 1:
-                potential_noise_labels = self.outlier_filter(labels, min_samples=minPts) # calculate the min_samples directly
+                potential_noise_labels = self.outlier_filter(min_samples=minPts) # calculate the min_samples directly
                 SIZE_NOISE_LABELS = len(potential_noise_labels) 
                 if SIZE_NOISE_LABELS == len(np.unique(labels)):
                     warnings.warn(
@@ -741,115 +673,55 @@ class CLASSIX:
                 SIZE_NOISE_LABELS = 0
 
             # remove noise cluster, avoid connecting two separate to a single cluster
-            #---------------------------------------------------------------------------------------------------------
-            # if minPts >= 1:
-            #     possible_noise_labels = self.noises_filter(labels, min_samples=minPts) # calculate the min_samples directly
-            # else: 
-            #     possible_noise_labels = self.noises_filter(labels, min_samples_rate=minPts) # calculate the min_samples as minPts*data.shape[0]
-            #---------------------------------------------------------------------------------------------------------
-            
-
-            
-            # label_return_noises = copy.deepcopy(labels) # all noises are marked as maxid, similar to DBSCAN return noises.
             # the label with the maxid is label marked noises
-
-            # the following is centers calculation step, which is not our current concern
-            # centers = np.zeros((0, data.shape[1]))
             
-            # self.outliers = np.array([]) # abnormal groups from aggregation
             
             if SIZE_NOISE_LABELS > 0:
-                # noise_id = max(labels)
-                # pure_labels = [i for i in np.unique(labels) if i != maxid]
-                # self.outliers = np.where(labels == maxid)[0]
-                # self.ne_outliers = np.where(labels != maxid)[0]
-                
-                # assign outliers in terms of group level
                 self.clean_index_ = labels != maxid
                 agln = agg_labels[self.clean_index_]
-                # agg_clean_index_ = np.unique(agln) # extract the unique number of aggregation groups.
-                # agg_noise_index = np.unique(self.groups_[self.outliers]) # extract the unique number of aggregation groups.
-                # print("aggregation clean index:", agg_clean_index_)
                 self.label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
-                # print("label change:", self.label_change)
                 # allocate the outliers to the corresponding closest cluster.
                 
                 self.group_outliers_ = np.unique(agg_labels[~self.clean_index_]) # abnormal groups
                 unique_agln = np.unique(agln)
                 splist_clean = splist[unique_agln]
-                # splist_outliers = splist[self.group_outliers_] 
+
                 if self.post_alloc:
                     for nsp in self.group_outliers_:
-                        alloc_class = np.argmin(np.linalg.norm(data[splist_clean[:, 0].astype(int)] - data[int(splist[nsp, 0])], axis=1, ord=2))
-                        # alloc_class = np.argmin(np.linalg.norm(splist_clean[:, 3:] - splist[nsp, 3:], axis=1, ord=2))
+                        alloc_class = np.argmin(
+                            np.linalg.norm(data[splist_clean[:, 0].astype(int)] - data[int(splist[nsp, 0])], axis=1, ord=2)
+                            )
+                        
                         labels[agg_labels == nsp] = self.label_change[unique_agln[alloc_class]]
                 else:
                     labels[np.isin(agg_labels, self.group_outliers_)] = -1
                 
                 
-                # previous code works on the point level
-                # ----------------------------------- old code 1-----------------------------------
-                # self.outliers = np.where(labels == maxid)[0]
-                # agln = agg_labels[labels != maxid]           
-                # splist_clean = splist[np.unique(agln)]
-                # 
-                # self.label_change = dict(zip(agln, labels[labels != maxid])) # how object change group to cluster.
-                # if self.outliers.size > 0:
-                #     # marked outliers location, and allocate the outliers to their closest clusters.
-                #     for i in self.outliers:
-                #         alloc_class = np.argmin(np.linalg.norm(splist_clean[:,3:] - data[i], axis=1, ord=2))
-                #         labels[i] = self.label_change[splist_clean[alloc_class, 1]]
-                # -------------------------------------------------------------------------------- 
-                
-                # ----------------------------------- old code 2-----------------------------------
-                # splist_clean = splist[agg_clean_index_]
-                # print("splist_clean:", splist_clean)
-                # if self.outliers.size > 0:
-                #     # marked outliers location, and allocate the outliers to their closest clusters.
-                #     for i in self.outliers:
-                #         alloc_class = np.argmin(np.linalg.norm(splist_clean[:,3:] - data[i], axis=1, ord=2))
-                #         # print("alloc_class:", alloc_class)
-                #         # print("labels[i]:", labels[i], "change to:", self.label_change[splist_clean[alloc_class, 1]])
-                #         labels[i] = self.label_change[splist_clean[alloc_class, 1]]
-                # -------------------------------------------------------------------------------- 
-                
-            # else:
-                # self.outliers = np.array([])
-                # pure_labels = np.unique(labels)
-            
-                # noise_id = -1   
-            
-            # we ensure the centers calculation does not include noises.
-            # for c in sorted(pure_labels):
-            #    indc = np.argwhere(labels==c)
-            #    center = np.mean(data[indc,:], axis=0)
-            #    centers = np.r_[ centers, center ]
             
                     
             labels = self.reassign_labels(labels) 
             self.label_change = dict(zip(agg_labels, labels)) # how object change from group to cluster.
             
 
-            # if self.verbose == 1:
-            #     print("As minPts is 20, the clusters are compressed from {l} to {r}.".format(
-            #         l=len(np.unique(agg_labels)), r=len(np.unique(labels))
-            #     ))
         else:
-            labels, self.old_cluster_count = blas_distance_agglomerate(data=data, 
-                                                labels=labels,
-                                                splist=splist,
-                                                ind=ind, 
-                                                radius=radius,
-                                                minPts=minPts,
-                                                scale=self.scale
-                                            )
+            labels, self.old_cluster_count, SIZE_NOISE_LABELS = blas_distance_agglomerate(data=data, 
+                                                                labels=labels,
+                                                                splist=splist,
+                                                                ind=ind, 
+                                                                radius=radius,
+                                                                minPts=minPts,
+                                                                scale=self.scale
+                                                            )
+            self.label_change = dict(zip(agg_labels, labels)) # how object change group to cluster.
+
+
 
         if self.verbose == 1:
             print("""The {datalen} data points were aggregated into {num_group} groups.""".format(datalen=len(data), num_group=splist.shape[0]))
             print("""In total {dist:.0f} comparisons were required ({avg:.2f} comparisons per data point). """.format(dist=self.dist_nr, avg=self.dist_nr/len(data)))
             print("""The {num_group} groups were merged into {c_size} clusters with the following sizes: """.format(
                 num_group=splist.shape[0], c_size=len(self.old_cluster_count)))
-            #print("Initialize clusters with size:")
+            
             
             self.pprint_format(self.old_cluster_count)
             if self.minPts != 0 and SIZE_NOISE_LABELS > 0:
@@ -1752,22 +1624,11 @@ class CLASSIX:
 
     
     
-    def outlier_filter(self, labels, min_samples=None, min_samples_rate=0.1): # percent
+    def outlier_filter(self, min_samples=None, min_samples_rate=0.1): # percent
         """Filter outliers in terms of min_samples"""
-        # print("Min_samples (minPts):{:.0f}".format(min_samples))
-        # self.cluster_count_dict = collections.Counter(labels) # move
         if min_samples == None:
             min_samples = min_samples_rate*sum(self.old_cluster_count.values())
             
-        # threshold = np.percentile(
-        #    a=np.array(list(count_dict.values())), q=percent,
-        #    interpolation='linear', axis=-1)
-        
-        # return [i[0] for i in count_dict.items() 
-        #         if i[1] <= threshold and i[1] <= min_samples]
-        
-        # filter minimum number of points each cluster smaller than scale
-        
         return [i[0] for i in self.old_cluster_count.items() if i[1] < min_samples]
     
     

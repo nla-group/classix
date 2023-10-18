@@ -70,10 +70,6 @@ def aggregate(data, sorting="pca", tol=0.5): # , verbose=1
         ind = np.argsort(sort_vals)
 
     elif sorting == "pca":
-        # pca = PCA(n_components=1) 
-        # sort_vals = pca.fit_transform(data_memview).reshape(-1)
-        # ind = np.argsort(sort_vals)
-        
         # change to svd 
         if data.shape[1]>1:
             if fdim <= 3: # memory inefficient
