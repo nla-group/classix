@@ -120,5 +120,5 @@ def aggregate(data, sorting="pca", tol=0.5, early_stopping=False): # , verbose=1
         splist.append([sp, lab] + [num_group] + list(data[sp,:]) ) 
         lab += 1
 
-    return np.array(labels), splist, nr_dist
+    return np.array(labels), splist, nr_dist, ind
 

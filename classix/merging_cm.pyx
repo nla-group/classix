@@ -46,7 +46,9 @@ np.import_array()
 @cython.binding(True)
 
 # Disjoint set union
-cpdef fast_agglomerate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.float64_t, ndim=2] splist, double radius, str method='distance', double scale=1.5):
+cpdef agglomerate(np.ndarray[np.float64_t, ndim=2] data, 
+                    np.ndarray[np.float64_t, ndim=2] splist, 
+                    double radius, str method='distance', double scale=1.5):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
     

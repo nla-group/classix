@@ -79,7 +79,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
     
     elif sorting == "pca":
         if data.shape[1]>1:
-            U1, s1, _ = svds(data, k=1, return_singular_vectors=True)
+            U1, s1, _ = svds(np.asarray(data), k=1, return_singular_vectors=True)
             sort_vals = U1[:,0]*s1[0]
         else:
             sort_vals = data[:,0]
@@ -123,6 +123,6 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
 
         lab += 1
   
-    return np.asarray(labels), splist, nr_dist
+    return np.asarray(labels), splist, nr_dist, ind
 
 

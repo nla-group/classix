@@ -26,7 +26,7 @@
 
 # Python implementation for group merging
 
-
+import collections
 import numpy as np
 # from tqdm import tqdm 
 from scipy.special import betainc, gamma
@@ -36,7 +36,104 @@ from scipy.sparse import csr_matrix, _sparsetools
 # from scipy.sparse.csgraph import minimum_spanning_tree
 
 
-def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
+def blas_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1.5):
+    """
+    Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
+    
+    Parameters
+    ----------
+    data : numpy.ndarray
+        The input that is array-like of shape (n_samples,).
+    
+    labels : numpy.ndarray
+        aggregation labels
+
+    splist : numpy.ndarray
+        Represent the list of starting points information formed in the aggregation. 
+        list of [ starting point index of current group, sorting values, and number of group elements ]
+
+    radius : float
+        The tolerance to control the aggregation. If the distance between the starting point 
+        of a group and another data point is less than or equal to the tolerance,
+        the point is allocated to that group. For details, we refer users to [1].
+
+    
+    scale : float, default 1.5
+        Design for distance-clustering, when distance between the two starting points 
+        associated with two distinct groups smaller than scale*radius, then the two groups merge.
+
+    Returns
+    -------
+
+    References
+    ----------
+    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
+
+    """
+    
+    splist_indices = splist[:, 0].astype(int)
+
+    spdata = data[splist_indices]
+    xxt = np.einsum('ij,ij->i', spdata, spdata)
+    sp_cluster_label = labels[splist_indices]
+
+    for i in range(splist.shape[0]):
+        xi = spdata[i, :]
+        spl = np.unique( sp_cluster_label[euclid(xxt, spdata, xi) <= (scale*radius)**2] )
+        minlab = np.min(spl)
+
+        for label in spl:
+            sp_cluster_label[sp_cluster_label==label] = minlab
+
+    # rename labels to be 1,2,3,... and determine cluster sizes
+    ul = np.unique(sp_cluster_label)
+    cs = np.zeros(len(ul))
+
+    for i in range(len(ul)):
+        cid = sp_cluster_label==ul[i]
+        sp_cluster_label[cid] = i
+        cs[i] = np.sum(splist[cid, 2])
+
+    labels = sp_cluster_label[labels]
+    sort_ind = np.argsort(ind)
+    labels = labels[sort_ind]
+
+    old_cluster_count = collections.Counter(labels)
+    cid = np.nonzero(cs < minPts)[0]
+
+    if cid.size > 0:
+        copy_sp_cluster_label = sp_cluster_label.copy()
+        
+        for i in cid:
+            ii = np.nonzero(copy_sp_label==i)[0] # find all tiny groups with that label
+            for iii in ii:
+                xi = spdata[iii, :]    # starting point of one tiny group
+
+                dist = euclid(xxt, spdata, xi)
+                merge_ind = np.argsort(dist)
+                for j in merge_ind:
+                    if cs[copy_sp_label(j)] >= minPts:
+                        sp_cluster_label[iii] = copy_sp_label[j]
+                        break
+
+        ul = np.unique(sp_cluster_label)
+        cs = np.zeros(len(ul))
+
+        for i in range(len(ul)):
+            cid = sp_cluster_label==ul[i]
+            sp_cluster_label[cid] = i
+            cs[i] = np.sum(splist[cid, 2])
+
+        labels = sp_cluster_label[labels]
+        sort_ind = np.argsort(ind)
+        labels = labels[sort_ind]
+
+    return labels, old_cluster_count
+
+
+
+
+def agglomerate(data, splist, radius, method='distance', scale=1.5):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
     
@@ -46,7 +143,8 @@ def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
         The input that is array-like of shape (n_samples,).
     
     splist : numpy.ndarray
-        List of starting points formed in the aggregation.
+        Represent the list of starting points information formed in the aggregation. 
+        list of [ starting point index of current group, sorting values, and number of group elements ]
 
     radius : float
         The tolerance to control the aggregation. If the distance between the starting point 
@@ -128,6 +226,7 @@ def fast_agglomerate(data, splist, radius, method='distance', scale=1.5):
                         # connected_pairs.append([i,j]) # store connected groups
                         merge(connected_pairs[i], connected_pairs[j])
                         connected_pairs_store.append([i, j])
+
         else: # "distance": 
             # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
             # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
@@ -176,7 +275,9 @@ def fast_query(data, starting_point, sort_vals, tol):
     return index_query
 
 
-
+def euclid(xxt, X, v):
+    return (xxt + np.inner(v,v).ravel() -2*X.dot(v)).astype(float)
+    
 # def scc_agglomerate(splist, radius=0.5, scale=1.5, n_jobs=-1): # limited to distance-based method
 #     """
 #     Implement CLASSIX's merging with strongly connected components finding algorithm in undirected graph.

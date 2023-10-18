@@ -123,8 +123,8 @@ def aggregate(data, sorting="pca", tol=0.5): # , verbose=1
                 labels[j] = lab
 
         splist.append([sp, sort_vals[sp], num_group])  
-        # list of [ starting point index of current group, sorting key, and number of group elements ]
+        # list of [ starting point index of current group, sorting values, and number of group elements ]
         lab += 1
 
-    return np.array(labels), splist, nr_dist
+    return np.array(labels), splist, nr_dist, ind
 

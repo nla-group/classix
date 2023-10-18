@@ -142,6 +142,6 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
         # list of [ starting point index of current group, sorting key, and number of group elements ]
         lab += 1
 
-    return labels, splist, nr_dist
+    return labels, splist, nr_dist, ind
 
 
