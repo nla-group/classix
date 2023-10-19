@@ -31,7 +31,7 @@ from classix import aggregation_test, novel_normalization
 
 def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
     data, (_mu, _scl) = novel_normalization(data, sorting)
-    labels, splist, nr_dist = aggregation_test.aggregate(
+    labels, splist, nr_dist, ind = aggregation_test.aggregate(
                          data, 
                          sorting=sorting,
                          tol=tol, 
