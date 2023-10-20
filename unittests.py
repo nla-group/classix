@@ -29,6 +29,8 @@ from classix import CLASSIX, loadData, cython_is_available
 from classix.clustering import calculate_cluster_centers
 from classix import novel_normalization
 from classix import aggregation, aggregation_c, aggregation_cm, aggregation_test
+from classix.merging import agglomerate, bf_distance_agglomerate
+from classix.merging_cm import agglomerate as agglomerate_cm
 
 
 def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
@@ -292,12 +294,18 @@ class TestClassix(unittest.TestCase):
         checkpoint = 1
         try:
             data = np.random.randn(10000, 2)
-            inverse_ind1, splist1, nr_dist, ind = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind2, splist2, nr_dist, ind = aggregation_cm.precompute_aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind3, splist3, nr_dist, ind = aggregation_c.precompute_aggregate(data, "pca", 0.5)
-            inverse_ind4, splist4, nr_dist, ind = aggregation.aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind5, splist5, nr_dist, ind = aggregation_c.aggregate(data, "pca", 0.5)
-            inverse_ind6, splist6, nr_dist, ind = aggregation_cm.aggregate(data, "pca", 0.5)
+            inverse_ind1, _, _, _ = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind2, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind3, _, _, _ = aggregation_c.precompute_aggregate(data, "pca", 0.5)
+            inverse_ind4, _, _, _ = aggregation.aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind5, _, _, _ = aggregation_c.aggregate(data, "pca", 0.5)
+            inverse_ind6, _, _, _ = aggregation_cm.aggregate(data, "pca", 0.5)
+
+            _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="norm-mean", tol=0.5)
+            _, _, _, _ = aggregation_c.precompute_aggregate(data, "norm-mean", 0.5)
+
+            _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="NA", tol=0.5)
+            _, _, _, _ = aggregation_c.precompute_aggregate(data, "NA", 0.5)
 
             if np.sum(inverse_ind1 != inverse_ind2) != 0:
                 checkpoint = 0
@@ -308,8 +316,35 @@ class TestClassix(unittest.TestCase):
             if np.sum(inverse_ind5 != inverse_ind6) != 0:
                 checkpoint = 0
 
-            # to do
             
+        except:
+            checkpoint = 0
+
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_merge(self): 
+        checkpoint = 1
+        try:
+            data = np.random.randn(10000, 2)
+
+            labels, splist, _, ind = aggregation.aggregate(data, sorting="pca", tol=0.5) # 
+            splist = np.asarray(splist)
+
+            radius = 0.5
+            labels_set1, connected_pairs_store1 = agglomerate(data, splist, radius, method='distance', scale=1.5)
+            labels_set2, connected_pairs_store2 = agglomerate_cm(data, splist, radius, method='distance', scale=1.5)
+
+            _, _, _ = bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1.5)
+
+
+            for i in range(len(labels_set2)):
+                if labels_set1[i] != labels_set2[i]:
+                    checkpoint = 0
+                    
+            for i in range(len(connected_pairs_store1)):
+                if connected_pairs_store1[i] != connected_pairs_store2[i]:
+                    checkpoint = 0
         except:
             checkpoint = 0
 
@@ -323,7 +358,7 @@ class TestClassix(unittest.TestCase):
                                      centers=3, n_features=2, 
                                      random_state=42
                                     )
-            centers = calculate_cluster_centers(X, y)
+            _ = calculate_cluster_centers(X, y)
         except:
             checkpoint = 0
             
