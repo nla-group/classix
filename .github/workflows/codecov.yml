@@ -21,7 +21,7 @@ jobs:
         pip install -r requirements.txt
         pip install -U scikit-learn
         pip install pytest-cov
-        pytest clx_unittest.py --cov=classix
+        pytest unittest.py --cov=classix
         coverage xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
