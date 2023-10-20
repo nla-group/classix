@@ -128,7 +128,7 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
         rhs = half_r2 - half_nrm2[sp] # right-hand side of norm ineq.
 
         for j in ind[i+1:]:
-            if labels[j] != -1:
+            if labels[j] >= 0:
                 continue
             
             if (sort_vals[j] - sort_vals[sp] > tol):
@@ -233,7 +233,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
         num_group = 1
 
         for j in ind[i+1:]:
-            if labels[j] != -1:
+            if labels[j] >= 0:
                 continue
             
             if (sort_vals[j] - sort_vals[sp] > tol):
