@@ -43,15 +43,13 @@ def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
     _, _, _, _ = aggregation_test.precompute_aggregate1(
                          data, 
                          sorting=sorting,
-                         tol=tol, 
-                         early_stopping=early_stopping
+                         tol=tol
     )
 
     _, _, _, _ = aggregation_test.precompute_aggregate2(
                          data, 
                          sorting=sorting,
-                         tol=tol, 
-                         early_stopping=early_stopping
+                         tol=tol
     )
 
     return nr_dist, labels
