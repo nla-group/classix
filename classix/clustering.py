@@ -39,7 +39,7 @@ import matplotlib.colors as colors
 from scipy.sparse.linalg import svds
 from scipy.sparse.csgraph import connected_components
 from scipy.sparse import csr_matrix, _sparsetools
-from .merging import bf_distance_agglomerate
+
 
 
 
@@ -425,33 +425,30 @@ class CLASSIX:
         from . import __enable_cython__
         self.__enable_cython__ = __enable_cython__
         
+        self.__enable_aggregation_cython__ = False
+
         if self.__enable_cython__:
             try:
-                # %load_ext Cython
-                # !python3 setup.py build_ext --inplace
-
-                from .merging_cm import agglomerate
-
                 try:
                     from .aggregation_cm import aggregate
-                    from .aggregation_cm import aggregate as precompute_aggregate # in cython memoryviews code,
-                                                                            # precompute is in disadvantage, so we set both the same.
+                    from .aggregation_cm import aggregate as precompute_aggregate 
                     
-                    # cython with memoryviews
-                    # Typed memoryviews allow efficient access to memory buffers, such as those underlying NumPy arrays, without incurring any Python overhead. 
-                
                 except ModuleNotFoundError:
                     from .aggregation_c import aggregate, precompute_aggregate 
-
+                
+                self.__enable_aggregation_cython__ = True
+                from .merging_cm import agglomerate, bf_distance_agglomerate
 
             except (ModuleNotFoundError, ValueError):
-                from .aggregation import aggregate, precompute_aggregate 
-                from .merging import agglomerate
+                if not self.__enable_aggregation_cython__:
+                    from .aggregation import aggregate, precompute_aggregate 
+                
+                from .merging import agglomerate, bf_distance_agglomerate
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
             from .aggregation import aggregate, precompute_aggregate 
-            from .merging import agglomerate
+            from .merging import agglomerate, bf_distance_agglomerate
             warnings.warn("This run of CLASSIX is not using Cython.")
 
         if not self.memory:
@@ -461,7 +458,9 @@ class CLASSIX:
             self.aggregate = aggregate
 
         self.agglomerate = agglomerate
-        
+        self.bf_distance_agglomerate = bf_distance_agglomerate
+            
+
             
     def fit(self, data):
         """ 
@@ -729,14 +728,14 @@ class CLASSIX:
             
 
         else:
-            labels, self.old_cluster_count, SIZE_NOISE_LABELS = bf_distance_agglomerate(data=data, 
-                                                                labels=labels,
-                                                                splist=splist,
-                                                                ind=ind, 
-                                                                radius=radius,
-                                                                minPts=minPts,
-                                                                scale=self.scale
-                                                            )
+            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self.bf_distance_agglomerate(data=data, 
+                                                                    labels=labels,
+                                                                    splist=splist,
+                                                                    ind=ind, 
+                                                                    radius=radius,
+                                                                    minPts=minPts,
+                                                                    scale=self.scale
+                                                                )
             self.label_change = dict(zip(agg_labels, labels)) # how object change group to cluster.
 
 
