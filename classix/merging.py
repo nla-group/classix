@@ -91,7 +91,7 @@ def agglomerate(data, splist, radius, method='distance', scale=1.5):
         
     for i in range(splist.shape[0]):
         sp1 =  data[splist_indices[i]]
-        neigbor_sp = data[splist_indices[i+1:, 0]] 
+        neigbor_sp = data[splist_indices[i+1:]] 
         select_stps = np.arange(i+1, splist.shape[0], dtype=int)
         sort_vals = splist[i:, 1]
         
@@ -209,7 +209,7 @@ def bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1
     nr_u = len(ul)
     
     cs = np.zeros(nr_u, dtype=int)
-    grp_sizes = splist.base[:, 2].astype(int)
+    grp_sizes = splist[:, 2].astype(int)
 
     for i in range(nr_u):
         cid = sp_cluster_label==ul[i]

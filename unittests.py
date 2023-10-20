@@ -31,6 +31,7 @@ from classix import novel_normalization
 from classix import aggregation, aggregation_c, aggregation_cm, aggregation_test
 from classix.merging import agglomerate, bf_distance_agglomerate
 from classix.merging_cm import agglomerate as agglomerate_cm
+from classix.merging_cm import bf_distance_agglomerate as bf_distance_agglomerate_cm
 
 
 def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
@@ -99,6 +100,7 @@ class TestClassix(unittest.TestCase):
             comp = clx.labels_ == checkpoint
             assert(comp.all())
 
+
     def non_cython_version(self):
         classix.__enable_cython__ = False
         checkpoint = 1
@@ -118,6 +120,7 @@ class TestClassix(unittest.TestCase):
                 break
         
         self.assertEqual(checkpoint, 1)
+    
     
     def cython_version(self):
         classix.__enable_cython__ = True
@@ -327,24 +330,29 @@ class TestClassix(unittest.TestCase):
         checkpoint = 1
         try:
             data = np.random.randn(10000, 2)
-
+            checkpoint = 1
             labels, splist, _, ind = aggregation.aggregate(data, sorting="pca", tol=0.5) # 
             splist = np.asarray(splist)
 
             radius = 0.5
-            labels_set1, connected_pairs_store1 = agglomerate(data, splist, radius, method='distance', scale=1.5)
-            labels_set2, connected_pairs_store2 = agglomerate_cm(data, splist, radius, method='distance', scale=1.5)
+            label_set1, connected_pairs_store1 = agglomerate(data, splist, radius, method='distance', scale=1.5)
+            label_set2, connected_pairs_store2 = agglomerate_cm(data, splist, radius, method='distance', scale=1.5)
 
-            _, _, _ = bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1.5)
+            label_set3, _, _ = bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1.5)
+            label_set4, _, _ = bf_distance_agglomerate_cm(data, labels, splist, ind, radius, minPts=0, scale=1.5)
 
-
-            for i in range(len(labels_set2)):
-                if labels_set1[i] != labels_set2[i]:
+            for i in range(len(label_set2)):
+                if label_set1[i] != label_set2[i]:
                     checkpoint = 0
-                    
+
             for i in range(len(connected_pairs_store1)):
                 if connected_pairs_store1[i] != connected_pairs_store2[i]:
                     checkpoint = 0
+                    
+            for i in range(len(label_set3)):
+                if label_set3[i] != label_set4[i]:
+                    checkpoint = 0
+
         except:
             checkpoint = 0
 
