@@ -43,7 +43,7 @@ np.import_array()
 @cython.wraparound(False)
 @cython.binding(True)
 
-cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float tol=0.5):
+cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", double tol=0.5):
     """Aggregate the data using precomputation
 
     Parameters
@@ -71,32 +71,33 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
         The number of pairwise distance calculations.
     """
     
-    cdef unsigned int num_group
-    cdef unsigned int fdim = data.shape[1] # feature dimension
-    cdef unsigned int len_ind = data.shape[0] # size of data
+    cdef int num_group
+    cdef Py_ssize_t fdim = data.shape[1] # feature dimension
+    cdef Py_ssize_t len_ind = data.shape[0] # size of data
     cdef np.ndarray[np.float64_t, ndim=2] U1
-    cdef unsigned int sp # sp: starting point
-    cdef unsigned int nr_dist = 0 # nr_dist:if necessary, count the distance computation
-    cdef unsigned int lab = 0 # lab: class
-    cdef double dist # distance 
-    cdef np.ndarray[np.int64_t, ndim=1] labels = np.zeros(len_ind, dtype=np.int64) - 1
-    cdef list splist = list() # store the starting points
-    cdef np.ndarray[np.float64_t, ndim=1] sort_vals = np.empty((len_ind, ), dtype=float)
-    cdef np.ndarray[np.float64_t, ndim=1] clustc = np.empty((fdim, ), dtype=float)
-    cdef np.ndarray[np.int64_t, ndim=1] ind = np.empty((len_ind, ), dtype=np.int64)
-    cdef unsigned int i, j, coord, c
+    cdef int sp 
+    cdef int nr_dist = 0 
+    cdef int lab = 0 
+    cdef double dist
+    cdef np.ndarray[np.int64_t, ndim=1] labels = np.full(len_ind, -1, dtype=int)
+    cdef list splist = list() 
+    cdef np.ndarray[np.float64_t, ndim=1] sort_vals
+    cdef np.ndarray[np.float64_t, ndim=1] clustc
+    cdef np.ndarray[np.int64_t, ndim=1] ind
+    cdef Py_ssize_t i, j, coord
     
     cdef double half_r2 = tol**2 * 0.5
     cdef np.ndarray[np.float64_t, ndim=1] half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
+    
     cdef np.ndarray[np.float64_t, ndim=1] dataj
     cdef double rhs
+    cdef int ii
 
     if sorting == "norm-mean" or sorting == "norm-orthant": 
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
         ind = np.argsort(sort_vals)
 
     elif sorting == "pca":
-        data = data - np.mean(data, axis=0)
         if data.shape[1]>1:
             if fdim <= 3: # memory inefficient
                 gemm = get_blas_funcs("gemm", [data.T, data])
@@ -117,6 +118,7 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
         ind = np.arange(len_ind)
     
     for i in range(len_ind):
+        
         sp = ind[i] 
         if labels[sp] >= 0:
             continue
@@ -127,19 +129,21 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
 
         rhs = half_r2 - half_nrm2[sp] # right-hand side of norm ineq.
 
-        for j in ind[i+1:]:
+        for ii in range(i+1, len_ind): 
+            j = ind[ii]
+            
             if labels[j] >= 0:
                 continue
             
-            if (sort_vals[j] - sort_vals[sp] > tol):
+            if sort_vals[j] - sort_vals[sp] > tol:
                 break       
             
             dist = 0
-            dataj = data[j]
+            dataj = data[j,:] 
 
             for coord in range(fdim):
                 dist += clustc[coord] * dataj[coord]
-            
+                
             nr_dist += 1
             
             if half_nrm2[j] - dist <= rhs:
@@ -147,7 +151,7 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
                 labels[j] = lab
 
         splist.append((sp, sort_vals[sp], num_group)) 
-        # list of [ starting point index of current group, sorting key, and number of group elements ]
+
         lab += 1
 
     return labels, splist, nr_dist, ind
@@ -182,20 +186,20 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
         The number of pairwise distance calculations.
     """
     
-    cdef unsigned int num_group
-    cdef unsigned int fdim = data.shape[1] # feature dimension
-    cdef unsigned int len_ind = data.shape[0] # size of data
+    cdef int num_group
+    cdef Py_ssize_t fdim = data.shape[1] # feature dimension
+    cdef Py_ssize_t len_ind = data.shape[0] # size of data
     cdef np.ndarray[np.float64_t, ndim=2] U1
-    cdef unsigned int sp # sp: starting point
-    cdef unsigned int nr_dist = 0 # nr_dist:if necessary, count the distance computation
-    cdef unsigned int lab = 0 # lab: class
+    cdef int sp # sp: starting point
+    cdef int nr_dist = 0 # nr_dist:if necessary, count the distance computation
+    cdef int lab = 0 # lab: class
     cdef double dist # distance 
-    cdef np.ndarray[np.int64_t, ndim=1] labels = np.zeros(len_ind, dtype=np.int64) - 1
+    cdef np.ndarray[np.int64_t, ndim=1] labels = np.full(len_ind, -1, dtype=int)
     cdef list splist = list() # store the starting points
-    cdef np.ndarray[np.float64_t, ndim=1] sort_vals = np.empty((len_ind, ), dtype=float)
-    cdef np.ndarray[np.float64_t, ndim=1] clustc = np.empty((fdim, ), dtype=float)
-    cdef np.ndarray[np.int64_t, ndim=1] ind = np.empty((len_ind, ), dtype=np.int64)
-    cdef unsigned int i, j, coord, c
+    cdef np.ndarray[np.float64_t, ndim=1] sort_vals
+    cdef np.ndarray[np.float64_t, ndim=1] clustc
+    cdef np.ndarray[np.int64_t, ndim=1] ind
+    cdef Py_ssize_t i, j, coord
     
     
     if sorting == "norm-mean" or sorting == "norm-orthant": 
@@ -203,7 +207,6 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
         ind = np.argsort(sort_vals)
 
     elif sorting == "pca":
-        data = data - np.mean(data, axis=0)
         if data.shape[1]>1:
             if fdim <= 3: # memory inefficient
                 gemm = get_blas_funcs("gemm", [data.T, data])
@@ -225,6 +228,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
     
     for i in range(len_ind):
         sp = ind[i] 
+
         if labels[sp] >= 0:
             continue
         
@@ -236,7 +240,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
             if labels[j] >= 0:
                 continue
             
-            if (sort_vals[j] - sort_vals[sp] > tol):
+            if sort_vals[j] - sort_vals[sp] > tol:
                 break       
             
             dist = 0
@@ -250,7 +254,6 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
                 labels[j] = lab
 
         splist.append((sp, sort_vals[sp], num_group)) 
-        # list of [ starting point index of current group, sorting key, and number of group elements ]
         lab += 1
 
     return labels, splist, nr_dist, ind
