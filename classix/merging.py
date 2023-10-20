@@ -31,9 +31,122 @@ import numpy as np
 from scipy.special import betainc, gamma
 
 
-def blas_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1.5):
+def agglomerate(data, splist, radius, method='distance', scale=1.5):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
+    
+    Parameters
+    ----------
+    data : numpy.ndarray
+        The input that is array-like of shape (n_samples,).
+    
+    splist : numpy.ndarray
+        Represent the list of starting points information formed in the aggregation. 
+        list of [ starting point index of current group, sorting values, and number of group elements ]
+
+    radius : float
+        The tolerance to control the aggregation. If the distance between the starting point 
+        of a group and another data point is less than or equal to the tolerance,
+        the point is allocated to that group. For details, we refer users to [1].
+
+    method : str, default='distance'
+        Method for group merging, Available options are:
+        
+        - 'density': two groups are merged if the density of data points in their intersection 
+           is at least as high the smaller density of both groups. This option uses the disjoint 
+           set structure to speedup agglomerate.
+           
+        - 'distance': two groups are merged if the distance of their starting points is at 
+           most scale*radius (the parameter above). This option uses the disjoint 
+           set structure to speedup agglomerate.
+    
+    scale : float
+        Design for distance-clustering, when distance between the two starting points 
+        associated with two distinct groups smaller than scale*radius, then the two groups merge.
+
+        
+    Returns
+    -------
+    labels_set : list
+        Connected components of graph with groups as vertices.
+    
+    connected_pairs_store : list
+        List for connected group labels.
+
+    References
+    ----------
+    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
+
+    """
+    
+    connected_pairs = [SET(i) for i in range(splist.shape[0])]
+    connected_pairs_store = []
+    
+    if method == "density":
+        volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
+    else:
+        volume = None
+        
+    for i in range(splist.shape[0]):
+        sp1 =  data[int(splist[i, 0])]
+        neigbor_sp = data[splist[i+1:, 0].astype(int)] 
+        select_stps = np.arange(i+1, splist.shape[0], dtype=int)
+        sort_vals = splist[i:, 1]
+        
+        if method == "density":                    # calculate the density
+            # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
+            # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
+            # AGGREGATION.
+            index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= 2*radius # 2*distance_scale*radius
+            select_stps = select_stps[index_overlap]
+            # calculate their neighbors ...1)
+            # later decide whether sps should merge with neighbors
+            if not np.any(index_overlap):
+                continue
+
+            c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
+            den1 = np.count_nonzero(c1) / volume
+            
+            for j in select_stps.astype(int):
+                sp2 = data[int(splist[j, 0])] # splist[int(j), 3:]
+
+                c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
+                den2 = np.count_nonzero(c2) / volume
+
+                if check_if_overlap(sp1, sp2, radius=radius): 
+                    internum = np.count_nonzero(c1 & c2)
+                    cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
+                    if cid >= den1 or cid >= den2: 
+                        merge(connected_pairs[i], connected_pairs[j])
+                        connected_pairs_store.append([i, j])
+
+        else: 
+            # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
+            # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
+            # AGGREGATION.
+            index_overlap = fast_query(neigbor_sp, sp1, sort_vals, scale*radius)
+            select_stps = select_stps[index_overlap]
+            if not np.any(index_overlap): # calculate their neighbors ...1)
+                continue
+    
+            for j in select_stps:
+                # two groups merge when their starting points distance is smaller than 1.5*radius
+                # connected_pairs.append([i,j]) # store connected groups
+                merge(connected_pairs[i], connected_pairs[j])
+                connected_pairs_store.append((i, j))
+        
+    labels = [findParent(i).data for i in connected_pairs]
+    labels_set = list()
+    for i in np.unique(labels):
+        labels_set.append(np.where(labels == i)[0].tolist())
+    return labels_set, connected_pairs_store  # merge_pairs(connected_pairs)
+
+
+
+
+def bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1.5):
+    """
+    Implement CLASSIX's merging with brute force computation
     
     Parameters
     ----------
@@ -63,6 +176,7 @@ def blas_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale
         Design for distance-clustering, when distance between the two starting points 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
 
+        
     Returns
     -------
 
@@ -136,118 +250,6 @@ def blas_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale
 
 
 
-
-def agglomerate(data, splist, radius, method='distance', scale=1.5):
-    """
-    Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
-    
-    Parameters
-    ----------
-    data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
-    
-    splist : numpy.ndarray
-        Represent the list of starting points information formed in the aggregation. 
-        list of [ starting point index of current group, sorting values, and number of group elements ]
-
-    radius : float
-        The tolerance to control the aggregation. If the distance between the starting point 
-        of a group and another data point is less than or equal to the tolerance,
-        the point is allocated to that group. For details, we refer users to [1].
-
-    method : str, default='distance'
-        Method for group merging, Available options are:
-        
-        - 'density': two groups are merged if the density of data points in their intersection 
-           is at least as high the smaller density of both groups. This option uses the disjoint 
-           set structure to speedup agglomerate.
-           
-        - 'distance': two groups are merged if the distance of their starting points is at 
-           most scale*radius (the parameter above). This option uses the disjoint 
-           set structure to speedup agglomerate.
-    
-    scale : float
-        Design for distance-clustering, when distance between the two starting points 
-        associated with two distinct groups smaller than scale*radius, then the two groups merge.
-
-    Returns
-    -------
-    labels_set : list
-        Connected components of graph with groups as vertices.
-    
-    connected_pairs_store : list
-        List for connected group labels.
-
-    References
-    ----------
-    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
-
-    """
-    
-    connected_pairs = [SET(i) for i in range(splist.shape[0])]
-    connected_pairs_store = []
-    
-    if method == "density":
-        volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
-    else:
-        volume = None
-        
-    for i in range(splist.shape[0]):
-        sp1 =  data[int(splist[i, 0])]
-        neigbor_sp = data[splist[i+1:, 0].astype(int)] 
-        select_stps = np.arange(i+1, splist.shape[0], dtype=int)
-        sort_vals = splist[i:, 1]
-        
-        if method == "density":                    # calculate the density
-            # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
-            # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
-            # AGGREGATION.
-            index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= 2*radius # 2*distance_scale*radius
-            select_stps = select_stps[index_overlap]
-            # calculate their neighbors ...1)
-            # later decide whether sps should merge with neighbors
-            if not np.any(index_overlap):
-                continue
-
-            c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
-            den1 = np.count_nonzero(c1) / volume
-            
-            for j in select_stps.astype(int):
-                sp2 = data[int(splist[j, 0])] # splist[int(j), 3:]
-
-                c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
-                den2 = np.count_nonzero(c2) / volume
-
-                if check_if_overlap(sp1, sp2, radius=radius): 
-                    internum = np.count_nonzero(c1 & c2)
-                    cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
-                    if cid >= den1 or cid >= den2: 
-                        merge(connected_pairs[i], connected_pairs[j])
-                        connected_pairs_store.append([i, j])
-
-        else: 
-            # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
-            # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
-            # AGGREGATION.
-            index_overlap = fast_query(neigbor_sp, sp1, sort_vals, scale*radius)
-            select_stps = select_stps[index_overlap]
-            if not np.any(index_overlap): # calculate their neighbors ...1)
-                continue
-    
-            for j in select_stps:
-                # two groups merge when their starting points distance is smaller than 1.5*radius
-                # connected_pairs.append([i,j]) # store connected groups
-                merge(connected_pairs[i], connected_pairs[j])
-                connected_pairs_store.append([i, j])
-        
-    labels = [findParent(i).data for i in connected_pairs]
-    labels_set = list()
-    for i in np.unique(labels):
-        labels_set.append(np.where(labels == i)[0].tolist())
-    return labels_set, connected_pairs_store  # merge_pairs(connected_pairs)
-
-
-
 def fast_query(data, starting_point, sort_vals, tol):
     """Fast query with built in early stopping strategy for merging."""
     len_ind = data.shape[0]
@@ -265,6 +267,7 @@ def fast_query(data, starting_point, sort_vals, tol):
             index_query[i] = True
             
     return index_query
+
 
 
 def euclid(xxt, X, v):

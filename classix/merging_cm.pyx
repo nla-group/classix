@@ -31,13 +31,11 @@
 #cython: profile=True
 #cython: linetrace=True
 
+
 cimport cython
 import numpy as np
 cimport numpy as np
 from scipy.special import betainc, gamma
-# from sklearn.metrics import pairwise_distances
-from scipy.sparse import csr_matrix, _sparsetools
-from scipy.sparse.csgraph import connected_components
 ctypedef np.uint8_t uint8
 np.import_array()
     
@@ -45,9 +43,10 @@ np.import_array()
 @cython.wraparound(False)
 @cython.binding(True)
 
+
 # Disjoint set union
-cpdef agglomerate(np.ndarray[np.float64_t, ndim=2] data, 
-                    np.ndarray[np.float64_t, ndim=2] splist, 
+cpdef agglomerate(double[:, :] data, 
+                    double[:, :] splist, 
                     double radius, str method='distance', double scale=1.5):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
@@ -100,62 +99,65 @@ cpdef agglomerate(np.ndarray[np.float64_t, ndim=2] data,
     cdef list connected_pairs_store = list()
     cdef double volume, den1, den2, cid
     cdef unsigned int i, j, internum
-    cdef np.ndarray[np.float64_t, ndim=2] neigbor_sp
-    cdef np.ndarray[np.float64_t, ndim=1] sort_vals
-    cdef np.ndarray[long, ndim=1] select_stps
+    cdef int ndim = data.shape[1]
+    cdef int nsize_stp = splist.shape[0]
+
+    cdef double[:, :] neigbor_sp
+    cdef double[:] sort_vals
+    cdef long[:] select_stps
     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] index_overlap, c1, c2
     if method == "density":
-        volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1) + np.finfo(float).eps
+        volume = np.pi**(ndim/2) * radius** ndim / gamma( ndim/2+1 ) + np.finfo(float).eps
     else:
         volume = 0.0 # no need for distance-based method
     
-    for i in range(splist.shape[0]):
-        sp1 = data[int(splist[i, 0])] # splist[i, 3:]
-        neigbor_sp = data[splist[i+1:, 0].astype(int)] # splist[i+1:, 3:]
+    for i in range(nsize_stp):
+        sp1 = data.base[int(splist[i, 0])] 
+        select_stps = splist.base[i+1:, 0].astype(int)
+        neigbor_sp = data.base[select_stps, :] 
         
-        select_stps = np.arange(i+1, splist.shape[0], dtype=int)
-        sort_vals = splist[i:, 1]
+        select_stps = np.arange(i+1, nsize_stp, dtype=int)
+        sort_vals = splist.base[i:, 1]
         
         if method == "density":
-            # index_overlap = np.linalg.norm(neigbor_sp[:,2:] - sp1, ord=2, axis=-1) <= 2*radius 
             index_overlap = fast_query(neigbor_sp, sp1, sort_vals, 2*radius)
-            select_stps = select_stps[index_overlap]
+            select_stps = select_stps.base[index_overlap]
             if not np.any(index_overlap):
                 continue
-            # neigbor_sp = neigbor_sp[index_overlap]
+            
             c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
             den1 = np.count_nonzero(c1) / volume
-            for j in select_stps.astype(int):
-                sp2 = data[int(splist[j, 0])] # splist[j, 3:]
+
+            for j in select_stps:
+                sp2 = data.base[int(splist[j, 0])] 
                 c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
                 den2 = np.count_nonzero(c2) / volume
+                
                 if check_if_overlap(sp1, sp2, radius=radius): 
                     internum = np.count_nonzero(c1 & c2)
                     cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
                     if cid >= den1 or cid >= den2: 
-                        # connected_pairs.append([i,j]) 
                         merge(connected_pairs[i], connected_pairs[j])
                         connected_pairs_store.append([i, j])
         else:
             # index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  
             index_overlap = fast_query(neigbor_sp, sp1, sort_vals, scale*radius)
-            select_stps = select_stps[index_overlap]
+            select_stps = select_stps.base[index_overlap]
             if not np.any(index_overlap):
                 continue
-
-            # neigbor_sp = neigbor_sp[index_overlap] 
+ 
             for j in select_stps:
-                # connected_pairs.append([i,j]) 
                 merge(connected_pairs[i], connected_pairs[j])
-                connected_pairs_store.append([i, j])
+                connected_pairs_store.append((i, j))
                 
     cdef SET obj = SET(0)
     cdef list labels_set = list()
     cdef list labels = [findParent(obj).data for obj in connected_pairs]
     cdef int lab
+
     for lab in np.unique(labels):
         labels_set.append([i for i in range(len(labels)) if labels[i] == lab])
-    return labels_set, connected_pairs_store # merge_pairs(connected_pairs)
+    return labels_set, connected_pairs_store 
 
 
 
@@ -165,7 +167,7 @@ cpdef fast_query(double[:,:] data, double[:] starting_point, double[:] sort_vals
     cdef double[:] candidate
     cdef double dist
     cdef Py_ssize_t i, coord
-    cdef fdim = data.shape[1] # remove the first three elements that not included in the features
+    cdef ndim = data.shape[1] # remove the first three elements that not included in the features
     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] index_query=np.full(len_ind, False, dtype=bool)
     for i in range(len_ind):
         candidate = data[i]
@@ -174,7 +176,7 @@ cpdef fast_query(double[:,:] data, double[:] starting_point, double[:] sort_vals
             break
 
         dist = 0
-        for coord in range(fdim):
+        for coord in range(ndim):
             dist += (candidate[coord] - starting_point[coord])**2
         
         if dist <= tol**2:

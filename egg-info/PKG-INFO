@@ -1,12 +1,11 @@
 Metadata-Version: 2.1
 Name: classixclustering
-Version: 0.7.7
+Version: 0.7.8
 Summary: Fast and explainable clustering based on sorting
 Home-page: https://github.com/nla-group/CLASSIX.git
 Author: Xinye Chen, Stefan Güttel
 Author-email: xinye.chen@manchester.ac.uk, stefan.guettel@manchester.ac.uk
 License: MIT License
-Platform: UNKNOWN
 Classifier: Intended Audience :: Science/Research
 Classifier: Intended Audience :: Developers
 Classifier: Programming Language :: Python
@@ -124,4 +123,3 @@ Citation
       type    = {arXiv EPrint},
       url     = {https://arxiv.org/abs/2202.01456}
     }
-

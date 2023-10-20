@@ -39,7 +39,9 @@ import matplotlib.colors as colors
 from scipy.sparse.linalg import svds
 from scipy.sparse.csgraph import connected_components
 from scipy.sparse import csr_matrix, _sparsetools
-from .merging import blas_distance_agglomerate
+from .merging import bf_distance_agglomerate
+
+
 
 def cython_is_available(verbose=0):
     "Check if CLASSIX is using cython."
@@ -51,28 +53,32 @@ def cython_is_available(verbose=0):
         try:
             # %load_ext Cython
             # !python3 setup.py build_ext --inplace
-            import scipy, numpy
-            if numpy.__version__ >= '1.22.0' and numpy.__version__ < '1.24.0':
-                from .aggregation_c import aggregate 
-                __cython_type__ =  "trivial"
-                # cython without memory view, solve the error from scipy ``TypeError: type not understood``
-            else:
+            import numpy
+            
+            try:
                 from .aggregation_cm import aggregate
-                # cython with memory view
-                # Typed memoryviews allow efficient access to memory buffers, such as those underlying NumPy arrays, without incurring any Python overhead. 
                 
+                # cython with memoryviews
+                # Typed memoryviews allow efficient access to memory buffers, such as those underlying NumPy arrays, without incurring any Python overhead. 
+            
+            except ModuleNotFoundError:
+                from .aggregation_c import aggregate, precompute_aggregate 
+                __cython_type__ =  "trivial"
+
             if verbose:
                 if __cython_type__ == "memoryview":
-                    print("This CLASSIX is using Cython memoryview.")
+                    print("This CLASSIX is using Cython typed memoryviews.")
                 else:
-                    print("This CLASSIX is not using Cython memoryview.")
+                    print("This CLASSIX is not using Cython typed memoryviews.")
                     
             from .merging_cm import agglomerate
             return True
 
         except (ModuleNotFoundError, ValueError):
-            from .aggregation import aggregate 
+            from .aggregation import aggregate, precompute_aggregate
+
             from .merging import agglomerate
+
             if verbose:
                 print("This CLASSIX is not using Cython.")
             return False
@@ -80,6 +86,7 @@ def cython_is_available(verbose=0):
         if verbose:
             print("Currently, the Cython implementation is disabled. Please try to set ``__enable_cython__`` to True to enable Cython if needed.")
         return False
+    
     
     
 def loadData(name='vdu_signals'):
@@ -318,14 +325,19 @@ class CLASSIX:
         If allocate the outliers to the closest groups, hence the corresponding clusters. 
         If False, all outliers will be labeled as -1.
 
-    algorithm : str, default='blas'
+    algorithm : str, default='bf'
         Algorithm to merge connected groups
 
-        - 'blas': Use BLAS routines to speed up the merging of connected groups.
+        - 'bf': Use brute force routines to speed up the merging of connected groups.
         
         - 'set': Use disjoint set structure to merge connected groups.
 
-        
+    memory: bool, default=True
+        If cython memoryviews is disable, a fast algorithm with less efficient momory comsuming is triggered
+          since precomputation for aggregation is used. 
+        Setting it True will use a memory efficient computing.  
+        If cython memoryviews is effective, thie parameter can be ignored. 
+
     verbose : boolean or int, default=1
         Whether print the logs or not.
              
@@ -377,7 +389,8 @@ class CLASSIX:
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
     """
         
-    def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, algorithm='set', verbose=1): 
+    def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, 
+                 algorithm='set', memory=False, verbose=1): 
 
 
         self.verbose = verbose
@@ -407,7 +420,8 @@ class CLASSIX:
         
         self.splist_indices = [None]
         self.index_data = []
-        
+        self.memory = memory
+
         from . import __enable_cython__
         self.__enable_cython__ = __enable_cython__
         
@@ -415,27 +429,38 @@ class CLASSIX:
             try:
                 # %load_ext Cython
                 # !python3 setup.py build_ext --inplace
-                import scipy, numpy
-                if scipy.__version__ >= '1.8.0' or numpy.__version__ >= '1.22.0':
-                    from .aggregation_c import aggregate 
-                    # cython without memory view, solve the error from scipy ``TypeError: type not understood``
-                else:
-                    from .aggregation_cm import aggregate
-                    # cython with memory view
+
                 from .merging_cm import agglomerate
 
+                try:
+                    from .aggregation_cm import aggregate
+                    from .aggregation_cm import aggregate as precompute_aggregate # in cython memoryviews code,
+                                                                            # precompute is in disadvantage, so we set both the same.
+                    
+                    # cython with memoryviews
+                    # Typed memoryviews allow efficient access to memory buffers, such as those underlying NumPy arrays, without incurring any Python overhead. 
+                
+                except ModuleNotFoundError:
+                    from .aggregation_c import aggregate, precompute_aggregate 
+
+
             except (ModuleNotFoundError, ValueError):
-                from .aggregation import aggregate 
+                from .aggregation import aggregate, precompute_aggregate 
                 from .merging import agglomerate
                 warnings.warn("This CLASSIX installation is not using Cython.")
+
         else:
-            from .aggregation import aggregate 
+            from .aggregation import aggregate, precompute_aggregate 
             from .merging import agglomerate
             warnings.warn("This run of CLASSIX is not using Cython.")
 
-        self.aggregate = aggregate
+        if not self.memory:
+            self.aggregate = precompute_aggregate
+            
+        else:
+            self.aggregate = aggregate
+
         self.agglomerate = agglomerate
-        
         
             
     def fit(self, data):
@@ -517,6 +542,7 @@ class CLASSIX:
                 minPts=self.minPts,
                 algorithm=self.algorithm
             ) 
+
         return self
 
 
@@ -541,17 +567,17 @@ class CLASSIX:
         
         
         
-    def predict(self, data, mode="blas"):
+    def predict(self, data, memory=False):
         """
         Allocate the data to their nearest clusters.
         
         - data : numpy.ndarray
             The ndarray-like input of shape (n_samples,)
 
-        - mode : str, default="blas"
-            - "blas": default, use BLAS to speedup the query
+        - memory : bool, default=False
+            - True: default, use precomputation is triggered to speedup the query
 
-            - "trivial": use memory efficient to perform query 
+            - False: a memory efficient way to perform query 
 
         Returns
         -------
@@ -565,7 +591,7 @@ class CLASSIX:
         splist = data[indices]
         num_of_points = data.shape[0]
 
-        if mode == "blas":
+        if not memory:
             xxt = np.einsum('ij,ij->i', splist, splist)
             for i in range(num_of_points):
                 splabel = np.argmin(euclid(xxt, splist, data[i]))
@@ -576,7 +602,6 @@ class CLASSIX:
                 splabel = np.argmin(np.linalg.norm(splist - data[i], axis=1, ord=2))
                 labels.append(self.label_change[splabel])
 
-            
         return labels
     
     
@@ -616,7 +641,7 @@ class CLASSIX:
         algorithm : str, default='set'
             Algorithm to merge connected groups
  
-            - 'blas': Use BLAS routines to speed up the merging of connected groups.
+            - 'bf': Use bruteforce routines to speed up the merging of connected groups.
 
             - 'set': Use disjoint set structure to merge connected groups.
 
@@ -704,7 +729,7 @@ class CLASSIX:
             
 
         else:
-            labels, self.old_cluster_count, SIZE_NOISE_LABELS = blas_distance_agglomerate(data=data, 
+            labels, self.old_cluster_count, SIZE_NOISE_LABELS = bf_distance_agglomerate(data=data, 
                                                                 labels=labels,
                                                                 splist=splist,
                                                                 ind=ind, 
@@ -1855,98 +1880,6 @@ class CLASSIX:
     
     
 
-# deprecated (24/07/2021)
-# python implementation for aggregation
-# def aggregate(data, sorting="pca", tol=0.5, verbose=1):
-#     """aggregate the data
-# 
-#     Parameters
-#     ----------
-#     data : numpy.ndarray
-#         the input that is array-like of shape (n_samples,).
-# 
-#     sorting : str
-#         the sorting way refered for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
-# 
-#     tol : float
-#         the tolerance to control the aggregation, if the distance between the starting point 
-#         and the object is less than or equal than the tolerance,
-#         the object should allocated to the group which starting point belongs to.  
-# 
-#     Returns
-#     -------
-#     labels (list) : the group category of the data after aggregation
-#     splist (list) : the list of the starting points
-#     agg_centers (list) : store the centers of aggregation groups
-#     """
-# 
-#     # nr_dist = 0 # if necessary, count the distance computation
-#     splist = list() # store the starting points
-#     len_ind = data.shape[0]
-# 
-#     if sorting == "norm-mean":
-#         sort_vals = np.linalg.norm(data, ord=2, axis=1)
-#         ind = np.argsort(sort_vals)
-# 
-#     elif sorting == "norm-orthant":
-#         sort_vals = np.linalg.norm(data, ord=2, axis=1)
-#         ind = np.argsort(sort_vals)
-# 
-#     elif sorting == "pca":
-#         pca = PCA(n_components=1)
-#         sort_vals = pca.fit_transform(data).reshape(-1)
-#         ind = np.argsort(sort_vals)
-# 
-#     else: # no sorting
-#         ind = np.arange(len_ind)
-# 
-#     lab = 0
-#     labels = [-1] * len_ind
-# 
-#     for i in tqdm(range(len_ind), disable=not verbose):
-#         sp = ind[i] # starting point
-#         if labels[sp] >= 0:
-#             continue
-#         else:
-#             clustc = data[sp,:] 
-#             labels[sp] = lab
-#             num_group = 0
-# 
-#         for j in ind[i:]:
-#             if labels[j] >= 0:
-#                 continue
-# 
-#             # sort_val_c = sort_vals[sp]
-#             # sort_val_j = sort_vals[j]
-# 
-#             if (sort_vals[j] - sort_vals[sp] > tol):
-#                 break       
-# 
-#             # nr_dist += 1
-#             # dist = np.sum((clustc - data[j,:])**2)    # slow
-# 
-#             dat = clustc - data[j,:]
-#             dist = np.inner(dat, dat)
-# 
-#             if dist <= tol**2:
-#                 num_group = num_group + 1
-#                 labels[j] = lab
-# 
-#         splist.append([sp, lab] + [num_group] + list(clustc) ) # respectively store starting point
-#                                                                # index, label, number of neighbor objects, center (starting point).
-#         lab = lab + 1
-# 
-#     agg_centers = list() 
-#     for c in range(lab):
-#         indc = [i for i in range(len_ind) if labels[i] == c]
-#         center = np.mean(data[indc,:], axis=0)
-#         center = [-1, c] + center.tolist()
-#         agg_centers.append( center )
-# 
-#     # if verbose == 1:
-#     #    print("aggregate {} groups".format(len(np.unique(labels))))
-# 
-#     return labels, splist, agg_centers
 
 
 
@@ -1973,7 +1906,6 @@ def visualize_connections(data, splist, radius=0.5, scale=1.5):
 def novel_normalization(data, base):
     """Initial data preparation of CLASSIX."""
     if base == "norm-mean":
-        # self._mu, self._std = data.mean(axis=0), data.std()
         _mu = data.mean(axis=0)
         ndata = data - _mu
         _scl = ndata.std()
@@ -1987,14 +1919,12 @@ def novel_normalization(data, base):
         ndata = ndata / _scl # now 50% of data are in unit ball 
 
     elif base == "norm-orthant":
-        # self._mu, self._std = data.min(axis=0), data.std()
         _mu = data.min(axis=0)
         ndata = data - _mu
         _scl = ndata.std()
         ndata = ndata / _scl
 
     else:
-        # self._mu, self._std = data.mean(axis=0), data.std(axis=0) # z-score
         _mu, _scl = 0, 1 # no normalization
         ndata = (data - _mu) / _scl
     return ndata, (_mu, _scl)
@@ -2061,6 +1991,7 @@ def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, t
     source_node = int(source_node)
     queque.append(source_node+1)
     dist_info[source_node,1] = 0
+
     while(np.any(queque)):
         node = queque.pop(0)
         if not visited_nodes[node-1]:
