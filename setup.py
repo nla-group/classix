@@ -10,7 +10,7 @@ except ImportError as e:
     warnings.warn(e.args[0])
     from setuptools.command.build_ext import build_ext
     
-_version="0.7.8"
+_version="0.7.9"
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
@@ -36,12 +36,14 @@ class CustomBuildExtCommand(build_ext):
 setup_args = {'name':"classixclustering",
         'packages':["classix"],
         'version':_version,
-        'install_requires':requirements(),
-        # 'package_data':{"classix": ["aggregation_c.pyx",
-        #                         "aggregation_cm.pyx", 
-        #                         "merging_cm.pyx"]
-        #             },
-        'packages': ['classix', 'classix.data'],
+        'install_requires':["cython>=0.27",
+                             "numpy>=1.17.3",
+                             "scipy>=1.7.0",
+                             "pandas",
+                             "matplotlib>=3.5",
+                             "requests"], # requirements()
+
+        'packages': ['classix'],
         'cmdclass': {'build_ext': CustomBuildExtCommand},
         'classifiers':["Intended Audience :: Science/Research",
                 "Intended Audience :: Developers",
@@ -92,8 +94,8 @@ try:
 
 
 except ext_errors as ext:
-    log.warn(ext)
-    log.warn("The C extension could not be compiled.")
+    log.warning(ext)
+    log.warning("The C extension could not be compiled.")
 
     setuptools.setup(setup_requires=["numpy>=1.17.3"], **setup_args)
     log.info("Plain-Python installation succeeded.")
