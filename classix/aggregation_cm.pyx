@@ -118,7 +118,7 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
         for ii in range(i+1, len_ind): 
             j = ind[ii]
                     
-            if labels[j] != -1:
+            if labels[j] >= 0:
                 continue
                 
             if sort_vals[j] - sort_vals[sp] > tol:
@@ -220,7 +220,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
         for ii in range(i+1, len_ind): 
             j = ind[ii]
                     
-            if labels[j] != -1:
+            if labels[j] >= 0:
                 continue
                 
             if sort_vals[j] - sort_vals[sp] > tol:
