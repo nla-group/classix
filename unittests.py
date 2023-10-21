@@ -32,7 +32,8 @@ from classix import aggregation, aggregation_c, aggregation_cm, aggregation_test
 from classix.merging import agglomerate, bf_distance_agglomerate
 from classix.merging_cm import agglomerate as agglomerate_cm
 from classix.merging_cm import bf_distance_agglomerate as bf_distance_agglomerate_cm
-
+from classix.merging_cm_win import agglomerate as agglomerate_cm_win
+from classix.merging_cm_win import bf_distance_agglomerate as bf_distance_agglomerate_cm_win
 
 def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
     data, (_mu, _scl) = novel_normalization(data, sorting)
@@ -259,6 +260,7 @@ class TestClassix(unittest.TestCase):
             clx.explain(0,  plot=True, savefig=True)
             clx.explain(3, 2000,  plot=True, savefig=False)
             clx.explain(0, 2008,  plot=True, savefig=True)
+            clx.explain(2000, 2028,  plot=True, savefig=True)
             clx.explain(index1=0, index2=2008, index3=100,  plot=True, savefig=True)
             # clx.explain(plot=True, figsize=(10,10), sp_fontsize=10, savefig=False)
             # clx.explain(0,  plot=True, sp_fontsize=10, savefig=False)
@@ -346,9 +348,11 @@ class TestClassix(unittest.TestCase):
             label_set1, connected_pairs_store1 = agglomerate(data, splist, radius, method='distance', scale=1.5)
             label_set2, connected_pairs_store2 = agglomerate_cm(data, splist, radius, method='distance', scale=1.5)
 
-            label_set3, _, _ = bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1.5)
-            label_set4, _, _ = bf_distance_agglomerate_cm(data, labels, splist, ind, radius, minPts=0, scale=1.5)
+            label_set3, _, _ = bf_distance_agglomerate(data, labels, splist, radius, minPts=0, scale=1.5)
+            label_set4, _, _ = bf_distance_agglomerate_cm(data, labels, splist, radius, minPts=0, scale=1.5)
 
+            label_set5, _, _ = bf_distance_agglomerate_win(data, labels, splist, radius, minPts=0, scale=1.5)
+            label_set6, _, _ = bf_distance_agglomerate_cm_win(data, labels, splist, radius, minPts=0, scale=1.5)
             for i in range(len(label_set2)):
                 if label_set1[i] != label_set2[i]:
                     checkpoint = 0
@@ -360,7 +364,10 @@ class TestClassix(unittest.TestCase):
             for i in range(len(label_set3)):
                 if label_set3[i] != label_set4[i]:
                     checkpoint = 0
-
+                if label_set3[i] != label_set5[i]:
+                    checkpoint = 0
+                if label_set5[i] != label_set6[i]:
+                    checkpoint = 0
         except:
             checkpoint = 0
 
