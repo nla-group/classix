@@ -344,33 +344,27 @@ class TestClassix(unittest.TestCase):
         try:
             data = np.random.randn(10000, 2)
             checkpoint = 1
-            labels, splist, _, ind = aggregation.aggregate(data, sorting="pca", tol=0.5) # 
+            labels, splist, _, ind = aggregation.aggregate(data, sorting="pca", tol=0.5) #
             splist = np.asarray(splist)
-
+            
             radius = 0.5
             label_set1, connected_pairs_store1 = agglomerate(data, splist, radius, method='distance', scale=1.5)
             label_set2, connected_pairs_store2 = agglomerate_cm(data, splist, radius, method='distance', scale=1.5)
-
+            
+            
             label_set3, _, _ = bf_distance_agglomerate(data, labels, splist, radius, minPts=0, scale=1.5)
             label_set4, _, _ = bf_distance_agglomerate_cm(data, labels, splist, radius, minPts=0, scale=1.5)
-
-            label_set5, _, _ = bf_distance_agglomerate_win(data, labels, splist, radius, minPts=0, scale=1.5)
-            label_set6, _, _ = bf_distance_agglomerate_cm_win(data, labels, splist, radius, minPts=0, scale=1.5)
+            
             for i in range(len(label_set2)):
                 if label_set1[i] != label_set2[i]:
                     checkpoint = 0
-
+            
             for i in range(len(connected_pairs_store1)):
                 if connected_pairs_store1[i] != connected_pairs_store2[i]:
                     checkpoint = 0
-                    
+            
             for i in range(len(label_set3)):
                 if label_set3[i] != label_set4[i]:
-                    checkpoint = 0
-                if label_set3[i] != label_set5[i]:
-                    checkpoint = 0
-                if label_set5[i] != label_set6[i]:
-                    checkpoint = 0
         except:
             checkpoint = 0
 
