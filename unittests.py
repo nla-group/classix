@@ -101,7 +101,7 @@ class TestClassix(unittest.TestCase):
             assert(comp.all())
 
 
-    def non_cython_version(self):
+    def test_non_cython_version(self):
         classix.__enable_cython__ = False
         checkpoint = 1
         for dim in range(1, 5):
@@ -122,7 +122,7 @@ class TestClassix(unittest.TestCase):
         self.assertEqual(checkpoint, 1)
     
     
-    def cython_version(self):
+    def test_cython_version(self):
         classix.__enable_cython__ = True
         checkpoint = 1
         for dim in range(1, 5):
@@ -136,6 +136,12 @@ class TestClassix(unittest.TestCase):
                 
                 clx = CLASSIX(sorting='pca', group_merging='distance')
                 clx.fit_transform(X)
+
+                clx = CLASSIX(sorting='pca', group_merging='distance'. algorithm='bf')
+                clx.fit_transform(X)
+
+                clx = CLASSIX(sorting='pca', group_merging='distance'. algorithm='bf', memory=True)
+                clx.fit_transform(X, memory=True)
             except:
                 checkpoint = 0
                 break
