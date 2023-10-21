@@ -326,7 +326,7 @@ class CLASSIX:
         If False, all outliers will be labeled as -1.
 
     algorithm : str, default='bf'
-        Algorithm to merge connected groups
+        Algorithm to merge connected groups.
 
         - 'bf': Use brute force routines to speed up the merging of connected groups.
         
@@ -379,7 +379,7 @@ class CLASSIX:
         After clustering the in-sample data, predict the out-sample data.
         Data will be allocated to the clusters with the nearest starting point in the stage of aggregation. Default values.
         
-    explain(index1, index2): 
+    explain(index1, index2, ...): 
         Explain the computed clustering. 
         The indices index1 and index2 are optional parameters (int) corresponding to the 
         indices of the data points. 
@@ -407,12 +407,12 @@ class CLASSIX:
         self.scale = scale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
 
-
         self.groups_ = None
         self.clean_index_ = None
         self.labels_ = None
         self.connected_pairs_ = None
         self.cluster_color = None
+        self.connected_paths = None
         self.algorithm = algorithm
 
         if self.verbose:
@@ -535,7 +535,6 @@ class CLASSIX:
                 agg_labels=self.groups_, 
                 splist=self.splist_,  
                 ind=ind,           
-                sorting=self.sorting, 
                 radius=self.radius, 
                 method=self.group_merging, 
                 minPts=self.minPts,
@@ -605,7 +604,7 @@ class CLASSIX:
     
     
     
-    def clustering(self, data, agg_labels, ind, splist, sorting="pca", radius=0.5, method="distance", minPts=0, algorithm='set'):
+    def clustering(self, data, agg_labels, ind, splist, radius=0.5, method="distance", minPts=0, algorithm='set'):
         """
         Merge groups after aggregation. 
 
@@ -619,10 +618,6 @@ class CLASSIX:
         
         splist: numpy.ndarray
             List formed in the aggregation storing starting points.
-        
-        sorting : str
-            The sorting way refered for aggregation, 
-            default='pca', other options: 'norm-mean', 'norm-orthant', 'z-pca', or None.
         
         radius : float, default=0.5
             Tolerance to control the aggregation hence the whole clustering process. For aggregation, 
@@ -638,7 +633,7 @@ class CLASSIX:
             When assgin it 0, algorithm won't check noises.
 
         algorithm : str, default='set'
-            Algorithm to merge connected groups
+            Algorithm to merge connected groups.
  
             - 'bf': Use bruteforce routines to speed up the merging of connected groups.
 
@@ -755,7 +750,7 @@ class CLASSIX:
                 
             print("Try the .explain() method to explain the clustering.")
 
-        return labels #, centers
+        return labels 
     
     
     
@@ -763,8 +758,10 @@ class CLASSIX:
                 plot=False, figsize=(11, 6), figstyle="ggplot", savefig=False, ind_color="k", ind_marker_size=150,
                 sp_fcolor='tomato',  sp_alpha=0.05, sp_pad=0.5, sp_fontsize=None, sp_bbox=None, 
                 dp_fcolor='bisque',  dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
-                cmap='turbo', cmin=0.07, cmax=0.97, color='red', connect_color='green', alpha=0.5, 
-                cline_width=0.5, axis='off', figname=None, fmt='pdf', *argv, **kwargs):
+                cmap='turbo', cmin=0.07, cmax=0.97, color='red', connect_color='green', alpha=0.5, cline_width=0.5, 
+                add_arrow=False, arrow_linestyle='--', arrow_fc='darkslategrey', arrow_ec='dimgrey',
+                directed_arrow=0, axis='off', figname=None, fmt='pdf', *argv, **kwargs):
+        
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
         'self.explain(object1/index1, object2/index2) # prints an explanation why object1 and object2 are either in the same or distinct clusters
@@ -873,7 +870,23 @@ class CLASSIX:
     
         cline_width : float, default=0.5
             Set the patch linewidth of circle for starting points.
+
+        add_arrow : bool, default=False 
+            Whether or not add arrows for connected paths.
+
+        arrow_linestyle : str, default='--' 
+            Linestyle for arrow.
         
+        arrow_fc : str, default='darkslategrey' 
+            Face color for arrow.
+
+        arrow_ec : str, default='dimgrey'
+            Edge color for arrow.
+
+        directed_arrow : int, default=0
+            Whether or not the edges for arrows is directed.
+            Values at {-1, 0, 1}, 0 refers to undirected, -1 refers to the edge direction opposite to 1.
+
         figname : str, optional
             Set the figure name for the image to be saved.
             
@@ -889,19 +902,19 @@ class CLASSIX:
             sp_bbox['facecolor'] = sp_fcolor
             sp_bbox['alpha'] = sp_alpha
             sp_bbox['pad'] = sp_pad
-        # else: sp_bbox = {'facecolor': 'tomato', 'alpha': 0.2, 'pad': 2}
+       
         
         if dp_bbox is None:
             dp_bbox = dict()
             dp_bbox['facecolor'] = dp_fcolor
             dp_bbox['alpha'] = dp_alpha
             dp_bbox['pad'] = dp_pad
-        # else: dp_bbox = {'facecolor': 'bisque', 'alpha': 0.2, 'pad': 2}
+        
             
         if dp_fontsize is None and sp_fontsize is not None:
             dp_fontsize = sp_fontsize
         
-        # if self.cluster_color is None:
+        
         if cmap is not None:
             _cmap = plt.cm.get_cmap(cmap)
             _interval = np.linspace(cmin, cmax, len(set(self.labels_))) 
@@ -926,17 +939,14 @@ class CLASSIX:
                 
             elif self.data.shape[1] == 2:
                 self.x_pca = self.data.copy()
-                self.s_pca = self.data[self.splist_[:, 0].astype(int)] # self.splist_[:, 3:].copy()
+                self.s_pca = self.data[self.splist_[:, 0].astype(int)] 
 
             else: # when data is one-dimensional, no PCA transform
                 self.x_pca = np.ones((len(self.data.copy()), 2))
                 self.x_pca[:, 0] = self.data[:, 0]
                 self.s_pca = np.ones((len(self.splist_), 2))
-                self.s_pca[:, 0] = self.data[self.splist_[:, 0].astype(int)].reshape(-1) # self.splist_[:, 2]
+                self.s_pca[:, 0] = self.data[self.splist_[:, 0].astype(int)].reshape(-1) 
                 
-                # remove (24/07/2021):
-                # print("This function is restricted to multidimensional (dimension greater than or equal to 2) data.")
-            
             self.form_starting_point_clusters_table()
             
         if index1 is None and index2 is not None:
@@ -1002,8 +1012,7 @@ class CLASSIX:
                     object1 = np.matmul(object1, self._V[np.argsort(self._s)].T)
                     
                 agg_label1 = np.argmin(np.linalg.norm(self.s_pca - object1, axis=1, ord=2)) # get the group index for object1
-                # if self.data.shape[1] >= 2:
-                #     object1 = self.pca.transform(object1)
+
                     
             else:
                 raise ValueError("Please enter a legal value for index1.")
@@ -1013,9 +1022,6 @@ class CLASSIX:
             
             
             # explain one object
-            # cluster_centers = self.calculate_group_centers(self.data, self.labels_)
-            # print("Starting point list of {} data:".format(len(self.groups_)))
-
             if index2 is None:
                 if replace_name is not None:
                     if isinstance(replace_name, list):
@@ -1026,18 +1032,16 @@ class CLASSIX:
                     index1 = index1
 
                 cluster_label1 = self.label_change[agg_label1]
-                sp_str = self.s_pca[agg_label1] # self.splist_[agg_label1, 3:]
+                sp_str = self.s_pca[agg_label1] 
                 
                 if plot == True:
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
                     plt.rcParams['axes.facecolor'] = 'white'
-                    # select indices
                     x_pca = self.x_pca[self.labels_ == cluster_label1]
                     s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
                     
                     ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", c=self.cluster_color[cluster_label1])
-                    # ax.scatter(x_pca[:, 0], x_pca[:, 1], marker="*", c='pink')
                     ax.scatter(s_pca[:, 0], s_pca[:, 1], marker="p")
                     
                     
@@ -1054,13 +1058,11 @@ class CLASSIX:
                         if sp_fontsize is None:
                             ax.text(s_pca[i, 0], s_pca[i, 1],
                                     s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
-                                    # self.splist_[self.sp_info.Cluster == cluster_label1, 1][i].astype(int).astype(str), 
                                     bbox=sp_bbox
                             )
                         else:
                             ax.text(s_pca[i, 0], s_pca[i, 1],
                                     s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
-                                    # self.splist_[self.sp_info.Cluster == cluster_label1, 1][i].astype(int).astype(str), 
                                     fontsize=sp_fontsize, bbox=sp_bbox
                             )
                     ax.plot()
@@ -1164,29 +1166,6 @@ class CLASSIX:
                         ax.add_patch(plt.Circle((s_pca[0], s_pca[1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
                         
                     if dp_fontsize is None:
-                        # for index in indexlist:
-                        #     _index = kwargs[index]
-                        #     if isinstance(_index, int):
-                        #         _object = self.x_pca[_index] # self.data has been normalized
-
-                        #     elif isinstance(_index, str):
-                        #         if _index in self.index_data:
-                        #             if len(set(self.index_data)) != len(self.index_data):
-                        #                 warnings.warn("The index of data is duplicate.")
-                        #                 _object = self.x_pca[np.where(self.index_data == _index)[0][0]][0]
-                        #             else:
-                        #                 _object = self.x_pca[self.index_data == _index][0]
-                        #         else:
-                        #             raise ValueError("Please enter a legal value for index.")
-
-                        #     elif isinstance(_index, list) or isinstance(_index, np.ndarray):
-                        #         _index = np.array(_index)
-                        #         _object = (_index - self._mu) / self._scl # allow for out-sample data
-                        #         if self.data.shape[1] > 2:
-                        #             _object = np.matmul(_object, self._V[np.argsort(self._s)].T)
-                                    # _object = self.pca.transform(_object)
-                        #     else:
-                        #         raise ValueError("Please enter a legal value for index.")
                         for ii in range(len(indexlist)):
                             if isinstance(index1, int) or isinstance(index1, str):
                                 _index = indexvalues[ii]
@@ -1198,29 +1177,6 @@ class CLASSIX:
                             ax.text(_object[0], _object[1], s=str(_index), bbox=dp_bbox, color=ind_color)
                             ax.scatter(_object[0], _object[1], marker="*", s=ind_marker_size)
                     else:
-                        # for index in indexlist:
-                        #     _index = kwargs[index]
-                        #     if isinstance(_index, int):
-                        #         _object = self.x_pca[_index] # self.data has been normalized
-
-                        #     elif isinstance(_index, str):
-                        #         if _index in self.index_data:
-                        #             if len(set(self.index_data)) != len(self.index_data):
-                        #                 warnings.warn("The index of data is duplicate.")
-                        #                 _object = self.x_pca[np.where(self.index_data == _index)[0][0]][0]
-                        #             else:
-                        #                 _object = self.x_pca[self.index_data == _index][0]
-                        #         else:
-                        #             raise ValueError("Please enter a legal value for index.")
-
-                        #     elif isinstance(_index, list) or isinstance(_index, np.ndarray):
-                        #         _index = np.array(_index)
-                        #         _object = (_index - self._mu) / self._scl # allow for out-sample data
-                        #         if self.data.shape[1] >= 2:
-                        #             _object = np.matmul(object_, self._V[np.argsort(self._s)].T)
-                                    # _object = self.pca.transform(_object)
-                        #     else:
-                        #         raise ValueError("Please enter a legal value for index.")
                         
                         for ii in range(len(indexlist)):
                             if isinstance(index1, int) or isinstance(index1, str):
@@ -1275,15 +1231,13 @@ class CLASSIX:
                     if self.data.shape[1] > 2:
                         object2 = np.matmul(object2, self._V[np.argsort(self._s)].T)
                     
-                    # if self.data.shape[1] >= 2:
-                    #     object2 = self.pca.transform(object2)
                     agg_label2 = np.argmin(np.linalg.norm(self.s_pca - object2, axis=1, ord=2)) # get the group index for object2
                 
                 else:
                     raise ValueError("Please enter a legal value for index2.")
 
                 if showsplist:
-                    # print(f"A list of information for {index1} is shown below.")
+                    
                     select_sp_info = self.sp_info.iloc[[agg_label1, agg_label2]].copy(deep=True)
                     if isinstance(index1, int) or isinstance(index1, str):
                         select_sp_info.loc[:, 'Label'] = [index1, index2]
@@ -1325,11 +1279,8 @@ class CLASSIX:
                     )
                     connected_paths = [agg_label1]
                 else:
-                    sp1_str = self.s_pca[agg_label1] # self.splist_[agg_label1, 3:]
-                    sp2_str = self.s_pca[agg_label2] # self.splist_[agg_label2, 3:]
                     
                     if self.connected_pairs_ is None:
-                        # distm = pairwise_distances(self.splist_[:,3:], Y=None, metric='euclidean', n_jobs=n_jobs)
                         distm = pairwise_distances(self.s_pca, Y=None, metric='euclidean', n_jobs=n_jobs)
                         distm = (distm <= radius*scale).astype(int)
                         self.connected_pairs_ = return_csr_matrix_indices(csr_matrix(distm)).tolist() # list
@@ -1340,17 +1291,13 @@ class CLASSIX:
                         ## apply Dijkstra’s algorithm with Fibonacci heaps for shortest path finding
                         # dist_matrix, predecessors = shortest_path(csgraph=path_graph, method="D", directed=False, return_predecessors=True) 
                         # connected_paths = get_shortest_path(predecessors, agg_label1, agg_label2)
+
                         connected_paths = find_shortest_path(agg_label1,
                                                              self.connected_pairs_,
                                                              self.splist_.shape[0],
                                                              agg_label2
                         )
                         
-                        # -- Deprecated
-                        # if agg_label1 != 0:
-                        #     connected_paths_vis = " -> ".join([str(group) for group in connected_paths]) 
-                        # else:
-                        #     connected_paths_vis = " -> ".join(["0"] + [str(group) for group in connected_paths]) 
                         
                         connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
                         print(
@@ -1377,20 +1324,15 @@ class CLASSIX:
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
                     plt.rcParams['axes.facecolor'] = 'white'
+                    
                     # select indices
                     union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
                     x_pca1 = self.x_pca[self.labels_ == cluster_label1]
                     x_pca2 = self.x_pca[self.labels_ == cluster_label2]
                     s_pca = self.s_pca[union_ind]
-                    # self.s_pca[]
                     
                     ax.scatter(x_pca1[:, 0], x_pca1[:, 1], marker=".", c=self.cluster_color[cluster_label1])
                     ax.scatter(x_pca2[:, 0], x_pca2[:, 1], marker=".", c=self.cluster_color[cluster_label2])
-                    
-                    # ax.scatter(x_pca1[:, 0], x_pca1[:, 1],
-                    #             marker="*", c='lightgreen')
-                    # ax.scatter(x_pca2[:, 0], x_pca2[:, 1],
-                    #             marker="*", c='lightblue')
                     
                     ax.scatter(s_pca[:,0], s_pca[:,1], marker="p")
                     
@@ -1420,6 +1362,7 @@ class CLASSIX:
                         else:
                             ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
                         ax.set_aspect('equal', adjustable='datalim')
+                        
                         if sp_fontsize is None:
                             ax.text(s_pca[i, 0], s_pca[i, 1], 
                                     s=self.sp_info.Group[(self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2)].values[i].astype(int).astype(str),
@@ -1430,6 +1373,59 @@ class CLASSIX:
                                     s=self.sp_info.Group[union_ind].values[i].astype(int).astype(str),
                                     fontsize=sp_fontsize, bbox=sp_bbox
                             )
+
+                    print("connected_paths:", connected_paths)
+                    nr_cps = len(connected_paths)
+                    
+                    if add_arrow:
+                        for i in range(nr_cps - 1):
+                            arrowStart=(s_pca[connected_paths[i], 0], s_pca[connected_paths[i], 1])
+                            arrowStop=(s_pca[connected_paths[i+1], 0],s_pca[connected_paths[i+1], 1])
+
+                            match directed_arrow:
+                                case 0:
+                                    ax.annotate("",arrowStop,
+                                                xytext=arrowStart,
+                                                arrowprops=dict(arrowstyle="-|>",
+                                                                shrinkA=0,shrinkB=5, 
+                                                                edgecolor=arrow_fc,
+                                                                facecolor=arrow_ec,
+                                                                linestyle=arrow_linestyle
+                                                                )
+                                                )
+                                    
+                                    ax.annotate("",arrowStart,
+                                                xytext=arrowStop,
+                                                arrowprops=dict(arrowstyle="-|>",
+                                                                shrinkA=0, shrinkB=5,
+                                                                edgecolor=arrow_fc,
+                                                                facecolor=arrow_ec,
+                                                                linestyle=arrow_linestyle
+                                                                )
+                                                )
+                                    
+                                case 1:
+                                    ax.annotate("",arrowStop,
+                                                xytext=arrowStart,
+                                                arrowprops=dict(arrowstyle="-|>",
+                                                                shrinkA=0,shrinkB=5,
+                                                                edgecolor=arrow_fc,
+                                                                facecolor=arrow_ec,
+                                                                linestyle=arrow_linestyle
+                                                                )
+                                                )
+
+                                case -1:
+                                    ax.annotate("",arrowStart,
+                                                xytext=arrowStop,
+                                                arrowprops=dict(arrowstyle="-|>",
+                                                                shrinkA=0, shrinkB=5,
+                                                                edgecolor=arrow_fc,
+                                                                facecolor=arrow_ec,
+                                                                linestyle=arrow_linestyle
+                                                                )
+                                                )
+                                
                     ax.axis('off') # the axis here may not be consistent, so hide.
                     ax.plot()
                     if savefig:
@@ -1448,7 +1444,8 @@ class CLASSIX:
                         print("image successfully save as", fm)
                         
                     plt.show()
-                    
+
+                    self.connected_paths = connected_paths
         return 
     
     
@@ -1513,7 +1510,6 @@ class CLASSIX:
         coord = list()
         
         if aggregate:
-            # for i in np.around(self.splist_[:, 3:], 2).tolist():
             for i in np.around(self.s_pca, 2).tolist():
                 fill = ""
                 if len(i) <= 5:
@@ -1526,7 +1522,6 @@ class CLASSIX:
                 fill += ""
                 coord.append(fill)
 
-            # self.sp_info = pd.DataFrame(self.splist_[:, 1:2], columns=cols)
 
         else:
             for i in self.splist_[:, 0]:
@@ -1588,12 +1583,8 @@ class CLASSIX:
         """
         
         distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(scale,2))
-        # plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = 'white'
-        # if norm:
-        #     P = self.splist_[:, 3:]
-        # else:
-        #     P = self.splist_[:, 3:]*self._scl + self._mu
+
         P = self.data[self.splist_[:, 0].astype(int)]
         link_list = return_csr_matrix_indices(csr_matrix(distm))
         
@@ -1655,65 +1646,7 @@ class CLASSIX:
             
         return [i[0] for i in self.old_cluster_count.items() if i[1] < min_samples]
     
-    
-    # deprecated (24/07/2021)
-    # def merge_pairs(self, pairs):
-    #     """Transform connected pairs to connected groups (list)"""
-    #     
-    #     ulabels = np.full(len_p, -1, dtype=int)
-    #     labels = list()
-    #     maxid = 0
-    #     for i in range(len(pairs)):
-    #         if ulabels[i] == -1:
-    #             sub = pairs[i]
-    #             ulabels[i] = maxid
-    # 
-    #             for j in range(i+1, len(pairs)):
-    #                 com = pairs[j]
-    #                 if check_if_intersect(sub, com):
-    #                     sub = sub + com
-    #                     if ulabels[j] == -1:
-    #                         ulabels[j] = maxid
-    #                     else:
-    #                         ulabels[ulabels == maxid] = ulabels[j]
-    # 
-    #             maxid = maxid + 1
-    # 
-    #     for i in np.unique(ulabels):
-    #         sub = list()
-    #         for j in np.where(ulabels == i)[0]:
-    #             sub = sub + pairs[int(j)]
-    #         labels.append(list(set(sub)))
-    #     return labels
-    
-    
 
-    # """
-    # def normalize(self, data, shift = 'z-score'):
-    #     if shift not in ['mean', 'min', 'z-score']:
-    #         raise ValueError("please enter a correct shift.")
-    #         
-    #     if shift == 'min':
-    #         _mu = data.min(axis=0)
-    #         _std = data.std()
-    #         
-    #     elif shift == 'mean':
-    #         _mu = data.mean(axis=0)
-    #         _std = data.std()
-    #     
-    #     else: #  shift == 'z-score':
-    #         _mu = data.mean(axis=0)
-    #         _std = data.std(axis=0)
-    #         
-    #     data = (data - _mu)/_std
-    #     return data, (_mu, _std)    
-    # """
-
-
-        
-    # def check_if_intersect(self, l1, l2):
-    #     return set(l1).intersection(l2) != set()
-  
 
 
     def reassign_labels(self, labels):
@@ -1769,8 +1702,7 @@ class CLASSIX:
         if value <= 0:
             raise ValueError(
                 "Please feed an correct value (>0) for tolerance.")
-        # if value > 1:
-        #     warnings.warn("Might lead to bad aggregation", DeprecationWarning)
+ 
         self._radius = value
     
     
@@ -1812,54 +1744,6 @@ class CLASSIX:
         self._group_merging = value
         
 
-
-    # @property
-    # def distance_scale(self):
-    #     return self._distance_scale
-    
-    
-    
-    # @distance_scale.setter
-    # def distance_scale(self, value):
-    #     if not isinstance(value, float) and not isinstance(value, int):
-    #         raise TypeError('Expected a float or int type')
-    #     if value <= 0:
-    #         raise ValueError(
-    #             "Please feed an correct value for distance_scale")
-
-    #     self._distance_scale = value
-    
-        
-    # @property
-    # def eta(self):
-    #     return self._eta
-    
-    
-    
-    # @eta.setter
-    # def eta(self, value):
-    #     if not isinstance(value, float) and not isinstance(value, int):
-    #         raise TypeError('Expected a float or int type')
-    #     if value <= 0:
-    #         raise ValueError(
-    #             "Please feed an correct value for eta")
-    #     self._eta = value
-
-
-        
-    # @property
-    # def noise_percent(self):
-    #     return self._noise_percent
-    
-    
-    
-    # @noise_percent.setter
-    # def noise_percent(self, value):
-    #     if not isinstance(value, float) and not isinstance(value,int):
-    #         raise TypeError('Expected a float or int type')
-    #     if value < 0 or value >= 100:
-    #         raise ValueError('Percentiles must be in the range [0, 100)')
-    #     self._noise_percent = value
     
     
     
@@ -2046,16 +1930,6 @@ def return_csr_matrix_indices(csr_matrix):
     return np.array(list(zip(indices, length_range)))
 
 
-
-# deprecated (24/07/2021) -> for scipy shortest distance use
-# def get_shortest_path(predecessors, i, j):
-#     """Get the shortest path between two nodes in the graph"""
-#     path = [j]
-#     k = j
-#     while predecessors[i, k] != -9999:
-#         path.append(predecessors[i, k])
-#         k = predecessors[i, k]
-#     return path[::-1]
 
 
 def euclid(xxt, X, v):
