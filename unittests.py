@@ -32,8 +32,7 @@ from classix import aggregation, aggregation_c, aggregation_cm, aggregation_test
 from classix.merging import agglomerate, bf_distance_agglomerate
 from classix.merging_cm import agglomerate as agglomerate_cm
 from classix.merging_cm import bf_distance_agglomerate as bf_distance_agglomerate_cm
-from classix.merging_cm_win import agglomerate as agglomerate_cm_win
-from classix.merging_cm_win import bf_distance_agglomerate as bf_distance_agglomerate_cm_win
+
 
 def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
     data, (_mu, _scl) = novel_normalization(data, sorting)
@@ -365,6 +364,8 @@ class TestClassix(unittest.TestCase):
             
             for i in range(len(label_set3)):
                 if label_set3[i] != label_set4[i]:
+                    checkpoint = 0
+                    
         except:
             checkpoint = 0
 
