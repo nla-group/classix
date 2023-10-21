@@ -25,6 +25,7 @@
 # SOFTWARE.
 
 import warnings
+import platform
 
 import os
 import re
@@ -426,7 +427,7 @@ class CLASSIX:
         self.__enable_cython__ = __enable_cython__
         
         self.__enable_aggregation_cython__ = False
-
+        
         if self.__enable_cython__:
             try:
                 try:
@@ -437,7 +438,11 @@ class CLASSIX:
                     from .aggregation_c import aggregate, precompute_aggregate 
                 
                 self.__enable_aggregation_cython__ = True
-                from .merging_cm import agglomerate, bf_distance_agglomerate
+
+                if platform.system() == 'Windows':
+                    from .merging_cm_win import agglomerate, bf_distance_agglomerate
+                else:
+                    from .merging_cm import agglomerate, bf_distance_agglomerate
 
             except (ModuleNotFoundError, ValueError):
                 if not self.__enable_aggregation_cython__:
@@ -534,7 +539,6 @@ class CLASSIX:
                 data=self.data,
                 agg_labels=self.groups_, 
                 splist=self.splist_,  
-                ind=ind,           
                 radius=self.radius, 
                 method=self.group_merging, 
                 minPts=self.minPts,
@@ -604,7 +608,7 @@ class CLASSIX:
     
     
     
-    def clustering(self, data, agg_labels, ind, splist, radius=0.5, method="distance", minPts=0, algorithm='set'):
+    def clustering(self, data, agg_labels, splist, radius=0.5, method="distance", minPts=0, algorithm='set'):
         """
         Merge groups after aggregation. 
 
@@ -726,7 +730,6 @@ class CLASSIX:
             labels, self.old_cluster_count, SIZE_NOISE_LABELS = self.bf_distance_agglomerate(data=data, 
                                                                     labels=labels,
                                                                     splist=splist,
-                                                                    ind=ind, 
                                                                     radius=radius,
                                                                     minPts=minPts,
                                                                     scale=self.scale

@@ -146,7 +146,7 @@ def agglomerate(data, splist, radius, method='distance', scale=1.5):
 
 
 
-def bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1.5):
+def bf_distance_agglomerate(data, labels, splist, radius, minPts=0, scale=1.5):
     """
     Implement CLASSIX's merging with brute force computation
     
@@ -216,7 +216,7 @@ def bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1
         sp_cluster_label[cid] = i
         cs[i] = np.sum(grp_sizes[cid])
 
-    old_cluster_count = collections.Counter(labels)
+    old_cluster_count = collections.Counter(sp_cluster_label[labels])
     cid = np.nonzero(cs < minPts)[0]
     SIZE_NOISE_LABELS = cid.size
 

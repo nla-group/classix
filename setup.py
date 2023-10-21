@@ -10,7 +10,7 @@ except ImportError as e:
     warnings.warn(e.args[0])
     from setuptools.command.build_ext import build_ext
     
-_version="0.8.0"
+_version="0.8.1"
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
@@ -79,6 +79,9 @@ aggregation_cm = Extension('classix.aggregation_cm',
 merging_cm = Extension('classix.merging_cm',
                         sources=['classix/merging_cm.pyx'])
 
+merging_cm_win = Extension('classix.merging_cm_win',
+                        sources=['classix/merging_cm_win.pyx'])
+
 try:
     # from Cython.Build import cythonize
     
@@ -87,7 +90,8 @@ try:
         # ext_modules=cythonize(["classix/*.pyx"], include_path=["classix"]),
         ext_modules=[aggregation_c,
                      aggregation_cm,
-                     merging_cm
+                     merging_cm,
+                     merging_cm_win
                     ],
         **setup_args
     )

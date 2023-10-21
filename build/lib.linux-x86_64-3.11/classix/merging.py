@@ -81,15 +81,17 @@ def agglomerate(data, splist, radius, method='distance', scale=1.5):
     
     connected_pairs = [SET(i) for i in range(splist.shape[0])]
     connected_pairs_store = []
-    
+    splist_indices = splist[:, 0].astype(int)
+
+
     if method == "density":
         volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
     else:
         volume = None
         
     for i in range(splist.shape[0]):
-        sp1 =  data[int(splist[i, 0])]
-        neigbor_sp = data[splist[i+1:, 0].astype(int)] 
+        sp1 =  data[splist_indices[i]]
+        neigbor_sp = data[splist_indices[i+1:]] 
         select_stps = np.arange(i+1, splist.shape[0], dtype=int)
         sort_vals = splist[i:, 1]
         
@@ -144,7 +146,7 @@ def agglomerate(data, splist, radius, method='distance', scale=1.5):
 
 
 
-def bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1.5):
+def bf_distance_agglomerate(data, labels, splist, radius, minPts=0, scale=1.5):
     """
     Implement CLASSIX's merging with brute force computation
     
@@ -204,18 +206,17 @@ def bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1
 
     # rename labels to be 1,2,3,... and determine cluster sizes
     ul = np.unique(sp_cluster_label)
-    cs = np.zeros(len(ul))
+    nr_u = len(ul)
+    
+    cs = np.zeros(nr_u, dtype=int)
+    grp_sizes = splist[:, 2].astype(int)
 
-    for i in range(len(ul)):
+    for i in range(nr_u):
         cid = sp_cluster_label==ul[i]
         sp_cluster_label[cid] = i
-        cs[i] = np.sum(splist[cid, 2])
+        cs[i] = np.sum(grp_sizes[cid])
 
-    labels = sp_cluster_label[labels]
-    sort_ind = np.argsort(ind)
-    labels = labels[sort_ind]
-
-    old_cluster_count = collections.Counter(labels)
+    old_cluster_count = collections.Counter(sp_cluster_label[labels])
     cid = np.nonzero(cs < minPts)[0]
     SIZE_NOISE_LABELS = cid.size
 
@@ -235,16 +236,15 @@ def bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1
                         break
 
         ul = np.unique(sp_cluster_label)
-        cs = np.zeros(len(ul))
+        nr_u = len(ul)
+        cs = np.zeros(nr_u, dtype=int)
 
-        for i in range(len(ul)):
+        for i in range(nr_u):
             cid = sp_cluster_label==ul[i]
             sp_cluster_label[cid] = i
-            cs[i] = np.sum(splist[cid, 2])
+            cs[i] = np.sum(grp_sizes[cid])
 
         labels = sp_cluster_label[labels]
-        sort_ind = np.argsort(ind)
-        labels = labels[sort_ind]
 
     return labels, old_cluster_count, SIZE_NOISE_LABELS
 
