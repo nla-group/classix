@@ -102,7 +102,7 @@ cpdef agglomerate(double[:, :] data,
     cdef unsigned int i, j, internum
     cdef int ndim = data.shape[1]
     cdef int nsize_stp = splist.shape[0]
-    cdef np.ndarray[np.int64_t, ndim=1] splist_indices = np.int64(splist[:, 0])
+    cdef np.ndarray[np.int32_t, ndim=1] splist_indices = np.int32(splist[:, 0])
 
     cdef double[:, :] neigbor_sp
     cdef double[:] sort_vals
