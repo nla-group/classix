@@ -46,7 +46,7 @@ A detailed documentation (work in progress), including tutorials, is available a
 CLASSIX has the following dependencies:
 
 - cython (recommend >= 0.27)
-- numpy >=1.17.3 (recommend <= 1.21.0)
+- numpy >=1.17.3 (recommend update to 1.24.3+)
 - scipy >= 1.2.1
 - requests
 - matplotlib
