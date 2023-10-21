@@ -64,6 +64,7 @@ class TestClassix(unittest.TestCase):
         checkpoint = 1
         try:
             cython_is_available()
+            cython_is_available(verbose=True)
         except:
             checkpoint = 0
         self.assertEqual(checkpoint, 1)
