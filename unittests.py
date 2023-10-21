@@ -141,7 +141,7 @@ class TestClassix(unittest.TestCase):
                 clx.fit_transform(X)
 
                 clx = CLASSIX(sorting='pca', group_merging='distance', algorithm='bf', memory=True)
-                clx.fit_transform(X, memory=True)
+                clx.fit_transform(X)
             except:
                 checkpoint = 0
                 break
@@ -253,6 +253,7 @@ class TestClassix(unittest.TestCase):
             clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
             clx.fit_transform(X)
             clx.predict(X)
+            clx.predict(X, memory=True)
             clx.explain(plot=True, figsize=(10,10),  savefig=True)
             clx.explain(0,  plot=True, savefig=True)
             clx.explain(3, 2000,  plot=True, savefig=False)
