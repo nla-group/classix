@@ -219,6 +219,7 @@ cpdef bf_distance_agglomerate(double[:, :] data, np.ndarray[np.int64_t, ndim=1] 
     cdef Py_ssize_t i, iii, j, ell
     cdef double[:] xi
     cdef long[:] merge_ind
+    cdef long[:] sort_ind
     cdef int minlab
     cdef np.ndarray[np.float64_t, ndim=1] dist
 
@@ -246,10 +247,6 @@ cpdef bf_distance_agglomerate(double[:, :] data, np.ndarray[np.int64_t, ndim=1] 
         sp_cluster_label[cid] = i
         cs[i] = np.sum(grp_sizes[cid])
 
-    labels = sp_cluster_label[labels]
-    cdef long[:] sort_ind = np.argsort(ind)
-    
-    labels = labels[sort_ind]
 
     old_cluster_count = collections.Counter(labels)
     cdef long[:] ncid = np.nonzero(cs.base < minPts)[0]
@@ -282,8 +279,6 @@ cpdef bf_distance_agglomerate(double[:, :] data, np.ndarray[np.int64_t, ndim=1] 
             cs[i] = np.sum(grp_sizes[cid])
 
         labels = sp_cluster_label[labels]
-        sort_ind = np.argsort(ind)
-        labels = labels[sort_ind]
 
     return labels, old_cluster_count, SIZE_NOISE_LABELS
 
