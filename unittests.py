@@ -137,10 +137,10 @@ class TestClassix(unittest.TestCase):
                 clx = CLASSIX(sorting='pca', group_merging='distance')
                 clx.fit_transform(X)
 
-                clx = CLASSIX(sorting='pca', group_merging='distance'. algorithm='bf')
+                clx = CLASSIX(sorting='pca', group_merging='distance', algorithm='bf')
                 clx.fit_transform(X)
 
-                clx = CLASSIX(sorting='pca', group_merging='distance'. algorithm='bf', memory=True)
+                clx = CLASSIX(sorting='pca', group_merging='distance', algorithm='bf', memory=True)
                 clx.fit_transform(X, memory=True)
             except:
                 checkpoint = 0
