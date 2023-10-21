@@ -216,10 +216,6 @@ def bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1
         sp_cluster_label[cid] = i
         cs[i] = np.sum(grp_sizes[cid])
 
-    labels = sp_cluster_label[labels]
-    sort_ind = np.argsort(ind)
-    labels = labels[sort_ind]
-
     old_cluster_count = collections.Counter(labels)
     cid = np.nonzero(cs < minPts)[0]
     SIZE_NOISE_LABELS = cid.size
@@ -249,8 +245,6 @@ def bf_distance_agglomerate(data, labels, splist, ind, radius, minPts=0, scale=1
             cs[i] = np.sum(grp_sizes[cid])
 
         labels = sp_cluster_label[labels]
-        sort_ind = np.argsort(ind)
-        labels = labels[sort_ind]
 
     return labels, old_cluster_count, SIZE_NOISE_LABELS
 
