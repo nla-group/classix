@@ -1382,49 +1382,48 @@ class CLASSIX:
                             arrowStart=(s_pca[connected_paths[i], 0], s_pca[connected_paths[i], 1])
                             arrowStop=(s_pca[connected_paths[i+1], 0],s_pca[connected_paths[i+1], 1])
 
-                            match directed_arrow:
-                                case 0:
-                                    ax.annotate("",arrowStop,
-                                                xytext=arrowStart,
-                                                arrowprops=dict(arrowstyle="-|>",
-                                                                shrinkA=0,shrinkB=5, 
-                                                                edgecolor=arrow_fc,
-                                                                facecolor=arrow_ec,
-                                                                linestyle=arrow_linestyle
-                                                                )
-                                                )
+                            if directed_arrow == 0:
+                                ax.annotate("",arrowStop,
+                                            xytext=arrowStart,
+                                            arrowprops=dict(arrowstyle="-|>",
+                                                            shrinkA=0,shrinkB=5, 
+                                                            edgecolor=arrow_fc,
+                                                            facecolor=arrow_ec,
+                                                            linestyle=arrow_linestyle
+                                                            )
+                                            )
+                                
+                                ax.annotate("",arrowStart,
+                                            xytext=arrowStop,
+                                            arrowprops=dict(arrowstyle="-|>",
+                                                            shrinkA=0, shrinkB=5,
+                                                            edgecolor=arrow_fc,
+                                                            facecolor=arrow_ec,
+                                                            linestyle=arrow_linestyle
+                                                            )
+                                            )
                                     
-                                    ax.annotate("",arrowStart,
-                                                xytext=arrowStop,
-                                                arrowprops=dict(arrowstyle="-|>",
-                                                                shrinkA=0, shrinkB=5,
-                                                                edgecolor=arrow_fc,
-                                                                facecolor=arrow_ec,
-                                                                linestyle=arrow_linestyle
-                                                                )
-                                                )
-                                    
-                                case 1:
-                                    ax.annotate("",arrowStop,
-                                                xytext=arrowStart,
-                                                arrowprops=dict(arrowstyle="-|>",
-                                                                shrinkA=0,shrinkB=5,
-                                                                edgecolor=arrow_fc,
-                                                                facecolor=arrow_ec,
-                                                                linestyle=arrow_linestyle
-                                                                )
-                                                )
+                            elif directed_arrow == 1:
+                                ax.annotate("",arrowStop,
+                                            xytext=arrowStart,
+                                            arrowprops=dict(arrowstyle="-|>",
+                                                            shrinkA=0,shrinkB=5,
+                                                            edgecolor=arrow_fc,
+                                                            facecolor=arrow_ec,
+                                                            linestyle=arrow_linestyle
+                                                            )
+                                            )
 
-                                case -1:
-                                    ax.annotate("",arrowStart,
-                                                xytext=arrowStop,
-                                                arrowprops=dict(arrowstyle="-|>",
-                                                                shrinkA=0, shrinkB=5,
-                                                                edgecolor=arrow_fc,
-                                                                facecolor=arrow_ec,
-                                                                linestyle=arrow_linestyle
-                                                                )
-                                                )
+                            else:
+                                ax.annotate("",arrowStart,
+                                            xytext=arrowStop,
+                                            arrowprops=dict(arrowstyle="-|>",
+                                                            shrinkA=0, shrinkB=5,
+                                                            edgecolor=arrow_fc,
+                                                            facecolor=arrow_ec,
+                                                            linestyle=arrow_linestyle
+                                                            )
+                                            )
                                 
                     ax.axis('off') # the axis here may not be consistent, so hide.
                     ax.plot()
