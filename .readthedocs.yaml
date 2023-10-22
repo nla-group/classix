@@ -11,8 +11,6 @@ version: 2
 # Set the OS, Python version and other tools you might need
 
 build:
-  image: stable
-  
   os: ubuntu-22.04
 
   tools:
