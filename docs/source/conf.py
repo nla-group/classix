@@ -57,6 +57,6 @@ html_style = 'css/_.css'
 html_theme = "sphinx_rtd_theme" # html_theme = 'alabaster'
 html_logo = "classix_logo.png"
 html_theme_options = {
-    'logo_only': True,
+    'logo_only': False,
     'navigation_depth': 5,
 }
