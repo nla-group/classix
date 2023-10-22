@@ -295,7 +295,7 @@ class TestClassix(unittest.TestCase):
     def test_built_in_data(self):
         checkpoint = 1
         try:
-            for dn in ['vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 'Phoneme', 'Wine']:
+            for dn in ['vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 'Phoneme', 'Wine', 'NA']:
                 loadData(name=dn)
         except:
             checkpoint = 0
