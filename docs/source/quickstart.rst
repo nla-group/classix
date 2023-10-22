@@ -166,7 +166,7 @@ The sample is exhibited with 2 clusters of 1000 2-dimensional data. Then, we emp
 
 .. admonition:: Remember
     
-    By default, CLASSIX will use ``pca`` sorting and apply distance-based merging. 
+    By default, CLASSIX will use ``sorting=pca`` sorting and apply ``group_merging="distance"``, i.e., distance-based merging. 
 
 
 After that, to get the clustering result, we just need to load ``clx.labels_``. Also you can return the cluster labels directly by ``labels = clx.fit_transform(X)``.
@@ -185,4 +185,9 @@ The result is as belows:
 
 That is a basic setting tutorial of CLASSIX, which applied to most cases. If you want to learn more, please go through other sections of the documentation.
 
+
+.. admonition:: Remember
+   CLASSIX allows to load starting points and cluster centers information by using the method ``clx.load_cluster_centers()`` and ``clx.load_splist_indices()`` where clx is the object of CLASSIX class.  
+   
+   More usages are shown in https://github.com/nla-group/classix/blob/master/unittests.py
 
