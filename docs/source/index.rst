@@ -22,7 +22,6 @@ Guide
    quickstart
    comparison
    clustering_tutorial
-   explainable_clustering
    outlier_detection
    
 
