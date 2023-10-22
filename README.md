@@ -146,9 +146,9 @@ use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
 In the above table, *Group* denotes the group label, *NrPts* denotes the number of data points in the group, *Cluster* is the cluster label assigned to the group, and the final column shows the normalized *Coordinates* of the starting point. In order to explain the cluster assignment of a particular data point, simply provide its index to the explain method:
 
 ```Python
-clx.explain(0, plot=True)
+clx.explain(10, plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/ex110.png width=700 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/ex1110.png width=700 />
 Output:
 
 ```
