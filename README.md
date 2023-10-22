@@ -76,7 +76,7 @@ To check the CLASSIX installation use:
 
 ### conda
 
-To install CLASSIX [![Anaconda-Server Badge](https://anaconda.org/conda-forge/classixclustering/badges/version.svg)](https://anaconda.org/conda-forge/classixclustering) via conda use:
+To install CLASSIX [![Conda version](https://img.shields.io/conda/vn/conda-forge/classixclustering.svg)](https://anaconda.org/conda-forge/classixclustering) via conda use:
 
 ```conda install -c conda-forge classixclustering```
 
