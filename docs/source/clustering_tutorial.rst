@@ -72,9 +72,10 @@ The visualization of clustering results is reasonable:
     :width: 360
 
 
-
+++++++++++++++++++
 Distance clustering
-------------------------------
+++++++++++++++++++
+
 The distance-based CLASSIX has the same steps as density-based CLASSIX except that the density comparison steps, in such a way distance-based CLASSIX does not require calculating the density, hence intuitively would be faster. By contrast, it just compares the pair of the clusters one at a time to determine if they should merge. 
 Also, we propose a distance-based clustering exempted from calculating the density but with one more parameter for appropriate smoothing ``scale``. By tuning the ``scale``, we only calculate the distance between pairs of starting points and define the distance as the weights in the graph, and the distance that is smaller than $\texttt{scale}*\radius$ is assigned to 1 otherwise 0. The next step, similarly, is to find the connected components in the graph as clusters.
 
@@ -124,6 +125,7 @@ Visualize the result:
 
 Visualize connecting edge
 ------------------------------
+
 Now we use the same example to demonstrate how cluster are formed by computing starting points and edge connections. We can output the information by
 
 .. code:: python
@@ -159,9 +161,9 @@ Though in most cases, the scale setting is not necessary, when the small ``radiu
 
 
 
-
++++++++++++++++++++++++
 Explainable Clustering
-------------------------------
++++++++++++++++++++++++
 
 CLASSIX provides an appealing explanation for clustering results, either in global view or by specific indexing. 
 
@@ -203,7 +205,7 @@ The output is:
 .. image:: images/explain_viz.png
 
 
-Track single data
+Track single object
 ------------------------------
 
 Following the previous steps, we can analyze the specific data by refering to the index, for example here, we want to track the data with index 0:
@@ -225,7 +227,7 @@ Output:
 
 .. image:: images/ex110.png
 
-Comparison insight
+Track multiple objects
 ------------------------------
 We give two examples to compare the data pair cluster assignment as follows.
 
@@ -287,8 +289,11 @@ Additionally, if one want to index more than 2 objects, use numbrt parameters ``
 
 .. image:: images/ex4773_792_m.png
 
+
+++++++++++++++++++++++++++++
 Case study of industry data
-------------------------------
+++++++++++++++++++++++++++++
+
 Here, we turn our attention on practical data. 
 Similar to above, we load the necessary data to produce the analytical result.
 
