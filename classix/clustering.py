@@ -391,7 +391,7 @@ class CLASSIX:
     """
         
     def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, 
-                 algorithm='set', memory=False, verbose=1): 
+                 algorithm='bf', memory=False, verbose=1): 
 
 
         self.verbose = verbose
@@ -577,6 +577,7 @@ class CLASSIX:
             The ndarray-like input of shape (n_samples,)
 
         - memory : bool, default=False
+        
             - True: default, use precomputation is triggered to speedup the query
 
             - False: a memory efficient way to perform query 
@@ -608,7 +609,7 @@ class CLASSIX:
     
     
     
-    def clustering(self, data, agg_labels, splist, radius=0.5, method="distance", minPts=0, algorithm='set'):
+    def clustering(self, data, agg_labels, splist, radius=0.5, method="distance", minPts=0, algorithm='bf'):
         """
         Merge groups after aggregation. 
 
@@ -636,7 +637,7 @@ class CLASSIX:
             The threshold, in the range of [0, infity] to determine the noise degree.
             When assgin it 0, algorithm won't check noises.
 
-        algorithm : str, default='set'
+        algorithm : str, default='bf'
             Algorithm to merge connected groups.
  
             - 'bf': Use bruteforce routines to speed up the merging of connected groups.
@@ -1301,8 +1302,8 @@ class CLASSIX:
                                                              agg_label2
                         )
                         
-                        
                         connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
+                        
                         print(
                         """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
                             """\nboth of which were merged into cluster #%(cluster)i. """% {
@@ -1361,9 +1362,12 @@ class CLASSIX:
                     
                     for i in range(s_pca.shape[0]):
                         if union_ind[i] in connected_paths:
-                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
+                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
+                                                     color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
                         else:
-                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
+                                                     color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                            
                         ax.set_aspect('equal', adjustable='datalim')
                         
                         if sp_fontsize is None:
@@ -1460,16 +1464,16 @@ class CLASSIX:
             for i in np.unique(self.labels_):
                 self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
 
-        # if self.data.shape[1] >= 2:
         plt.style.use('default') # clear the privous figure style
         plt.style.use(style=figstyle)
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = 'white'
         plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker="p")
+
         for i in np.unique(self.labels_):
             x_pca_part = self.x_pca[self.labels_ == i,:]
             plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="*", c=self.cluster_color[i])
-            # plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="*", c='#%06X' % np.random.randint(0, 0xFFFFFF))
+            
             for j in range(self.s_pca.shape[0]):
                 if fontsize is None:
                     plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), bbox=bbox)
@@ -1496,9 +1500,6 @@ class CLASSIX:
             print("successfully save")
 
         plt.show()
-            
-        # else:
-        #     print("Visualization is restricted to multidimensional (dimension greater than or equal to 2) data.")
             
         return
         
@@ -1555,6 +1556,7 @@ class CLASSIX:
                           markersize=320,
                           plot_boundary=False,
                           bound_color='red', path='.', fmt='pdf'):
+        
         """Visualize the linkage in the distance clustering.
         
         
@@ -1610,7 +1612,7 @@ class CLASSIX:
             fig.savefig(path + '/linkage_scale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.pdf', bbox_inches='tight')
         else:
             fig.savefig(path + '/linkage_scale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.png', bbox_inches='tight')
-        # plt.show()
+        
     
     
     
@@ -1652,7 +1654,6 @@ class CLASSIX:
 
 
     def reassign_labels(self, labels):
-        # unique_labels = sorted(np.unique(labels))
         sorted_dict = sorted(self.old_cluster_count.items(), key=lambda x: x[1], reverse=True)
 
         clabels = copy.deepcopy(labels)
@@ -1663,11 +1664,9 @@ class CLASSIX:
     
 
     def pprint_format(self, items):
-        # lite-function to print dict or turple/list
         cluster = 0
         if isinstance(items, dict):
             for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True): 
-                # print("      [-] cluster {} : {}".format(key, value))
                 print("      * cluster {} : {}".format(cluster, value))
                 cluster = cluster + 1
                 
@@ -1870,9 +1869,11 @@ def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, t
     queque = list()
     graph = pairs_to_graph(connected_pairs, num_nodes) # return sparse matrix
     dist_info = np.empty((num_nodes, 3), dtype=int) # node, dist, last node
+    
     dist_info[:,0] = np.arange(num_nodes)
     dist_info[:,1] = num_nodes # np.iinfo(np.int64).max
     dist_info[:,2] = -1
+    
     source_node = int(source_node)
     queque.append(source_node+1)
     dist_info[source_node,1] = 0
@@ -1910,10 +1911,10 @@ def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, t
 def pairs_to_graph(pairs, num_nodes, sparse=True):
     """Transform the pairs represented by list into graph."""
     # from scipy.sparse import csr_matrix
-    graph = np.full((num_nodes, num_nodes), np.inf, dtype=int)
+    graph = np.full((num_nodes, num_nodes), -99, dtype=int)
     for i in range(num_nodes):
         graph[i, i] = 0
-    pairs = np.array(pairs, dtype=int)
+    
     for pair in pairs:
         graph[pair[0], pair[1]] = graph[pair[1], pair[0]] = 1
     if sparse:
