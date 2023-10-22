@@ -154,9 +154,9 @@ Output:
 ```
 ----------------------------------------
  Group  NrPts  Cluster Coordinates Label
-  54     4       1     0.13 -0.49    0  
+ 109     5       3      0.49 0.54    10 
 ----------------------------------------
-The data point 0 is in group 54, which has been merged into cluster #1.
+The data point 10 is in group 109, which has been merged into cluster #3.
 ```
 
 We can also query why two data points ended up in the same cluster, or not: 
