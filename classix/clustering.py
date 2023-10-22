@@ -1268,7 +1268,7 @@ class CLASSIX:
 
                 connected_groups = {}
                 for subs in self.merge_groups:
-                    if self.label_change[agg_label1] == self.label_change[agg_label2]： # agg_label1 in subs and agg_label2 in subs:
+                    if self.label_change[agg_label1] == self.label_change[agg_label2]: # agg_label1 in subs and agg_label2 in subs:
                         connected_groups["object 1"] = connected_groups["object 2"] = np.array(subs, dtype=int)
                     elif agg_label1 in subs:
                         connected_groups["object 1"] = np.array(subs, dtype=int)
