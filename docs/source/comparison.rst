@@ -154,7 +154,7 @@ The runtime of all algorithms is visualized in the below bar chart. Recall that 
 .. image:: images/runtime.png
 
 
-Example 2: Gaussian blobs
+Example: Gaussian blobs
 ##################
 
 We perform clustering algorithms on the Gaussian blob data, and provide three experimental examples with minor modifications that satisfies various parameter settings. 
