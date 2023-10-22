@@ -186,8 +186,8 @@ The result is as belows:
 That is a basic setting tutorial of CLASSIX, which applied to most cases. If you want to learn more, please go through other sections of the documentation.
 
 
-.. admonition:: Remember
-   CLASSIX allows to load starting points and cluster centers information by using the method ``clx.load_cluster_centers()`` and ``clx.load_splist_indices()`` where clx is the object of CLASSIX class.  
-   
-   More usages are shown in https://github.com/nla-group/classix/blob/master/unittests.py
+.. admonition:: Note
+
+   CLASSIX allows to load starting points and cluster centers information by using the method ``clx.load_cluster_centers()`` and ``clx.load_splist_indices()`` where clx is the object of CLASSIX 
+   class. More usages are shown in `unittests.py <https://github.com/nla-group/classix/blob/master/unittests.py>`_
 
