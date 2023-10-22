@@ -1603,18 +1603,11 @@ class CLASSIX:
         else:
             fig.savefig(path + '/linkage_scale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.png', bbox_inches='tight')
         
+
     
-    
-    
-    def load_splist_indices(self):
-        if self.splist_indices is not None:
-            self.splist_indices = np.full(self.data.shape[0], 0, dtype=int)
-            self.splist_indices[self.splist_[:,0].astype(int)] = 1
-        return self.splist_indices
-        
-        
-        
     def load_cluster_centers(self):
+        """Load cluster centers."""
+        
         if self.centers is None:
             self.centers = calculate_cluster_centers(self.data*self._scl + self._mu, self.labels_)
             return self.centers
@@ -1623,18 +1616,32 @@ class CLASSIX:
         
         
     def calculate_group_centers(self, data, labels):
+        """Compute data center for each label according to label sequence."""
+        
         centers = list() 
         for c in set(labels):
             indc = [i for i in range(data.shape[0]) if labels[i] == c]
             indc = (labels==c)
             center = [-1, c] + np.mean(data[indc,:], axis=0).tolist()
             centers.append( center )
+            
         return centers
 
     
+    def load_splist_indices(self):
+        """Get the starting point indices."""
+        
+        if self.splist_indices is not None:
+            self.splist_indices = np.full(self.data.shape[0], 0, dtype=int)
+            self.splist_indices[self.splist_[:,0].astype(int)] = 1
+            
+        return self.splist_indices
+
+
     
     def outlier_filter(self, min_samples=None, min_samples_rate=0.1): # percent
-        """Filter outliers in terms of min_samples"""
+        """Filter outliers in terms of ``min_samples`` or ``min_samples_rate``. """
+        
         if min_samples == None:
             min_samples = min_samples_rate*sum(self.old_cluster_count.values())
             
@@ -1644,6 +1651,8 @@ class CLASSIX:
 
 
     def reassign_labels(self, labels):
+        """Renumber the labels to 0, 1, 2, 3, ..."""
+        
         sorted_dict = sorted(self.old_cluster_count.items(), key=lambda x: x[1], reverse=True)
 
         clabels = copy.deepcopy(labels)
@@ -1654,6 +1663,8 @@ class CLASSIX:
     
 
     def pprint_format(self, items):
+        """Format item value for clusters. """
+        
         cluster = 0
         if isinstance(items, dict):
             for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True): 
