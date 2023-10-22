@@ -1,4 +1,4 @@
-Software API Reference
+General API Reference
 ======================
 
 
@@ -8,3 +8,4 @@ Software API Reference
 
    classix.cython_is_available
    classix.loadData
+   classix.clustering
