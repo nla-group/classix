@@ -265,7 +265,7 @@ class TestClassix(unittest.TestCase):
             clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
             clx.fit_transform(X)
             clx.load_cluster_centers()
-            clx.load_splist_indices(X, clx.labels_)
+            clx.load_splist_indices()
             clx.predict(X)
             clx.predict(X, memory=True)
             clx.explain(plot=True, figsize=(10,10),  savefig=True)
