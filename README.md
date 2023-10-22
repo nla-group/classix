@@ -148,7 +148,7 @@ In the above table, *Group* denotes the group label, *NrPts* denotes the number 
 ```Python
 clx.explain(0, plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/ex110.png width=800 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/ex110.png width=700 />
 Output:
 
 ```
@@ -164,7 +164,7 @@ We can also query why two data points ended up in the same cluster, or not:
 ```Python
 clx.explain(773, 792, plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/ex2773_792.png width=750 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/ex2773_792.png width=700 />
 Output:
 
 ```
