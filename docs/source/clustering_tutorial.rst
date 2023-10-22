@@ -48,44 +48,7 @@ The output of the code is:
         * cluster 4 : 10
         * cluster 5 : 6
         * cluster 6 : 3
-        * cluster 7 : 3
-        * cluster 8 : 3
-        * cluster 9 : 3
-        * cluster 10 : 3
-        * cluster 11 : 2
-        * cluster 12 : 2
-        * cluster 13 : 2
-        * cluster 14 : 2
-        * cluster 15 : 2
-        * cluster 16 : 1
-        * cluster 17 : 1
-        * cluster 18 : 1
-        * cluster 19 : 1
-        * cluster 20 : 1
-        * cluster 21 : 1
-        * cluster 22 : 1
-        * cluster 23 : 1
-        * cluster 24 : 1
-        * cluster 25 : 1
-        * cluster 26 : 1
-        * cluster 27 : 1
-        * cluster 28 : 1
-        * cluster 29 : 1
-        * cluster 30 : 1
-        * cluster 31 : 1
-        * cluster 32 : 1
-        * cluster 33 : 1
-        * cluster 34 : 1
-        * cluster 35 : 1
-        * cluster 36 : 1
-        * cluster 37 : 1
-        * cluster 38 : 1
-        * cluster 39 : 1
-        * cluster 40 : 1
-        * cluster 41 : 1
-        * cluster 42 : 1
-        * cluster 43 : 1
-        * cluster 44 : 1
+        ......
         * cluster 45 : 1
         * cluster 46 : 1
     As MinPts is 10, the number of clusters has been further reduced to 5.
