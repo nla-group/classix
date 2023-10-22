@@ -106,13 +106,7 @@ clx = CLASSIX(radius=0.35, verbose=0)
 clx.fit(X)
 ```
 
-The cluster labels of each data point are available in ``clx.labels_``:
-```Python
-import matplotlib.pyplot as plt
-plt.figure(figsize=(10,10))
-plt.scatter(X[:,0], X[:,1], c=clx.labels_)
-plt.show()
-```
+The cluster labels of each data point are available in ``clx.labels_``.
 
 ## :mortar_board: The explain method
 
@@ -127,26 +121,26 @@ clx.explain(plot=True)
 The starting points, shown as the small red boxes, can be thought of as a coarse representation of the data. Each starting point is associated with a group of data points, and groups are merged into clusters. The `explain` method returns a textual summary of the clustering:
 
 ```
-A clustering of 5000 data points with 2 features has been performed. 
-The radius parameter was set to 0.50 and MinPts was set to 0. 
-As the provided data has been scaled by a factor of 1/6.01,
-data points within a radius of R=0.50*6.01=3.01 were aggregated into groups. 
-In total 7903 comparisons were required (1.58 comparisons per data point). 
-This resulted in 14 groups, each uniquely associated with a starting point. 
-These 14 groups were subsequently merged into 2 clusters. 
+A clustering of 1000 data points with 2 features has been performed. 
+The radius parameter was set to 0.10 and MinPts was set to 99. 
+As the provided data has been scaled by a factor of 1/8.12,
+data points within a radius of R=0.10*8.12=0.81 were aggregated into groups. 
+In total 4610 comparisons were required (4.61 comparisons per data point). 
+This resulted in 163 groups, each uniquely associated with a starting point. 
+These 163 groups were subsequently merged into 7 clusters. 
 A list of all starting points is shown below.
 ----------------------------------------
- Group  NrPts  Cluster  Coordinates 
-   0     398      0     -1.19 -1.09 
-   1    1073      0     -0.65 -1.15 
-   2     553      0     -1.17 -0.56 
+ Group  NrPts  Cluster Coordinates 
+   0      2      0      1.07 -1.15 
+   1      7      0      1.25 -1.01 
+   2      2      0      1.14 -1.07 
   ---      lines omitted        ---
-  11       6      1       0.42 1.35 
-  12       5      1       1.24 0.59 
-  13       2      1        1.0 1.08 
+ 160      2      6      -1.02 1.18 
+ 161      3      6       -0.86 1.3 
+ 162      1      6      -1.17 1.32 
 ----------------------------------------
 In order to explain the clustering of individual data points, 
-use .explain(ind1) or .explain(ind1, ind2) with indices of the data points. 
+use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
 ```
 
 In the above table, *Group* denotes the group label, *NrPts* denotes the number of data points in the group, *Cluster* is the cluster label assigned to the group, and the final column shows the normalized *Coordinates* of the starting point. In order to explain the cluster assignment of a particular data point, simply provide its index to the explain method:
@@ -154,25 +148,35 @@ In the above table, *Group* denotes the group label, *NrPts* denotes the number 
 ```Python
 clx.explain(0, plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0.png width=500 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/ex110.png width=500 />
 Output:
 
 ```
-The data point 0 is in group 2, which has been merged into cluster #0.
+----------------------------------------
+ Group  NrPts  Cluster Coordinates Label
+  54     4       1     0.13 -0.49    0  
+----------------------------------------
+The data point 0 is in group 54, which has been merged into cluster #1.
 ```
 
 We can also query why two data points ended up in the same cluster, or not: 
 
 ```Python
-clx.explain(0, 2000, plot=True)
+clx.explain(773, 792, plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None0_2000.png width=550 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/ex2773_792.png width=550 />
 Output:
 
 ```
-The data point 0 is in group 2, which has been merged into cluster 0.
-The data point 2000 is in group 10, which has been merged into cluster 1.
-There is no path of overlapping groups between these clusters.
+----------------------------------------
+ Group  NrPts  Cluster Coordinates   Label
+  37     17      1      0.15 -0.66   773  
+  50      4      1     -0.27 -0.75   792  
+----------------------------------------
+The data point 773 is in group 37 and the data point 792 is in group 50, 
+both of which were merged into cluster #1. 
+These two groups are connected via groups 37 <-> 49 <-> 41 <-> 45 <-> 38 <-> 50.
+connected_paths: [37, 49, 41, 45, 38, 50]
 ```
 
 #### Example 2
