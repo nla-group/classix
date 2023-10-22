@@ -91,20 +91,26 @@ Similar to the previous example, we refer ``group_merge`` to 'distance', then ad
 
 .. parsed-literal::
 
-    CLASSIX(sorting='pca', radius=0.1, method='distance')
-    The 2500 data points were aggregated into 316 groups.
-    In total 16395 comparisons were required (6.56 comparisons per data point). 
-    The 316 groups were merged into 28 clusters with the following sizes: 
-        * cluster 0 : 733
-        * cluster 1 : 730
-        * cluster 2 : 501
-        * cluster 3 : 500
-        * cluster 4 : 4
-        * cluster 5 : 4
-        ......
-        * cluster 27 : 1
-    As MinPts is 4, the number of clusters has been further reduced to 4.
-    Try the .explain() method to explain the clustering.
+    A clustering of 1000 data points with 2 features has been performed. 
+    The radius parameter was set to 0.10 and MinPts was set to 99. 
+    As the provided data has been scaled by a factor of 1/8.12,
+    data points within a radius of R=0.10*8.12=0.81 were aggregated into groups. 
+    In total 4610 comparisons were required (4.61 comparisons per data point). 
+    This resulted in 163 groups, each uniquely associated with a starting point. 
+    These 163 groups were subsequently merged into 7 clusters. 
+    A list of all starting points is shown below.
+    ----------------------------------------
+     Group  NrPts  Cluster Coordinates 
+       0      2      0      1.07 -1.15 
+       1      7      0      1.25 -1.01 
+       2      2      0      1.14 -1.07 
+      ---      lines omitted        ---
+     160      2      6      -1.02 1.18 
+     161      3      6       -0.86 1.3 
+     162      1      6      -1.17 1.32 
+    ----------------------------------------
+    In order to explain the clustering of individual data points, 
+    use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
 
 
 Visualize the result:
@@ -174,7 +180,6 @@ We now have a global view of it:
 .. code:: python
 
     from sklearn import datasets
-    import numpy as np
     from classix import CLASSIX
     
     X, y = datasets.make_blobs(n_samples=1000, centers=10, n_features=2, cluster_std=1, random_state=42)
@@ -212,7 +217,7 @@ Following the previous steps, we can analyze the specific data by refering to th
 
 .. code:: python
 
-    clx.explain(0,  plot=True, savefig=True, fmt='PNG')
+    clx.explain(10,  plot=True, savefig=True, fmt='PNG')
 
 
 Output:
@@ -221,11 +226,11 @@ Output:
 
     ----------------------------------------
      Group  NrPts  Cluster Coordinates Label
-      54     4       1     0.13 -0.49    0  
+     109     5       3      0.49 0.54    10 
     ----------------------------------------
-    The data point 0 is in group 54, which has been merged into cluster #1.
+    The data point 10 is in group 109, which has been merged into cluster #3.
 
-.. image:: images/ex110.png
+.. image:: images/ex1110.png
 
 Track multiple objects
 ------------------------------
