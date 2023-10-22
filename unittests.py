@@ -32,6 +32,7 @@ from classix import aggregation, aggregation_c, aggregation_cm, aggregation_test
 from classix.merging import agglomerate, bf_distance_agglomerate
 from classix.merging_cm import agglomerate as agglomerate_cm
 from classix.merging_cm import bf_distance_agglomerate as bf_distance_agglomerate_cm
+from sklearn.metrics.cluster import adjusted_rand_score
 
 
 def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
@@ -90,15 +91,20 @@ class TestClassix(unittest.TestCase):
         vdu_signals = loadData('vdu_signals')
 
         for tol in np.arange(0.8, 1, 0.1):
-            clx = CLASSIX(radius=tol, group_merging='density', verbose=0)
-            clx.fit_transform(vdu_signals)
-            
+            clx1 = CLASSIX(radius=tol, group_merging='density', verbose=0, algorithm='set')
+            clx1.fit_transform(vdu_signals)
+
+            clx2 = CLASSIX(radius=tol, group_merging='density', verbose=0, algorithm='bf')
+            clx2.fit_transform(vdu_signals)
+
+            if adjusted_rand_score(clx1.labels_, clx2.labels_) != 1:
+                raise ValueError("Inconsistent results.")
             # version 0.2.7
             # np.save('classix/data/checkpoint_density_' + str(np.round(tol,2)) + '.npy', clx.labels_) 
             
             # test new version
             checkpoint = np.load('classix/data/checkpoint_density_' + str(np.round(tol,2)) + '.npy')
-            comp = clx.labels_ == checkpoint
+            comp = clx1.labels_ == checkpoint
             assert(comp.all())
 
 
