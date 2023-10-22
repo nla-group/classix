@@ -276,7 +276,7 @@ If you want to show the paths connected the two points, setting the optional par
 
 .. image:: images/ex3773_792.png
 
-More controled parameters for fancy arrow plot can be referred to detailed parameters of `classix.CLASSIX.explain <https://classix.readthedocs.io/en/latest/_autosummary/classix.CLASSIX.explain.html#classix.CLASSIX.explain>`_. 
+More controled parameters for fancy arrow plot can be referred to detailed documentation of `classix.CLASSIX.explain <https://classix.readthedocs.io/en/latest/_autosummary/classix.CLASSIX.explain.html#classix.CLASSIX.explain>`_. 
 
 Additionally, if one want to index more than 2 objects, use numbrt parameters ``index{number}``, for example, indexing 3 objects information, use:
 
