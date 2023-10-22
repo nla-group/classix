@@ -1266,15 +1266,6 @@ class CLASSIX:
 
                 cluster_label1, cluster_label2 = self.label_change[agg_label1], self.label_change[agg_label2]
 
-                connected_groups = {}
-                for subs in self.merge_groups:
-                    if self.label_change[agg_label1] == self.label_change[agg_label2]: # agg_label1 in subs and agg_label2 in subs:
-                        connected_groups["object 1"] = connected_groups["object 2"] = np.array(subs, dtype=int)
-                    elif agg_label1 in subs:
-                        connected_groups["object 1"] = np.array(subs, dtype=int)
-                    elif agg_label2 in subs:
-                        connected_groups["object 2"] = np.array(subs, dtype=int)
-               
                 
                 if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
                     sp_str = np.array2string(self.splist_[agg_label1, 3:], separator=',')
@@ -1283,10 +1274,9 @@ class CLASSIX:
                     )
                     connected_paths = [agg_label1]
                 else:
-                    
                     if self.connected_pairs_ is None:
-                        distm = pairwise_distances(self.s_pca, Y=None, metric='euclidean', n_jobs=n_jobs)
-                        distm = (distm <= radius*scale).astype(int)
+                        distm = pairwise_distances(self.s_pca)
+                        distm = (distm <= self.radius*self.scale).astype(int)
                         self.connected_pairs_ = return_csr_matrix_indices(csr_matrix(distm)).tolist() # list
                         
                     if cluster_label1 == cluster_label2: # when ind1 & ind2 are in the same cluster but diff group
