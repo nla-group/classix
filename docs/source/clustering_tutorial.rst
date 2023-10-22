@@ -69,7 +69,7 @@ The visualization of clustering results is reasonable:
     plt.show()
 
 .. image:: images/demo2.png
-    :width: 360
+    :width: 430
 
 
 ++++++++++++++++++
@@ -116,7 +116,7 @@ Visualize the result:
     plt.show()
 
 .. image:: images/demo3.png
-    :width: 360
+    :width: 430
 
 .. admonition:: Note
 
