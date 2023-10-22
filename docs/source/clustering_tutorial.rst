@@ -101,27 +101,7 @@ Similar to the previous example, we refer ``group_merge`` to 'distance', then ad
         * cluster 3 : 500
         * cluster 4 : 4
         * cluster 5 : 4
-        * cluster 6 : 3
-        * cluster 7 : 2
-        * cluster 8 : 2
-        * cluster 9 : 2
-        * cluster 10 : 2
-        * cluster 11 : 1
-        * cluster 12 : 1
-        * cluster 13 : 1
-        * cluster 14 : 1
-        * cluster 15 : 1
-        * cluster 16 : 1
-        * cluster 17 : 1
-        * cluster 18 : 1
-        * cluster 19 : 1
-        * cluster 20 : 1
-        * cluster 21 : 1
-        * cluster 22 : 1
-        * cluster 23 : 1
-        * cluster 24 : 1
-        * cluster 25 : 1
-        * cluster 26 : 1
+        ......
         * cluster 27 : 1
     As MinPts is 4, the number of clusters has been further reduced to 4.
     Try the .explain() method to explain the clustering.
