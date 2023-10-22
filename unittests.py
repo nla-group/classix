@@ -253,7 +253,8 @@ class TestClassix(unittest.TestCase):
         try:
             clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
             clx.fit_transform(X)
-            clx.calculate_group_centers(X, clx.labels_)
+            clx.load_cluster_centers()
+            clx.load_splist_indices(X, clx.labels_)
             clx.predict(X)
             clx.predict(X, memory=True)
             clx.explain(plot=True, figsize=(10,10),  savefig=True)
@@ -265,10 +266,6 @@ class TestClassix(unittest.TestCase):
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=1, savefig=True)
             clx.explain(index1=0, index2=2008, index3=100,  plot=True, savefig=True)
-            # clx.explain(plot=True, figsize=(10,10), sp_fontsize=10, savefig=False)
-            # clx.explain(0,  plot=True, sp_fontsize=10, savefig=False)
-            # clx.explain(3, 2000,  plot=True, sp_fontsize=10, savefig=False)
-            # clx.explain(0, 2008,  plot=True, sp_fontsize=10, savefig=False)
         except:
             checkpoint = 0
 
