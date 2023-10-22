@@ -20,9 +20,10 @@ The examples here are demonstrated with a sample with a more complicated shape:
 
     Setting radius lower, the more groups will form, and the groups tend to be separated instead of merging as clusters, and therefore runtime will increase. 
     
-
+++++++++++++++++++
 Density clustering
-------------------------------
+++++++++++++++++++
+
 Instead of leaving the default option as the previous example, in this example, we can explicitly set a parameter ``group_merging`` to specify which merging strategy we would like to adopt. 
 Also, we employ ``sorting='pca'`` or other choices such as 'norm-orthant' or 'norm-mean'. In most cases, we recommend PCA sorting. Other available parameters include ``radius`` and ``minPts``. The parameter of ``radius`` is a tolerance value dominating the aggregation phase, which immediately affects the merging phase. 
 Usually, the thinner boundary between the clusters are, the lower ``radius`` is required. In addition, we would explain why we set `minPts` to 10 later. Also, we can output the log by setting verbose to 1, then it clearly shows how many clusters and the associated size we get:
