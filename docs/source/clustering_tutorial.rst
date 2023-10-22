@@ -275,9 +275,10 @@ If you want to show the paths connected the two points, setting the optional par
     clx.explain(773, 792,  plot=True, add_arrow=True)
 
 .. image:: images/ex3773_792.png
-    
 
-If you want to index more than 2 objects, use numbrt parameters ``index{number}``, for example, indexing 3 objects information, use:
+More controled parameters for fancy arrow plot can be referred to https://classix.readthedocs.io/en/latest/_autosummary/classix.CLASSIX.explain.html#classix.CLASSIX.explain. 
+
+Additionally, if one want to index more than 2 objects, use numbrt parameters ``index{number}``, for example, indexing 3 objects information, use:
 
 .. code:: python
     
