@@ -46,8 +46,6 @@ The output of the code is:
         * cluster 2 : 500
         * cluster 3 : 500
         * cluster 4 : 10
-        * cluster 5 : 6
-        * cluster 6 : 3
         ......
         * cluster 45 : 1
         * cluster 46 : 1
@@ -218,7 +216,11 @@ Output:
 
 .. parsed-literal::
 
-    The data point is in group 2, which has been merged into cluster #0.
+    ----------------------------------------
+     Group  NrPts  Cluster Coordinates Label
+      54     4       1     0.13 -0.49    0  
+    ----------------------------------------
+    The data point 0 is in group 54, which has been merged into cluster #1.
 
 .. image:: images/ex110.png
 
@@ -226,22 +228,8 @@ Comparison insight
 ------------------------------
 We give two examples to compare the data pair cluster assignment as follows.
 
-.. code:: python
-    
-    clx.explain(0, 998,  plot=True)
 
-.. parsed-literal::
-
-    ----------------------------------------
-     Group  NrPts  Cluster Coordinates Label
-      54     4       1     0.13 -0.49    0  
-    ----------------------------------------
-    The data point 0 is in group 54, which has been merged into cluster #1.
-
-.. image:: images/None0_2000.png
-
-
-Another example is to show two objects in different clusters:
+Example to show two objects in different clusters:
 
 .. code:: python
     
@@ -260,8 +248,42 @@ Another example is to show two objects in different clusters:
 
 .. image:: images/ex10_998.png
 
+Example to show two objects in the same clusters:
 
+.. code:: python
+    
+    clx.explain(773, 792,  plot=True, savefig=True, fmt='png', figname='ex2')
 
+.. parsed-literal::
+    
+    ----------------------------------------
+     Group  NrPts  Cluster Coordinates   Label
+      37     17      1      0.15 -0.66   773  
+      50      4      1     -0.27 -0.75   792  
+    ----------------------------------------
+    The data point 773 is in group 37 and the data point 792 is in group 50, 
+    both of which were merged into cluster #1. 
+    These two groups are connected via groups 37 <-> 49 <-> 41 <-> 45 <-> 38 <-> 50.
+    connected_paths: [37, 49, 41, 45, 38, 50]
+
+.. image:: images/ex2773_792.png
+
+If you want to show the paths connected the two points, setting the optional parameter ``add_arrow`` to ``True``. That is,
+
+.. code:: python
+    
+    clx.explain(773, 792,  plot=True, add_arrow=True)
+
+.. image:: images/ex3773_792.png
+    
+
+If you want to index more than 2 objects, use numbrt parameters ``index{number}``, for example, indexing 3 objects information, use:
+
+.. code:: python
+    
+    clx.explain(index1=773, index2=792, index3=199, plot=True)
+
+.. image:: images/ex4773_792_m.png
 
 Case study of industry data
 ------------------------------
