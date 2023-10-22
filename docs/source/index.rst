@@ -29,12 +29,9 @@ Guide
 API Reference
 -------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    api_reference
-   main_parameters
-   agg_parameters
-   mg_parameters
 
 
 Others
