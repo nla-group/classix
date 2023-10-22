@@ -220,7 +220,7 @@ Output:
 
     The data point is in group 2, which has been merged into cluster #0.
 
-.. image:: images/None0.png
+.. image:: images/ex110.png
 
 Comparison insight
 ------------------------------
@@ -249,11 +249,16 @@ Another example is to show two objects in different clusters:
 
 .. parsed-literal::
 
-    The data point 0 is in group 2 and the data point 2008 is in group 4, 
-    both of which were merged into cluster #0. 
-    These two groups are connected via groups 2 <-> 1 <-> 4.
+    ----------------------------------------
+     Group  NrPts  Cluster Coordinates   Label
+      54      4      1      0.13 -0.49     0  
+      39     27      2     -0.48 -1.02   998  
+    ----------------------------------------
+    The data point 0 is in group 54, which has been merged into cluster 1.
+    The data point 998 is in group 39, which has been merged into cluster 2.
+    There is no path of overlapping groups between these clusters.
 
-.. image:: images/None0_2008.png
+.. image:: images/ex10_998.png
 
 
 
