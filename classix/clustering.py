@@ -1376,8 +1376,8 @@ class CLASSIX:
                     
                     if add_arrow:
                         for i in range(nr_cps - 1):
-                            arrowStart=(s_pca[connected_paths[i], 0], s_pca[connected_paths[i], 1])
-                            arrowStop=(s_pca[connected_paths[i+1], 0],s_pca[connected_paths[i+1], 1])
+                            arrowStart=(self.s_pca[connected_paths[i], 0], self.s_pca[connected_paths[i], 1])
+                            arrowStop=(self.s_pca[connected_paths[i+1], 0], self.s_pca[connected_paths[i+1], 1])
 
                             if directed_arrow == 0:
                                 ax.annotate("",arrowStop,
