@@ -203,6 +203,8 @@ clx.fit_transform(X)
 clx.explain(index1='Tom', index2='Bert', plot=True, sp_fontsize=12)
 ```
 
+Output:
+
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=500 />
 
 ```
