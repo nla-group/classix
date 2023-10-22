@@ -20,8 +20,8 @@ Guide
    :maxdepth: 2
    
    quickstart
-   comparison
    clustering_tutorial
+   comparison
    outlier_detection
    
 
