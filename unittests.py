@@ -135,7 +135,7 @@ class TestClassix(unittest.TestCase):
                 clx = CLASSIX(sorting='pca', group_merging='density')
                 clx.fit_transform(X)
                 
-                clx = CLASSIX(sorting='pca', group_merging='distance')
+                clx = CLASSIX(sorting='pca', group_merging='distance', minPts=150)
                 clx.fit_transform(X)
 
                 clx = CLASSIX(sorting='pca', group_merging='distance', algorithm='bf')
@@ -253,6 +253,7 @@ class TestClassix(unittest.TestCase):
         try:
             clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
             clx.fit_transform(X)
+            clx.calculate_group_centers(X, clx.labels_)
             clx.predict(X)
             clx.predict(X, memory=True)
             clx.explain(plot=True, figsize=(10,10),  savefig=True)
