@@ -175,10 +175,10 @@ We now have a global view of it:
     from sklearn import datasets
     import numpy as np
     from classix import CLASSIX
-
-    X, y = datasets.make_blobs(n_samples=5000, centers=2, n_features=2, cluster_std=1, random_state=1)
-
-    clx = CLASSIX(sorting='pca', group_merging='density', radius=0.5, verbose=1, minPts=4)
+    
+    X, y = datasets.make_blobs(n_samples=1000, centers=10, n_features=2, cluster_std=1, random_state=42)
+    
+    clx = CLASSIX(sorting='pca', group_merging='distance', radius=0.1, verbose=1, minPts=99)
     clx.fit(X)
 
     clx.explain(plot=True, savefig=True, figsize=(10,10))
@@ -189,27 +189,18 @@ The output is:
 
 .. parsed-literal::
 
-    A clustering of 5000 data points with 2 features has been performed. 
-    The radius parameter was set to 0.50 and MinPts was set to 4. 
-    As the provided data has been scaled by a factor of 1/6.01,
-    data points within a radius of R=0.50*6.01=3.01 were aggregated into groups. 
-    In total 7903 comparisons were required (1.58 comparisons per data point). 
-    This resulted in 14 groups, each uniquely associated with a starting point. 
-    These 14 groups were subsequently merged into 2 clusters. 
-    A list of all starting points is shown below.
-    ----------------------------------------
-    Group  NrPts  Cluster  Coordinates 
-    0     398      0     -1.19 -1.09 
-    1    1073      0     -0.65 -1.15 
-    2     553      0     -1.17 -0.56 
-            ......
-    10     763      1       0.69 0.67 
-    11       6      1       0.42 1.35 
-    12       5      1       1.24 0.59 
-    13       2      1        1.0 1.08 
-    ----------------------------------------
-    In order to explain the clustering of individual data points, 
-    use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
+    CLASSIX(sorting='pca', radius=0.1, minPts=99, group_merging='distance')
+    The 1000 data points were aggregated into 163 groups.
+    In total 4610 comparisons were required (4.61 comparisons per data point). 
+    The 163 groups were merged into 14 clusters with the following sizes: 
+          * cluster 0 : 199
+          * cluster 1 : 198
+          * cluster 2 : 194
+          * cluster 3 : 102
+          * cluster 4 : 100
+                ......
+          * cluster 13 : 1
+    As MinPts is 99, the number of clusters has been further reduced to 7.
 .. image:: images/explain_viz.png
 
 
@@ -237,20 +228,24 @@ We give two examples to compare the data pair cluster assignment as follows.
 
 .. code:: python
     
-    clx.explain(0, 2000,  plot=True, savefig=True, fmt='png')
+    clx.explain(0, 998,  plot=True)
 
 .. parsed-literal::
 
-    The data point 0 is in group 2, which has been merged into cluster 0.
-    The data point 2000 is in group 10, which has been merged into cluster 1.
-    There is no path of overlapping groups between these clusters.
+    ----------------------------------------
+     Group  NrPts  Cluster Coordinates Label
+      54     4       1     0.13 -0.49    0  
+    ----------------------------------------
+    The data point 0 is in group 54, which has been merged into cluster #1.
 
 .. image:: images/None0_2000.png
 
 
+Another example is to show two objects in different clusters:
+
 .. code:: python
     
-    clx.explain(0, 2008,  plot=True, savefig=True, fmt='png')
+    clx.explain(0, 998,  plot=True, savefig=True, fmt='png', figname='ex1')
 
 .. parsed-literal::
 
