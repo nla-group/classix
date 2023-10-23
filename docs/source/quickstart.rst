@@ -23,7 +23,6 @@ and requires the following packages for data visualization:
  
 **If you want to compare the speed with other clustering algorithms in scikit-learn or other packages combined with Cython, please use CLASSIX of Cython installation for a fair comparison.**
 
-Note: using numpy<=1.22, CLASSIX will support Cython with memoryview, it's even faster.  
 
 I. **pip**
 
