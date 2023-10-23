@@ -63,7 +63,7 @@ def cython_is_available(verbose=0):
                 # Typed memoryviews allow efficient access to memory buffers, such as those underlying NumPy arrays, without incurring any Python overhead. 
             
             except ModuleNotFoundError:
-                from .aggregation_c import aggregate, precompute_aggregate 
+                from .aggregation_c import aggregate, precompute_aggregate, precompute_aggregate_pca
                 __cython_type__ =  "trivial"
 
             if verbose:
@@ -76,7 +76,7 @@ def cython_is_available(verbose=0):
             return True
 
         except (ModuleNotFoundError, ValueError):
-            from .aggregation import aggregate, precompute_aggregate
+            from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
 
             from .merging import agglomerate
 
@@ -432,10 +432,10 @@ class CLASSIX:
             try:
                 try:
                     from .aggregation_cm import aggregate
-                    from .aggregation_cm import aggregate as precompute_aggregate 
+                    from .aggregation_cm import aggregate as precompute_aggregate, precompute_aggregate_pca
                     
                 except ModuleNotFoundError:
-                    from .aggregation_c import aggregate, precompute_aggregate 
+                    from .aggregation_c import aggregate, precompute_aggregate, precompute_aggregate_pca 
                 
                 self.__enable_aggregation_cython__ = True
 
@@ -446,18 +446,21 @@ class CLASSIX:
 
             except (ModuleNotFoundError, ValueError):
                 if not self.__enable_aggregation_cython__:
-                    from .aggregation import aggregate, precompute_aggregate 
+                    from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
                 
                 from .merging import agglomerate, bf_distance_agglomerate
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
-            from .aggregation import aggregate, precompute_aggregate 
+            from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
             from .merging import agglomerate, bf_distance_agglomerate
             warnings.warn("This run of CLASSIX is not using Cython.")
 
         if not self.memory:
-            self.aggregate = precompute_aggregate
+            if sorting == 'pca':
+                self.aggregate = precompute_aggregate_pca
+            else:
+                self.aggregate = precompute_aggregate
             
         else:
             self.aggregate = aggregate
