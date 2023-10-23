@@ -78,8 +78,6 @@ cpdef precompute_aggregate_pca(double[:,:] data, double tol=0.5):
     cdef list splist = list() 
     cdef Py_ssize_t i, j
     
-    cdef double half_r2 = tol**2 * 0.5
-    cdef double[:] half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
     cdef double rhs
 
     if fdim > 1:
@@ -96,8 +94,12 @@ cpdef precompute_aggregate_pca(double[:,:] data, double tol=0.5):
     sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
         
     ind = np.argsort(sort_vals)
+    
     data = data.base[ind]
-
+    sort_vals = sort_vals.base[ind] 
+    cdef double half_r2 = tol**2 * 0.5
+    cdef double[:] half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
+    
     for i in range(len_ind): 
         if labels[i] >= 0:
             continue
@@ -197,7 +199,7 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
     else: # no sorting
         sort_vals = np.zeros(len_ind)
         
-    ind = np.arange(len_ind)
+    ind = np.argsort(sort_vals)
 
     for i in range(len_ind): 
         sp = ind[i] # starting point
@@ -238,7 +240,6 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
         lab += 1
   
     return np.asarray(labels), splist, nr_dist, ind
-
 
 
 
@@ -287,22 +288,25 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
     
     if sorting == "norm-mean" or sorting == "norm-orthant":
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
-        ind = np.argsort(sort_vals)
     
     elif sorting == "pca":
-        if data.shape[1]>1:
-            U1, s1, _ = svds(np.asarray(data), k=1, return_singular_vectors=True)
-            sort_vals = U1[:,0]*s1[0]
+        if fdim > 1:
+            if fdim <= 3: # memory inefficient
+                    gemm = get_blas_funcs("gemm", [data.T, data])
+                    _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
+                    sort_vals = data@U1.reshape(-1)
+            else:
+                U1, s1, _ = svds(np.asarray(data), k=1, return_singular_vectors=True)
+                sort_vals = U1[:,0]*s1[0]
         else:
             sort_vals = data[:,0]
             
         sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
-        ind = np.argsort(sort_vals)
     
     else: # no sorting
         sort_vals = np.zeros(len_ind)
-        ind = np.arange(len_ind)
 
+    ind = np.argsort(sort_vals)
     for i in range(len_ind): 
         sp = ind[i] # starting point
         
@@ -338,5 +342,4 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
         lab += 1
   
     return np.asarray(labels), splist, nr_dist, ind
-
 
