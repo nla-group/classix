@@ -33,7 +33,7 @@ from scipy.linalg import get_blas_funcs, eigh
 
 
 # stefan added 23/10/2023
-def precompute_aggregate_pca(data, tol=0.5):
+def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
     """Aggregate the data with PCA using precomputation
 
     Parameters
@@ -94,7 +94,7 @@ def precompute_aggregate_pca(data, tol=0.5):
         clustc = data[i,:] 
         labels[i] = lab
         num_group = 1
-        splist.append((i, sort_vals[i], num_group))
+        splist.append((ind[i], sort_vals[i], num_group))
 
         rhs = half_r2 - half_nrm2[i] # right-hand side of norm ineq.
         last_j = np.searchsorted(sort_vals, tol + sort_vals[i], side='right')
@@ -112,6 +112,7 @@ def precompute_aggregate_pca(data, tol=0.5):
         lab += 1
     
     labels = labels[np.argsort(ind)]
+    print("this is python")
     
     return labels, splist, nr_dist, ind
 
