@@ -33,7 +33,7 @@ from scipy.linalg import get_blas_funcs, eigh
 
 
 # stefan added 23/10/2023
-def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
+def precompute_aggregate_pca(data, tol=0.5):
     """Aggregate the data with PCA using precomputation
 
     Parameters
@@ -59,9 +59,8 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
         The number of pairwise distance calculations.
     """
     
-    n, fdim = data.shape
-    half_r2 = 0.5*tol**2
-    half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5 # precomputation
+    len_ind, fdim = data.shape
+    
 
     # get sorting values
     if fdim>1:
@@ -77,16 +76,18 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
 
     sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
     ind = np.argsort(sort_vals)
-    sort_vals = sort_vals[ind] 
     data = data[ind,:] # sort data
-
+    sort_vals = sort_vals[ind] 
  
+    half_r2 = 0.5*tol**2
+    half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5 # precomputation
+
     lab = 0
-    labels = np.full(n, -1, dtype=int)
+    labels = np.full(len_ind, -1, dtype=int)
     nr_dist = 0 
     splist = list()
 
-    for i in range(n): 
+    for i in range(len_ind): 
         if labels[i] >= 0:
             continue
 
@@ -97,7 +98,7 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
 
         rhs = half_r2 - half_nrm2[i] # right-hand side of norm ineq.
         last_j = np.searchsorted(sort_vals, tol + sort_vals[i], side='right')
-        ips = np.matmul(data[i+1:last_j,:],clustc.T)
+        ips = np.matmul(data[i+1:last_j,:], clustc.T)
         nr_dist += last_j - i - 1
 
         for j in range(i+1,last_j):
