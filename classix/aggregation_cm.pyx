@@ -128,6 +128,7 @@ cpdef precompute_aggregate_pca(double[:,:] data, double tol=0.5):
 
 
 
+
 cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
     """Aggregate the data using precomputation
 
@@ -178,7 +179,6 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
 
     if sorting == "norm-mean" or sorting == "norm-orthant":
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
-        ind = np.argsort(sort_vals)
     
     elif sorting == "pca":
         if fdim > 1:
@@ -193,11 +193,11 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
             sort_vals = data[:,0]
             
         sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
-        ind = np.argsort(sort_vals)
     
     else: # no sorting
         sort_vals = np.zeros(len_ind)
-        ind = np.arange(len_ind)
+        
+    ind = np.arange(len_ind)
 
     for i in range(len_ind): 
         sp = ind[i] # starting point
