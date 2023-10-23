@@ -379,8 +379,38 @@ class TestClassix(unittest.TestCase):
             checkpoint = 0
 
         self.assertEqual(checkpoint, 1)
+    
 
 
+    def test_precompute_pca(self):
+        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=2, 
+                               cluster_std=1.5, random_state=1
+        )
+        
+        checkpoint = 1
+        try:
+            labels1, splist1, nr_dist1, ind1 = aggregation.precompute_aggregate_pca(X, tol=0.5, sorting='pca')
+            labels2, splist2, nr_dist2, ind2 = aggregation_c.precompute_aggregate_pca(X, tol=0.5, sorting='pca')
+            labels3, splist3, nr_dist3, ind3 = aggregation_cm.precompute_aggregate_pca(X, tol=0.5, sorting='pca')
+            
+            
+            for i in range(len(labels)):
+                if labels1[i] != labels2[i]:
+                    checkpoint = 0
+                if labels2[i] != labels3[i]:
+                    checkpoint = 0
+            
+            for i in range(len(splist1)):
+                if splist1[i][0] != splist2[i][0]:
+                    checkpoint = 0
+                if splist2[i][0] != splist3[i][0]:
+                    checkpoint = 0
+        except:
+            checkpoint = 0
+
+        self.assertEqual(checkpoint, 1)
+
+    
     def test_misc(self):
         checkpoint = 1
         try:
