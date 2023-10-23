@@ -32,6 +32,87 @@ from scipy.sparse.linalg import svds
 from scipy.linalg import get_blas_funcs, eigh
 
 
+# stefan added 23/10/2023
+def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
+    """Aggregate the data with PCA using precomputation
+
+    Parameters
+    ----------
+    data : numpy.ndarray
+        The input that is array-like of shape (n_samples,).
+    
+    tol : float
+        The tolerance to control the aggregation, if the distance between the starting point 
+        and the object is less than or equal than the tolerance,
+        the object should allocated to the group which starting point belongs to.  
+    
+    
+    Returns
+    -------
+    labels (numpy.ndarray) : 
+        The group category of the data after aggregation.
+    
+    splist (list) : 
+        The list of the starting points.
+    
+    nr_dist (int) :
+        The number of pairwise distance calculations.
+    """
+    
+    n, fdim = data.shape
+    half_r2 = 0.5*tol**2
+    half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5 # precomputation
+
+    # get sorting values
+    if fdim>1:
+        if fdim <= 3: # memory inefficient
+            gemm = get_blas_funcs("gemm", [data.T, data])
+            _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
+            sort_vals = data@U1.reshape(-1)
+        else:
+            U1, s1, _ = svds(data, k=1, return_singular_vectors=True)
+            sort_vals = U1[:,0]*s1[0]
+    else:
+        sort_vals = data[:,0]
+
+    sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
+    ind = np.argsort(sort_vals)
+    sort_vals = sort_vals[ind] 
+    data = data[ind,:] # sort data
+
+ 
+    lab = 0
+    labels = np.full(n, -1, dtype=int)
+    nr_dist = 0 
+    splist = list()
+
+    for i in range(n): 
+        if labels[i] >= 0:
+            continue
+
+        clustc = data[i,:] 
+        labels[i] = lab
+        num_group = 1
+        splist.append((i, sort_vals[i], num_group))
+
+        rhs = half_r2 - half_nrm2[i] # right-hand side of norm ineq.
+        last_j = np.searchsorted(sort_vals, tol + sort_vals[i], side='right')
+        ips = np.matmul(data[i+1:last_j,:],clustc.T)
+        nr_dist += last_j - i - 1
+
+        for j in range(i+1,last_j):
+            if labels[j] >= 0:
+                continue
+
+            if half_nrm2[j] - ips[j-i-1] <= rhs:
+                num_group += 1
+                labels[j] = lab
+
+        lab += 1
+    
+    labels = labels[np.argsort(ind)]
+    
+    return labels, splist, nr_dist, ind
 
 def precompute_aggregate(data, sorting="pca", tol=0.5): 
     """Aggregate the data using precomputation
