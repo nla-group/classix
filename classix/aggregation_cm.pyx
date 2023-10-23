@@ -81,13 +81,8 @@ cpdef precompute_aggregate_pca(double[:,:] data, str sorting='pca', double tol=0
     cdef double rhs
 
     if fdim > 1:
-        if fdim <= 3: # memory inefficient
-                gemm = get_blas_funcs("gemm", [data.T, data])
-                _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
-                sort_vals = data@U1.reshape(-1)
-        else:
-            U1, s1, _ = svds(np.asarray(data), k=1, return_singular_vectors=True)
-            sort_vals = U1[:,0]*s1[0]
+        U1, s1, _ = svds(np.asarray(data), k=1, return_singular_vectors=True)
+        sort_vals = U1[:,0]*s1[0]
     else:
         sort_vals = data[:,0]
         
