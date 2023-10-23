@@ -112,8 +112,7 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
         lab += 1
     
     labels = labels[np.argsort(ind)]
-    print("this is python")
-    
+
     return labels, splist, nr_dist, ind
 
 
