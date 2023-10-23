@@ -38,7 +38,7 @@ np.import_array()
 @cython.wraparound(False)
 @cython.binding(True)
 
-cpdef precompute_aggregate_pca(double[:,:] data, double tol=0.5):
+cpdef precompute_aggregate_pca(double[:,:] data, str sorting='pca', double tol=0.5):
     """Aggregate the data with PCA using precomputation
 
     Parameters
@@ -107,7 +107,7 @@ cpdef precompute_aggregate_pca(double[:,:] data, double tol=0.5):
         clustc = data[i,:] 
         labels[i] = lab
         num_group = 1
-        splist.append((i, sort_vals[i], num_group))
+        splist.append((ind[i], sort_vals[i], num_group))
             
         rhs = half_r2 - half_nrm2[i] # right-hand side of norm ineq.
         last_j = np.searchsorted(sort_vals, tol + sort_vals[i], side='right')
