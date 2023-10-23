@@ -43,7 +43,7 @@ np.import_array()
 @cython.wraparound(False)
 @cython.binding(True)
 
-cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, double tol=0.5):
+cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, str sorting='pca', double tol=0.5):
     """Aggregate the data with PCA using precomputation
 
     Parameters
@@ -86,7 +86,7 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, double tol
     cdef Py_ssize_t i, j
     
     cdef double half_r2 = tol**2 * 0.5
-    cdef np.ndarray[np.float64_t, ndim=1] half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
+    
     
     cdef double rhs
 
@@ -105,6 +105,10 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, double tol
     sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
 
     ind = np.argsort(sort_vals)
+    data = data[ind]
+    sort_vals = sort_vals[ind] 
+    cdef np.ndarray[np.float64_t, ndim=1] half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
+
 
     for i in range(len_ind): 
         if labels[i] >= 0:
@@ -113,7 +117,7 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, double tol
         clustc = data[i,:] 
         labels[i] = lab
         num_group = 1
-        splist.append((i, sort_vals[i], num_group))
+        splist.append((ind[i], sort_vals[i], num_group))
             
         rhs = half_r2 - half_nrm2[i] # right-hand side of norm ineq.
         last_j = np.searchsorted(sort_vals, tol + sort_vals[i], side='right')
