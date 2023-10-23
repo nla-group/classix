@@ -324,13 +324,16 @@ class TestClassix(unittest.TestCase):
             inverse_ind4, _, _, _ = aggregation.aggregate(data, sorting="pca", tol=0.5)
             inverse_ind5, _, _, _ = aggregation_c.aggregate(data, "pca", 0.5)
             inverse_ind6, _, _, _ = aggregation_cm.aggregate(data, "pca", 0.5)
-
+            inverse_ind7, _, _, _ = aggregation.precompute_aggregate_pca(data, sorting="pca", tol=0.5)
+            inverse_ind8, _, _, _ = aggregation_c.precompute_aggregate_pca(data, "pca", 0.5)
+            inverse_ind9, _, _, _ = aggregation_cm.precompute_aggregate_pca(data, "pca", 0.5)
+            
             _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="norm-mean", tol=0.5)
             _, _, _, _ = aggregation_c.precompute_aggregate(data, "norm-mean", 0.5)
-
+            
             _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="NA", tol=0.5)
             _, _, _, _ = aggregation_c.precompute_aggregate(data, "NA", 0.5)
-
+            
             if np.sum(inverse_ind1 != inverse_ind2) != 0:
                 checkpoint = 0
             if np.sum(inverse_ind2 != inverse_ind3) != 0:
@@ -339,8 +342,11 @@ class TestClassix(unittest.TestCase):
                 checkpoint = 0
             if np.sum(inverse_ind5 != inverse_ind6) != 0:
                 checkpoint = 0
+            if np.sum(inverse_ind7 != inverse_ind8) != 0:
+                checkpoint = 0
+            if np.sum(inverse_ind8 != inverse_ind9) != 0:
+                checkpoint = 0
 
-            
         except:
             checkpoint = 0
 
@@ -379,36 +385,7 @@ class TestClassix(unittest.TestCase):
             checkpoint = 0
 
         self.assertEqual(checkpoint, 1)
-    
 
-
-    def test_precompute_pca(self):
-        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=2, 
-                               cluster_std=1.5, random_state=1
-        )
-        
-        checkpoint = 1
-        try:
-            labels1, splist1, nr_dist1, ind1 = aggregation.precompute_aggregate_pca(X, tol=0.5, sorting='pca')
-            labels2, splist2, nr_dist2, ind2 = aggregation_c.precompute_aggregate_pca(X, tol=0.5, sorting='pca')
-            labels3, splist3, nr_dist3, ind3 = aggregation_cm.precompute_aggregate_pca(X, tol=0.5, sorting='pca')
-            
-            
-            for i in range(len(labels)):
-                if labels1[i] != labels2[i]:
-                    checkpoint = 0
-                if labels2[i] != labels3[i]:
-                    checkpoint = 0
-            
-            for i in range(len(splist1)):
-                if splist1[i][0] != splist2[i][0]:
-                    checkpoint = 0
-                if splist2[i][0] != splist3[i][0]:
-                    checkpoint = 0
-        except:
-            checkpoint = 0
-
-        self.assertEqual(checkpoint, 1)
 
     
     def test_misc(self):
