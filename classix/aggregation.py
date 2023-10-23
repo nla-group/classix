@@ -151,7 +151,7 @@ def precompute_aggregate(data, sorting="pca", tol=0.5):
     
     if sorting == "norm-mean" or sorting == "norm-orthant": 
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
-        ind = np.argsort(sort_vals)
+        
 
     elif sorting == "pca":
         # change to svd 
@@ -168,11 +168,12 @@ def precompute_aggregate(data, sorting="pca", tol=0.5):
             sort_vals = data[:,0]
             
         sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
-        ind = np.argsort(sort_vals)
+        
 
     else: # no sorting
         sort_vals = np.zeros(len_ind) 
-        ind = np.arange(len_ind)
+        
+    ind = np.argsort(sort_vals)
         
     lab = 0
     labels = [-1]*len_ind
