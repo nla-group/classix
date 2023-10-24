@@ -120,7 +120,7 @@ cpdef precompute_aggregate_pca(double[:,:] data, str sorting='pca', double tol=0
         lab += 1
 
     labels = labels.base[np.argsort(ind)]
-    return np.asarray(labels), splist, nr_dist, ind
+    return np.asarray(labels), splist, nr_dist, ind, half_nrm2
 
 
 
