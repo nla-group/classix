@@ -702,7 +702,6 @@ class CLASSIX:
             # remove noise cluster, avoid connecting two separate to a single cluster
             # the label with the maxid is label marked noises
             
-            
             if SIZE_NOISE_LABELS > 0:
                 self.clean_index_ = labels != maxid
                 agln = agg_labels[self.clean_index_]
@@ -1374,7 +1373,9 @@ class CLASSIX:
                                     fontsize=sp_fontsize, bbox=sp_bbox
                             )
 
-                    print("connected_paths:", connected_paths)
+                    if len(connected_paths) != 0:
+                        print("connected_paths:", connected_paths)
+                        
                     nr_cps = len(connected_paths)
                     
                     if add_arrow:

@@ -63,7 +63,7 @@ def cython_is_available(verbose=0):
                 # Typed memoryviews allow efficient access to memory buffers, such as those underlying NumPy arrays, without incurring any Python overhead. 
             
             except ModuleNotFoundError:
-                from .aggregation_c import aggregate, precompute_aggregate 
+                from .aggregation_c import aggregate, precompute_aggregate, precompute_aggregate_pca
                 __cython_type__ =  "trivial"
 
             if verbose:
@@ -76,7 +76,7 @@ def cython_is_available(verbose=0):
             return True
 
         except (ModuleNotFoundError, ValueError):
-            from .aggregation import aggregate, precompute_aggregate
+            from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
 
             from .merging import agglomerate
 
@@ -391,7 +391,7 @@ class CLASSIX:
     """
         
     def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, 
-                 algorithm='set', memory=False, verbose=1): 
+                 algorithm='bf', memory=False, verbose=1): 
 
 
         self.verbose = verbose
@@ -432,10 +432,10 @@ class CLASSIX:
             try:
                 try:
                     from .aggregation_cm import aggregate
-                    from .aggregation_cm import aggregate as precompute_aggregate 
+                    from .aggregation_cm import aggregate as precompute_aggregate, precompute_aggregate_pca
                     
                 except ModuleNotFoundError:
-                    from .aggregation_c import aggregate, precompute_aggregate 
+                    from .aggregation_c import aggregate, precompute_aggregate, precompute_aggregate_pca 
                 
                 self.__enable_aggregation_cython__ = True
 
@@ -446,18 +446,21 @@ class CLASSIX:
 
             except (ModuleNotFoundError, ValueError):
                 if not self.__enable_aggregation_cython__:
-                    from .aggregation import aggregate, precompute_aggregate 
+                    from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
                 
                 from .merging import agglomerate, bf_distance_agglomerate
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
-            from .aggregation import aggregate, precompute_aggregate 
+            from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
             from .merging import agglomerate, bf_distance_agglomerate
             warnings.warn("This run of CLASSIX is not using Cython.")
 
         if not self.memory:
-            self.aggregate = precompute_aggregate
+            if sorting == 'pca':
+                self.aggregate = precompute_aggregate_pca
+            else:
+                self.aggregate = precompute_aggregate
             
         else:
             self.aggregate = aggregate
@@ -577,6 +580,7 @@ class CLASSIX:
             The ndarray-like input of shape (n_samples,)
 
         - memory : bool, default=False
+        
             - True: default, use precomputation is triggered to speedup the query
 
             - False: a memory efficient way to perform query 
@@ -608,7 +612,7 @@ class CLASSIX:
     
     
     
-    def clustering(self, data, agg_labels, splist, radius=0.5, method="distance", minPts=0, algorithm='set'):
+    def clustering(self, data, agg_labels, splist, radius=0.5, method="distance", minPts=0, algorithm='bf'):
         """
         Merge groups after aggregation. 
 
@@ -636,7 +640,7 @@ class CLASSIX:
             The threshold, in the range of [0, infity] to determine the noise degree.
             When assgin it 0, algorithm won't check noises.
 
-        algorithm : str, default='set'
+        algorithm : str, default='bf'
             Algorithm to merge connected groups.
  
             - 'bf': Use bruteforce routines to speed up the merging of connected groups.
@@ -697,7 +701,6 @@ class CLASSIX:
 
             # remove noise cluster, avoid connecting two separate to a single cluster
             # the label with the maxid is label marked noises
-            
             
             if SIZE_NOISE_LABELS > 0:
                 self.clean_index_ = labels != maxid
@@ -1265,15 +1268,6 @@ class CLASSIX:
 
                 cluster_label1, cluster_label2 = self.label_change[agg_label1], self.label_change[agg_label2]
 
-                connected_groups = {}
-                for subs in self.merge_groups:
-                    if agg_label1 in subs and agg_label2 in subs:
-                        connected_groups["object 1"] = connected_groups["object 2"] = np.array(subs, dtype=int)
-                    elif agg_label1 in subs:
-                        connected_groups["object 1"] = np.array(subs, dtype=int)
-                    elif agg_label2 in subs:
-                        connected_groups["object 2"] = np.array(subs, dtype=int)
-               
                 
                 if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
                     sp_str = np.array2string(self.splist_[agg_label1, 3:], separator=',')
@@ -1282,10 +1276,9 @@ class CLASSIX:
                     )
                     connected_paths = [agg_label1]
                 else:
-                    
                     if self.connected_pairs_ is None:
-                        distm = pairwise_distances(self.s_pca, Y=None, metric='euclidean', n_jobs=n_jobs)
-                        distm = (distm <= radius*scale).astype(int)
+                        distm = pairwise_distances(self.s_pca)
+                        distm = (distm <= self.radius*self.scale).astype(int)
                         self.connected_pairs_ = return_csr_matrix_indices(csr_matrix(distm)).tolist() # list
                         
                     if cluster_label1 == cluster_label2: # when ind1 & ind2 are in the same cluster but diff group
@@ -1301,8 +1294,8 @@ class CLASSIX:
                                                              agg_label2
                         )
                         
-                        
                         connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
+                        
                         print(
                         """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
                             """\nboth of which were merged into cluster #%(cluster)i. """% {
@@ -1361,9 +1354,12 @@ class CLASSIX:
                     
                     for i in range(s_pca.shape[0]):
                         if union_ind[i] in connected_paths:
-                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
+                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
+                                                     color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
                         else:
-                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
+                                                     color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                            
                         ax.set_aspect('equal', adjustable='datalim')
                         
                         if sp_fontsize is None:
@@ -1377,13 +1373,15 @@ class CLASSIX:
                                     fontsize=sp_fontsize, bbox=sp_bbox
                             )
 
-                    print("connected_paths:", connected_paths)
+                    if len(connected_paths) != 0:
+                        print("connected_paths:", connected_paths)
+                        
                     nr_cps = len(connected_paths)
                     
                     if add_arrow:
                         for i in range(nr_cps - 1):
-                            arrowStart=(s_pca[connected_paths[i], 0], s_pca[connected_paths[i], 1])
-                            arrowStop=(s_pca[connected_paths[i+1], 0],s_pca[connected_paths[i+1], 1])
+                            arrowStart=(self.s_pca[connected_paths[i], 0], self.s_pca[connected_paths[i], 1])
+                            arrowStop=(self.s_pca[connected_paths[i+1], 0], self.s_pca[connected_paths[i+1], 1])
 
                             if directed_arrow == 0:
                                 ax.annotate("",arrowStop,
@@ -1460,16 +1458,16 @@ class CLASSIX:
             for i in np.unique(self.labels_):
                 self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
 
-        # if self.data.shape[1] >= 2:
         plt.style.use('default') # clear the privous figure style
         plt.style.use(style=figstyle)
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = 'white'
         plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker="p")
+
         for i in np.unique(self.labels_):
             x_pca_part = self.x_pca[self.labels_ == i,:]
             plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="*", c=self.cluster_color[i])
-            # plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="*", c='#%06X' % np.random.randint(0, 0xFFFFFF))
+            
             for j in range(self.s_pca.shape[0]):
                 if fontsize is None:
                     plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), bbox=bbox)
@@ -1496,9 +1494,6 @@ class CLASSIX:
             print("successfully save")
 
         plt.show()
-            
-        # else:
-        #     print("Visualization is restricted to multidimensional (dimension greater than or equal to 2) data.")
             
         return
         
@@ -1555,6 +1550,7 @@ class CLASSIX:
                           markersize=320,
                           plot_boundary=False,
                           bound_color='red', path='.', fmt='pdf'):
+        
         """Visualize the linkage in the distance clustering.
         
         
@@ -1610,19 +1606,12 @@ class CLASSIX:
             fig.savefig(path + '/linkage_scale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.pdf', bbox_inches='tight')
         else:
             fig.savefig(path + '/linkage_scale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.png', bbox_inches='tight')
-        # plt.show()
-    
-    
-    
-    def load_splist_indices(self):
-        if self.splist_indices is not None:
-            self.splist_indices = np.full(self.data.shape[0], 0, dtype=int)
-            self.splist_indices[self.splist_[:,0].astype(int)] = 1
-        return self.splist_indices
         
-        
-        
+
+    
     def load_cluster_centers(self):
+        """Load cluster centers."""
+        
         if self.centers is None:
             self.centers = calculate_cluster_centers(self.data*self._scl + self._mu, self.labels_)
             return self.centers
@@ -1631,18 +1620,32 @@ class CLASSIX:
         
         
     def calculate_group_centers(self, data, labels):
+        """Compute data center for each label according to label sequence."""
+        
         centers = list() 
         for c in set(labels):
             indc = [i for i in range(data.shape[0]) if labels[i] == c]
             indc = (labels==c)
             center = [-1, c] + np.mean(data[indc,:], axis=0).tolist()
             centers.append( center )
+            
         return centers
 
     
+    def load_splist_indices(self):
+        """Get the starting point indices."""
+        
+        if self.splist_indices is not None:
+            self.splist_indices = np.full(self.data.shape[0], 0, dtype=int)
+            self.splist_indices[self.splist_[:,0].astype(int)] = 1
+            
+        return self.splist_indices
+
+
     
     def outlier_filter(self, min_samples=None, min_samples_rate=0.1): # percent
-        """Filter outliers in terms of min_samples"""
+        """Filter outliers in terms of ``min_samples`` or ``min_samples_rate``. """
+        
         if min_samples == None:
             min_samples = min_samples_rate*sum(self.old_cluster_count.values())
             
@@ -1652,7 +1655,8 @@ class CLASSIX:
 
 
     def reassign_labels(self, labels):
-        # unique_labels = sorted(np.unique(labels))
+        """Renumber the labels to 0, 1, 2, 3, ..."""
+        
         sorted_dict = sorted(self.old_cluster_count.items(), key=lambda x: x[1], reverse=True)
 
         clabels = copy.deepcopy(labels)
@@ -1663,11 +1667,11 @@ class CLASSIX:
     
 
     def pprint_format(self, items):
-        # lite-function to print dict or turple/list
+        """Format item value for clusters. """
+        
         cluster = 0
         if isinstance(items, dict):
             for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True): 
-                # print("      [-] cluster {} : {}".format(key, value))
                 print("      * cluster {} : {}".format(cluster, value))
                 cluster = cluster + 1
                 
@@ -1870,9 +1874,11 @@ def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, t
     queque = list()
     graph = pairs_to_graph(connected_pairs, num_nodes) # return sparse matrix
     dist_info = np.empty((num_nodes, 3), dtype=int) # node, dist, last node
+    
     dist_info[:,0] = np.arange(num_nodes)
     dist_info[:,1] = num_nodes # np.iinfo(np.int64).max
     dist_info[:,2] = -1
+    
     source_node = int(source_node)
     queque.append(source_node+1)
     dist_info[source_node,1] = 0
@@ -1910,10 +1916,10 @@ def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, t
 def pairs_to_graph(pairs, num_nodes, sparse=True):
     """Transform the pairs represented by list into graph."""
     # from scipy.sparse import csr_matrix
-    graph = np.full((num_nodes, num_nodes), np.inf, dtype=int)
+    graph = np.full((num_nodes, num_nodes), -99, dtype=int)
     for i in range(num_nodes):
         graph[i, i] = 0
-    pairs = np.array(pairs, dtype=int)
+    
     for pair in pairs:
         graph[pair[0], pair[1]] = graph[pair[1], pair[0]] = 1
     if sparse:
