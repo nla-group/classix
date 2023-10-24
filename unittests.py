@@ -347,7 +347,7 @@ class TestClassix(unittest.TestCase):
             if np.sum(inverse_ind8 != inverse_ind9) != 0:
                 checkpoint = 0
 
-            for i in range(len(spl1))
+            for i in range(len(spl1)):
                 if spl1[i][0] != spl2[i][0]:
                     checkpoint = 0
                 if spl2[i][0] != spl3[i][0]:
