@@ -190,11 +190,11 @@ cpdef merging(double[:, :] data,
         
         - 'density': two groups are merged if the density of data points in their intersection 
            is at least as high the smaller density of both groups. This option uses the disjoint 
-           set structure to speedup agglomerate.
+           set structure to speedup merging.
            
         - 'distance': two groups are merged if the distance of their starting points is at 
            most scale*radius (the parameter above). This option uses the disjoint 
-           set structure to speedup agglomerate.
+           set structure to speedup merging.
     
     scale : float
         Design for distance-clustering, when distance between the two starting points 
