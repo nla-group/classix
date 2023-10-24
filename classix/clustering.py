@@ -530,7 +530,7 @@ class CLASSIX:
                                                                        sorting=self.sorting, 
                                                                        tol=self.radius
                                                                     ) 
-        self.splist_ = np.array(self.splist_)
+        self.splist_ = np.asarray(self.splist_)
         
         self.clean_index_ = np.full(self.data.shape[0], True) # claim clean data indices
         # clustering
