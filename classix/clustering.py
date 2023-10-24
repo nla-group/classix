@@ -462,13 +462,15 @@ class CLASSIX:
 
         if not self.memory:
             if sorting == 'pca':
+                self.__precompute_agg__ = True
                 self._aggregate = precompute_aggregate_pca
             else:
                 self._aggregate = precompute_aggregate
             
         else:
+            self.__precompute_agg__ = False
             self._aggregate = aggregate
-
+    
         self._merging = merging
         self._bf_distance_merging = bf_distance_merging
             
@@ -526,10 +528,15 @@ class CLASSIX:
             self.data = (data - self._mu) / self._scl
         
         # aggregation
-        self.groups_, self.splist_, self.dist_nr, ind = self._aggregate(data=self.data,
-                                                                       sorting=self.sorting, 
+        if self.__precompute_agg__:
+            self.groups_, self.splist_, self.dist_nr, ind, xxt = self._aggregate(data=self.data, sorting=self.sorting, 
                                                                        tol=self.radius
                                                                     ) 
+        else:
+            self.groups_, self.splist_, self.dist_nr, ind = self._aggregate(data=self.data, sorting=self.sorting, 
+                                                                       tol=self.radius
+                                                                    ) 
+            
         self.splist_ = np.asarray(self.splist_)
         
         self.clean_index_ = np.full(self.data.shape[0], True) # claim clean data indices
@@ -544,6 +551,7 @@ class CLASSIX:
         else:
             self.labels_ = self.merging(
                 data=self.data,
+                xxt=xxt,
                 agg_labels=self.groups_, 
                 splist=self.splist_,  
                 radius=self.radius, 
