@@ -32,7 +32,7 @@ from scipy.special import betainc, gamma
 
 
 
-def bf_distance_agglomerate(data, labels, splist, radius, minPts=0, scale=1.5):
+def bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5):
     """
     Implement CLASSIX's merging with brute force computation
     
@@ -136,7 +136,7 @@ def bf_distance_agglomerate(data, labels, splist, radius, minPts=0, scale=1.5):
 
 
 
-def agglomerate(data, splist, radius, method='distance', scale=1.5):
+def merging(data, splist, radius, method='distance', scale=1.5):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
     
