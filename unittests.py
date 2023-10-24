@@ -29,9 +29,9 @@ from classix import CLASSIX, loadData, cython_is_available
 from classix.clustering import calculate_cluster_centers
 from classix import novel_normalization
 from classix import aggregation, aggregation_c, aggregation_cm, aggregation_test
-from classix.merging import agglomerate, bf_distance_agglomerate
-from classix.merging_cm import agglomerate as agglomerate_cm
-from classix.merging_cm import bf_distance_agglomerate as bf_distance_agglomerate_cm
+from classix.merging import merging, bf_distance_merging
+from classix.merging_cm import merging as merging_cm
+from classix.merging_cm import bf_distance_merging as bf_distance_merging_cm
 from sklearn.metrics.cluster import adjusted_rand_score
 
 
@@ -389,12 +389,12 @@ class TestClassix(unittest.TestCase):
             splist = np.asarray(splist)
             
             radius = 0.5
-            label_set1, connected_pairs_store1 = agglomerate(data, splist, radius, method='distance', scale=1.5)
-            label_set2, connected_pairs_store2 = agglomerate_cm(data, splist, radius, method='distance', scale=1.5)
+            label_set1, connected_pairs_store1 = merging(data, splist, radius, method='distance', scale=1.5)
+            label_set2, connected_pairs_store2 = merging_cm(data, splist, radius, method='distance', scale=1.5)
             
             
-            label_set3, _, _ = bf_distance_agglomerate(data, labels, splist, radius, minPts=0, scale=1.5)
-            label_set4, _, _ = bf_distance_agglomerate_cm(data, labels, splist, radius, minPts=0, scale=1.5)
+            label_set3, _, _ = bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5)
+            label_set4, _, _ = bf_distance_merging_cm(data, labels, splist, radius, minPts=0, scale=1.5)
             
             for i in range(len(label_set2)):
                 if label_set1[i] != label_set2[i]:
