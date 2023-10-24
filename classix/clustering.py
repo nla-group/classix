@@ -526,7 +526,7 @@ class CLASSIX:
             self.data = (data - self._mu) / self._scl
         
         # aggregation
-        self.groups_, self.splist_, self.dist_nr, ind = self.aggregate(data=self.data,
+        self.groups_, self.splist_, self.dist_nr, ind = self._aggregate(data=self.data,
                                                                        sorting=self.sorting, 
                                                                        tol=self.radius
                                                                     ) 
