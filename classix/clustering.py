@@ -72,13 +72,13 @@ def cython_is_available(verbose=0):
                 else:
                     print("This CLASSIX is not using Cython typed memoryviews.")
                     
-            from .merging_cm import agglomerate
+            from .merging_cm import merging
             return True
 
         except (ModuleNotFoundError, ValueError):
             from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
 
-            from .merging import agglomerate
+            from .merging import merging
 
             if verbose:
                 print("This CLASSIX is not using Cython.")
@@ -290,30 +290,34 @@ class CLASSIX:
         - 'norm-orthant': shift data to positive orthant and then sort by 2-norm values
         
         - None: aggregate the raw data without any sorting
+
         
     radius : float, default=0.5
         Tolerance to control the aggregation. If the distance between a starting point 
         and an object is less than or equal to the tolerance, the object will be allocated 
         to the group which the starting point belongs to. For details, we refer users to [1].
+
     
     group_merging : str, {'density', 'distance', None}, default='distance'
         The method for merging the groups. 
         
         - 'density': two groups are merged if the density of data points in their intersection 
            is at least as high the smaller density of both groups. This option uses the disjoint 
-           set structure to speedup agglomerate.
+           set structure to speedup merging.
         
         - 'distance': two groups are merged if the distance of their starting points is at 
            most scale*radius (the parameter above). This option uses the disjoint 
-           set structure to speedup agglomerate.
+           set structure to speedup merging.
         
         For more details, we refer to [1].
         If the users set group_merging to None, the clustering will only return the labels formed by aggregation as cluster labels.
+
     
     minPts : int, default=0
         Clusters with less than minPts points are classified as abnormal clusters.  
         The data points in an abnormal cluster will be redistributed to the nearest normal cluster. 
         When set to 0, no redistribution is performed. 
+
     
     norm : boolean, default=True
         If normalize the data associated with the sorting, default as True. 
@@ -440,20 +444,20 @@ class CLASSIX:
                 self.__enable_aggregation_cython__ = True
 
                 if platform.system() == 'Windows':
-                    from .merging_cm_win import agglomerate, bf_distance_agglomerate
+                    from .merging_cm_win import merging, bf_distance_merging
                 else:
-                    from .merging_cm import agglomerate, bf_distance_agglomerate
+                    from .merging_cm import merging, bf_distance_merging
 
             except (ModuleNotFoundError, ValueError):
                 if not self.__enable_aggregation_cython__:
                     from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
                 
-                from .merging import agglomerate, bf_distance_agglomerate
+                from .merging import merging, bf_distance_merging
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
             from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
-            from .merging import agglomerate, bf_distance_agglomerate
+            from .merging import merging, bf_distance_merging
             warnings.warn("This run of CLASSIX is not using Cython.")
 
         if not self.memory:
@@ -465,8 +469,8 @@ class CLASSIX:
         else:
             self.aggregate = aggregate
 
-        self.agglomerate = agglomerate
-        self.bf_distance_agglomerate = bf_distance_agglomerate
+        self.merging = merging
+        self.bf_distance_merging = bf_distance_merging
             
 
             
@@ -661,7 +665,7 @@ class CLASSIX:
         labels = copy.deepcopy(agg_labels) 
         
         if method == 'density' or algorithm == 'set':
-            self.merge_groups, self.connected_pairs_ = self.agglomerate(data, splist, radius, method, scale=self.scale)
+            self.merge_groups, self.connected_pairs_ = self.merging(data, splist, radius, method, scale=self.scale)
             maxid = max(labels) + 1
             
             # after this step, the connected pairs (groups) will be transformed into merged clusters, 
@@ -730,7 +734,7 @@ class CLASSIX:
             
 
         else:
-            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self.bf_distance_agglomerate(data=data, 
+            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self.bf_distance_merging(data=data, 
                                                                     labels=labels,
                                                                     splist=splist,
                                                                     radius=radius,
