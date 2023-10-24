@@ -46,7 +46,7 @@ np.import_array()
 
 
 
-cpdef bf_distance_agglomerate(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labels,
+cpdef bf_distance_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labels,
                                 double[:, :] splist, 
                                 double radius, int minPts=0, double scale=1.5):
 
@@ -166,7 +166,7 @@ cpdef bf_distance_agglomerate(double[:, :] data, np.ndarray[np.int32_t, ndim=1] 
 
 
 # Disjoint set union
-cpdef agglomerate(double[:, :] data, 
+cpdef merging(double[:, :] data, 
                     double[:, :] splist, 
                     double radius, str method='distance', double scale=1.5):
     """
@@ -190,11 +190,11 @@ cpdef agglomerate(double[:, :] data,
         
         - 'density': two groups are merged if the density of data points in their intersection 
            is at least as high the smaller density of both groups. This option uses the disjoint 
-           set structure to speedup agglomerate.
+           set structure to speedup merging.
            
         - 'distance': two groups are merged if the distance of their starting points is at 
            most scale*radius (the parameter above). This option uses the disjoint 
-           set structure to speedup agglomerate.
+           set structure to speedup merging.
     
     scale : float
         Design for distance-clustering, when distance between the two starting points 
