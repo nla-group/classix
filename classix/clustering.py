@@ -444,20 +444,20 @@ class CLASSIX:
                 self.__enable_aggregation_cython__ = True
 
                 if platform.system() == 'Windows':
-                    from .merging_cm_win import merging, bf_distance_merging
+                    from .merging_cm_win import merging, bf_distance_merging, bf_distance_merging_precompute
                 else:
-                    from .merging_cm import merging, bf_distance_merging
+                    from .merging_cm import merging, bf_distance_merging, bf_distance_merging_precompute
 
             except (ModuleNotFoundError, ValueError):
                 if not self.__enable_aggregation_cython__:
                     from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
                 
-                from .merging import merging, bf_distance_merging
+                from .merging import merging, bf_distance_merging, bf_distance_merging_precompute
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
             from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
-            from .merging import merging, bf_distance_merging
+            from .merging import merging, bf_distance_merging, bf_distance_merging_precompute
             warnings.warn("This run of CLASSIX is not using Cython.")
 
         if not self.memory:
@@ -473,7 +473,7 @@ class CLASSIX:
     
         self._merging = merging
         self._bf_distance_merging = bf_distance_merging
-            
+        self._bf_distance_merging_precompute = bf_distance_merging_precompute
 
             
     def fit(self, data):
@@ -529,7 +529,7 @@ class CLASSIX:
         
         # aggregation
         if self.__precompute_agg__:
-            self.groups_, self.splist_, self.dist_nr, ind, xxt = self._aggregate(data=self.data, sorting=self.sorting, 
+            self.groups_, self.splist_, self.dist_nr, ind, half_nrm2 = self._aggregate(data=self.data, sorting=self.sorting, 
                                                                        tol=self.radius
                                                                     ) 
         else:
@@ -551,7 +551,7 @@ class CLASSIX:
         else:
             self.labels_ = self.merging(
                 data=self.data,
-                xxt=xxt,
+                half_nrm2=half_nrm2,
                 agg_labels=self.groups_, 
                 splist=self.splist_,  
                 radius=self.radius, 
@@ -742,13 +742,24 @@ class CLASSIX:
             
 
         else:
-            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._bf_distance_merging(data=data, 
+            if self.__precompute_agg__:
+                labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._bf_distance_merging_precompute(data=data, 
+                                                                                            labels=labels,
+                                                                                            splist=splist,
+                                                                                            half_nrm2=2*half_nrm2,
+                                                                                            radius=radius,
+                                                                                            minPts=minPts,
+                                                                                            scale=self.scale
+                                                                                        )
+            else:
+                labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._bf_distance_merging(data=data, 
                                                                     labels=labels,
                                                                     splist=splist,
                                                                     radius=radius,
                                                                     minPts=minPts,
                                                                     scale=self.scale
                                                                 )
+                
             self.label_change = dict(zip(agg_labels, labels)) # how object change group to cluster.
 
 
