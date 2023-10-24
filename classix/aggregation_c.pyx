@@ -252,7 +252,7 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
 
         lab += 1
 
-    return labels, splist, nr_dist, ind
+    return labels, splist, nr_dist, ind, half_nrm2
 
 
 
