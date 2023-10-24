@@ -64,7 +64,7 @@ cpdef bf_distance_merging_precompute(double[:, :] data, np.ndarray[np.int64_t, n
         Represent the list of starting points information formed in the aggregation. 
         list of [ starting point index of current group, sorting values, and number of group elements ].
 
-    half_nrm2: numpy.ndarray
+    half_nrm2 : numpy.ndarray
         Precomputed values for np.sum(data * data, axis=1).
 
     radius : float
