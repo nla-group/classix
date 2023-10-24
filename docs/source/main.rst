@@ -19,4 +19,3 @@ CLASSIX API Reference
    classix.CLASSIX.outlier_filter
    classix.CLASSIX.pprint_format
    classix.CLASSIX.reassign_labels
-   classix.form_starting_point_clusters_table
