@@ -64,8 +64,8 @@ cpdef bf_distance_merging_precompute(double[:, :] data, np.ndarray[np.int64_t, n
         Represent the list of starting points information formed in the aggregation. 
         list of [ starting point index of current group, sorting values, and number of group elements ].
 
-    ind : numpy.ndarray
-        Sort values.
+    half_nrm2: numpy.ndarray
+        Precomputed values for np.sum(data * data, axis=1).
 
     radius : float
         The tolerance to control the aggregation. If the distance between the starting point 
@@ -181,8 +181,8 @@ cpdef bf_distance_merging(double[:, :] data, np.ndarray[np.int64_t, ndim=1] labe
         Represent the list of starting points information formed in the aggregation. 
         list of [ starting point index of current group, sorting values, and number of group elements ].
 
-    ind : numpy.ndarray
-        Sort values.
+    half_nrm2: numpy.ndarray
+        Precomputed values for np.sum(data * data, axis=1).
 
     radius : float
         The tolerance to control the aggregation. If the distance between the starting point 
