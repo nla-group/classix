@@ -47,7 +47,7 @@ def bf_distance_merging_precompute(data, labels, splist, half_nrm2, radius, minP
         Represent the list of starting points information formed in the aggregation. 
         list of [ starting point index of current group, sorting values, and number of group elements ].
 
-    half_nrm2: numpy.ndarray
+    half_nrm2 : numpy.ndarray
         Precomputed values for np.sum(data * data, axis=1).
     
     ind : numpy.ndarray
