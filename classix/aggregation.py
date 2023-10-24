@@ -113,7 +113,7 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
     
     labels = labels[np.argsort(ind)]
 
-    return labels, splist, nr_dist, ind
+    return labels, splist, nr_dist, ind, half_nrm2
 
 
 
