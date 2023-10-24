@@ -253,7 +253,7 @@ def aggregate(data, sorting="pca", tol=0.5):
 
     elif sorting == "pca":
         # change to svd 
-        if data.shape[1]>1:
+        if fdim > 1:
             if fdim <= 3: # memory inefficient
                 gemm = get_blas_funcs("gemm", [data.T, data])
                 _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
