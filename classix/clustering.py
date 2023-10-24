@@ -624,7 +624,7 @@ class CLASSIX:
     
     
     
-    def merging(self, data, agg_labels, splist, radius=0.5, method="distance", minPts=0, algorithm='bf'):
+    def merging(self, data, agg_labels, splist, half_nrm2=None, radius=0.5, method="distance", minPts=0, algorithm='bf'):
         """
         Merge groups after aggregation. 
 
