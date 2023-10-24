@@ -94,7 +94,6 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
         clustc = data[i,:] 
         labels[i] = lab
         num_group = 1
-        splist.append((ind[i], sort_vals[i], num_group))
 
         rhs = half_r2 - half_nrm2[i] # right-hand side of norm ineq.
         last_j = np.searchsorted(sort_vals, tol + sort_vals[i], side='right')
@@ -109,6 +108,7 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
                 num_group += 1
                 labels[j] = lab
 
+        splist.append((ind[i], sort_vals[i], num_group))
         lab += 1
     
     labels = labels[np.argsort(ind)]
