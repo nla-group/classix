@@ -228,7 +228,7 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
 
         lab += 1
   
-    return np.asarray(labels), splist, nr_dist, ind
+    return np.asarray(labels), splist, nr_dist, ind, half_nrm2
 
 
 
