@@ -462,15 +462,15 @@ class CLASSIX:
 
         if not self.memory:
             if sorting == 'pca':
-                self.aggregate = precompute_aggregate_pca
+                self._aggregate = precompute_aggregate_pca
             else:
-                self.aggregate = precompute_aggregate
+                self._aggregate = precompute_aggregate
             
         else:
-            self.aggregate = aggregate
+            self._aggregate = aggregate
 
-        self.merging = merging
-        self.bf_distance_merging = bf_distance_merging
+        self._merging = merging
+        self._bf_distance_merging = bf_distance_merging
             
 
             
@@ -542,7 +542,7 @@ class CLASSIX:
             self.labels_ = copy.deepcopy(self.groups_) 
         
         else:
-            self.labels_ = self.clustering(
+            self.labels_ = self.merging(
                 data=self.data,
                 agg_labels=self.groups_, 
                 splist=self.splist_,  
@@ -616,7 +616,7 @@ class CLASSIX:
     
     
     
-    def clustering(self, data, agg_labels, splist, radius=0.5, method="distance", minPts=0, algorithm='bf'):
+    def merging(self, data, agg_labels, splist, radius=0.5, method="distance", minPts=0, algorithm='bf'):
         """
         Merge groups after aggregation. 
 
@@ -665,7 +665,7 @@ class CLASSIX:
         labels = copy.deepcopy(agg_labels) 
         
         if method == 'density' or algorithm == 'set':
-            self.merge_groups, self.connected_pairs_ = self.merging(data, splist, radius, method, scale=self.scale)
+            self.merge_groups, self.connected_pairs_ = self._merging(data, splist, radius, method, scale=self.scale)
             maxid = max(labels) + 1
             
             # after this step, the connected pairs (groups) will be transformed into merged clusters, 
@@ -734,7 +734,7 @@ class CLASSIX:
             
 
         else:
-            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self.bf_distance_merging(data=data, 
+            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._bf_distance_merging(data=data, 
                                                                     labels=labels,
                                                                     splist=splist,
                                                                     radius=radius,
