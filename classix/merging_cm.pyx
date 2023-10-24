@@ -46,7 +46,7 @@ np.import_array()
 
 
 
-cpdef bf_distance_agglomerate(double[:, :] data, np.ndarray[np.int64_t, ndim=1] labels,
+cpdef bf_distance_merging(double[:, :] data, np.ndarray[np.int64_t, ndim=1] labels,
                                 double[:, :] splist,  double radius, int minPts=0, 
                                 double scale=1.5):
 
@@ -166,7 +166,7 @@ cpdef bf_distance_agglomerate(double[:, :] data, np.ndarray[np.int64_t, ndim=1] 
 
 
 # Disjoint set union
-cpdef agglomerate(double[:, :] data, 
+cpdef merging(double[:, :] data, 
                     double[:, :] splist, 
                     double radius, str method='distance', double scale=1.5):
     """
