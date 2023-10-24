@@ -114,7 +114,7 @@ def bf_distance_merging_precompute(data, labels, splist, half_nrm2, radius, minP
             for iii in ii:
                 xi = spdata[iii, :]    # starting point of one tiny group
 
-                dist = euclid(xxt, spdata, xi)
+                dist = euclid(half_nrm2, spdata, xi)
                 merge_ind = np.argsort(dist)
                 for j in merge_ind:
                     if cs[copy_sp_cluster_label[j]] >= minPts:
@@ -220,7 +220,7 @@ def bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5):
             for iii in ii:
                 xi = spdata[iii, :]    # starting point of one tiny group
 
-                dist = euclid(xxt, spdata, xi)
+                dist = euclid(half_nrm2, spdata, xi)
                 merge_ind = np.argsort(dist)
                 for j in merge_ind:
                     if cs[copy_sp_cluster_label[j]] >= minPts:
