@@ -72,14 +72,10 @@ def cython_is_available(verbose=0):
                 else:
                     print("This CLASSIX is not using Cython typed memoryviews.")
                     
-            from .merging_cm import merging
+            from .merging_cm import merging, bf_distance_merging, bf_distance_merging_precompute
             return True
 
         except (ModuleNotFoundError, ValueError):
-            from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
-
-            from .merging import merging
-
             if verbose:
                 print("This CLASSIX is not using Cython.")
             return False
