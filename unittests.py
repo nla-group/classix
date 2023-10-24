@@ -318,6 +318,7 @@ class TestClassix(unittest.TestCase):
         checkpoint = 1
         try:
             data = np.random.randn(10000, 2)
+            
             inverse_ind1, spl1, _, _ = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5)
             inverse_ind2, spl2, _, _ = aggregation_cm.precompute_aggregate(data, sorting="pca", tol=0.5)
             inverse_ind3, spl3, _, _ = aggregation_c.precompute_aggregate(data, "pca", 0.5)
@@ -346,7 +347,7 @@ class TestClassix(unittest.TestCase):
                 checkpoint = 0
             if np.sum(inverse_ind8 != inverse_ind9) != 0:
                 checkpoint = 0
-
+            
             for i in range(len(spl1)):
                 if spl1[i][0] != spl2[i][0]:
                     checkpoint = 0
@@ -359,6 +360,19 @@ class TestClassix(unittest.TestCase):
                 if spl5[i][0] != spl6[i][0]:
                     checkpoint = 0
                 if spl6[i][0] != spl7[i][0]:
+                    checkpoint = 0
+                    
+                if spl1[i][2] != spl2[i][2]:
+                    checkpoint = 0
+                if spl2[i][2] != spl3[i][2]:
+                    checkpoint = 0
+                if spl3[i][2] != spl4[i][2]:
+                    checkpoint = 0
+                if spl4[i][2] != spl5[i][2]:
+                    checkpoint = 0
+                if spl5[i][2] != spl6[i][2]:
+                    checkpoint = 0
+                if spl6[i][2] != spl7[i][2]:
                     checkpoint = 0
         except:
             checkpoint = 0
