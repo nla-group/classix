@@ -14,6 +14,7 @@ CLASSIX API Reference
    classix.CLASSIX.visualize_linkage
    classix.CLASSIX.load_cluster_centers
    classix.CLASSIX.load_splist_indices
+   classix.CLASSIX.form_starting_point_clusters_table
    classix.CLASSIX.calculate_group_centers
    classix.CLASSIX.outlier_filter
    classix.CLASSIX.pprint_format
