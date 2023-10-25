@@ -183,7 +183,7 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
     cdef Py_ssize_t i, j, coord
     
     cdef double half_r2 = tol**2 * 0.5
-    cdef np.ndarray[np.float64_t, ndim=1] half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
+    cdef np.ndarray[np.float64_t, ndim=1] half_nrm2
     
     cdef np.ndarray[np.float64_t, ndim=1] dataj
     cdef double rhs
@@ -213,7 +213,8 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
     ind = np.argsort(sort_vals)
     data = data[ind]
     sort_vals = sort_vals[ind] 
-
+    half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
+    
     for i in range(len_ind):
         if labels[i] >= 0:
             continue
