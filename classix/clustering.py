@@ -1581,6 +1581,7 @@ class CLASSIX:
         
         """
         from scipy.sparse import csr_matrix
+        from matplotlib import pyplot as plt
                               
         distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(scale,2))
         plt.rcParams['axes.facecolor'] = 'white'
