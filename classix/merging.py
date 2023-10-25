@@ -31,111 +31,6 @@ import numpy as np
 from scipy.special import betainc, gamma
 
 
-def bf_distance_merging_precompute(data, labels, splist, half_nrm2, radius, minPts=0, scale=1.5):
-    """
-    Implement CLASSIX's merging with brute force computation
-    
-    Parameters
-    ----------
-    data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
-    
-    labels : numpy.ndarray
-        aggregation labels
-
-    splist : numpy.ndarray
-        Represent the list of starting points information formed in the aggregation. 
-        list of [ starting point index of current group, sorting values, and number of group elements ].
-
-    half_nrm2 : numpy.ndarray
-        Precomputed values for np.sum(data * data, axis=1).
-    
-    ind : numpy.ndarray
-        Sort values.
-
-    radius : float
-        The tolerance to control the aggregation. If the distance between the starting point 
-        of a group and another data point is less than or equal to the tolerance,
-        the point is allocated to that group. For details, we refer users to [1].
-
-    minPts : int, default=0
-        The threshold, in the range of [0, infity] to determine the noise degree.
-        When assgin it 0, algorithm won't check noises.
-
-    scale : float, default 1.5
-        Design for distance-clustering, when distance between the two starting points 
-        associated with two distinct groups smaller than scale*radius, then the two groups merge.
-
-
-    Returns
-    -------
-
-    References
-    ----------
-    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
-
-    """
-    
-    splist_indices = splist[:, 0].astype(int)
-
-    spdata = data[splist_indices]
-
-    sp_cluster_label = labels[splist_indices]
-
-    for i in range(splist.shape[0]):
-        xi = spdata[i, :]
-        spl = np.unique( sp_cluster_label[euclid(half_nrm2, spdata, xi) <= (scale*radius)**2] )
-        minlab = np.min(spl)
-
-        for label in spl:
-            sp_cluster_label[sp_cluster_label==label] = minlab
-
-    # rename labels to be 1,2,3,... and determine cluster sizes
-    ul = np.unique(sp_cluster_label)
-    nr_u = len(ul)
-    
-    cs = np.zeros(nr_u, dtype=int)
-    grp_sizes = splist[:, 2].astype(int)
-
-    for i in range(nr_u):
-        cid = sp_cluster_label==ul[i]
-        sp_cluster_label[cid] = i
-        cs[i] = np.sum(grp_sizes[cid])
-
-    old_cluster_count = collections.Counter(sp_cluster_label[labels])
-    cid = np.nonzero(cs < minPts)[0]
-    SIZE_NOISE_LABELS = cid.size
-
-    if SIZE_NOISE_LABELS > 0:
-        copy_sp_cluster_label = sp_cluster_label.copy()
-        
-        for i in cid:
-            ii = np.nonzero(copy_sp_cluster_label==i)[0] # find all tiny groups with that label
-            for iii in ii:
-                xi = spdata[iii, :]    # starting point of one tiny group
-
-                dist = euclid(half_nrm2, spdata, xi)
-                merge_ind = np.argsort(dist)
-                for j in merge_ind:
-                    if cs[copy_sp_cluster_label[j]] >= minPts:
-                        sp_cluster_label[iii] = copy_sp_cluster_label[j]
-                        break
-
-        ul = np.unique(sp_cluster_label)
-        nr_u = len(ul)
-        cs = np.zeros(nr_u, dtype=int)
-
-        for i in range(nr_u):
-            cid = sp_cluster_label==ul[i]
-            sp_cluster_label[cid] = i
-            cs[i] = np.sum(grp_sizes[cid])
-
-    labels = sp_cluster_label[labels]
-
-    return labels, old_cluster_count, SIZE_NOISE_LABELS
-
-
-
 
 def bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5):
     """
@@ -169,8 +64,7 @@ def bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5):
         Design for distance-clustering, when distance between the two starting points 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
 
-
-    
+        
     Returns
     -------
 
@@ -183,14 +77,14 @@ def bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5):
     splist_indices = splist[:, 0].astype(int)
 
     spdata = data[splist_indices]
-    half_nrm2 = np.einsum('ij,ij->i', spdata, spdata) 
+    xxt = np.einsum('ij,ij->i', spdata, spdata) 
     # np.einsum('ij,ij->i', data, data) <-> np.sum(data * data, axis=1)
 
     sp_cluster_label = labels[splist_indices]
 
     for i in range(splist.shape[0]):
         xi = spdata[i, :]
-        spl = np.unique( sp_cluster_label[euclid(half_nrm2, spdata, xi) <= (scale*radius)**2] )
+        spl = np.unique( sp_cluster_label[euclid(xxt, spdata, xi) <= (scale*radius)**2] )
         minlab = np.min(spl)
 
         for label in spl:
@@ -220,7 +114,7 @@ def bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5):
             for iii in ii:
                 xi = spdata[iii, :]    # starting point of one tiny group
 
-                dist = euclid(half_nrm2, spdata, xi)
+                dist = euclid(xxt, spdata, xi)
                 merge_ind = np.argsort(dist)
                 for j in merge_ind:
                     if cs[copy_sp_cluster_label[j]] >= minPts:

@@ -136,7 +136,7 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, str sortin
         lab += 1
 
     labels = labels[np.argsort(ind)]
-    return labels, splist, nr_dist, ind, half_nrm2
+    return labels, splist, nr_dist, ind
 
 
 
@@ -252,7 +252,7 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
 
         lab += 1
 
-    return labels, splist, nr_dist, ind, half_nrm2
+    return labels, splist, nr_dist, ind
 
 
 

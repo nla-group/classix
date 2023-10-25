@@ -46,124 +46,6 @@ np.import_array()
 
 
 
-cpdef bf_distance_merging_precompute(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labels,
-                                double[:, :] splist, double[:] half_nrm2,
-                                double radius, int minPts=0, double scale=1.5):
-
-    """
-    Implement CLASSIX's merging with brute force computation
-    
-    Parameters
-    ----------
-    data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
-    
-    labels : numpy.ndarray
-        aggregation labels
-
-    splist : numpy.ndarray
-        Represent the list of starting points information formed in the aggregation. 
-        list of [ starting point index of current group, sorting values, and number of group elements ].
-
-    half_nrm2 : numpy.ndarray
-        Precomputed values for np.sum(data * data, axis=1).
-
-    radius : float
-        The tolerance to control the aggregation. If the distance between the starting point 
-        of a group and another data point is less than or equal to the tolerance,
-        the point is allocated to that group. For details, we refer users to [1].
-
-    minPts : int, default=0
-        The threshold, in the range of [0, infity] to determine the noise degree.
-        When assgin it 0, algorithm won't check noises.
-
-    scale : float, default 1.5
-        Design for distance-clustering, when distance between the two starting points 
-        associated with two distinct groups smaller than scale*radius, then the two groups merge.
-
-        
-    Returns
-    -------
-
-    References
-    ----------
-    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
-
-    """
-
-    cdef long[:] splist_indices = np.int32(splist[:, 0])
-    cdef double[:, :] spdata = data.base[splist_indices]
-    cdef np.ndarray[np.int32_t, ndim=1] sp_cluster_label = labels[splist_indices]  
-    cdef np.ndarray[np.int32_t, ndim=1] copy_sp_cluster_label
-    cdef long[:] spl, ii
-    cdef Py_ssize_t fdim =  splist.shape[0]
-    cdef Py_ssize_t i, iii, j, ell
-    cdef double[:] xi
-    cdef long[:] merge_ind
-    cdef long minlab
-    cdef np.ndarray[np.float64_t, ndim=1] dist
-
-
-    for i in range(fdim):
-        xi = spdata[i, :]
-        dist = euclid(half_nrm2, spdata, xi)
-        spl = np.unique( sp_cluster_label[dist <= (scale*radius)**2] )
-        minlab = np.min(spl)
-
-        for ell in spl:
-            sp_cluster_label[sp_cluster_label==ell] = minlab
-
-
-    cdef long[:] ul = np.unique(sp_cluster_label)
-    cdef Py_ssize_t nr_u = len(ul)
-
-    cdef long[:] cs = np.zeros(nr_u, dtype=np.int32)
-    
-    cdef np.ndarray[np.npy_bool, ndim=1, cast=True] cid
-    cdef np.ndarray[np.int32_t, ndim=1] grp_sizes = np.int32(splist[:, 2])
-
-    for i in range(nr_u):
-        cid = sp_cluster_label==ul[i]
-        sp_cluster_label[cid] = i
-        cs[i] = np.sum(grp_sizes[cid])
-
-
-    old_cluster_count = collections.Counter(sp_cluster_label[labels])
-    cdef long[:] ncid = np.int32(np.nonzero(cs.base < minPts)[0])
-
-    cdef Py_ssize_t SIZE_NOISE_LABELS = ncid.size
-
-    if SIZE_NOISE_LABELS > 0:
-        copy_sp_cluster_label = sp_cluster_label.copy()
-
-        for i in ncid:
-            ii = np.int32(np.nonzero(copy_sp_cluster_label==i)[0])
-            
-            for iii in ii:
-                xi = spdata[iii, :]    # starting point of one tiny group
-                
-                dist = euclid(half_nrm2, spdata, xi)
-                merge_ind = np.int32(np.argsort(dist))
-                for j in merge_ind:
-                    if cs[copy_sp_cluster_label[j]] >= minPts:
-                        sp_cluster_label[iii] = copy_sp_cluster_label[j]
-                        break
-
-        ul = np.unique(sp_cluster_label)
-        nr_u = len(ul)
-        cs = np.zeros(nr_u, dtype=np.int32)
-
-        for i in range(nr_u):
-            cid = sp_cluster_label==ul[i]
-            sp_cluster_label[cid] = i
-            cs[i] = np.int32(np.sum(grp_sizes[cid]))
-
-    labels = sp_cluster_label[labels]
-
-    return labels, old_cluster_count, SIZE_NOISE_LABELS
-
-
-
 cpdef bf_distance_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labels,
                                 double[:, :] splist, 
                                 double radius, int minPts=0, double scale=1.5):
@@ -211,7 +93,7 @@ cpdef bf_distance_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labe
 
     cdef long[:] splist_indices = np.int32(splist[:, 0])
     cdef double[:, :] spdata = data.base[splist_indices]
-    cdef double[:] half_nrm2 = np.einsum('ij,ij->i', spdata, spdata)
+    cdef double[:] xxt = np.einsum('ij,ij->i', spdata, spdata)
     cdef np.ndarray[np.int32_t, ndim=1] sp_cluster_label = labels[splist_indices]  
     cdef np.ndarray[np.int32_t, ndim=1] copy_sp_cluster_label
     cdef long[:] spl, ii
@@ -225,7 +107,7 @@ cpdef bf_distance_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labe
 
     for i in range(fdim):
         xi = spdata[i, :]
-        dist = euclid(half_nrm2, spdata, xi)
+        dist = euclid(xxt, spdata, xi)
         spl = np.unique( sp_cluster_label[dist <= (scale*radius)**2] )
         minlab = np.min(spl)
 
@@ -261,7 +143,7 @@ cpdef bf_distance_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labe
             for iii in ii:
                 xi = spdata[iii, :]    # starting point of one tiny group
                 
-                dist = euclid(half_nrm2, spdata, xi)
+                dist = euclid(xxt, spdata, xi)
                 merge_ind = np.int32(np.argsort(dist))
                 for j in merge_ind:
                     if cs[copy_sp_cluster_label[j]] >= minPts:
