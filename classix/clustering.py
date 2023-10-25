@@ -35,7 +35,6 @@ import pandas as pd
 from numpy.linalg import norm
 
 
-from scipy.sparse import csr_matrix, _sparsetools
 
 
 
@@ -900,7 +899,8 @@ class CLASSIX:
         from scipy.sparse.linalg import svds
         from matplotlib import pyplot as plt
         import matplotlib.colors as colors
-                    
+        
+        
         # -----------------------------second method--------------------------------
         if sp_bbox is None:
             sp_bbox = dict()
@@ -1275,6 +1275,8 @@ class CLASSIX:
                     )
                     connected_paths = [agg_label1]
                 else:
+                    from scipy.sparse import csr_matrix
+                    
                     if self.connected_pairs_ is None:
                         distm = pairwise_distances(self.s_pca)
                         distm = (distm <= self.radius*self.scale).astype(int)
@@ -1580,7 +1582,8 @@ class CLASSIX:
             Specify the format of the image to be saved, default as 'pdf', other choice: png.
         
         """
-        
+        from scipy.sparse import csr_matrix
+                              
         distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(scale,2))
         plt.rcParams['axes.facecolor'] = 'white'
 
@@ -1919,7 +1922,8 @@ def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, t
 
 def pairs_to_graph(pairs, num_nodes, sparse=True):
     """Transform the pairs represented by list into graph."""
-    # from scipy.sparse import csr_matrix
+    from scipy.sparse import csr_matrix
+    
     graph = np.full((num_nodes, num_nodes), -99, dtype=int)
     for i in range(num_nodes):
         graph[i, i] = 0
@@ -1932,13 +1936,16 @@ def pairs_to_graph(pairs, num_nodes, sparse=True):
 
 
 
-def return_csr_matrix_indices(csr_matrix): 
+def return_csr_matrix_indices(csr_mat): 
     """Return sparce matrix indices."""
-    shape_dim1, shape_dim2 = csr_matrix.shape
-    length_range = csr_matrix.indices
 
-    indices = np.empty(len(length_range), dtype=csr_matrix.indices.dtype)
-    _sparsetools.expandptr(shape_dim1, csr_matrix.indptr, indices)
+    from scipy.sparse import _sparsetools
+    
+    shape_dim1, shape_dim2 = csr_mat.shape
+    length_range = csr_mat.indices
+
+    indices = np.empty(len(length_range), dtype=csr_mat.indices.dtype)
+    _sparsetools.expandptr(shape_dim1, csr_mat.indptr, indices)
     return np.array(list(zip(indices, length_range)))
 
 
