@@ -116,11 +116,10 @@ cpdef precompute_aggregate_pca(double[:,:] data, str sorting='pca', double tol=0
                 num_group += 1
                 labels[j] = lab
 
-        splist.append((ind[i], num_group))
+        splist.append((i, num_group))
         lab += 1
 
-    labels = labels.base[np.argsort(ind)]
-    return np.asarray(labels), splist, nr_dist, ind
+    return np.asarray(labels), splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data), np.asarray(half_nrm2)
 
 
 
@@ -159,7 +158,6 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
     cdef double[:] sort_vals
     cdef double[:, :] U1, _  # = np.empty((len_ind, ), dtype=float)
     cdef long long[:] ind # = np.empty((len_ind, ), dtype=int)
-    cdef Py_ssize_t sp # starting point index
     cdef unsigned int lab=0, nr_dist=0, num_group
     cdef double[:] clustc # starting point coordinates
     cdef double dist
@@ -189,26 +187,25 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
         sort_vals = np.zeros(len_ind)
         
     ind = np.argsort(sort_vals)
+    data = data.base[ind]
+    sort_vals = sort_vals.base[ind] 
 
     for i in range(len_ind): 
-        sp = ind[i] # starting point
-        
-        if labels[sp] >= 0:
+        if labels[i] >= 0:
             continue
         
-        clustc = data[sp,:] 
-        labels[sp] = lab
+        clustc = data[i,:] 
+        labels[i] = lab
         num_group = 1
             
-        rhs = half_r2 - half_nrm2[sp] # right-hand side of norm ineq.
+        rhs = half_r2 - half_nrm2[i] # right-hand side of norm ineq.
 
-        for ii in range(i+1, len_ind): 
-            j = ind[ii]
-                    
+        for j in range(i+1, len_ind): 
+            
             if labels[j] >= 0:
                 continue
                 
-            if sort_vals[j] - sort_vals[sp] > tol:
+            if sort_vals[j] - sort_vals[i] > tol:
                 break       
             
             dist = 0
@@ -223,12 +220,12 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
                 num_group += 1
                 labels[j] = lab
 
-        splist.append((sp, num_group))  
+        splist.append((i, num_group))  
         # list of [ starting point index of current group, sorting key, and number of group elements ]
 
         lab += 1
   
-    return np.asarray(labels), splist, nr_dist, ind
+    return np.asarray(labels), splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data), np.asarray(half_nrm2)
 
 
 
@@ -266,7 +263,6 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
     cdef double[:] sort_vals
     cdef double[:, :] U1, _  # = np.empty((len_ind, ), dtype=float)
     cdef long long[:] ind # = np.empty((len_ind, ), dtype=int)
-    cdef Py_ssize_t sp # starting point index
     cdef unsigned int lab=0, nr_dist=0, num_group
     cdef double[:] clustc # starting point coordinates
     cdef double dist
@@ -291,23 +287,23 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
         sort_vals = np.zeros(len_ind)
 
     ind = np.argsort(sort_vals)
+    data = data.base[ind]
+    sort_vals = sort_vals.base[ind] 
+
     for i in range(len_ind): 
-        sp = ind[i] # starting point
-        
-        if labels[sp] >= 0:
+        if labels[i] >= 0:
             continue
         
-        clustc = data[sp,:] 
-        labels[sp] = lab
+        clustc = data[i,:] 
+        labels[i] = lab
         num_group = 1
             
-        for ii in range(i+1, len_ind): 
-            j = ind[ii]
+        for j in range(i+1, len_ind): 
                     
             if labels[j] >= 0:
                 continue
                 
-            if sort_vals[j] - sort_vals[sp] > tol:
+            if sort_vals[j] - sort_vals[i] > tol:
                 break       
             
             dist = 0
@@ -320,10 +316,10 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
                 num_group += 1
                 labels[j] = lab
 
-        splist.append((sp, num_group))  
+        splist.append((i, num_group))  
         # list of [ starting point index of current group, sorting key, and number of group elements ]
 
         lab += 1
   
-    return np.asarray(labels), splist, nr_dist, ind
+    return np.asarray(labels), splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data)
 

@@ -132,11 +132,10 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, str sortin
                 num_group += 1
                 labels[j] = lab
 
-        splist.append((ind[i], num_group))
+        splist.append((i, num_group))
         lab += 1
 
-    labels = labels[np.argsort(ind)]
-    return labels, splist, nr_dist, ind
+    return labels, splist, nr_dist, ind, sort_vals, data, half_nrm2
 
 
 
@@ -173,7 +172,6 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
     cdef Py_ssize_t fdim = data.shape[1] # feature dimension
     cdef Py_ssize_t len_ind = data.shape[0] # size of data
     cdef np.ndarray[np.float64_t, ndim=2] U1
-    cdef int sp 
     cdef int nr_dist = 0 
     cdef int lab = 0 
     cdef double dist
@@ -189,11 +187,9 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
     
     cdef np.ndarray[np.float64_t, ndim=1] dataj
     cdef double rhs
-    cdef int ii
 
     if sorting == "norm-mean" or sorting == "norm-orthant": 
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
-        ind = np.argsort(sort_vals)
 
     elif sorting == "pca":
         if fdim > 1:
@@ -209,31 +205,31 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
             sort_vals = data[:,0]
             
         sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
-        ind = np.argsort(sort_vals)
+        
 
     else: # no sorting
         sort_vals = np.zeros(len_ind)
-        ind = np.arange(len_ind)
-    
-    for i in range(len_ind):
         
-        sp = ind[i] 
-        if labels[sp] >= 0:
+    ind = np.argsort(sort_vals)
+    data = data[ind]
+    sort_vals = sort_vals[ind] 
+
+    for i in range(len_ind):
+        if labels[i] >= 0:
             continue
         
-        clustc = data[sp,:] 
-        labels[sp] = lab
+        clustc = data[i,:] 
+        labels[i] = lab
         num_group = 1
 
-        rhs = half_r2 - half_nrm2[sp] # right-hand side of norm ineq.
+        rhs = half_r2 - half_nrm2[i] # right-hand side of norm ineq.
 
-        for ii in range(i+1, len_ind): 
-            j = ind[ii]
+        for j in range(i+1, len_ind): 
             
             if labels[j] >= 0:
                 continue
             
-            if sort_vals[j] - sort_vals[sp] > tol:
+            if sort_vals[j] - sort_vals[i] > tol:
                 break       
             
             dist = 0
@@ -248,11 +244,11 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
                 num_group = num_group + 1
                 labels[j] = lab
 
-        splist.append((sp, num_group)) 
+        splist.append((i, num_group)) 
 
         lab += 1
 
-    return labels, splist, nr_dist, ind
+    return labels, splist, nr_dist, ind, sort_vals, data, half_nrm2
 
 
 
@@ -288,7 +284,6 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
     cdef Py_ssize_t fdim = data.shape[1] # feature dimension
     cdef Py_ssize_t len_ind = data.shape[0] # size of data
     cdef np.ndarray[np.float64_t, ndim=2] U1
-    cdef int sp # sp: starting point
     cdef int nr_dist = 0 # nr_dist:if necessary, count the distance computation
     cdef int lab = 0 # lab: class
     cdef double dist # distance 
@@ -318,27 +313,29 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
             sort_vals = data[:,0]
             
         sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
-        ind = np.argsort(sort_vals)
+        
 
     else: # no sorting
         sort_vals = np.zeros(len_ind)
-        ind = np.arange(len_ind)
+    
+    ind = np.argsort(sort_vals)
+    data = data[ind]
+    sort_vals = sort_vals[ind] 
     
     for i in range(len_ind):
-        sp = ind[i] 
 
-        if labels[sp] >= 0:
+        if labels[i] >= 0:
             continue
         
-        clustc = data[sp,:] 
-        labels[sp] = lab
+        clustc = data[i,:] 
+        labels[i] = lab
         num_group = 1
 
-        for j in ind[i+1:]:
+        for j in range(i+1, len_ind):
             if labels[j] >= 0:
                 continue
             
-            if sort_vals[j] - sort_vals[sp] > tol:
+            if sort_vals[j] - sort_vals[i] > tol:
                 break       
             
             dist = 0
@@ -351,7 +348,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
                 num_group = num_group + 1
                 labels[j] = lab
 
-        splist.append((sp, num_group)) 
+        splist.append((i, num_group)) 
         lab += 1
 
-    return labels, splist, nr_dist, ind
+    return labels, splist, nr_dist, ind, sort_vals, data

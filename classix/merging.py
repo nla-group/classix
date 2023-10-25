@@ -32,7 +32,7 @@ from scipy.special import betainc, gamma
 
 
 
-def bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5):
+def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2):
     """
     Implement CLASSIX's merging with brute force computation
     
@@ -47,9 +47,6 @@ def bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5):
     splist : numpy.ndarray
         Represent the list of starting points information formed in the aggregation. 
         list of [ starting point index of current group, sorting values, and number of group elements ].
-
-    ind : numpy.ndarray
-        Sort values.
 
     radius : float
         The tolerance to control the aggregation. If the distance between the starting point 
@@ -67,76 +64,94 @@ def bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5):
         
     Returns
     -------
+    labels : numpy.ndarray
+        The merging labels.
+    
+    old_cluster_count : int
+        The number of clusters without outliers elimination.
+    
+    SIZE_NOISE_LABELS : int
+        The number of clusters marked as outliers.
 
+        
     References
     ----------
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
 
     """
     
-    splist_indices = splist[:, 0].astype(int)
-
+    splist_indices = splist[:, 0]
+    
+    sort_vals_sp = sort_vals[splist_indices]
     spdata = data[splist_indices]
-    xxt = np.einsum('ij,ij->i', spdata, spdata) 
+    half_nrm2_sp = half_nrm2[splist_indices]
     # np.einsum('ij,ij->i', data, data) <-> np.sum(data * data, axis=1)
-
-    sp_cluster_label = labels[splist_indices]
+    
+    sp_cluster_labels = labels[splist_indices]
+    radius = scale*radius
+    radius_2 = (radius)**2/2
 
     for i in range(splist.shape[0]):
         xi = spdata[i, :]
-        spl = np.unique( sp_cluster_label[euclid(xxt, spdata, xi) <= (scale*radius)**2] )
-        minlab = np.min(spl)
 
+        last_j = np.searchsorted(sort_vals_sp, radius + sort_vals_sp[i], side='right')
+        eucl = half_nrm2_sp[i:last_j] - np.matmul(spdata[i:last_j,:], xi.T)
+        inds = np.where(eucl <= radius_2 - half_nrm2_sp[i]) 
+
+        inds = i + inds[0]
+        spl = np.unique(sp_cluster_labels[inds])
+        minlab = np.min(spl)
+        
         for label in spl:
-            sp_cluster_label[sp_cluster_label==label] = minlab
+            sp_cluster_labels[sp_cluster_labels==label] = minlab
 
     # rename labels to be 1,2,3,... and determine cluster sizes
-    ul = np.unique(sp_cluster_label)
+    ul = np.unique(sp_cluster_labels)
     nr_u = len(ul)
     
     cs = np.zeros(nr_u, dtype=int)
     grp_sizes = splist[:, 1].astype(int)
 
     for i in range(nr_u):
-        cid = sp_cluster_label==ul[i]
-        sp_cluster_label[cid] = i
+        cid = sp_cluster_labels==ul[i]
+        sp_cluster_labels[cid] = i
         cs[i] = np.sum(grp_sizes[cid])
 
-    old_cluster_count = collections.Counter(sp_cluster_label[labels])
+    old_cluster_count = collections.Counter(sp_cluster_labels[labels])
     cid = np.nonzero(cs < minPts)[0]
     SIZE_NOISE_LABELS = cid.size
 
     if SIZE_NOISE_LABELS > 0:
-        copy_sp_cluster_label = sp_cluster_label.copy()
+        copy_sp_cluster_label = sp_cluster_labels.copy()
         
         for i in cid:
             ii = np.nonzero(copy_sp_cluster_label==i)[0] # find all tiny groups with that label
             for iii in ii:
                 xi = spdata[iii, :]    # starting point of one tiny group
 
-                dist = euclid(xxt, spdata, xi)
+                dist = half_nrm2_sp - np.matmul(spdata, xi) + half_nrm2_sp[iii]
                 merge_ind = np.argsort(dist)
                 for j in merge_ind:
                     if cs[copy_sp_cluster_label[j]] >= minPts:
-                        sp_cluster_label[iii] = copy_sp_cluster_label[j]
+                        sp_cluster_labels[iii] = copy_sp_cluster_label[j]
                         break
 
-        ul = np.unique(sp_cluster_label)
+        ul = np.unique(sp_cluster_labels)
         nr_u = len(ul)
         cs = np.zeros(nr_u, dtype=int)
 
         for i in range(nr_u):
-            cid = sp_cluster_label==ul[i]
-            sp_cluster_label[cid] = i
+            cid = sp_cluster_labels==ul[i]
+            sp_cluster_labels[cid] = i
             cs[i] = np.sum(grp_sizes[cid])
 
-    labels = sp_cluster_label[labels]
+    labels = sp_cluster_labels[labels]
 
     return labels, old_cluster_count, SIZE_NOISE_LABELS
 
 
 
-def merging(data, splist, radius, method='distance', scale=1.5):
+def density_merging(data, splist, radius, sort_vals, half_nrm2):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
     
@@ -186,90 +201,60 @@ def merging(data, splist, radius, method='distance', scale=1.5):
     
     connected_pairs = [SET(i) for i in range(splist.shape[0])]
     connected_pairs_store = []
-    splist_indices = splist[:, 0].astype(int)
+    splist_indices = splist[:, 0]
+    sort_vals_sp = sort_vals[splist_indices]
+    spdata = data[splist_indices]
+    half_nrm2_sp = half_nrm2[splist_indices]
 
+    volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
 
-    if method == "density":
-        volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
-    else:
-        volume = None
-        
+    radius_2 = (2*radius)**2
+    radius_22 = radius**2
+
     for i in range(splist.shape[0]):
-        sp1 =  data[splist_indices[i]]
-        neigbor_sp = data[splist_indices[i+1:]] 
-        select_stps = np.arange(i+1, splist.shape[0], dtype=int)
-        sort_vals = splist[i:, 1]
+        sp1 = spdata[i]
+        last_j = np.searchsorted(sort_vals_sp, 2*radius + sort_vals_sp[i], side='right')
         
-        if method == "density":                    # calculate the density
-            # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
-            # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
-            # AGGREGATION.
-            index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= 2*radius # 2*distance_scale*radius
-            select_stps = select_stps[index_overlap]
-            # calculate their neighbors ...1)
-            # later decide whether sps should merge with neighbors
-            if not np.any(index_overlap):
-                continue
+        neigbor_sp = spdata[i+1:last_j]
+        
+        # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
+        # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
+        # AGGREGATION.
+        # index_overlap = euclid(2*half_nrm2_sp[i+1:last_j], neigbor_sp, sp1) <= radius_2 # 2*distance_scale*radius
 
-            c1 = np.linalg.norm(data-sp1, ord=2, axis=-1) <= radius
-            den1 = np.count_nonzero(c1) / volume
-            
-            for j in select_stps.astype(int):
-                sp2 = data[int(splist[j, 0])] # splist[int(j), 3:]
+        index_overlap = half_nrm2_sp[i+1:last_j] - np.matmul(neigbor_sp, sp1) <= radius_2 - half_nrm2_sp[i]
+        
+        select_stps = i+1 + np.where(index_overlap)[0]
+        # calculate their neighbors ...1)
+        # later decide whether sps should merge with neighbors
+        if not np.any(index_overlap):
+            continue
 
-                c2 = np.linalg.norm(data-sp2, ord=2, axis=-1) <= radius
-                den2 = np.count_nonzero(c2) / volume
+        c1 = euclid(2*half_nrm2, data, sp1) <= radius_22
+        den1 = np.count_nonzero(c1) / volume
+        
+        for j in select_stps:
+            sp2 = spdata[j]
 
-                if check_if_overlap(sp1, sp2, radius=radius): 
-                    internum = np.count_nonzero(c1 & c2)
-                    cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
-                    if cid >= den1 or cid >= den2: 
-                        merge(connected_pairs[i], connected_pairs[j])
-                        connected_pairs_store.append([i, j])
+            c2 = euclid(2*half_nrm2, data, sp2) <= radius_22
+            den2 = np.count_nonzero(c2) / volume
 
-        else: 
-            # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
-            # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
-            # AGGREGATION.
-            index_overlap = fast_query(neigbor_sp, sp1, sort_vals, scale*radius)
-            select_stps = select_stps[index_overlap]
-            if not np.any(index_overlap): # calculate their neighbors ...1)
-                continue
-    
-            for j in select_stps:
-                # two groups merge when their starting points distance is smaller than 1.5*radius
-                # connected_pairs.append([i,j]) # store connected groups
-                merge(connected_pairs[i], connected_pairs[j])
-                connected_pairs_store.append((i, j))
+            if check_if_overlap(sp1, sp2, radius=radius): 
+                internum = np.count_nonzero(c1 & c2)
+                cid = cal_inter_density(sp1, sp2, radius=radius, num=internum)
+                if cid >= den1 or cid >= den2: 
+                    merge(connected_pairs[i], connected_pairs[j])
+                    connected_pairs_store.append([i, j])
+
         
     labels = [findParent(i).data for i in connected_pairs]
     labels_set = list()
     for i in np.unique(labels):
         labels_set.append(np.where(labels == i)[0].tolist())
-    return labels_set, connected_pairs_store  # merge_pairs(connected_pairs)
+
+    return labels_set, connected_pairs_store 
 
 
-
-
-
-
-def fast_query(data, starting_point, sort_vals, tol):
-    """Fast query with built in early stopping strategy for merging."""
-    len_ind = data.shape[0]
-    fdim = data.shape[1] # remove the first three elements that not included in the features
-    index_query=np.full(len_ind, False, dtype=bool)
-    for i in range(len_ind):
-        candidate = data[i]
-        
-        if (sort_vals[i+1] - sort_vals[0] > tol):
-            break
-            
-        dat = candidate - starting_point
-        dist = np.inner(dat, dat)
-        if dist <= tol**2:
-            index_query[i] = True
-            
-    return index_query
 
 
 

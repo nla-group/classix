@@ -49,12 +49,13 @@ def cython_is_available(verbose=0):
             
             try:
                 from .aggregation_cm import aggregate
-                
+                from .merging_cm import density_merging, distance_merging
                 # cython with memoryviews
                 # Typed memoryviews allow efficient access to memory buffers, such as those underlying NumPy arrays, without incurring any Python overhead. 
             
             except ModuleNotFoundError:
                 from .aggregation_c import aggregate, precompute_aggregate, precompute_aggregate_pca
+                
                 __cython_type__ =  "trivial"
 
             if verbose:
@@ -62,8 +63,7 @@ def cython_is_available(verbose=0):
                     print("This CLASSIX is using Cython typed memoryviews.")
                 else:
                     print("This CLASSIX is not using Cython typed memoryviews.")
-                    
-            from .merging_cm import merging
+            
             return True
 
         except (ModuleNotFoundError, ValueError):
@@ -384,7 +384,7 @@ class CLASSIX:
     """
         
     def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, 
-                 algorithm='bf', memory=False, verbose=1): 
+                 memory=False, verbose=1): 
 
 
         self.verbose = verbose
@@ -407,7 +407,9 @@ class CLASSIX:
         self.connected_pairs_ = None
         self.cluster_color = None
         self.connected_paths = None
-        self.algorithm = algorithm
+        self.half_nrm2 = None
+        self.inverse_ind = None
+        self.label_change = None
 
         if self.verbose:
             print(self)
@@ -434,20 +436,20 @@ class CLASSIX:
                 import platform
                 
                 if platform.system() == 'Windows':
-                    from .merging_cm_win import merging, bf_distance_merging
+                    from .merging_cm_win import density_merging, distance_merging
                 else:
-                    from .merging_cm import merging, bf_distance_merging
+                    from .merging_cm import density_merging, distance_merging
 
             except (ModuleNotFoundError, ValueError):
                 if not self.__enable_aggregation_cython__:
                     from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
                 
-                from .merging import merging, bf_distance_merging
+                from .merging import density_merging, distance_merging
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
             from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
-            from .merging import merging, bf_distance_merging
+            from .merging import density_merging, distance_merging
             warnings.warn("This run of CLASSIX is not using Cython.")
 
         if not self.memory:
@@ -459,8 +461,8 @@ class CLASSIX:
         else:
             self._aggregate = aggregate
 
-        self._merging = merging
-        self._bf_distance_merging = bf_distance_merging
+        self._density_merging = density_merging
+        self._distance_merging = distance_merging
             
 
             
@@ -516,10 +518,16 @@ class CLASSIX:
             self.data = (data - self._mu) / self._scl
         
         # aggregation
-        self.groups_, self.splist_, self.dist_nr, ind = self._aggregate(data=self.data,
-                                                                       sorting=self.sorting, 
-                                                                       tol=self.radius
-                                                                    ) 
+        if not self.memory:
+            self.groups_, self.splist_, self.dist_nr, self.ind, sort_vals, self.data, self.half_nrm2 = self._aggregate(data=self.data,
+                                                                                                    sorting=self.sorting, 
+                                                                                                    tol=self.radius
+                                                                                                ) 
+        else:
+            self.groups_, self.splist_, self.dist_nr, self.ind, sort_vals, self.data = self._aggregate(data=self.data,
+                                                                                                sorting=self.sorting, 
+                                                                                                tol=self.radius
+                                                                                            ) 
         self.splist_ = np.asarray(self.splist_)
         
         if self.group_merging is None:
@@ -533,10 +541,10 @@ class CLASSIX:
                 data=self.data,
                 agg_labels=self.groups_, 
                 splist=self.splist_,  
+                ind=self.ind, sort_vals=sort_vals, 
                 radius=self.radius, 
                 method=self.group_merging, 
-                minPts=self.minPts,
-                algorithm=self.algorithm
+                minPts=self.minPts
             ) 
 
         return self
@@ -603,7 +611,7 @@ class CLASSIX:
     
     
     
-    def merging(self, data, agg_labels, splist, radius=0.5, method="distance", minPts=0, algorithm='bf'):
+    def merging(self, data, agg_labels, splist, ind, sort_vals, radius=0.5, method="distance", minPts=0):
         """
         Merge groups after aggregation. 
 
@@ -618,6 +626,9 @@ class CLASSIX:
         splist: numpy.ndarray
             List formed in the aggregation storing starting points.
         
+        ind : numpy.ndarray
+            Sort values.
+
         radius : float, default=0.5
             Tolerance to control the aggregation hence the whole clustering process. For aggregation, 
             if the distance between a starting point and an object is less than or equal to the tolerance, 
@@ -639,7 +650,6 @@ class CLASSIX:
             - 'set': Use disjoint set structure to merge connected groups.
 
 
-
         Returns
         -------
         centers : numpy.ndarray
@@ -648,12 +658,12 @@ class CLASSIX:
         clabels : numpy.ndarray 
             The clusters labels of the data
         """
+        
         import collections
         
-        labels = copy.deepcopy(agg_labels) 
-        
-        if method == 'density' or algorithm == 'set':
-            self.merge_groups, self.connected_pairs_ = self._merging(data, splist, radius, method, scale=self.scale)
+        if method == 'density':
+            labels = copy.deepcopy(agg_labels) 
+            self.merge_groups, self.connected_pairs_ = self._density_merging(data, splist, radius, sort_vals=sort_vals, half_nrm2=self.half_nrm2)
             maxid = max(labels) + 1
             
             # after this step, the connected pairs (groups) will be transformed into merged clusters, 
@@ -695,6 +705,7 @@ class CLASSIX:
             # the label with the maxid is label marked noises
             
             if SIZE_NOISE_LABELS > 0:
+                
                 self.clean_index_ = labels != maxid
                 agln = agg_labels[self.clean_index_]
                 self.label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
@@ -715,20 +726,23 @@ class CLASSIX:
                     labels[np.isin(agg_labels, self.group_outliers_)] = -1
                 
             labels = self.reassign_labels(labels) 
-            self.label_change = dict(zip(agg_labels, labels)) # how object change from group to cluster.
-            
 
         else:
-            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._bf_distance_merging(data=data, 
-                                                                    labels=labels,
+            if self.memory: self.half_nrm2 = norm(data, axis=1, ord=2) * 0.5 # precomputation
+                
+            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merging(data=data, 
+                                                                    labels=agg_labels,
                                                                     splist=splist,
                                                                     radius=radius,
                                                                     minPts=minPts,
-                                                                    scale=self.scale
+                                                                    scale=self.scale, 
+                                                                    sort_vals=sort_vals,
+                                                                    half_nrm2=self.half_nrm2
                                                                 )
-            self.label_change = dict(zip(agg_labels, labels)) # how object change group to cluster.
+            
 
 
+        labels = labels[np.argsort(ind)]
 
         if self.verbose == 1:
             print("""The {datalen} data points were aggregated into {num_group} groups.""".format(datalen=len(data), num_group=splist.shape[0]))
@@ -895,6 +909,7 @@ class CLASSIX:
         import matplotlib.colors as colors
         
         
+
         # -----------------------------second method--------------------------------
         if sp_bbox is None:
             sp_bbox = dict()
@@ -902,14 +917,12 @@ class CLASSIX:
             sp_bbox['alpha'] = sp_alpha
             sp_bbox['pad'] = sp_pad
        
-        
         if dp_bbox is None:
             dp_bbox = dict()
             dp_bbox['facecolor'] = dp_fcolor
             dp_bbox['alpha'] = dp_alpha
             dp_bbox['pad'] = dp_pad
         
-            
         if dp_fontsize is None and sp_fontsize is not None:
             dp_fontsize = sp_fontsize
         
@@ -926,25 +939,32 @@ class CLASSIX:
             self.cluster_color = dict()
             for i in np.unique(self.labels_):
                 self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
-                
+
+        if self.inverse_ind is None:
+            self.inverse_ind = np.argsort(self.ind)
+            self.label_change = dict(zip(self.groups_[self.inverse_ind], self.labels_)) # how object change group to cluster.
+
+        data = self.data[self.inverse_ind]
+        groups_ = self.groups_[self.inverse_ind]
+
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
             
-            if self.data.shape[1] > 2:
+            if data.shape[1] > 2:
                 warnings.warn("The group radius in the visualization might not be accurate.")
-                scaled_data = self.data - self.data.mean(axis=0)
+                scaled_data = data - data.mean(axis=0)
                 _U, self._s, self._V = svds(scaled_data, k=2, return_singular_vectors=True)
                 self.x_pca = np.matmul(scaled_data, self._V[np.argsort(self._s)].T)
-                self.s_pca = self.x_pca[self.splist_[:, 0].astype(int)]
+                self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
                 
-            elif self.data.shape[1] == 2:
-                self.x_pca = self.data.copy()
-                self.s_pca = self.data[self.splist_[:, 0].astype(int)] 
+            elif data.shape[1] == 2:
+                self.x_pca = data.copy()
+                self.s_pca = data[self.ind[self.splist_[:, 0]]] 
 
             else: # when data is one-dimensional, no PCA transform
-                self.x_pca = np.ones((len(self.data.copy()), 2))
-                self.x_pca[:, 0] = self.data[:, 0]
+                self.x_pca = np.ones((len(data.copy()), 2))
+                self.x_pca[:, 0] = data[:, 0]
                 self.s_pca = np.ones((len(self.splist_), 2))
-                self.s_pca[:, 0] = self.data[self.splist_[:, 0].astype(int)].reshape(-1) 
+                self.s_pca[:, 0] = data[self.ind[self.splist_[:, 0]]].reshape(-1) 
                 
             self.form_starting_point_clusters_table()
             
@@ -962,8 +982,8 @@ class CLASSIX:
             if plot == True:
                 self.explain_viz(figsize=figsize, figstyle=figstyle, savefig=savefig, fontsize=sp_fontsize, bbox=sp_bbox, axis=axis, fmt=fmt)
                 
-            data_size = self.data.shape[0]
-            feat_dim = self.data.shape[1]
+            data_size = data.shape[0]
+            feat_dim = data.shape[1]
             
             print("""A clustering of {length:.0f} data points with {dim:.0f} features has been performed. """.format(length=data_size, dim=feat_dim))
             print("""The radius parameter was set to {tol:.2f} and MinPts was set to {minPts:.0f}. """.format(tol=self.radius, minPts=self.minPts))
@@ -987,18 +1007,18 @@ class CLASSIX:
             
         else: # index is not None, explain(index1)
             if isinstance(index1, int):
-                object1 = self.x_pca[index1] # self.data has been normalized
-                agg_label1 = self.groups_[index1] # get the group index for object1
+                object1 = self.x_pca[index1] # data has been normalized
+                agg_label1 = groups_[index1] # get the group index for object1
             
             elif isinstance(index1, str):
                 if index1 in self.index_data:
                     if len(set(self.index_data)) != len(self.index_data):
                         warnings.warn("The index of data is duplicate.")
                         object1 = self.x_pca[np.where(self.index_data == index1)[0]][0]
-                        agg_label1 = self.groups_[np.where(self.index_data == index1)[0][0]]
+                        agg_label1 = groups_[np.where(self.index_data == index1)[0][0]]
                     else:
                         object1 = self.x_pca[self.index_data == index1][0]
-                        agg_label1 = self.groups_[self.index_data == index1][0]
+                        agg_label1 = groups_[self.index_data == index1][0]
                         
                 else:
                     raise ValueError("Please enter a legal value for index1.")
@@ -1007,7 +1027,7 @@ class CLASSIX:
                 index1 = np.array(index1)
                 object1 = (index1 - self._mu) / self._scl # allow for out-sample data
                 
-                if self.data.shape[1] > 2:
+                if data.shape[1] > 2:
                     object1 = np.matmul(object1, self._V[np.argsort(self._s)].T)
                     
                 agg_label1 = np.argmin(np.linalg.norm(self.s_pca - object1, axis=1, ord=2)) # get the group index for object1
@@ -1111,8 +1131,8 @@ class CLASSIX:
                     indexvalues = [index1, index2] + indexvalues
                     
                     if isinstance(index1, int):
-                        objects = np.array([self.x_pca[kwargs[i]] for i in indexlist]) # self.data has been normalized
-                        group_labels_m = np.array([int(self.groups_[kwargs[i]]) for i in indexlist])
+                        objects = np.array([self.x_pca[kwargs[i]] for i in indexlist]) # data has been normalized
+                        group_labels_m = np.array([int(groups_[kwargs[i]]) for i in indexlist])
                         
                     elif isinstance(index1, str):
                         objects = list()
@@ -1123,10 +1143,10 @@ class CLASSIX:
                                 if len(set(self.index_data)) != len(self.index_data):
                                     warnings.warn("The index of data is duplicate.")
                                     _object = self.x_pca[np.where(self.index_data == index1)[0]][0]
-                                    temp_label = self.groups_(np.where(self.index_data == _index)[0][0])
+                                    temp_label = groups_(np.where(self.index_data == _index)[0][0])
                                 else:
                                     _object = self.x_pca[self.index_data == index1][0]
-                                    temp_label = self.groups_(self.index_data == _index)
+                                    temp_label = groups_(self.index_data == _index)
                                     
                                 objects.append(_object)
                                 group_labels_m.append(temp_label)
@@ -1141,7 +1161,7 @@ class CLASSIX:
                     elif isinstance(index1, list) or isinstance(index1, np.ndarray):
                         objects = np.array([np.array((kwargs[i] - self._mu) / self._scl) for i in indexlist])
 
-                        if self.data.shape[1] > 2:
+                        if data.shape[1] > 2:
                             objects = np.array([np.matmul(ii, self._V[np.argsort(self._s)].T) for ii in objects])
 
                         group_labels_m = np.array([np.argmin(np.linalg.norm(self.s_pca - ii, axis=1, ord=2)) for ii in objects]) # get the group index for object1
@@ -1208,18 +1228,18 @@ class CLASSIX:
                     return 
                 
                 if isinstance(index2, int):
-                    object2 = self.x_pca[index2] # self.data has been normalized
-                    agg_label2 = self.groups_[index2] # get the group index for object2
+                    object2 = self.x_pca[index2] # data has been normalized
+                    agg_label2 = groups_[index2] # get the group index for object2
                     
                 elif isinstance(index2, str):
                     if index2 in self.index_data:
                         if len(set(self.index_data)) != len(self.index_data):
                             warnings.warn("The index of data is duplicate.")
                             object2 = self.x_pca[np.where(self.index_data == index2)[0][0]][0]
-                            agg_label2 = self.groups_[np.where(self.index_data == index2)[0][0]]
+                            agg_label2 = groups_[np.where(self.index_data == index2)[0][0]]
                         else:
                             object2 = self.x_pca[self.index_data == index2][0]
-                            agg_label2 = self.groups_[self.index_data == index2][0]
+                            agg_label2 = groups_[self.index_data == index2][0]
                     else:
                         raise ValueError("Please enter a legal value for index2.")
                         
@@ -1227,7 +1247,7 @@ class CLASSIX:
                     index2 = np.array(index2)
                     object2 = (index2 - self._mu) / self._scl # allow for out-sample data
                     
-                    if self.data.shape[1] > 2:
+                    if data.shape[1] > 2:
                         object2 = np.matmul(object2, self._V[np.argsort(self._s)].T)
                     
                     agg_label2 = np.argmin(np.linalg.norm(self.s_pca - object2, axis=1, ord=2)) # get the group index for object2
@@ -1454,7 +1474,7 @@ class CLASSIX:
             self.cluster_color = dict()
             for i in np.unique(self.labels_):
                 self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
-
+        
         plt.style.use('default') # clear the privous figure style
         plt.style.use(style=figstyle)
         plt.figure(figsize=figsize)
