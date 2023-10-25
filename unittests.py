@@ -30,8 +30,8 @@ from classix.clustering import calculate_cluster_centers
 from classix import novel_normalization
 from classix import aggregation, aggregation_c, aggregation_cm
 from classix.merging import distance_merging, density_merging
-from classix.merging_cm import distance_merging_cm
-from classix.merging_cm import density_merging_cm
+from classix.merging_cm import distance_merging as distance_merging_cm
+from classix.merging_cm import density_merging as density_merging_cm
 from sklearn.metrics.cluster import adjusted_rand_score
 
 
