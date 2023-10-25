@@ -596,6 +596,9 @@ class CLASSIX:
         splist = data[indices]
         num_of_points = data.shape[0]
 
+        if self.label_change is None:
+            self.label_change = dict(zip(self.groups_[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
+
         if not memory:
             xxt = np.einsum('ij,ij->i', splist, splist)
             for i in range(num_of_points):
@@ -943,7 +946,7 @@ class CLASSIX:
 
         if self.inverse_ind is None:
             self.inverse_ind = np.argsort(self.ind)
-            self.label_change = dict(zip(self.groups_[self.inverse_ind], self.labels_)) # how object change group to cluster.
+            self.label_change = dict(zip(self.groups_[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
 
         data = self.data[self.inverse_ind]
         groups_ = self.groups_[self.inverse_ind]
