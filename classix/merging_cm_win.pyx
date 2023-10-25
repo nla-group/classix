@@ -85,12 +85,13 @@ cpdef distance_merging(double[:, :] data, np.ndarray[np.int64_t, ndim=1] labels,
     Returns
     -------
     labels : numpy.ndarray
-    
+        The merging labels.
     
     old_cluster_count : int
-    
+        The number of clusters without outliers elimination.
     
     SIZE_NOISE_LABELS : int
+        The number of clusters marked as outliers.
     
     
     References
