@@ -1452,6 +1452,8 @@ class CLASSIX:
     def explain_viz(self, figsize=(12, 8), figstyle="ggplot", savefig=False, fontsize=None, bbox={'facecolor': 'tomato', 'alpha': 0.3, 'pad': 2}, axis='off', fmt='pdf'):
         """Visualize the starting point and data points"""
         
+        from matplotlib import pyplot as plt
+        
         if self.cluster_color is None:
             self.cluster_color = dict()
             for i in np.unique(self.labels_):
