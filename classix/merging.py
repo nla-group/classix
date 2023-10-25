@@ -95,7 +95,7 @@ def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, hal
         xi = spdata[i, :]
 
         last_j = np.searchsorted(sort_vals_sp, radius + sort_vals_sp[i], side='right')
-        eucl = half_nrm2_sp[i:last_j] - np.matmul(spdata[i:last_j,:], xi.T)
+        eucl = half_nrm2_sp[i:last_j] - np.matmul(spdata[i:last_j,:], xi)
         inds = np.where(eucl <= radius_2 - half_nrm2_sp[i]) 
 
         inds = i + inds[0]
