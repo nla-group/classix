@@ -65,9 +65,10 @@ class TestClassix(unittest.TestCase):
             
             # test new version
             checkpoint = np.load('classix/data/checkpoint_distance_' + str(np.round(tol,2)) + '.npy')
-            comp = clx1.labels_ == checkpoint
-            assert(comp.all())
-    
+            
+            assert(adjusted_rand_score(clx1.labels_, checkpoint) == 1)
+            assert(adjusted_rand_score(clx2.labels_, checkpoint) == 1)
+            
             
     def test_density_cluster(self):
         vdu_signals = loadData('vdu_signals')
@@ -86,10 +87,11 @@ class TestClassix(unittest.TestCase):
             
             # test new version
             checkpoint = np.load('classix/data/checkpoint_density_' + str(np.round(tol,2)) + '.npy')
-            comp = clx1.labels_ == checkpoint
-            assert(comp.all())
+  
+            assert(adjusted_rand_score(clx1.labels_, checkpoint) == 1)
+            assert(adjusted_rand_score(clx2.labels_, checkpoint) == 1)
 
-
+    
     def test_non_cython_version(self):
         classix.__enable_cython__ = False
         checkpoint = 1
