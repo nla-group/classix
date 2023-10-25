@@ -164,9 +164,8 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
     cdef long[:] labels = np.full(len_ind, -1, dtype=int) # np.zeros(, dtype=int) - 1
     cdef list splist = list() # list of starting points
     cdef Py_ssize_t i, ii, j, coord
-    
+    cdef double[:] half_nrm2
     cdef double half_r2 = tol**2 * 0.5
-    cdef double[:] half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
     cdef double[:] dataj
     cdef double rhs
 
@@ -189,6 +188,8 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
     ind = np.argsort(sort_vals)
     data = data.base[ind]
     sort_vals = sort_vals.base[ind] 
+
+    half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
 
     for i in range(len_ind): 
         if labels[i] >= 0:
