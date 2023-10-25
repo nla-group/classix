@@ -25,7 +25,6 @@
 # SOFTWARE.
 
 import warnings
-import platform
 
 import os
 import copy
@@ -33,9 +32,6 @@ import copy
 import numpy as np
 import pandas as pd
 from numpy.linalg import norm
-
-
-
 
 
 
@@ -436,6 +432,8 @@ class CLASSIX:
                 
                 self.__enable_aggregation_cython__ = True
 
+                import platform
+                
                 if platform.system() == 'Windows':
                     from .merging_cm_win import merging, bf_distance_merging
                 else:
