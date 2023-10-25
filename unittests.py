@@ -340,17 +340,16 @@ class TestClassix(unittest.TestCase):
         try:
             data = np.random.randn(10000, 2)
             checkpoint = 1
-            labels, splist, nr_dist, ind, sort_vals, data, half_nrm2 = aggregation.aggregate(data, sorting="pca", tol=0.5) #
+            labels, splist, nr_dist, ind, sort_vals, data, half_nrm2 = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5) #
             splist = np.asarray(splist)
             
             radius = 0.5
             splist = np.asarray(splist)
-            label_set1, connected_pairs_store1 = distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
-            label_set2, connected_pairs_store2 = distance_merging_cm(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
+            label_set1, connected_pairs_store1 = density_merging(data, splist, radius, sort_vals, half_nrm2)
+            label_set2, connected_pairs_store2 = density_merging(data, splist, radius, sort_vals, half_nrm2)
             
-            
-            label_set3, _, _ = density_merging(data, splist, radius, sort_vals, half_nrm2)
-            label_set4, _, _ = distance_merging_cm(data, splist, radius, sort_vals, half_nrm2)
+            label_set3, _,_ = distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
+            label_set4, _,_ = distance_merging_cm(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
             
             for i in range(len(label_set2)):
                 if label_set1[i] != label_set2[i]:
