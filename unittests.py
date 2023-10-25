@@ -29,11 +29,10 @@ from classix import CLASSIX, loadData, cython_is_available
 from classix.clustering import calculate_cluster_centers
 from classix import novel_normalization
 from classix import aggregation, aggregation_c, aggregation_cm
-from classix.merging import merging, bf_distance_merging
-from classix.merging_cm import merging as merging_cm
-from classix.merging_cm import bf_distance_merging as bf_distance_merging_cm
+from classix.merging import distance_merging, density_merging
+from classix.merging_cm import distance_merging_cm
+from classix.merging_cm import density_merging_cm
 from sklearn.metrics.cluster import adjusted_rand_score
-
 
 
 
@@ -53,10 +52,10 @@ class TestClassix(unittest.TestCase):
         vdu_signals = loadData('vdu_signals')
 
         for tol in np.arange(0.8, 1, 0.1):
-            clx1 = CLASSIX(radius=tol, group_merging='distance', verbose=0, algorithm='set')
+            clx1 = CLASSIX(radius=tol, group_merging='distance', verbose=0, memory=True)
             clx1.fit_transform(vdu_signals)
 
-            clx2 = CLASSIX(radius=tol, group_merging='distance', verbose=0, algorithm='bf')
+            clx2 = CLASSIX(radius=tol, group_merging='distance', verbose=0, memory=False)
             clx2.fit_transform(vdu_signals)
 
             if adjusted_rand_score(clx1.labels_, clx2.labels_) != 1:
@@ -74,10 +73,10 @@ class TestClassix(unittest.TestCase):
         vdu_signals = loadData('vdu_signals')
 
         for tol in np.arange(0.8, 1, 0.1):
-            clx1 = CLASSIX(radius=tol, group_merging='density', verbose=0, algorithm='set')
+            clx1 = CLASSIX(radius=tol, group_merging='density', verbose=0, memory=True)
             clx1.fit_transform(vdu_signals)
 
-            clx2 = CLASSIX(radius=tol, group_merging='density', verbose=0, algorithm='bf')
+            clx2 = CLASSIX(radius=tol, group_merging='density', verbose=0, memory=False)
             clx2.fit_transform(vdu_signals)
 
             if adjusted_rand_score(clx1.labels_, clx2.labels_) != 1:
@@ -207,31 +206,6 @@ class TestClassix(unittest.TestCase):
                 checkpoint = 0
         self.assertEqual(checkpoint, 1)
 
-        
-    def test_agg_early_stop(self):
-        X, y = data.make_blobs(n_samples=1000, centers=10, n_features=2, random_state=0)
-
-        for TOL in np.arange(0.1, 1, 0.1):
-            ort_nr_dist_true, ort_labels_true = exp_aggregate_nr_dist(X, tol=TOL, sorting='norm-orthant', early_stopping=True)
-            ort_nr_dist_false, ort_labels_false = exp_aggregate_nr_dist(X, tol=TOL, sorting='norm-orthant', early_stopping=False)
-            if ort_labels_true.tolist() == ort_labels_false.tolist():
-                assert(True)
-            if ort_nr_dist_true == ort_nr_dist_false:
-                assert(True)
-
-            mean_nr_dist_true, mean_labels_true = exp_aggregate_nr_dist(X, tol=TOL, sorting='norm-mean', early_stopping=True)
-            mean_nr_dist_false, mean_labels_false = exp_aggregate_nr_dist(X, tol=TOL, sorting='norm-mean', early_stopping=False)
-            if mean_labels_true.tolist() == mean_labels_false.tolist():
-                assert(True)
-            if mean_nr_dist_true == mean_nr_dist_false:
-                assert(True)    
-
-            pca_nr_dist_true, pca_labels_true = exp_aggregate_nr_dist(X, tol=TOL, sorting='pca', early_stopping=True)
-            pca_nr_dist_false, pca_labels_false = exp_aggregate_nr_dist(X, tol=TOL, sorting='pca', early_stopping=False)
-            if pca_labels_true.tolist() == pca_labels_false.tolist():
-                assert(True)
-            if pca_nr_dist_true == pca_nr_dist_false:
-                assert(True)
 
                 
     def test_explain(self):
@@ -297,21 +271,21 @@ class TestClassix(unittest.TestCase):
         try:
             data = np.random.randn(10000, 2)
             
-            inverse_ind1, spl1, _, _ = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind2, spl2, _, _ = aggregation_cm.precompute_aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind3, spl3, _, _ = aggregation_c.precompute_aggregate(data, "pca", 0.5)
-            inverse_ind4, spl4, _, _ = aggregation.aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind5, spl5, _, _ = aggregation_c.aggregate(data, "pca", 0.5)
-            inverse_ind6, spl6, _, _ = aggregation_cm.aggregate(data, "pca", 0.5)
-            inverse_ind7, spl7, _, _ = aggregation.precompute_aggregate_pca(data, sorting="pca", tol=0.5)
-            inverse_ind8, spl8, _, _ = aggregation_c.precompute_aggregate_pca(data, "pca", 0.5)
-            inverse_ind9, spl9, _, _ = aggregation_cm.precompute_aggregate_pca(data, "pca", 0.5)
+            inverse_ind1, spl1, _, _, _, _, _ = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind2, spl2, _, _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind3, spl3, _, _, _, _, _ = aggregation_c.precompute_aggregate(data, "pca", 0.5)
+            inverse_ind4, spl4, _, _, _, _ = aggregation.aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind5, spl5, _, _, _, _ = aggregation_c.aggregate(data, "pca", 0.5)
+            inverse_ind6, spl6, _, _, _, _ = aggregation_cm.aggregate(data, "pca", 0.5)
+            inverse_ind7, spl7, _, _, _, _, _ = aggregation.precompute_aggregate_pca(data, sorting="pca", tol=0.5)
+            inverse_ind8, spl8, _, _, _, _, _ = aggregation_c.precompute_aggregate_pca(data, "pca", 0.5)
+            inverse_ind9, spl9, _, _, _, _, _ = aggregation_cm.precompute_aggregate_pca(data, "pca", 0.5)
             
-            _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="norm-mean", tol=0.5)
-            _, _, _, _ = aggregation_c.precompute_aggregate(data, "norm-mean", 0.5)
+            _, _, _, _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="norm-mean", tol=0.5)
+            _, _, _, _, _, _, _ = aggregation_c.precompute_aggregate(data, "norm-mean", 0.5)
             
-            _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="NA", tol=0.5)
-            _, _, _, _ = aggregation_c.precompute_aggregate(data, "NA", 0.5)
+            _, _, _, _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="NA", tol=0.5)
+            _, _, _, _, _, _, _ = aggregation_c.precompute_aggregate(data, "NA", 0.5)
             
             if np.sum(inverse_ind1 != inverse_ind2) != 0:
                 checkpoint = 0
@@ -340,17 +314,17 @@ class TestClassix(unittest.TestCase):
                 if spl6[i][0] != spl7[i][0]:
                     checkpoint = 0
                     
-                if spl1[i][2] != spl2[i][2]:
+                if spl1[i][1] != spl2[i][1]:
                     checkpoint = 0
-                if spl2[i][2] != spl3[i][2]:
+                if spl2[i][1] != spl3[i][1]:
                     checkpoint = 0
-                if spl3[i][2] != spl4[i][2]:
+                if spl3[i][1] != spl4[i][1]:
                     checkpoint = 0
-                if spl4[i][2] != spl5[i][2]:
+                if spl4[i][1] != spl5[i][1]:
                     checkpoint = 0
-                if spl5[i][2] != spl6[i][2]:
+                if spl5[i][1] != spl6[i][1]:
                     checkpoint = 0
-                if spl6[i][2] != spl7[i][2]:
+                if spl6[i][1] != spl7[i][1]:
                     checkpoint = 0
         except:
             checkpoint = 0
@@ -360,19 +334,23 @@ class TestClassix(unittest.TestCase):
 
     def test_merge(self): 
         checkpoint = 1
+        minPts = 10
+        scale = 1.5
+
         try:
             data = np.random.randn(10000, 2)
             checkpoint = 1
-            labels, splist, _, ind = aggregation.aggregate(data, sorting="pca", tol=0.5) #
+            labels, splist, nr_dist, ind, sort_vals, data, half_nrm2 = aggregation.aggregate(data, sorting="pca", tol=0.5) #
             splist = np.asarray(splist)
             
             radius = 0.5
-            label_set1, connected_pairs_store1 = merging(data, splist, radius, method='distance', scale=1.5)
-            label_set2, connected_pairs_store2 = merging_cm(data, splist, radius, method='distance', scale=1.5)
+            splist = np.asarray(splist)
+            label_set1, connected_pairs_store1 = distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
+            label_set2, connected_pairs_store2 = distance_merging_cm(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
             
             
-            label_set3, _, _ = bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5)
-            label_set4, _, _ = bf_distance_merging_cm(data, labels, splist, radius, minPts=0, scale=1.5)
+            label_set3, _, _ = density_merging(data, splist, radius, sort_vals, half_nrm2)
+            label_set4, _, _ = distance_merging_cm(data, splist, radius, sort_vals, half_nrm2)
             
             for i in range(len(label_set2)):
                 if label_set1[i] != label_set2[i]:
@@ -408,4 +386,3 @@ class TestClassix(unittest.TestCase):
         
 if __name__ == '__main__':
     unittest.main()
-
