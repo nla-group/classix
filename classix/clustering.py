@@ -660,8 +660,8 @@ class CLASSIX:
         """
         
         import collections
-        if self.memory: self.half_nrm2 = norm(data, axis=1, ord=2) * 0.5 # precomputation
-        
+        if self.memory: self.half_nrm2 = norm(data, axis=1, ord=2)**2 * 0.5 # precomputation
+
         if method == 'density':
             labels = copy.deepcopy(agg_labels) 
             self.merge_groups, self.connected_pairs_ = self._density_merging(data, splist, 
