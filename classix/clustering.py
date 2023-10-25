@@ -28,17 +28,13 @@ import warnings
 import platform
 
 import os
-import re
 import copy
-import requests
-import collections
+
 import numpy as np
 import pandas as pd
 from numpy.linalg import norm
-from matplotlib import pyplot as plt
-import matplotlib.colors as colors
-from scipy.sparse.linalg import svds
-from scipy.sparse.csgraph import connected_components
+
+
 from scipy.sparse import csr_matrix, _sparsetools
 
 
@@ -175,6 +171,8 @@ def loadData(name='vdu_signals'):
 
 def get_data(current_dir='', name='vdu_signals'):
     """Download the built-in data."""
+    import requests
+    
     if name == 'vdu_signals':
         url_parent = "https://github.com/nla-group/classix/raw/master/classix/source/vdu_signals.npy"
         vdu_signals = requests.get(url_parent).content
@@ -654,7 +652,8 @@ class CLASSIX:
         clabels : numpy.ndarray 
             The clusters labels of the data
         """
-
+        import collections
+        
         labels = copy.deepcopy(agg_labels) 
         
         if method == 'density' or algorithm == 'set':
@@ -897,8 +896,11 @@ class CLASSIX:
             Specify the format of the image to be saved, default as 'pdf', other choice: png.
         
         """
-        
-        
+        import re
+        from scipy.sparse.linalg import svds
+        from matplotlib import pyplot as plt
+        import matplotlib.colors as colors
+                    
         # -----------------------------second method--------------------------------
         if sp_bbox is None:
             sp_bbox = dict()
@@ -1781,6 +1783,9 @@ def pairwise_distances(X):
 
 def visualize_connections(data, splist, radius=0.5, scale=1.5):
     """Calculate the connected components for graph constructed by starting points given radius and scale."""
+
+    from scipy.sparse.csgraph import connected_components
+    
     distm = pairwise_distances(data[splist[:,0].astype(int)])
     tol = radius*scale
     distm = (distm <= tol).astype(int)
