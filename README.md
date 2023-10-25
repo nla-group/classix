@@ -107,12 +107,12 @@ clx = CLASSIX(radius=0.1, minPts=99)
 clx.fit(X)
 ```
 
-The cluster labels of each data point are available in ``clx.labels_``.
+The cluster labels of each data point are available in ``clx.labels_``. CLASSIX can visualize the clustering result as follows. 
 
 ## :mortar_board: The explain method
 
 #### Example 1
-CLASSIX provides an API for the easy visualization of clusters and to explain the assignment of data points to their clusters. To get an overview of the data, the location of starting points, and their associated groups, type:
+CLASSIX provides an API for the easy visualization of clusters (different clusters are marked by distinct colors) and to explain the assignment of data points to their clusters. To get an overview of the data, the location of starting points, and their associated groups, type:
 
 ```Python
 clx.explain(plot=True)
