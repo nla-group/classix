@@ -46,7 +46,7 @@ np.import_array()
 
 
 
-cpdef distance_merging(double[:, :] data, np.ndarray[np.int64_t, ndim=1] labels,
+cpdef distance_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labels,
                        long[:, :] splist,  double radius, int minPts, double scale, 
                        double[:] sort_vals, double[:] half_nrm2):
 
