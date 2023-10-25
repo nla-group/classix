@@ -47,8 +47,8 @@ np.import_array()
 
 
 cpdef bf_distance_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labels,
-                                double[:, :] splist, 
-                                double radius, int minPts=0, double scale=1.5):
+                         long[:, :] splist, 
+                         double radius, int minPts=0, double scale=1.5):
 
     """
     Implement CLASSIX's merging with brute force computation
@@ -91,7 +91,7 @@ cpdef bf_distance_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labe
 
     """
 
-    cdef long[:] splist_indices = np.int32(splist[:, 0])
+    cdef long[:] splist_indices = splist[:, 0]
     cdef double[:, :] spdata = data.base[splist_indices]
     cdef double[:] xxt = np.einsum('ij,ij->i', spdata, spdata)
     cdef np.ndarray[np.int32_t, ndim=1] sp_cluster_label = labels[splist_indices]  
@@ -121,7 +121,7 @@ cpdef bf_distance_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labe
     cdef long[:] cs = np.zeros(nr_u, dtype=np.int32)
     
     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] cid
-    cdef np.ndarray[np.int32_t, ndim=1] grp_sizes = np.int32(splist[:, 2])
+    cdef np.ndarray[np.int32_t, ndim=1] grp_sizes = np.int32(splist[:, 1])
 
     for i in range(nr_u):
         cid = sp_cluster_label==ul[i]
@@ -167,8 +167,8 @@ cpdef bf_distance_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=1] labe
 
 # Disjoint set union
 cpdef merging(double[:, :] data, 
-                    double[:, :] splist, 
-                    double radius, str method='distance', double scale=1.5):
+                long[:, :] splist, 
+                double radius, str method='distance', double scale=1.5):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
     

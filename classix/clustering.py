@@ -418,7 +418,6 @@ class CLASSIX:
 
         from . import __enable_cython__
         self.__enable_cython__ = __enable_cython__
-        
         self.__enable_aggregation_cython__ = False
         
         if self.__enable_cython__:
@@ -715,9 +714,6 @@ class CLASSIX:
                 else:
                     labels[np.isin(agg_labels, self.group_outliers_)] = -1
                 
-                
-            
-                    
             labels = self.reassign_labels(labels) 
             self.label_change = dict(zip(agg_labels, labels)) # how object change from group to cluster.
             
@@ -1035,7 +1031,7 @@ class CLASSIX:
                     index1 = index1
 
                 cluster_label1 = self.label_change[agg_label1]
-                sp_str = self.s_pca[agg_label1] 
+                # sp_str = self.s_pca[agg_label1] 
                 
                 if plot == True:
                     plt.style.use(style=figstyle)
@@ -1267,7 +1263,7 @@ class CLASSIX:
 
                 
                 if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
-                    sp_str = np.array2string(self.splist_[agg_label1, 3:], separator=',')
+                    # sp_str = np.array2string(self.splist_[agg_label1, 3:], separator=',')
                     print("The data points %(index1)s and %(index2)s are in the same group %(agg_id)i, hence were merged into the same cluster #%(m_c)i"%{
                         "index1":index1, "index2":index2, "agg_id":agg_label1, "m_c":cluster_label1}
                     )
@@ -1537,9 +1533,9 @@ class CLASSIX:
                 
         self.sp_info = pd.DataFrame(columns=cols)
         self.sp_info["Group"] = np.arange(0, self.splist_.shape[0])
-        self.sp_info["NrPts"] = self.splist_[:, 2].astype(int)
+        self.sp_info["NrPts"] = self.splist_[:, 1].astype(int)
         self.sp_info["Cluster"] = [self.label_change[i] for i in range(self.splist_.shape[0])]
-        self.sp_info["Coordinates"] = coord # np.around(self.splist_[:,3:], 2).tolist()
+        self.sp_info["Coordinates"] = coord 
         self.sp_to_c_info = True
         return
         

@@ -95,7 +95,7 @@ def bf_distance_merging(data, labels, splist, radius, minPts=0, scale=1.5):
     nr_u = len(ul)
     
     cs = np.zeros(nr_u, dtype=int)
-    grp_sizes = splist[:, 2].astype(int)
+    grp_sizes = splist[:, 1].astype(int)
 
     for i in range(nr_u):
         cid = sp_cluster_label==ul[i]

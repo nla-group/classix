@@ -132,7 +132,7 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, str sortin
                 num_group += 1
                 labels[j] = lab
 
-        splist.append((ind[i], sort_vals[i], num_group))
+        splist.append((ind[i], num_group))
         lab += 1
 
     labels = labels[np.argsort(ind)]
@@ -248,7 +248,7 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
                 num_group = num_group + 1
                 labels[j] = lab
 
-        splist.append((sp, sort_vals[sp], num_group)) 
+        splist.append((sp, num_group)) 
 
         lab += 1
 
@@ -351,7 +351,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
                 num_group = num_group + 1
                 labels[j] = lab
 
-        splist.append((sp, sort_vals[sp], num_group)) 
+        splist.append((sp, num_group)) 
         lab += 1
 
     return labels, splist, nr_dist, ind

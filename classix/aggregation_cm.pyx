@@ -116,7 +116,7 @@ cpdef precompute_aggregate_pca(double[:,:] data, str sorting='pca', double tol=0
                 num_group += 1
                 labels[j] = lab
 
-        splist.append((ind[i], sort_vals[i], num_group))
+        splist.append((ind[i], num_group))
         lab += 1
 
     labels = labels.base[np.argsort(ind)]
@@ -223,7 +223,7 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
                 num_group += 1
                 labels[j] = lab
 
-        splist.append((sp, sort_vals[sp], num_group))  
+        splist.append((sp, num_group))  
         # list of [ starting point index of current group, sorting key, and number of group elements ]
 
         lab += 1
@@ -320,7 +320,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
                 num_group += 1
                 labels[j] = lab
 
-        splist.append((sp, sort_vals[sp], num_group))  
+        splist.append((sp, num_group))  
         # list of [ starting point index of current group, sorting key, and number of group elements ]
 
         lab += 1

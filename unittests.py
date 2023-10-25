@@ -28,35 +28,13 @@ import sklearn.datasets as data
 from classix import CLASSIX, loadData, cython_is_available
 from classix.clustering import calculate_cluster_centers
 from classix import novel_normalization
-from classix import aggregation, aggregation_c, aggregation_cm, aggregation_test
+from classix import aggregation, aggregation_c, aggregation_cm
 from classix.merging import merging, bf_distance_merging
 from classix.merging_cm import merging as merging_cm
 from classix.merging_cm import bf_distance_merging as bf_distance_merging_cm
 from sklearn.metrics.cluster import adjusted_rand_score
 
 
-def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
-    data, (_mu, _scl) = novel_normalization(data, sorting)
-    labels, _, nr_dist, ind = aggregation_test.aggregate(
-                         data, 
-                         sorting=sorting,
-                         tol=tol, 
-                         early_stopping=early_stopping
-    )
-
-    _, _, _, _ = aggregation_test.precompute_aggregate1(
-                         data, 
-                         sorting=sorting,
-                         tol=tol
-    )
-
-    _, _, _, _ = aggregation_test.precompute_aggregate2(
-                         data, 
-                         sorting=sorting,
-                         tol=tol
-    )
-
-    return nr_dist, labels
 
 
 class TestClassix(unittest.TestCase):
