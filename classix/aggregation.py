@@ -211,7 +211,7 @@ def precompute_aggregate(data, sorting="pca", tol=0.5):
         splist.append((i, num_group))  
         lab += 1
 
-    return np.array(labels), splist, nr_dist, ind, sort_vals, data, half_nrm2
+    return np.asarray(labels), splist, nr_dist, ind, sort_vals, data, half_nrm2
 
 
 
@@ -305,5 +305,5 @@ def aggregate(data, sorting="pca", tol=0.5):
 
         lab += 1
 
-    return np.array(labels), splist, nr_dist, ind, sort_vals, data
+    return np.asarray(labels), splist, nr_dist, ind, sort_vals, data
 
