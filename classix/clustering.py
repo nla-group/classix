@@ -660,10 +660,13 @@ class CLASSIX:
         """
         
         import collections
+        if self.memory: self.half_nrm2 = norm(data, axis=1, ord=2) * 0.5 # precomputation
         
         if method == 'density':
             labels = copy.deepcopy(agg_labels) 
-            self.merge_groups, self.connected_pairs_ = self._density_merging(data, splist, radius, sort_vals=sort_vals, half_nrm2=self.half_nrm2)
+            self.merge_groups, self.connected_pairs_ = self._density_merging(data, splist, 
+                                                                             radius, sort_vals=sort_vals, 
+                                                                             half_nrm2=self.half_nrm2)
             maxid = max(labels) + 1
             
             # after this step, the connected pairs (groups) will be transformed into merged clusters, 
@@ -728,8 +731,6 @@ class CLASSIX:
             labels = self.reassign_labels(labels) 
 
         else:
-            if self.memory: self.half_nrm2 = norm(data, axis=1, ord=2) * 0.5 # precomputation
-                
             labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merging(data=data, 
                                                                     labels=agg_labels,
                                                                     splist=splist,
