@@ -76,10 +76,6 @@ def cython_is_available(verbose=0):
             return True
 
         except (ModuleNotFoundError, ValueError):
-            from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
-
-            from .merging import merging
-
             if verbose:
                 print("This CLASSIX is not using Cython.")
             return False
