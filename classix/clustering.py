@@ -597,6 +597,8 @@ class CLASSIX:
         num_of_points = data.shape[0]
 
         if self.label_change is None:
+            if self.inverse_ind is None:
+                self.inverse_ind = np.argsort(self.ind)
             self.label_change = dict(zip(self.groups_[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
 
         if not memory:
