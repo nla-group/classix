@@ -138,7 +138,7 @@ cpdef distance_merging(double[:, :] data, list labels,
     cdef long[:] cs = np.zeros(nr_u, dtype=int)
     
     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] cid
-    cdef np.ndarray[np.int64_t, ndim=1] grp_sizes = splist[:, 1]
+    cdef np.ndarray[np.int64_t, ndim=1] grp_sizes = np.int64(splist[:, 1])
 
     for i in range(nr_u):
         cid = sp_cluster_labels==ul[i]
@@ -240,7 +240,7 @@ cpdef density_merging(double[:, :] data, long[:, :] splist, double radius, doubl
     cdef int last_j
     
     cdef int len_sp = splist.shape[0]
-    cdef np.ndarray[np.int64_t, ndim=1] splist_indices = splist[:, 0]
+    cdef np.ndarray[np.int64_t, ndim=1] splist_indices = np.int64(splist[:, 0])
     cdef double[:] sort_vals_sp = sort_vals.base[splist_indices]
     cdef double[:] half_nrm2_sp = half_nrm2.base[splist_indices]
 

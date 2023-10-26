@@ -1,9 +1,7 @@
-import time
 import random
 import numpy as np
 import pandas as pd
 import hdbscan
-import sklearn.datasets
 from sklearn import metrics
 from classix import CLASSIX
 from sklearn.cluster import KMeans

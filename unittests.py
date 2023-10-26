@@ -30,8 +30,15 @@ from classix.clustering import calculate_cluster_centers
 from classix import novel_normalization
 from classix import aggregation, aggregation_c, aggregation_cm
 from classix.merging import distance_merging, density_merging
-from classix.merging_cm import distance_merging as distance_merging_cm
-from classix.merging_cm import density_merging as density_merging_cm
+import platform
+
+if platform.system() == 'Windows':
+    from classix.merging_cm_win import distance_merging as distance_merging_cm
+    from classix.merging_cm_win import density_merging as density_merging_cm
+else:
+    from classix.merging_cm import distance_merging as distance_merging_cm
+    from classix.merging_cm import density_merging as density_merging_cm
+
 from sklearn.metrics.cluster import adjusted_rand_score
 
 
@@ -70,6 +77,18 @@ class TestClassix(unittest.TestCase):
             assert(adjusted_rand_score(clx2.labels_, checkpoint) == 1)
             
             
+    def test_normalization(self):
+        checkpoint = 1
+        try:
+            novel_normalization(data, "norm-mean")
+            novel_normalization(data, "pca")
+            novel_normalization(data, "norm-orthant")
+        except:
+            checkpoint = 0
+        
+        self.assertEqual(checkpoint, 1)
+
+        
     def test_density_cluster(self):
         vdu_signals = loadData('vdu_signals')
 

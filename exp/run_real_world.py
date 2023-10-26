@@ -3,18 +3,15 @@ import random
 import numpy as np
 import pandas as pd
 import hdbscan
-import sklearn.datasets
 from sklearn import metrics
 from classix import CLASSIX
 from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
 from sklearn import preprocessing
-from tqdm import tqdm
 from sklearn.cluster import MeanShift
 from quickshift.QuickshiftPP import *
 import matplotlib.pyplot as plt
-from tqdm import tqdm
-import seaborn as sns
+# import seaborn as sns
 plt.style.use('bmh')
 seed = 0
 
