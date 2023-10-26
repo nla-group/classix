@@ -53,7 +53,7 @@ cpdef precompute_aggregate_pca(double[:,:] data, str sorting='pca', double tol=0
     
     Returns
     -------
-    labels (numpy.ndarray) : 
+    labels (list) : 
         The group category of the data after aggregation.
     
     splist (list) : 
@@ -73,7 +73,7 @@ cpdef precompute_aggregate_pca(double[:,:] data, str sorting='pca', double tol=0
     cdef double[:] clustc 
     
 
-    cdef long[:] labels = np.full(len_ind, -1, dtype=int) 
+    cdef list labels = [-1]*len_ind
     cdef list splist = list() 
     cdef Py_ssize_t i, j
     
@@ -119,7 +119,7 @@ cpdef precompute_aggregate_pca(double[:,:] data, str sorting='pca', double tol=0
         splist.append((i, num_group))
         lab += 1
 
-    return np.asarray(labels), splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data), np.asarray(half_nrm2)
+    return labels, splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data), np.asarray(half_nrm2)
 
 
 
@@ -143,7 +143,7 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
     
     Returns
     -------
-    labels (numpy.ndarray) : 
+    labels (list) : 
         The group category of the data after aggregation.
     
     splist (list) : 
@@ -161,7 +161,7 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
     cdef unsigned int lab=0, nr_dist=0, num_group
     cdef double[:] clustc # starting point coordinates
     cdef double dist
-    cdef long[:] labels = np.full(len_ind, -1, dtype=int) # np.zeros(, dtype=int) - 1
+    cdef list labels = [-1]*len_ind
     cdef list splist = list() # list of starting points
     cdef Py_ssize_t i, ii, j, coord
     cdef double[:] half_nrm2
@@ -226,7 +226,7 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
 
         lab += 1
   
-    return np.asarray(labels), splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data), np.asarray(half_nrm2)
+    return labels, splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data), np.asarray(half_nrm2)
 
 
 
@@ -249,7 +249,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
     
     Returns
     -------
-    labels (numpy.ndarray) : 
+    labels (list) : 
         The group category of the data after aggregation.
     
     splist (list) : 
@@ -267,7 +267,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
     cdef unsigned int lab=0, nr_dist=0, num_group
     cdef double[:] clustc # starting point coordinates
     cdef double dist
-    cdef long[:] labels = np.full(len_ind, -1, dtype=int) # np.zeros(, dtype=int) - 1
+    cdef list labels = [-1]*len_ind
     cdef list splist = list() # list of starting points
     cdef Py_ssize_t i, ii, j, coord
     
@@ -322,5 +322,5 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
 
         lab += 1
   
-    return np.asarray(labels), splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data)
+    return labels, splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data)
 

@@ -49,7 +49,7 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
     
     Returns
     -------
-    labels (numpy.ndarray) : 
+    labels (list) : 
         The group category of the data after aggregation.
     
     splist (list) : 
@@ -83,7 +83,7 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
     half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5 # precomputation
 
     lab = 0
-    labels = np.full(len_ind, -1, dtype=int)
+    labels = [-1] * len_ind
     nr_dist = 0 
     splist = list()
 
@@ -211,7 +211,7 @@ def precompute_aggregate(data, sorting="pca", tol=0.5):
         splist.append((i, num_group))  
         lab += 1
 
-    return np.asarray(labels), splist, nr_dist, ind, sort_vals, data, half_nrm2
+    return labels, splist, nr_dist, ind, sort_vals, data, half_nrm2
 
 
 
@@ -305,5 +305,5 @@ def aggregate(data, sorting="pca", tol=0.5):
 
         lab += 1
 
-    return np.asarray(labels), splist, nr_dist, ind, sort_vals, data
+    return labels, splist, nr_dist, ind, sort_vals, data
 

@@ -5,7 +5,6 @@ classix/__init__.py
 classix/aggregation.py
 classix/aggregation_c.pyx
 classix/aggregation_cm.pyx
-classix/aggregation_test.py
 classix/clustering.py
 classix/merging.py
 classix/merging_cm.pyx

@@ -41,7 +41,7 @@ def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, hal
     data : numpy.ndarray
         The input that is array-like of shape (n_samples,).
     
-    labels : numpy.ndarray
+    labels : list
         aggregation labels
 
     splist : numpy.ndarray
@@ -87,6 +87,7 @@ def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, hal
     half_nrm2_sp = half_nrm2[splist_indices]
     # np.einsum('ij,ij->i', data, data) <-> np.sum(data * data, axis=1)
     
+    labels = np.asarray(labels)
     sp_cluster_labels = labels[splist_indices]
     radius = scale*radius
     radius_2 = (radius)**2/2

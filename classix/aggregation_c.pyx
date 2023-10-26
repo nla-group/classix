@@ -61,7 +61,7 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, str sortin
 
     Returns
     -------
-    labels (numpy.ndarray) : 
+    labels (list) : 
         The group categories of the data after aggregation.
     
     splist (list) : 
@@ -78,7 +78,7 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, str sortin
 
     cdef int nr_dist = 0 
     cdef int lab = 0 
-    cdef np.ndarray[np.int64_t, ndim=1] labels = np.full(len_ind, -1, dtype=int)
+    cdef list labels = [-1]*len_ind
     cdef list splist = list() 
     cdef np.ndarray[np.float64_t, ndim=1] sort_vals
     cdef np.ndarray[np.float64_t, ndim=1] clustc
@@ -158,7 +158,7 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
 
     Returns
     -------
-    labels (numpy.ndarray) : 
+    labels (list) : 
         The group categories of the data after aggregation.
     
     splist (list) : 
@@ -175,7 +175,7 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
     cdef int nr_dist = 0 
     cdef int lab = 0 
     cdef double dist
-    cdef np.ndarray[np.int64_t, ndim=1] labels = np.full(len_ind, -1, dtype=int)
+    cdef list labels = [-1]*len_ind
     cdef list splist = list() 
     cdef np.ndarray[np.float64_t, ndim=1] sort_vals
     cdef np.ndarray[np.float64_t, ndim=1] clustc
@@ -271,7 +271,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
 
     Returns
     -------
-    labels (numpy.ndarray) : 
+    labels (list) : 
         The group categories of the data after aggregation.
     
     splist (list) : 
@@ -288,7 +288,7 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
     cdef int nr_dist = 0 # nr_dist:if necessary, count the distance computation
     cdef int lab = 0 # lab: class
     cdef double dist # distance 
-    cdef np.ndarray[np.int64_t, ndim=1] labels = np.full(len_ind, -1, dtype=int)
+    cdef list labels = [-1]*len_ind
     cdef list splist = list() # store the starting points
     cdef np.ndarray[np.float64_t, ndim=1] sort_vals
     cdef np.ndarray[np.float64_t, ndim=1] clustc

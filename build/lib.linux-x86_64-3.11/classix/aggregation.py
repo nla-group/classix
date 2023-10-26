@@ -49,7 +49,7 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
     
     Returns
     -------
-    labels (numpy.ndarray) : 
+    labels (list) : 
         The group category of the data after aggregation.
     
     splist (list) : 
@@ -83,7 +83,7 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
     half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5 # precomputation
 
     lab = 0
-    labels = np.full(len_ind, -1, dtype=int)
+    labels = [-1] * len_ind
     nr_dist = 0 
     splist = list()
 
@@ -100,7 +100,7 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
         ips = np.matmul(data[i+1:last_j,:], clustc.T)
         nr_dist += last_j - i - 1
 
-        for j in range(i+1,last_j):
+        for j in range(i+1, last_j):
             if labels[j] >= 0:
                 continue
 
@@ -108,12 +108,10 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
                 num_group += 1
                 labels[j] = lab
 
-        splist.append((ind[i], sort_vals[i], num_group))
+        splist.append((i, num_group))
         lab += 1
-    
-    labels = labels[np.argsort(ind)]
 
-    return labels, splist, nr_dist, ind
+    return labels, splist, nr_dist, ind, sort_vals, data, half_nrm2
 
 
 
@@ -175,30 +173,32 @@ def precompute_aggregate(data, sorting="pca", tol=0.5):
         sort_vals = np.zeros(len_ind) 
         
     ind = np.argsort(sort_vals)
-        
+    data = data[ind]
+    sort_vals = sort_vals[ind]
+
     lab = 0
     labels = [-1]*len_ind
     nr_dist = 0 
 
+    
     half_r2 = tol**2 * 0.5
     half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5 # precomputation
-
+    
     for i in range(len_ind): 
-        sp = ind[i] # starting point
-        if labels[sp] >= 0:
+        if labels[i] >= 0:
             continue
         else:
-            clustc = data[sp,:] 
-            labels[sp] = lab
+            clustc = data[i,:] 
+            labels[i] = lab
             num_group = 1
         
-        rhs = half_r2 - half_nrm2[sp] # right-hand side of norm ineq.
+        rhs = half_r2 - half_nrm2[i] # right-hand side of norm ineq.
 
-        for j in ind[i+1:]:
+        for j in range(i+1, len_ind):
             if labels[j] >= 0:
                 continue
 
-            if (sort_vals[j] - sort_vals[sp] > tol):
+            if (sort_vals[j] - sort_vals[i] > tol):
                 break       
 
             nr_dist += 1
@@ -208,10 +208,10 @@ def precompute_aggregate(data, sorting="pca", tol=0.5):
                 num_group += 1
                 labels[j] = lab
 
-        splist.append((sp, sort_vals[sp], num_group))  
+        splist.append((i, num_group))  
         lab += 1
 
-    return np.array(labels), splist, nr_dist, ind
+    return labels, splist, nr_dist, ind, sort_vals, data, half_nrm2
 
 
 
@@ -249,11 +249,10 @@ def aggregate(data, sorting="pca", tol=0.5):
     
     if sorting == "norm-mean" or sorting == "norm-orthant": 
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
-        ind = np.argsort(sort_vals)
-
+        
     elif sorting == "pca":
         # change to svd 
-        if data.shape[1]>1:
+        if fdim > 1:
             if fdim <= 3: # memory inefficient
                 gemm = get_blas_funcs("gemm", [data.T, data])
                 _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
@@ -266,30 +265,32 @@ def aggregate(data, sorting="pca", tol=0.5):
             sort_vals = data[:,0]
             
         sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
-        ind = np.argsort(sort_vals)
+        
 
     else: # no sorting
         sort_vals = np.zeros(len_ind) 
-        ind = np.arange(len_ind)
-        
+
+    ind = np.argsort(sort_vals)
+    data = data[ind]
+    sort_vals = sort_vals[ind]
+
     lab = 0
     labels = [-1]*len_ind
     nr_dist = 0 
     
     for i in range(len_ind): 
-        sp = ind[i] # starting point
-        if labels[sp] >= 0:
+        if labels[i] >= 0:
             continue
         else:
-            clustc = data[sp,:] 
-            labels[sp] = lab
+            clustc = data[i,:] 
+            labels[i] = lab
             num_group = 1
 
-        for j in ind[i+1:]:
+        for j in range(i+1, len_ind):
             if labels[j] >= 0:
                 continue
 
-            if (sort_vals[j] - sort_vals[sp] > tol):
+            if (sort_vals[j] - sort_vals[i] > tol):
                 break       
 
             dat = clustc - data[j,:]
@@ -300,9 +301,9 @@ def aggregate(data, sorting="pca", tol=0.5):
                 num_group += 1
                 labels[j] = lab
 
-        splist.append((sp, sort_vals[sp], num_group))  
-        # list of [ starting point index of current group, sorting values, and number of group elements ]
+        splist.append((i, num_group))  
+
         lab += 1
 
-    return np.array(labels), splist, nr_dist, ind
+    return labels, splist, nr_dist, ind, sort_vals, data
 

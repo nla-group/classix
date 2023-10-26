@@ -528,7 +528,7 @@ class CLASSIX:
                                                                                                 sorting=self.sorting, 
                                                                                                 tol=self.radius
                                                                                             ) 
-        self.splist_ = np.asarray(self.splist_)
+        self.splist_ = np.array(self.splist_)
         
         if self.group_merging is None:
             self.labels_ = copy.deepcopy(self.groups_) 
@@ -666,6 +666,7 @@ class CLASSIX:
         if self.memory: self.half_nrm2 = norm(data, axis=1, ord=2)**2 * 0.5 # precomputation
 
         if method == 'density':
+            agg_labels = np.asarray(agg_labels)
             labels = copy.deepcopy(agg_labels) 
             self.merge_groups, self.connected_pairs_ = self._density_merging(data, splist, 
                                                                              radius, sort_vals=sort_vals, 
