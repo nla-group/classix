@@ -6,8 +6,8 @@ Merging API Reference
    :recursive:
 
    classix.merging
-   classix.merging.agglomerate
-   classix.merging.bf_distance_agglomerate
+   classix.merging.distance_merging
+   classix.merging.density_merging
    classix.cal_inter_density
    classix.cal_inter_volume
    classix.check_if_overlap
