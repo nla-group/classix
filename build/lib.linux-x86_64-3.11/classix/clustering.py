@@ -597,7 +597,10 @@ class CLASSIX:
         num_of_points = data.shape[0]
 
         if self.label_change is None:
-            self.label_change = dict(zip(self.groups_[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
+            if self.inverse_ind is None:
+                self.inverse_ind = np.argsort(self.ind)
+                groups = np.array(self.groups_)
+            self.label_change = dict(zip(groups[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
 
         if not memory:
             xxt = np.einsum('ij,ij->i', splist, splist)
@@ -947,10 +950,13 @@ class CLASSIX:
 
         if self.inverse_ind is None:
             self.inverse_ind = np.argsort(self.ind)
-            self.label_change = dict(zip(self.groups_[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
+
+            groups_ = np.array(self.groups_)
+            self.label_change = dict(zip(groups_[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
 
         data = self.data[self.inverse_ind]
-        groups_ = self.groups_[self.inverse_ind]
+        groups_ = np.array(self.groups_)
+        groups_ = groups_[self.inverse_ind]
 
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
             
