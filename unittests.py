@@ -79,10 +79,11 @@ class TestClassix(unittest.TestCase):
             
     def test_normalization(self):
         checkpoint = 1
+        X, _ = data.make_blobs(n_samples=200, centers=3, n_features=2, random_state=42)
         try:
-            novel_normalization(data, "norm-mean")
-            novel_normalization(data, "pca")
-            novel_normalization(data, "norm-orthant")
+            novel_normalization(X, "norm-mean")
+            novel_normalization(X, "pca")
+            novel_normalization(X, "norm-orthant")
         except:
             checkpoint = 0
         
