@@ -338,7 +338,7 @@ class CLASSIX:
              
     Attributes
     ----------
-    groups_ : numpy.ndarray
+    groups_ : list
         Groups labels of aggregation.
     
     splist_ : numpy.ndarray
@@ -626,7 +626,7 @@ class CLASSIX:
         data : numpy.ndarray
             The input that is array-like of shape (n_samples,).
         
-        agg_labels: numpy.ndarray
+        agg_labels: list
             Groups labels of aggregation.
         
         splist: numpy.ndarray
