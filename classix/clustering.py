@@ -771,7 +771,7 @@ class CLASSIX:
     
     
     
-    def explain(self, index1=None, index2=None, showsplist=True, max_colwidth=None, replace_name=None, 
+    def explain(self, index1=None, index2=None, showsplist=False, max_colwidth=None, replace_name=None, 
                 plot=False, figsize=(11, 6), figstyle="ggplot", savefig=False, ind_color="k", ind_marker_size=150,
                 sp_fcolor='tomato',  sp_alpha=0.05, sp_pad=0.5, sp_fontsize=None, sp_bbox=None, 
                 dp_fcolor='bisque',  dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
