@@ -401,6 +401,7 @@ class CLASSIX:
         self.scale = scale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
 
+        self.sp_info = None
         self.groups_ = None
         self.clean_index_ = None
         self.labels_ = None
@@ -772,12 +773,14 @@ class CLASSIX:
     
     
     def explain(self, index1=None, index2=None, showsplist=False, max_colwidth=None, replace_name=None, 
-                plot=False, figsize=(11, 6), figstyle="ggplot", savefig=False, ind_color="k", ind_marker_size=150,
-                sp_fcolor='tomato',  sp_alpha=0.05, sp_pad=0.5, sp_fontsize=None, sp_bbox=None, 
-                dp_fcolor='bisque',  dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
+                plot=False, figsize=(11, 6), figstyle="ggplot", savefig=False, ind_color="k", width=1.5, 
+                ind_marker_size=150, sp_fcolor='tomato', sp_marker="+", sp_mcolor='k', sp_alpha=0.05, sp_pad=0.5, 
+                sp_fontsize=None, sp_bbox=None, sp_cmarker='+', sp_csize=100, sp_ccolor='crimson', sp_clinewidths=2.5, 
+                dp_fcolor='bisque', dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
+                show_all_grp_circle=False, show_connected_grp_circle=False, show_obj_grp_circle=True,  
                 cmap='turbo', cmin=0.07, cmax=0.97, color='red', connect_color='green', alpha=0.5, cline_width=0.5, 
-                add_arrow=False, arrow_linestyle='--', arrow_fc='darkslategrey', arrow_ec='dimgrey',
-                directed_arrow=0, axis='off', figname=None, fmt='pdf', *argv, **kwargs):
+                add_arrow=False, arrow_linestyle='--', arrow_fc='darkslategrey', arrow_ec='k', arrow_linewidth=1,
+                arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', figname=None, fmt='pdf', *argv, **kwargs):
         
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
@@ -798,7 +801,7 @@ class CLASSIX:
         index2 : int or numpy.ndarray, optional
             Input object2 [with index 'index2'] for explanation, and compare objects [with indices 'index1' and 'index2'].
         
-        showsplist : boolean
+        showsplist : boolean, default=False
             Determine if show the starting points information, which include the number of data points (NumPts), 
             corresponding clusters, and associated coordinates. This only applies to both index1 and index2 are "NULL".
             Default as True. 
@@ -843,6 +846,9 @@ class CLASSIX:
         sp_fcolor : str, default='tomato'
             The color marked for starting points text box. 
             
+        sp_mcolor : str, default='k'
+            The color marked for startpoint points scatter marker.
+
         sp_alpha : float, default=0.3
             The value setting for transprency of text box for starting points. 
             
@@ -897,12 +903,18 @@ class CLASSIX:
         arrow_fc : str, default='darkslategrey' 
             Face color for arrow.
 
-        arrow_ec : str, default='dimgrey'
+        arrow_ec : str, default='k'
             Edge color for arrow.
+
+        arrow_linewidth : float, default=1
+            Set the linewidth of the arrow edges.
 
         directed_arrow : int, default=0
             Whether or not the edges for arrows is directed.
             Values at {-1, 0, 1}, 0 refers to undirected, -1 refers to the edge direction opposite to 1.
+        
+        shrinkA, shrinkB : float, default=2
+            Shrinking factor of the tail and head of the arrow respectively.
 
         figname : str, optional
             Set the figure name for the image to be saved.
@@ -962,9 +974,9 @@ class CLASSIX:
             
             if data.shape[1] > 2:
                 warnings.warn("The group radius in the visualization might not be accurate.")
-                scaled_data = data - data.mean(axis=0)
-                _U, self._s, self._V = svds(scaled_data, k=2, return_singular_vectors=True)
-                self.x_pca = np.matmul(scaled_data, self._V[np.argsort(self._s)].T)
+                # scaled_data = data - data.mean(axis=0)
+                _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
+                self.x_pca = np.matmul(data, self._V[np.argsort(self._s)].T)
                 self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
                 
             elif data.shape[1] == 2:
@@ -984,14 +996,15 @@ class CLASSIX:
         
         
         # pd.options.display.max_colwidth = colwidth
-        dash_line = "--------"*5 # "--------"*(self.splist_.shape[1])
+        dash_line = "--------"*5 
             
         indexlist = [i for i in kwargs.keys() if 'index' in re.split('(\d+)',i)]
         indexvalues = [i for i in kwargs.values()]
         
         if index1 is None: # analyze in the general way with a global view
             if plot == True:
-                self.explain_viz(figsize=figsize, figstyle=figstyle, savefig=savefig, fontsize=sp_fontsize, bbox=sp_bbox, axis=axis, fmt=fmt)
+                self.explain_viz(figsize=figsize, figstyle=figstyle, savefig=savefig, sp_marker=sp_marker,
+                                 sp_mcolor=sp_mcolor, width=width, fontsize=sp_fontsize, bbox=sp_bbox, axis=axis, fmt=fmt)
                 
             data_size = data.shape[0]
             feat_dim = data.shape[1]
@@ -1062,18 +1075,20 @@ class CLASSIX:
                     index1 = index1
 
                 cluster_label1 = self.label_change[agg_label1]
-                # sp_str = self.s_pca[agg_label1] 
                 
                 if plot == True:
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
+                    
                     plt.rcParams['axes.facecolor'] = 'white'
+
                     x_pca = self.x_pca[self.labels_ == cluster_label1]
                     s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
                     
-                    ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", c=self.cluster_color[cluster_label1])
-                    ax.scatter(s_pca[:, 0], s_pca[:, 1], marker="p")
+                    ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", linewidth=width, 
+                               c=self.cluster_color[cluster_label1])
                     
+                    ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, linewidth=2*width, c=sp_mcolor)
                     
                     if dp_fontsize is None:
                         ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=ind_color)
@@ -1082,8 +1097,14 @@ class CLASSIX:
                     
                     ax.scatter(object1[0], object1[1], marker="*", s=ind_marker_size)
                     
+                    ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
+                               marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
+                    
                     for i in range(s_pca.shape[0]):
-                        ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                        if data.shape[1] <= 2:
+                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color,
+                                                     alpha=alpha, lw=cline_width, clip_on=False))
+                        
                         ax.set_aspect('equal', adjustable='datalim')
                         if sp_fontsize is None:
                             ax.text(s_pca[i, 0], s_pca[i, 1],
@@ -1095,6 +1116,7 @@ class CLASSIX:
                                     s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
                                     fontsize=sp_fontsize, bbox=sp_bbox
                             )
+
                     ax.plot()
                     ax.axis('off') # the axis here may not be consistent, so hide.
                     
@@ -1131,7 +1153,6 @@ class CLASSIX:
                 )
 
             # explain two objects relationship
-            
             else: # explain(index1, index2, ...)
 
                 if len(indexlist) > 0: # A more general case, index1=.., index2=.., index3=..
@@ -1188,13 +1209,17 @@ class CLASSIX:
                     
                     for i in set(cluster_labels_m):
                         x_pca = self.x_pca[self.labels_ == i, :]
-                        ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", c=self.cluster_color[i])
+                        ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", c=self.cluster_color[i], linewidth=width)
                     
                     for i in set(group_labels_m):
                         s_pca = self.s_pca[i]
-                        ax.scatter(s_pca[0], s_pca[1], marker="p")
-                        ax.add_patch(plt.Circle((s_pca[0], s_pca[1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
-                        
+                        ax.scatter(s_pca[0], s_pca[1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
+                                   # ax.scatter(s_pca[0], s_pca[1], marker=sp_marker, c=sp_mcolor)
+                        if data.shape[1] <= 2:
+                            ax.add_patch(plt.Circle((s_pca[0], s_pca[1]), self.radius, fill=False,
+                                                     color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                    
+                    ax.set_aspect('equal', adjustable='datalim')
                     if dp_fontsize is None:
                         for ii in range(len(indexlist)):
                             if isinstance(index1, int) or isinstance(index1, str):
@@ -1272,7 +1297,7 @@ class CLASSIX:
                     if isinstance(index1, int) or isinstance(index1, str):
                         select_sp_info.loc[:, 'Label'] = [index1, index2]
                     else:
-                        select_sp_info.loc[:, 'Label'] = [str(np.round(index1,3)), str(np.round(index2, 3))]
+                        select_sp_info.loc[:, 'Label'] = [str(np.round(index1, 3)), str(np.round(index2, 3))]
                         
                     print(dash_line)
                     print(select_sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
@@ -1353,10 +1378,10 @@ class CLASSIX:
                     x_pca2 = self.x_pca[self.labels_ == cluster_label2]
                     s_pca = self.s_pca[union_ind]
                     
-                    ax.scatter(x_pca1[:, 0], x_pca1[:, 1], marker=".", c=self.cluster_color[cluster_label1])
-                    ax.scatter(x_pca2[:, 0], x_pca2[:, 1], marker=".", c=self.cluster_color[cluster_label2])
+                    ax.scatter(x_pca1[:, 0], x_pca1[:, 1], marker=".", c=self.cluster_color[cluster_label1], linewidth=width)
+                    ax.scatter(x_pca2[:, 0], x_pca2[:, 1], marker=".", c=self.cluster_color[cluster_label2], linewidth=2*width)
                     
-                    ax.scatter(s_pca[:,0], s_pca[:,1], marker="p")
+                    ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, c=sp_mcolor)
                     
                     if isinstance(index1, int) or isinstance(index1, str):
                         if dp_fontsize is None:
@@ -1374,17 +1399,23 @@ class CLASSIX:
                             ax.text(object2[0], object2[1], s='index 2', fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                         
 
-                    
                     ax.scatter(object1[0], object1[1], marker="*", s=ind_marker_size)
                     ax.scatter(object2[0], object2[1], marker="*", s=ind_marker_size)
                     
                     for i in range(s_pca.shape[0]):
                         if union_ind[i] in connected_paths:
-                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
-                                                     color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
+                            # draw circle for connected starting points or not, 
+                            # and also determine the marker of the connected starting points.
+                            ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, 
+                                       c=sp_ccolor, linewidths=sp_clinewidths)
+                            
+                            if data.shape[1] <= 2:
+                                ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
+                                                    color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
                         else:
-                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
-                                                     color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                            if data.shape[1] <= 2:
+                                ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
+                                                    color=color, alpha=alpha, lw=cline_width, clip_on=False))
                             
                         ax.set_aspect('equal', adjustable='datalim')
                         
@@ -1410,31 +1441,36 @@ class CLASSIX:
                             arrowStop=(self.s_pca[connected_paths[i+1], 0], self.s_pca[connected_paths[i+1], 1])
 
                             if directed_arrow == 0:
-                                ax.annotate("",arrowStop,
-                                            xytext=arrowStart,
+                                ax.annotate("", arrowStop, 
+                                            xytext=arrowStart, 
                                             arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=0,shrinkB=5, 
+                                                            shrinkA=arrow_shrinkA, 
+                                                            shrinkB=arrow_shrinkB, 
                                                             edgecolor=arrow_fc,
                                                             facecolor=arrow_ec,
-                                                            linestyle=arrow_linestyle
+                                                            linestyle=arrow_linestyle,
+                                                            linewidth=arrow_linewidth
                                                             )
                                             )
                                 
-                                ax.annotate("",arrowStart,
-                                            xytext=arrowStop,
+                                ax.annotate("", arrowStart,
+                                            xytext=arrowStop, 
                                             arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=0, shrinkB=5,
+                                                            shrinkA=arrow_shrinkA, 
+                                                            shrinkB=arrow_shrinkB, 
                                                             edgecolor=arrow_fc,
                                                             facecolor=arrow_ec,
-                                                            linestyle=arrow_linestyle
+                                                            linestyle=arrow_linestyle,
+                                                            linewidth=arrow_linewidth
                                                             )
                                             )
                                     
                             elif directed_arrow == 1:
-                                ax.annotate("",arrowStop,
+                                ax.annotate("", arrowStop,
                                             xytext=arrowStart,
                                             arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=0,shrinkB=5,
+                                                            shrinkA=arrow_shrinkA, 
+                                                            shrinkB=arrow_shrinkB, 
                                                             edgecolor=arrow_fc,
                                                             facecolor=arrow_ec,
                                                             linestyle=arrow_linestyle
@@ -1442,13 +1478,15 @@ class CLASSIX:
                                             )
 
                             else:
-                                ax.annotate("",arrowStart,
-                                            xytext=arrowStop,
+                                ax.annotate("", arrowStart,
+                                            xytext=arrowStop, 
                                             arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=0, shrinkB=5,
+                                                            shrinkA=arrow_shrinkA, 
+                                                            shrinkB=arrow_shrinkB, 
                                                             edgecolor=arrow_fc,
                                                             facecolor=arrow_ec,
-                                                            linestyle=arrow_linestyle
+                                                            linestyle=arrow_linestyle,
+
                                                             )
                                             )
                                 
@@ -1476,7 +1514,8 @@ class CLASSIX:
     
     
     
-    def explain_viz(self, figsize=(12, 8), figstyle="ggplot", savefig=False, fontsize=None, bbox={'facecolor': 'tomato', 'alpha': 0.3, 'pad': 2}, axis='off', fmt='pdf'):
+    def explain_viz(self, figsize=(12, 8), figstyle="ggplot", width=0.5, sp_marker="+", sp_mcolor="k", 
+                    savefig=False, fontsize=None, bbox={'facecolor': 'tomato', 'alpha': 0.3, 'pad': 2}, axis='off', fmt='pdf'):
         """Visualize the starting point and data points"""
         
         from matplotlib import pyplot as plt
@@ -1490,17 +1529,18 @@ class CLASSIX:
         plt.style.use(style=figstyle)
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = 'white'
-        plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker="p")
-
+        
         for i in np.unique(self.labels_):
             x_pca_part = self.x_pca[self.labels_ == i,:]
-            plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="*", c=self.cluster_color[i])
+            plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="x", linewidth=width, c=self.cluster_color[i])
             
             for j in range(self.s_pca.shape[0]):
                 if fontsize is None:
                     plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), bbox=bbox)
                 else:
                     plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), fontsize=fontsize, bbox=bbox)
+
+        plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker=sp_marker, linewidth=2*width, c=sp_mcolor)
 
         plt.axis(axis) # the axis here may not be consistent, so hide.
         plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
@@ -1619,7 +1659,7 @@ class CLASSIX:
         fig, ax = plt.subplots(figsize=figsize)
         for i in range(self.splist_.shape[0]):
             ax.scatter(P[i,0], P[i,1], s=markersize, c='k', marker='.')
-            if plot_boundary:
+            if plot_boundary and self.data.shape[1] <= 2:
                 ax.add_patch(plt.Circle((P[i, 0], P[i, 1]), self.radius, 
                                         color=bound_color, fill=False, clip_on=False)
                             )
