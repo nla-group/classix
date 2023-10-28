@@ -1376,10 +1376,6 @@ class CLASSIX:
 
                 
                 if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
-                    # sp_str = np.array2string(self.splist_[agg_label1, 3:], separator=',')
-                    print("The data points %(index1)s and %(index2)s are in the same group %(agg_id)i, hence were merged into the same cluster #%(m_c)i"%{
-                        "index1":index1, "index2":index2, "agg_id":agg_label1, "m_c":cluster_label1}
-                    )
                     connected_paths = [agg_label1]
                 else:
                     from scipy.sparse import csr_matrix
@@ -1404,25 +1400,9 @@ class CLASSIX:
                         
                         connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
                         
-                        print(
-                        """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
-                            """\nboth of which were merged into cluster #%(cluster)i. """% {
-                            "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
-                        )
-                        
-                        print("""These two groups are connected via groups %(connected)s.""" % {
-                               "connected":connected_paths_vis}
-                        )
                     else: 
                         
                         connected_paths = []
-                        print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
-                            "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1})
-
-                        print("""The data point %(index2)s is in group %(agg_id2)i, which has been merged into cluster %(c_id2)s.""" % {
-                            "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2})   
-                        
-                        print("""There is no path of overlapping groups between these clusters.""")
                         
                 if plot == True:
                     plt.style.use(style=figstyle)
@@ -1495,8 +1475,8 @@ class CLASSIX:
                                     fontsize=sp_fontsize, bbox=sp_bbox
                             )
 
-                    if len(connected_paths) != 0:
-                        print("connected_paths:", connected_paths)
+                    # if len(connected_paths) != 0:
+                    #     print("connected_paths:", connected_paths)
                         
                     nr_cps = len(connected_paths)
                     
@@ -1583,6 +1563,31 @@ class CLASSIX:
                         print("image successfully save as", fm)
                         
                     plt.show()
+
+                    if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
+                        print("The data points %(index1)s and %(index2)s are in the same group %(agg_id)i, hence were merged into the same cluster #%(m_c)i"%{
+                            "index1":index1, "index2":index2, "agg_id":agg_label1, "m_c":cluster_label1}
+                        )
+                    else:
+                        if cluster_label1 == cluster_label2:
+                            print(
+                            """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
+                                """\nboth of which were merged into cluster #%(cluster)i. """% {
+                                "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
+                            )
+                            
+                            print("""These two groups are connected via groups %(connected)s.""" % {
+                                "connected":connected_paths_vis}
+                            )
+                        else: 
+                            connected_paths = []
+                            print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
+                                "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1})
+
+                            print("""The data point %(index2)s is in group %(agg_id2)i, which has been merged into cluster %(c_id2)s.""" % {
+                                "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2})   
+                            
+                            print("""There is no path of overlapping groups between these clusters.""")
 
                     self.connected_paths = connected_paths
         return 
