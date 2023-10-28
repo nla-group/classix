@@ -773,14 +773,14 @@ class CLASSIX:
     
     
     def explain(self, index1=None, index2=None, showsplist=False, max_colwidth=None, replace_name=None, 
-                plot=False, figsize=(11, 6), figstyle="ggplot", savefig=False, ind_color="k", width=1.5, 
-                ind_marker_size=150, sp_fcolor='tomato', sp_marker="+", sp_mcolor='k', sp_alpha=0.05, sp_pad=0.5, 
-                sp_fontsize=None, sp_bbox=None, sp_cmarker='+', sp_csize=100, sp_ccolor='crimson', sp_clinewidths=2.5, 
-                dp_fcolor='bisque', dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
+                plot=False, figsize=(11, 6), figstyle="seaborn", savefig=False, bcolor="#f5f9f9", ind_color="k", width=1.5, 
+                ind_msize=150, sp_fcolor="tomato", sp_marker="+", sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, 
+                sp_fontsize=None, sp_bbox=None, sp_cmarker="+", sp_csize=100, sp_ccolor="crimson", sp_clinewidths=2.5, 
+                dp_fcolor="bisque", dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
                 show_all_grp_circle=False, show_connected_grp_circle=False, show_obj_grp_circle=True,  
-                cmap='turbo', cmin=0.07, cmax=0.97, color='red', connect_color='green', alpha=0.5, cline_width=0.5, 
-                add_arrow=False, arrow_linestyle='--', arrow_fc='darkslategrey', arrow_ec='k', arrow_linewidth=1,
-                arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', figname=None, fmt='pdf', *argv, **kwargs):
+                cmap="turbo", cmin=0.07, cmax=0.97, color="red", connect_color="green", alpha=0.5, cline_width=0.5, 
+                add_arrow=False, arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
+                arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', figname=None, fmt="pdf", *argv, **kwargs):
         
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
@@ -830,18 +830,21 @@ class CLASSIX:
         figsize : tuple, default=(10, 6)
             Determine the size of visualization figure. 
 
-        figstyle : str, default="ggplot"
+        figstyle : str, default="seaborn"
             Determine the style of visualization.
             see reference: https://matplotlib.org/stable/gallery/style_sheets/style_sheets_reference.html
         
         savefig : boolean, default=False
             Determine if save figure, the figure will be saved in the folder named "img".
         
-        indices_color : str, default as 'k'
-            Color for visualization of data with indices index1 and index2.
+        bcolor : str, default="#f5f9f9"
+            Color for figure background.
         
-        ind_marker_size : float, optional:
-            Size for visualization of data with indices index1 and index2.
+        ind_color : str, default as "k"
+            Color for the text of data of index1 and index2.
+        
+        ind_msize : float, optional:
+            Size for markers for data of index1 and index2.
     
         sp_fcolor : str, default='tomato'
             The color marked for starting points text box. 
@@ -956,7 +959,7 @@ class CLASSIX:
         if dp_fontsize is None and sp_fontsize is not None:
             dp_fontsize = sp_fontsize
         
-        
+
         if cmap is not None:
             _cmap = plt.cm.get_cmap(cmap)
             _interval = np.linspace(cmin, cmax, len(set(self.labels_))) 
@@ -1013,7 +1016,7 @@ class CLASSIX:
         
         if index1 is None: # analyze in the general way with a global view
             if plot == True:
-                self.explain_viz(figsize=figsize, figstyle=figstyle, savefig=savefig, sp_marker=sp_marker,
+                self.explain_viz(figsize=figsize, figstyle=figstyle, bcolor=bcolor, savefig=savefig, sp_marker=sp_marker,
                                  sp_mcolor=sp_mcolor, width=width, fontsize=sp_fontsize, bbox=sp_bbox, axis=axis, fmt=fmt)
                 
             data_size = data.shape[0]
@@ -1087,7 +1090,7 @@ class CLASSIX:
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
                     
-                    plt.rcParams['axes.facecolor'] = 'white'
+                    ax.set_facecolor(bcolor)
 
                     x_pca = self.x_pca[self.labels_ == cluster_label1]
                     s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
@@ -1102,7 +1105,7 @@ class CLASSIX:
                     else:
                         ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                     
-                    ax.scatter(object1[0], object1[1], marker="*", s=ind_marker_size)
+                    ax.scatter(object1[0], object1[1], marker="*", s=ind_msize)
                     
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
                                marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
@@ -1130,8 +1133,18 @@ class CLASSIX:
                         
                     ax.set_aspect('equal', adjustable='datalim')
                     ax.plot()
-                    ax.axis('off') # the axis here may not be consistent, so hide.
+
+                    if axis:
+                        ax.axis('on')
+                        if data.shape[1] > 1:
+                            ax.set_xlabel("1st principal component")
+                            ax.set_ylabel("2st principal component")
+                        else:
+                            ax.set_xlabel("1st principal component")
+                    else:
+                        ax.axis('off') # the axis here may not be consistent, so hide.
                     
+
                     if savefig:
                         if not os.path.exists("img"):
                             os.mkdir("img")
@@ -1217,7 +1230,7 @@ class CLASSIX:
 
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
-                    plt.rcParams['axes.facecolor'] = 'white'
+                    ax.set_facecolor(bcolor)
                     
                     for i in set(cluster_labels_m):
                         x_pca = self.x_pca[self.labels_ == i, :]
@@ -1243,7 +1256,7 @@ class CLASSIX:
                             _object = objects[ii]
                             
                             ax.text(_object[0], _object[1], s=str(_index), bbox=dp_bbox, color=ind_color)
-                            ax.scatter(_object[0], _object[1], marker="*", s=ind_marker_size)
+                            ax.scatter(_object[0], _object[1], marker="*", s=ind_msize)
                     else:
                         
                         for ii in range(len(indexlist)):
@@ -1253,10 +1266,19 @@ class CLASSIX:
                                 _index = indexlist[ii]
                             
                             ax.text(_object[0], _object[1], s=str(_index), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
-                            ax.scatter(_object[0], _object[1], marker="*", s=ind_marker_size)
+                            ax.scatter(_object[0], _object[1], marker="*", s=ind_msize)
                     
 
-                    ax.axis('off') # the axis here may not be consistent, so hide.
+                    if axis:
+                        ax.axis('on')
+                        if data.shape[1] > 1:
+                            ax.set_xlabel("1st principal component")
+                            ax.set_ylabel("2st principal component")
+                        else:
+                            ax.set_xlabel("1st principal component")
+                    else:
+                        ax.axis('off') # the axis here may not be consistent, so hide.
+
                     ax.plot()
                     if savefig:
                         if not os.path.exists("img"):
@@ -1383,7 +1405,7 @@ class CLASSIX:
                 if plot == True:
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
-                    plt.rcParams['axes.facecolor'] = 'white'
+                    ax.set_facecolor(bcolor)
                     
                     # select indices
                     union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
@@ -1412,8 +1434,8 @@ class CLASSIX:
                             ax.text(object2[0], object2[1], s='index 2', fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                         
 
-                    ax.scatter(object1[0], object1[1], marker="*", s=ind_marker_size)
-                    ax.scatter(object2[0], object2[1], marker="*", s=ind_marker_size)
+                    ax.scatter(object1[0], object1[1], marker="*", s=ind_msize)
+                    ax.scatter(object2[0], object2[1], marker="*", s=ind_msize)
                     
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
@@ -1511,7 +1533,17 @@ class CLASSIX:
                                                             )
                                             )
                                 
-                    ax.axis('off') # the axis here may not be consistent, so hide.
+
+                    if axis:
+                        ax.axis('on')
+                        if data.shape[1] > 1:
+                            ax.set_xlabel("1st principal component")
+                            ax.set_ylabel("2st principal component")
+                        else:
+                            ax.set_xlabel("1st principal component")
+                    else:
+                        ax.axis('off') # the axis here may not be consistent, so hide.
+                        
                     ax.plot()
                     if savefig:
                         if not os.path.exists("img"):
@@ -1535,8 +1567,8 @@ class CLASSIX:
     
     
     
-    def explain_viz(self, figsize=(12, 8), figstyle="ggplot", width=0.5, sp_marker="+", sp_mcolor="k", 
-                    savefig=False, fontsize=None, bbox={'facecolor': 'tomato', 'alpha': 0.3, 'pad': 2}, axis='off', fmt='pdf'):
+    def explain_viz(self, figsize=(12, 8), figstyle="seaborn", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
+                    savefig=False, fontsize=None, bbox={'facecolor': 'tomato', 'alpha': 0.3, 'pad': 2}, axis="off", fmt="pdf"):
         """Visualize the starting point and data points"""
         
         from matplotlib import pyplot as plt
@@ -1549,7 +1581,7 @@ class CLASSIX:
         plt.style.use('default') # clear the privous figure style
         plt.style.use(style=figstyle)
         plt.figure(figsize=figsize)
-        plt.rcParams['axes.facecolor'] = 'white'
+        plt.rcParams['axes.facecolor'] = bcolor
         
         for i in np.unique(self.labels_):
             x_pca_part = self.x_pca[self.labels_ == i,:]
@@ -1563,9 +1595,18 @@ class CLASSIX:
 
         plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker=sp_marker, linewidth=2*width, c=sp_mcolor)
 
-        plt.axis(axis) # the axis here may not be consistent, so hide.
         plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
         plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
+
+        if axis:
+            plt.axis('on')
+            if self.s_pca.shape[1] > 1:
+                plt.xlabel("1st principal component")
+                plt.ylabel("2st principal component")
+            else:
+                plt.xlabel("1st principal component")
+        else:
+            plt.axis('off') # the axis here may not be consistent, so hide.
 
         if savefig:
             if not os.path.exists("img"):
@@ -1581,6 +1622,7 @@ class CLASSIX:
                 plt.savefig(fm, bbox_inches='tight')
                 
             print("successfully save")
+            
 
         plt.show()
             
