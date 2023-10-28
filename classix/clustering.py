@@ -774,8 +774,8 @@ class CLASSIX:
     
     def explain(self, index1=None, index2=None, showsplist=False, max_colwidth=None, replace_name=None, 
                 plot=False, figsize=(11, 6), figstyle="seaborn", savefig=False, bcolor="#f5f9f9", ind_color="k", width=1.5, 
-                ind_msize=150, sp_fcolor="tomato", sp_marker="+", sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, 
-                sp_fontsize=None, sp_bbox=None, sp_cmarker="+", sp_csize=100, sp_ccolor="crimson", sp_clinewidths=2.5, 
+                ind_msize=150, sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, 
+                sp_fontsize=None, sp_bbox=None, sp_cmarker="+", sp_csize=110, sp_ccolor="crimson", sp_clinewidths=2.7, 
                 dp_fcolor="bisque", dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
                 show_all_grp_circle=False, show_connected_grp_circle=False, show_obj_grp_circle=True,  
                 cmap="turbo", cmin=0.07, cmax=0.97, color="red", connect_color="green", alpha=0.5, cline_width=0.5, 
@@ -848,7 +848,13 @@ class CLASSIX:
     
         sp_fcolor : str, default='tomato'
             The color marked for starting points text box. 
-            
+        
+        sp_marker : str, default="+"
+            The marker for the start points.
+        
+        sp_size : int, default=66
+            The marker size for the start points.
+        
         sp_mcolor : str, default='k'
             The color marked for startpoint points scatter marker.
 
@@ -863,7 +869,19 @@ class CLASSIX:
     
         sp_fontsize : int, optional
             The fontsize for text marked for starting points. 
-    
+
+        sp_cmarker : str, default="+"
+            The marker for the connected starting points.
+        
+        sp_csize : int, default=100
+            The marker size for the connected starting points.
+        
+        sp_ccolor : str, default="crimson"
+            The marker color for the connected starting points.
+        
+        sp_clinewidths : str, default=2.5
+            The marker width for the connected starting points. 
+
         dp_fcolor : str, default='bisque'
             The color marked for specified data objects text box. 
             
@@ -1098,7 +1116,7 @@ class CLASSIX:
                     ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", linewidth=width, 
                                c=self.cluster_color[cluster_label1])
                     
-                    ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, linewidth=2*width, c=sp_mcolor)
+                    ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, s=sp_size, linewidth=1.8*width, c=sp_mcolor)
                     
                     if dp_fontsize is None:
                         ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=ind_color)
@@ -1414,9 +1432,9 @@ class CLASSIX:
                     s_pca = self.s_pca[union_ind]
                     
                     ax.scatter(x_pca1[:, 0], x_pca1[:, 1], marker=".", c=self.cluster_color[cluster_label1], linewidth=width)
-                    ax.scatter(x_pca2[:, 0], x_pca2[:, 1], marker=".", c=self.cluster_color[cluster_label2], linewidth=2*width)
+                    ax.scatter(x_pca2[:, 0], x_pca2[:, 1], marker=".", c=self.cluster_color[cluster_label2], linewidth=width)
                     
-                    ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, c=sp_mcolor)
+                    ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=1.8*width)
                     
                     if isinstance(index1, int) or isinstance(index1, str):
                         if dp_fontsize is None:
@@ -1593,7 +1611,7 @@ class CLASSIX:
                 else:
                     plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), fontsize=fontsize, bbox=bbox)
 
-        plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker=sp_marker, linewidth=2*width, c=sp_mcolor)
+        plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker=sp_marker, linewidth=1.8*width, c=sp_mcolor)
 
         plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
         plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
