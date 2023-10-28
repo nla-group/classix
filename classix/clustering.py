@@ -1253,6 +1253,10 @@ class CLASSIX:
                     for i in set(cluster_labels_m):
                         x_pca = self.x_pca[self.labels_ == i, :]
                         ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", c=self.cluster_color[i], linewidth=width)
+                        
+                    for i in set(cluster_labels_m):
+                        s_pca = self.s_pca[np.where(self.sp_info.Cluster == i)[0], :]
+                        ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=1.8*width)
                     
                     for i in set(group_labels_m):
                         s_pca = self.s_pca[i]
@@ -1311,7 +1315,7 @@ class CLASSIX:
                             fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'_m.'+fmt
                             plt.savefig(fm, bbox_inches='tight')
                         
-                        print("image successfully save as ",fm)
+                        print("image successfully save as ", fm)
                     
                     plt.show()
                     return 
