@@ -876,6 +876,18 @@ class CLASSIX:
         dp_bbox : dict, optional
             Dict with properties for patches.FancyBboxPatch for specified data objects.
         
+        show_all_grp_circle : bool, default=False
+            Whether or not to show all groups' periphery within the objects' clusters 
+            (only applies to when data dimension is less than or equal to 2).
+        
+        show_connected_grp_circle : bool, default=False
+            Whether or not to show all connected groups' periphery within the objects' clusters 
+            (only applies to when data dimension is less than or equal to 2).
+        
+        show_obj_grp_circle : bool, default=True
+            Whether or not to show the groups' periphery of the objects
+            (only applies to when data dimension is less than or equal to 2).
+        
         cmap : str, default='turbo'
             The colormap to be employed.
         
@@ -928,8 +940,6 @@ class CLASSIX:
         from matplotlib import pyplot as plt
         import matplotlib.colors as colors
         
-        
-
         # -----------------------------second method--------------------------------
         if sp_bbox is None:
             sp_bbox = dict()
@@ -1060,9 +1070,6 @@ class CLASSIX:
             else:
                 raise ValueError("Please enter a legal value for index1.")
                 
-            plt.style.use('default')
-            plt.style.use(style=figstyle)
-            
             
             # explain one object
             if index2 is None:
@@ -1101,11 +1108,11 @@ class CLASSIX:
                                marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
                     
                     for i in range(s_pca.shape[0]):
-                        if data.shape[1] <= 2:
+                        if data.shape[1] <= 2 and show_all_grp_circle:
                             ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color,
                                                      alpha=alpha, lw=cline_width, clip_on=False))
                         
-                        ax.set_aspect('equal', adjustable='datalim')
+                        
                         if sp_fontsize is None:
                             ax.text(s_pca[i, 0], s_pca[i, 1],
                                     s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
@@ -1117,6 +1124,11 @@ class CLASSIX:
                                     fontsize=sp_fontsize, bbox=sp_bbox
                             )
 
+                    if show_obj_grp_circle:
+                        ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
+                                                color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
+                        
+                    ax.set_aspect('equal', adjustable='datalim')
                     ax.plot()
                     ax.axis('off') # the axis here may not be consistent, so hide.
                     
@@ -1215,9 +1227,10 @@ class CLASSIX:
                         s_pca = self.s_pca[i]
                         ax.scatter(s_pca[0], s_pca[1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
                                    # ax.scatter(s_pca[0], s_pca[1], marker=sp_marker, c=sp_mcolor)
-                        if data.shape[1] <= 2:
+                        
+                        if data.shape[1] <= 2 and show_obj_grp_circle:
                             ax.add_patch(plt.Circle((s_pca[0], s_pca[1]), self.radius, fill=False,
-                                                     color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                                                     color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
                     
                     ax.set_aspect('equal', adjustable='datalim')
                     if dp_fontsize is None:
@@ -1403,6 +1416,10 @@ class CLASSIX:
                     ax.scatter(object2[0], object2[1], marker="*", s=ind_marker_size)
                     
                     for i in range(s_pca.shape[0]):
+                        if data.shape[1] <= 2 and show_all_grp_circle:
+                                ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
+                                                    color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                                
                         if union_ind[i] in connected_paths:
                             # draw circle for connected starting points or not, 
                             # and also determine the marker of the connected starting points.
@@ -1410,12 +1427,16 @@ class CLASSIX:
                                        c=sp_ccolor, linewidths=sp_clinewidths)
                             
                             if data.shape[1] <= 2:
-                                ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
+                                if show_connected_grp_circle:
+                                    ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
                                                     color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
-                        else:
-                            if data.shape[1] <= 2:
-                                ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
-                                                    color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                                    
+                        if show_obj_grp_circle:
+                            ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False,
+                                            color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
+                            
+                            ax.add_patch(plt.Circle((self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1]), self.radius, fill=False,
+                                            color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
                             
                         ax.set_aspect('equal', adjustable='datalim')
                         
