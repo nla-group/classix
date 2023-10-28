@@ -779,7 +779,7 @@ class CLASSIX:
                 dp_fcolor="bisque", dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
                 show_all_grp_circle=False, show_connected_grp_circle=False, show_obj_grp_circle=True,  
                 cmap="turbo", cmin=0.07, cmax=0.97, color="red", connect_color="green", alpha=0.5, cline_width=0.5, 
-                add_arrow=False, arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
+                add_arrow=True, arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
                 arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', figname=None, fmt="pdf", *argv, **kwargs):
         
         """
