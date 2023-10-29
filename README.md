@@ -126,20 +126,10 @@ A clustering of 1000 data points with 2 features has been performed.
 The radius parameter was set to 0.10 and MinPts was set to 99. 
 As the provided data has been scaled by a factor of 1/8.12,
 data points within a radius of R=0.10*8.12=0.81 were aggregated into groups. 
-In total 4610 comparisons were required (4.61 comparisons per data point). 
+In total 7003 comparisons were required (7.00 comparisons per data point). 
 This resulted in 163 groups, each uniquely associated with a starting point. 
 These 163 groups were subsequently merged into 7 clusters. 
-A list of all starting points is shown below.
-----------------------------------------
- Group  NrPts  Cluster Coordinates 
-   0      2      0      1.07 -1.15 
-   1      7      0      1.25 -1.01 
-   2      2      0      1.14 -1.07 
-  ---      lines omitted        ---
- 160      2      6      -1.02 1.18 
- 161      3      6       -0.86 1.3 
- 162      1      6      -1.17 1.32 
-----------------------------------------
+In order to see a visual representation of the clustered data, use .explain(plot=True). 
 In order to explain the clustering of individual data points, 
 use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
 ```
@@ -147,17 +137,13 @@ use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
 In the above table, *Group* denotes the group label, *NrPts* denotes the number of data points in the group, *Cluster* is the cluster label assigned to the group, and the final column shows the normalized *Coordinates* of the starting point. In order to explain the cluster assignment of a particular data point, simply provide its index to the explain method:
 
 ```Python
-clx.explain(10, plot=True)
+clx.explain(73, plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/ex1110.png width=700 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None73.png width=700 />
 Output:
 
 ```
-----------------------------------------
- Group  NrPts  Cluster Coordinates Label
- 109     5       3      0.49 0.54    10 
-----------------------------------------
-The data point 10 is in group 109, which has been merged into cluster #3.
+The data point 73 is in group 60, which has been merged into cluster #2.
 ```
 
 We can also query why two data points ended up in the same cluster, or not: 
@@ -165,7 +151,7 @@ We can also query why two data points ended up in the same cluster, or not:
 ```Python
 clx.explain(773, 792, plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/ex2773_792.png width=700 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None773_792.png width=700 />
 Output:
 
 ```
@@ -177,7 +163,6 @@ Output:
 The data point 773 is in group 37 and the data point 792 is in group 50, 
 both of which were merged into cluster #1. 
 These two groups are connected via groups 37 <-> 49 <-> 41 <-> 45 <-> 38 <-> 50.
-connected_paths: [37, 49, 41, 45, 38, 50]
 ```
 
 #### Example 2
