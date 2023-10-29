@@ -117,7 +117,7 @@ CLASSIX provides an API for the easy visualization of clusters (different cluste
 ```Python
 clx.explain(plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=550 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=750 />
 
 The starting points, shown as the small red boxes, can be thought of as a coarse representation of the data. Each starting point is associated with a group of data points, and groups are merged into clusters. The `explain` method returns a textual summary of the clustering:
 
