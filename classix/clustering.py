@@ -1116,14 +1116,16 @@ class CLASSIX:
                     ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", linewidth=width, 
                                c=self.cluster_color[cluster_label1])
                     
-                    ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, s=sp_size, linewidth=1.8*width, c=sp_mcolor)
+                    ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers', 
+                               s=sp_size, linewidth=1.8*width, c=sp_mcolor)
                     
                     if dp_fontsize is None:
-                        ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=ind_color)
+                        ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=ind_color,)
                     else:
                         ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                     
-                    ax.scatter(object1[0], object1[1], marker="*", s=ind_msize)
+                    ax.scatter(object1[0], object1[1], marker="*", s=ind_msize,
+                                label='data point {} '.format(index1)+'(cluster #{})'.format(cluster_label1))
                     
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
                                marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
@@ -1152,6 +1154,7 @@ class CLASSIX:
                     ax.set_aspect('equal', adjustable='datalim')
                     ax.plot()
 
+                    ax.legend()
                     if axis:
                         ax.axis('on')
                         if data.shape[1] > 1:
@@ -1252,12 +1255,17 @@ class CLASSIX:
                     
                     for i in set(cluster_labels_m):
                         x_pca = self.x_pca[self.labels_ == i, :]
-                        ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", c=self.cluster_color[i], linewidth=width)
+                        ax.scatter(x_pca[:, 0], x_pca[:, 1], label='cluster '+str(i), 
+                                   marker=".", c=self.cluster_color[i], linewidth=width)
                         
                     for i in set(cluster_labels_m):
                         s_pca = self.s_pca[np.where(self.sp_info.Cluster == i)[0], :]
-                        ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=1.8*width)
-                    
+                        if i == 0:
+                            ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, label='group centers', 
+                                   s=sp_size, c=sp_mcolor, linewidth=1.8*width)
+                        else:
+                            ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=1.8*width)
+
                     for i in set(group_labels_m):
                         s_pca = self.s_pca[i]
                         ax.scatter(s_pca[0], s_pca[1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
@@ -1278,7 +1286,8 @@ class CLASSIX:
                             _object = objects[ii]
                             
                             ax.text(_object[0], _object[1], s=str(_index), bbox=dp_bbox, color=ind_color)
-                            ax.scatter(_object[0], _object[1], marker="*", s=ind_msize)
+                            ax.scatter(_object[0], _object[1], marker="*", s=ind_msize,
+                                       label='data point {} '.format(_index)+'(cluster #{})'.format(cluster_labels_m[ii]))
                     else:
                         
                         for ii in range(len(indexlist)):
@@ -1290,6 +1299,7 @@ class CLASSIX:
                             ax.text(_object[0], _object[1], s=str(_index), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                             ax.scatter(_object[0], _object[1], marker="*", s=ind_msize)
                     
+                    ax.legend()
 
                     if axis:
                         ax.axis('on')
@@ -1411,14 +1421,23 @@ class CLASSIX:
                     
                     # select indices
                     union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
-                    x_pca1 = self.x_pca[self.labels_ == cluster_label1]
-                    x_pca2 = self.x_pca[self.labels_ == cluster_label2]
                     s_pca = self.s_pca[union_ind]
                     
-                    ax.scatter(x_pca1[:, 0], x_pca1[:, 1], marker=".", c=self.cluster_color[cluster_label1], linewidth=width)
-                    ax.scatter(x_pca2[:, 0], x_pca2[:, 1], marker=".", c=self.cluster_color[cluster_label2], linewidth=width)
-                    
-                    ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=1.8*width)
+                    if cluster_label1 == cluster_label2:
+                        x_pca = self.x_pca[self.labels_ == cluster_label1]
+                        ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", label='cluster #'+str(cluster_label1),
+                                    c=self.cluster_color[cluster_label1], linewidth=width)
+                    else:
+                        x_pca1 = self.x_pca[self.labels_ == cluster_label1]
+                        x_pca2 = self.x_pca[self.labels_ == cluster_label2]
+                        ax.scatter(x_pca1[:, 0], x_pca1[:, 1], marker=".", label='cluster #'+str(cluster_label1),
+                                    c=self.cluster_color[cluster_label1], linewidth=width)
+                        
+                        ax.scatter(x_pca2[:, 0], x_pca2[:, 1], marker=".", label='cluster #'+str(cluster_label2),
+                                    c=self.cluster_color[cluster_label2], linewidth=width)
+                        
+                    ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size,
+                                c=sp_mcolor, linewidth=1.8*width)
                     
                     if isinstance(index1, int) or isinstance(index1, str):
                         if dp_fontsize is None:
@@ -1436,20 +1455,30 @@ class CLASSIX:
                             ax.text(object2[0], object2[1], s='index 2', fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                         
 
-                    ax.scatter(object1[0], object1[1], marker="*", s=ind_msize)
-                    ax.scatter(object2[0], object2[1], marker="*", s=ind_msize)
+                    ax.scatter(object1[0], object1[1], marker="*", s=ind_msize, 
+                               label='data point {} '.format(index1)+'(cluster #{})'.format(cluster_label1)
+                            )
+                    
+                    ax.scatter(object2[0], object2[1], marker="*", s=ind_msize,
+                                label='data point {} '.format(index2)+'(cluster #{})'.format(cluster_label2)
+                            )
                     
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
                                 ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
-                                                    color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                                                    color=color, alpha=alpha, lw=cline_width, clip_on=False)
+                                                    )
                                 
                         if union_ind[i] in connected_paths:
                             # draw circle for connected starting points or not, 
                             # and also determine the marker of the connected starting points.
-                            ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, 
-                                       c=sp_ccolor, linewidths=sp_clinewidths)
-                            
+                            if union_ind[i] == connected_paths[0]: 
+                                ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, 
+                                       label='connected group centers', c=sp_ccolor, linewidths=sp_clinewidths)
+                            else:
+                                ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, 
+                                           linewidths=sp_clinewidths)
+                                
                             if data.shape[1] <= 2:
                                 if show_connected_grp_circle:
                                     ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
@@ -1466,7 +1495,9 @@ class CLASSIX:
                         
                         if sp_fontsize is None:
                             ax.text(s_pca[i, 0], s_pca[i, 1], 
-                                    s=self.sp_info.Group[(self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2)].values[i].astype(int).astype(str),
+                                    s=self.sp_info.Group[
+                                        (self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2)
+                                        ].values[i].astype(int).astype(str),
                                     bbox=sp_bbox
                             )
                         else:
@@ -1535,6 +1566,7 @@ class CLASSIX:
                                                             )
                                             )
                                 
+                    ax.legend()
 
                     if axis:
                         ax.axis('on')
@@ -1612,7 +1644,8 @@ class CLASSIX:
         
         for i in np.unique(self.labels_):
             x_pca_part = self.x_pca[self.labels_ == i,:]
-            plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="x", linewidth=width, c=self.cluster_color[i])
+            plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="x", linewidth=width, c=self.cluster_color[i], 
+                        label='cluster '+str(i))
             
             for j in range(self.s_pca.shape[0]):
                 if fontsize is None:
@@ -1620,10 +1653,11 @@ class CLASSIX:
                 else:
                     plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), fontsize=fontsize, bbox=bbox)
 
-        plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker=sp_marker, linewidth=1.8*width, c=sp_mcolor)
+        plt.scatter(self.s_pca[:,0], self.s_pca[:,1], label='group centers', marker=sp_marker, linewidth=1.8*width, c=sp_mcolor)
 
         plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
         plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
+        plt.legend()
 
         if axis:
             plt.axis('on')
@@ -1995,10 +2029,8 @@ def calculate_cluster_centers(data, labels):
 
 
 # ##########################################################################################################
-# *************************** <!-- the independent functions of checking overlap ***************************
-# *******************************  determine if two groups should be merged ********************************
-
-
+# **************<!-- the independent functions of finding shortest path between two objects ***************
+# ##########################################################################################################
 
 
 
