@@ -338,7 +338,7 @@ class CLASSIX:
              
     Attributes
     ----------
-    groups_ : numpy.ndarray
+    groups_ : list
         Groups labels of aggregation.
     
     splist_ : numpy.ndarray
@@ -401,6 +401,7 @@ class CLASSIX:
         self.scale = scale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
 
+        self.sp_info = None
         self.groups_ = None
         self.clean_index_ = None
         self.labels_ = None
@@ -626,7 +627,7 @@ class CLASSIX:
         data : numpy.ndarray
             The input that is array-like of shape (n_samples,).
         
-        agg_labels: numpy.ndarray
+        agg_labels: list
             Groups labels of aggregation.
         
         splist: numpy.ndarray
@@ -771,13 +772,15 @@ class CLASSIX:
     
     
     
-    def explain(self, index1=None, index2=None, showsplist=True, max_colwidth=None, replace_name=None, 
-                plot=False, figsize=(11, 6), figstyle="ggplot", savefig=False, ind_color="k", ind_marker_size=150,
-                sp_fcolor='tomato',  sp_alpha=0.05, sp_pad=0.5, sp_fontsize=None, sp_bbox=None, 
-                dp_fcolor='bisque',  dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
-                cmap='turbo', cmin=0.07, cmax=0.97, color='red', connect_color='green', alpha=0.5, cline_width=0.5, 
-                add_arrow=False, arrow_linestyle='--', arrow_fc='darkslategrey', arrow_ec='dimgrey',
-                directed_arrow=0, axis='off', figname=None, fmt='pdf', *argv, **kwargs):
+    def explain(self, index1=None, index2=None, showsplist=False, max_colwidth=None, replace_name=None, 
+                plot=False, figsize=(11, 6), figstyle="seaborn", savefig=False, bcolor="#f5f9f9", ind_color="k", width=1.5, 
+                ind_msize=150, sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, 
+                sp_fontsize=None, sp_bbox=None, sp_cmarker="+", sp_csize=110, sp_ccolor="crimson", sp_clinewidths=2.7, 
+                dp_fcolor="bisque", dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
+                show_all_grp_circle=False, show_connected_grp_circle=False, show_obj_grp_circle=True,  
+                cmap="turbo", cmin=0.07, cmax=0.97, color="red", connect_color="green", alpha=0.5, cline_width=0.5, 
+                add_arrow=True, arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
+                arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', figname=None, fmt="pdf", *argv, **kwargs):
         
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
@@ -798,7 +801,7 @@ class CLASSIX:
         index2 : int or numpy.ndarray, optional
             Input object2 [with index 'index2'] for explanation, and compare objects [with indices 'index1' and 'index2'].
         
-        showsplist : boolean
+        showsplist : boolean, default=False
             Determine if show the starting points information, which include the number of data points (NumPts), 
             corresponding clusters, and associated coordinates. This only applies to both index1 and index2 are "NULL".
             Default as True. 
@@ -827,22 +830,34 @@ class CLASSIX:
         figsize : tuple, default=(10, 6)
             Determine the size of visualization figure. 
 
-        figstyle : str, default="ggplot"
+        figstyle : str, default="seaborn"
             Determine the style of visualization.
             see reference: https://matplotlib.org/stable/gallery/style_sheets/style_sheets_reference.html
         
         savefig : boolean, default=False
             Determine if save figure, the figure will be saved in the folder named "img".
         
-        indices_color : str, default as 'k'
-            Color for visualization of data with indices index1 and index2.
+        bcolor : str, default="#f5f9f9"
+            Color for figure background.
         
-        ind_marker_size : float, optional:
-            Size for visualization of data with indices index1 and index2.
+        ind_color : str, default as "k"
+            Color for the text of data of index1 and index2.
+        
+        ind_msize : float, optional:
+            Size for markers for data of index1 and index2.
     
         sp_fcolor : str, default='tomato'
             The color marked for starting points text box. 
-            
+        
+        sp_marker : str, default="+"
+            The marker for the start points.
+        
+        sp_size : int, default=66
+            The marker size for the start points.
+        
+        sp_mcolor : str, default='k'
+            The color marked for startpoint points scatter marker.
+
         sp_alpha : float, default=0.3
             The value setting for transprency of text box for starting points. 
             
@@ -854,7 +869,19 @@ class CLASSIX:
     
         sp_fontsize : int, optional
             The fontsize for text marked for starting points. 
-    
+
+        sp_cmarker : str, default="+"
+            The marker for the connected starting points.
+        
+        sp_csize : int, default=100
+            The marker size for the connected starting points.
+        
+        sp_ccolor : str, default="crimson"
+            The marker color for the connected starting points.
+        
+        sp_clinewidths : str, default=2.5
+            The marker width for the connected starting points. 
+
         dp_fcolor : str, default='bisque'
             The color marked for specified data objects text box. 
             
@@ -869,6 +896,18 @@ class CLASSIX:
                       
         dp_bbox : dict, optional
             Dict with properties for patches.FancyBboxPatch for specified data objects.
+        
+        show_all_grp_circle : bool, default=False
+            Whether or not to show all groups' periphery within the objects' clusters 
+            (only applies to when data dimension is less than or equal to 2).
+        
+        show_connected_grp_circle : bool, default=False
+            Whether or not to show all connected groups' periphery within the objects' clusters 
+            (only applies to when data dimension is less than or equal to 2).
+        
+        show_obj_grp_circle : bool, default=True
+            Whether or not to show the groups' periphery of the objects
+            (only applies to when data dimension is less than or equal to 2).
         
         cmap : str, default='turbo'
             The colormap to be employed.
@@ -897,12 +936,18 @@ class CLASSIX:
         arrow_fc : str, default='darkslategrey' 
             Face color for arrow.
 
-        arrow_ec : str, default='dimgrey'
+        arrow_ec : str, default='k'
             Edge color for arrow.
+
+        arrow_linewidth : float, default=1
+            Set the linewidth of the arrow edges.
 
         directed_arrow : int, default=0
             Whether or not the edges for arrows is directed.
             Values at {-1, 0, 1}, 0 refers to undirected, -1 refers to the edge direction opposite to 1.
+        
+        shrinkA, shrinkB : float, default=2
+            Shrinking factor of the tail and head of the arrow respectively.
 
         figname : str, optional
             Set the figure name for the image to be saved.
@@ -916,8 +961,6 @@ class CLASSIX:
         from matplotlib import pyplot as plt
         import matplotlib.colors as colors
         
-        
-
         # -----------------------------second method--------------------------------
         if sp_bbox is None:
             sp_bbox = dict()
@@ -934,7 +977,7 @@ class CLASSIX:
         if dp_fontsize is None and sp_fontsize is not None:
             dp_fontsize = sp_fontsize
         
-        
+
         if cmap is not None:
             _cmap = plt.cm.get_cmap(cmap)
             _interval = np.linspace(cmin, cmax, len(set(self.labels_))) 
@@ -962,9 +1005,9 @@ class CLASSIX:
             
             if data.shape[1] > 2:
                 warnings.warn("The group radius in the visualization might not be accurate.")
-                scaled_data = data - data.mean(axis=0)
-                _U, self._s, self._V = svds(scaled_data, k=2, return_singular_vectors=True)
-                self.x_pca = np.matmul(scaled_data, self._V[np.argsort(self._s)].T)
+                # scaled_data = data - data.mean(axis=0)
+                _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
+                self.x_pca = np.matmul(data, self._V[np.argsort(self._s)].T)
                 self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
                 
             elif data.shape[1] == 2:
@@ -984,14 +1027,15 @@ class CLASSIX:
         
         
         # pd.options.display.max_colwidth = colwidth
-        dash_line = "--------"*5 # "--------"*(self.splist_.shape[1])
+        dash_line = "--------"*5 
             
         indexlist = [i for i in kwargs.keys() if 'index' in re.split('(\d+)',i)]
         indexvalues = [i for i in kwargs.values()]
         
         if index1 is None: # analyze in the general way with a global view
             if plot == True:
-                self.explain_viz(figsize=figsize, figstyle=figstyle, savefig=savefig, fontsize=sp_fontsize, bbox=sp_bbox, axis=axis, fmt=fmt)
+                self.explain_viz(figsize=figsize, figstyle=figstyle, bcolor=bcolor, savefig=savefig, sp_marker=sp_marker,
+                                 sp_mcolor=sp_mcolor, width=width, fontsize=sp_fontsize, bbox=sp_bbox, axis=axis, fmt=fmt)
                 
             data_size = data.shape[0]
             feat_dim = data.shape[1]
@@ -1047,9 +1091,6 @@ class CLASSIX:
             else:
                 raise ValueError("Please enter a legal value for index1.")
                 
-            plt.style.use('default')
-            plt.style.use(style=figstyle)
-            
             
             # explain one object
             if index2 is None:
@@ -1062,29 +1103,42 @@ class CLASSIX:
                     index1 = index1
 
                 cluster_label1 = self.label_change[agg_label1]
-                # sp_str = self.s_pca[agg_label1] 
                 
                 if plot == True:
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
-                    plt.rcParams['axes.facecolor'] = 'white'
+                    
+                    ax.set_facecolor(bcolor)
+
                     x_pca = self.x_pca[self.labels_ == cluster_label1]
                     s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
                     
-                    ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", c=self.cluster_color[cluster_label1])
-                    ax.scatter(s_pca[:, 0], s_pca[:, 1], marker="p")
+                    ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", linewidth=width, 
+                               c=self.cluster_color[cluster_label1])
                     
+                    ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers', 
+                               s=sp_size, linewidth=1.8*width, c=sp_mcolor)
                     
                     if dp_fontsize is None:
-                        ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=ind_color)
+                        ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=ind_color,)
                     else:
                         ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                     
-                    ax.scatter(object1[0], object1[1], marker="*", s=ind_marker_size)
+                    ax.scatter(object1[0], object1[1], marker="*", s=ind_msize,
+                                label='data point {} '.format(index1)+'(group center #{0}, cluster #{1})'.format(
+                                    agg_label1, cluster_label1
+                                    )
+                                )
+                    
+                    ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
+                               marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
                     
                     for i in range(s_pca.shape[0]):
-                        ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
-                        ax.set_aspect('equal', adjustable='datalim')
+                        if data.shape[1] <= 2 and show_all_grp_circle:
+                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color,
+                                                     alpha=alpha, lw=cline_width, clip_on=False))
+                        
+                        
                         if sp_fontsize is None:
                             ax.text(s_pca[i, 0], s_pca[i, 1],
                                     s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
@@ -1095,9 +1149,26 @@ class CLASSIX:
                                     s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
                                     fontsize=sp_fontsize, bbox=sp_bbox
                             )
+
+                    if show_obj_grp_circle:
+                        ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
+                                                color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
+                        
+                    ax.set_aspect('equal', adjustable='datalim')
                     ax.plot()
-                    ax.axis('off') # the axis here may not be consistent, so hide.
+
+                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
+                    if axis:
+                        ax.axis('on')
+                        if data.shape[1] > 1:
+                            ax.set_xlabel("1st principal component")
+                            ax.set_ylabel("2st principal component")
+                        else:
+                            ax.set_xlabel("1st principal component")
+                    else:
+                        ax.axis('off') # the axis here may not be consistent, so hide.
                     
+
                     if savefig:
                         if not os.path.exists("img"):
                             os.mkdir("img")
@@ -1131,7 +1202,6 @@ class CLASSIX:
                 )
 
             # explain two objects relationship
-            
             else: # explain(index1, index2, ...)
 
                 if len(indexlist) > 0: # A more general case, index1=.., index2=.., index3=..
@@ -1184,17 +1254,45 @@ class CLASSIX:
 
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
-                    plt.rcParams['axes.facecolor'] = 'white'
+                    ax.set_facecolor(bcolor)
                     
                     for i in set(cluster_labels_m):
                         x_pca = self.x_pca[self.labels_ == i, :]
-                        ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", c=self.cluster_color[i])
-                    
+                        ax.scatter(x_pca[:, 0], x_pca[:, 1], label='cluster '+str(i), 
+                                   marker=".", c=self.cluster_color[i], linewidth=width)
+                        
+                        s_pca = self.s_pca[np.where(self.sp_info.Cluster == i)[0], :]
+                        if i == 0:
+                            ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, label='group centers', 
+                                   s=sp_size, c=sp_mcolor, linewidth=1.8*width)
+                        else:
+                            ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=1.8*width)
+
+                        s_pca = self.s_pca[self.sp_info.Cluster == i]
+                        for ii in range(s_pca.shape[0]):
+                            if sp_fontsize is None:
+                                ax.text(s_pca[ii, 0], s_pca[ii, 1],
+                                        s=str(self.sp_info.Group[self.sp_info.Cluster == i].astype(int).values[ii]),
+                                        bbox=sp_bbox
+                                )
+                            else:
+                                ax.text(s_pca[ii, 0], s_pca[ii, 1],
+                                        s=str(self.sp_info.Group[self.sp_info.Cluster == i].astype(int).values[ii]),
+                                        fontsize=sp_fontsize, bbox=sp_bbox
+                                )
+
+
                     for i in set(group_labels_m):
                         s_pca = self.s_pca[i]
-                        ax.scatter(s_pca[0], s_pca[1], marker="p")
-                        ax.add_patch(plt.Circle((s_pca[0], s_pca[1]), self.radius, fill=False, color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                        ax.scatter(s_pca[0], s_pca[1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
+                                   # ax.scatter(s_pca[0], s_pca[1], marker=sp_marker, c=sp_mcolor)
                         
+                        if data.shape[1] <= 2 and show_obj_grp_circle:
+                            ax.add_patch(plt.Circle((s_pca[0], s_pca[1]), self.radius, fill=False,
+                                                     color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
+                    
+                    ax.set_aspect('equal', adjustable='datalim')
+
                     if dp_fontsize is None:
                         for ii in range(len(indexlist)):
                             if isinstance(index1, int) or isinstance(index1, str):
@@ -1205,7 +1303,9 @@ class CLASSIX:
                             _object = objects[ii]
                             
                             ax.text(_object[0], _object[1], s=str(_index), bbox=dp_bbox, color=ind_color)
-                            ax.scatter(_object[0], _object[1], marker="*", s=ind_marker_size)
+                            ax.scatter(_object[0], _object[1], marker="*", s=ind_msize,
+                                       label='data point {} '.format(_index)+'(group center #{0}, cluster #{1})'.format(
+                                           group_labels_m[ii], cluster_labels_m[ii]))
                     else:
                         
                         for ii in range(len(indexlist)):
@@ -1215,10 +1315,20 @@ class CLASSIX:
                                 _index = indexlist[ii]
                             
                             ax.text(_object[0], _object[1], s=str(_index), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
-                            ax.scatter(_object[0], _object[1], marker="*", s=ind_marker_size)
+                            ax.scatter(_object[0], _object[1], marker="*", s=ind_msize)
                     
+                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
 
-                    ax.axis('off') # the axis here may not be consistent, so hide.
+                    if axis:
+                        ax.axis('on')
+                        if data.shape[1] > 1:
+                            ax.set_xlabel("1st principal component")
+                            ax.set_ylabel("2st principal component")
+                        else:
+                            ax.set_xlabel("1st principal component")
+                    else:
+                        ax.axis('off') # the axis here may not be consistent, so hide.
+
                     ax.plot()
                     if savefig:
                         if not os.path.exists("img"):
@@ -1233,7 +1343,7 @@ class CLASSIX:
                             fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'_m.'+fmt
                             plt.savefig(fm, bbox_inches='tight')
                         
-                        print("image successfully save as ",fm)
+                        print("image successfully save as ", fm)
                     
                     plt.show()
                     return 
@@ -1272,7 +1382,7 @@ class CLASSIX:
                     if isinstance(index1, int) or isinstance(index1, str):
                         select_sp_info.loc[:, 'Label'] = [index1, index2]
                     else:
-                        select_sp_info.loc[:, 'Label'] = [str(np.round(index1,3)), str(np.round(index2, 3))]
+                        select_sp_info.loc[:, 'Label'] = [str(np.round(index1, 3)), str(np.round(index2, 3))]
                         
                     print(dash_line)
                     print(select_sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
@@ -1294,10 +1404,6 @@ class CLASSIX:
 
                 
                 if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
-                    # sp_str = np.array2string(self.splist_[agg_label1, 3:], separator=',')
-                    print("The data points %(index1)s and %(index2)s are in the same group %(agg_id)i, hence were merged into the same cluster #%(m_c)i"%{
-                        "index1":index1, "index2":index2, "agg_id":agg_label1, "m_c":cluster_label1}
-                    )
                     connected_paths = [agg_label1]
                 else:
                     from scipy.sparse import csr_matrix
@@ -1322,41 +1428,34 @@ class CLASSIX:
                         
                         connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
                         
-                        print(
-                        """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
-                            """\nboth of which were merged into cluster #%(cluster)i. """% {
-                            "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
-                        )
-                        
-                        print("""These two groups are connected via groups %(connected)s.""" % {
-                               "connected":connected_paths_vis}
-                        )
                     else: 
                         
                         connected_paths = []
-                        print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
-                            "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1})
-
-                        print("""The data point %(index2)s is in group %(agg_id2)i, which has been merged into cluster %(c_id2)s.""" % {
-                            "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2})   
-                        
-                        print("""There is no path of overlapping groups between these clusters.""")
                         
                 if plot == True:
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
-                    plt.rcParams['axes.facecolor'] = 'white'
+                    ax.set_facecolor(bcolor)
                     
                     # select indices
                     union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
-                    x_pca1 = self.x_pca[self.labels_ == cluster_label1]
-                    x_pca2 = self.x_pca[self.labels_ == cluster_label2]
                     s_pca = self.s_pca[union_ind]
                     
-                    ax.scatter(x_pca1[:, 0], x_pca1[:, 1], marker=".", c=self.cluster_color[cluster_label1])
-                    ax.scatter(x_pca2[:, 0], x_pca2[:, 1], marker=".", c=self.cluster_color[cluster_label2])
-                    
-                    ax.scatter(s_pca[:,0], s_pca[:,1], marker="p")
+                    if cluster_label1 == cluster_label2:
+                        x_pca = self.x_pca[self.labels_ == cluster_label1]
+                        ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", label='cluster #'+str(cluster_label1),
+                                    c=self.cluster_color[cluster_label1], linewidth=width)
+                    else:
+                        x_pca1 = self.x_pca[self.labels_ == cluster_label1]
+                        x_pca2 = self.x_pca[self.labels_ == cluster_label2]
+                        ax.scatter(x_pca1[:, 0], x_pca1[:, 1], marker=".", label='cluster #'+str(cluster_label1),
+                                    c=self.cluster_color[cluster_label1], linewidth=width)
+                        
+                        ax.scatter(x_pca2[:, 0], x_pca2[:, 1], marker=".", label='cluster #'+str(cluster_label2),
+                                    c=self.cluster_color[cluster_label2], linewidth=width)
+                        
+                    ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size,
+                                c=sp_mcolor, linewidth=1.8*width)
                     
                     if isinstance(index1, int) or isinstance(index1, str):
                         if dp_fontsize is None:
@@ -1374,23 +1473,51 @@ class CLASSIX:
                             ax.text(object2[0], object2[1], s='index 2', fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                         
 
+                    ax.scatter(object1[0], object1[1], marker="*", s=ind_msize, 
+                               label='data point {} '.format(index1)+'(group center #{0}, cluster #{1})'.format(
+                                   agg_label1, cluster_label1)
+                            )
                     
-                    ax.scatter(object1[0], object1[1], marker="*", s=ind_marker_size)
-                    ax.scatter(object2[0], object2[1], marker="*", s=ind_marker_size)
+                    ax.scatter(object2[0], object2[1], marker="*", s=ind_msize,
+                                label='data point {} '.format(index2)+'(group center #{0}, cluster #{1})'.format(
+                                    agg_label2, cluster_label2)
+                            )
                     
                     for i in range(s_pca.shape[0]):
+                        if data.shape[1] <= 2 and show_all_grp_circle:
+                                ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
+                                                    color=color, alpha=alpha, lw=cline_width, clip_on=False)
+                                                    )
+                                
                         if union_ind[i] in connected_paths:
-                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
-                                                     color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
-                        else:
-                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
-                                                     color=color, alpha=alpha, lw=cline_width, clip_on=False))
+                            # draw circle for connected starting points or not, 
+                            # and also determine the marker of the connected starting points.
+                            if union_ind[i] == connected_paths[0]: 
+                                ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, 
+                                       label='connected group centers', c=sp_ccolor, linewidths=sp_clinewidths)
+                            else:
+                                ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, 
+                                           linewidths=sp_clinewidths)
+                                
+                            if data.shape[1] <= 2:
+                                if show_connected_grp_circle:
+                                    ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
+                                                    color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
+                                    
+                        if show_obj_grp_circle:
+                            ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False,
+                                            color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
+                            
+                            ax.add_patch(plt.Circle((self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1]), self.radius, fill=False,
+                                            color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
                             
                         ax.set_aspect('equal', adjustable='datalim')
                         
                         if sp_fontsize is None:
                             ax.text(s_pca[i, 0], s_pca[i, 1], 
-                                    s=self.sp_info.Group[(self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2)].values[i].astype(int).astype(str),
+                                    s=self.sp_info.Group[
+                                        (self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2)
+                                        ].values[i].astype(int).astype(str),
                                     bbox=sp_bbox
                             )
                         else:
@@ -1399,8 +1526,8 @@ class CLASSIX:
                                     fontsize=sp_fontsize, bbox=sp_bbox
                             )
 
-                    if len(connected_paths) != 0:
-                        print("connected_paths:", connected_paths)
+                    # if len(connected_paths) != 0:
+                    #     print("connected_paths:", connected_paths)
                         
                     nr_cps = len(connected_paths)
                     
@@ -1410,31 +1537,36 @@ class CLASSIX:
                             arrowStop=(self.s_pca[connected_paths[i+1], 0], self.s_pca[connected_paths[i+1], 1])
 
                             if directed_arrow == 0:
-                                ax.annotate("",arrowStop,
-                                            xytext=arrowStart,
+                                ax.annotate("", arrowStop, 
+                                            xytext=arrowStart, 
                                             arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=0,shrinkB=5, 
+                                                            shrinkA=arrow_shrinkA, 
+                                                            shrinkB=arrow_shrinkB, 
                                                             edgecolor=arrow_fc,
                                                             facecolor=arrow_ec,
-                                                            linestyle=arrow_linestyle
+                                                            linestyle=arrow_linestyle,
+                                                            linewidth=arrow_linewidth
                                                             )
                                             )
                                 
-                                ax.annotate("",arrowStart,
-                                            xytext=arrowStop,
+                                ax.annotate("", arrowStart,
+                                            xytext=arrowStop, 
                                             arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=0, shrinkB=5,
+                                                            shrinkA=arrow_shrinkA, 
+                                                            shrinkB=arrow_shrinkB, 
                                                             edgecolor=arrow_fc,
                                                             facecolor=arrow_ec,
-                                                            linestyle=arrow_linestyle
+                                                            linestyle=arrow_linestyle,
+                                                            linewidth=arrow_linewidth
                                                             )
                                             )
                                     
                             elif directed_arrow == 1:
-                                ax.annotate("",arrowStop,
+                                ax.annotate("", arrowStop,
                                             xytext=arrowStart,
                                             arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=0,shrinkB=5,
+                                                            shrinkA=arrow_shrinkA, 
+                                                            shrinkB=arrow_shrinkB, 
                                                             edgecolor=arrow_fc,
                                                             facecolor=arrow_ec,
                                                             linestyle=arrow_linestyle
@@ -1442,17 +1574,30 @@ class CLASSIX:
                                             )
 
                             else:
-                                ax.annotate("",arrowStart,
-                                            xytext=arrowStop,
+                                ax.annotate("", arrowStart,
+                                            xytext=arrowStop, 
                                             arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=0, shrinkB=5,
+                                                            shrinkA=arrow_shrinkA, 
+                                                            shrinkB=arrow_shrinkB, 
                                                             edgecolor=arrow_fc,
                                                             facecolor=arrow_ec,
-                                                            linestyle=arrow_linestyle
+                                                            linestyle=arrow_linestyle,
+
                                                             )
                                             )
                                 
-                    ax.axis('off') # the axis here may not be consistent, so hide.
+                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
+
+                    if axis:
+                        ax.axis('on')
+                        if data.shape[1] > 1:
+                            ax.set_xlabel("1st principal component")
+                            ax.set_ylabel("2st principal component")
+                        else:
+                            ax.set_xlabel("1st principal component")
+                    else:
+                        ax.axis('off') # the axis here may not be consistent, so hide.
+                        
                     ax.plot()
                     if savefig:
                         if not os.path.exists("img"):
@@ -1471,12 +1616,38 @@ class CLASSIX:
                         
                     plt.show()
 
+                    if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
+                        print("The data points %(index1)s and %(index2)s are in the same group %(agg_id)i, hence were merged into the same cluster #%(m_c)i"%{
+                            "index1":index1, "index2":index2, "agg_id":agg_label1, "m_c":cluster_label1}
+                        )
+                    else:
+                        if cluster_label1 == cluster_label2:
+                            print(
+                            """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
+                                """\nboth of which were merged into cluster #%(cluster)i. """% {
+                                "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
+                            )
+                            
+                            print("""These two groups are connected via groups %(connected)s.""" % {
+                                "connected":connected_paths_vis}
+                            )
+                        else: 
+                            connected_paths = []
+                            print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
+                                "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1})
+
+                            print("""The data point %(index2)s is in group %(agg_id2)i, which has been merged into cluster %(c_id2)s.""" % {
+                                "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2})   
+                            
+                            print("""There is no path of overlapping groups between these clusters.""")
+
                     self.connected_paths = connected_paths
         return 
     
     
     
-    def explain_viz(self, figsize=(12, 8), figstyle="ggplot", savefig=False, fontsize=None, bbox={'facecolor': 'tomato', 'alpha': 0.3, 'pad': 2}, axis='off', fmt='pdf'):
+    def explain_viz(self, figsize=(12, 8), figstyle="seaborn", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
+                    savefig=False, fontsize=None, bbox={'facecolor': 'tomato', 'alpha': 0.3, 'pad': 2}, axis="off", fmt="pdf"):
         """Visualize the starting point and data points"""
         
         from matplotlib import pyplot as plt
@@ -1489,12 +1660,12 @@ class CLASSIX:
         plt.style.use('default') # clear the privous figure style
         plt.style.use(style=figstyle)
         plt.figure(figsize=figsize)
-        plt.rcParams['axes.facecolor'] = 'white'
-        plt.scatter(self.s_pca[:,0], self.s_pca[:,1], marker="p")
-
+        plt.rcParams['axes.facecolor'] = bcolor
+        
         for i in np.unique(self.labels_):
             x_pca_part = self.x_pca[self.labels_ == i,:]
-            plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="*", c=self.cluster_color[i])
+            plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker="x", linewidth=width, c=self.cluster_color[i], 
+                        label='cluster '+str(i))
             
             for j in range(self.s_pca.shape[0]):
                 if fontsize is None:
@@ -1502,9 +1673,21 @@ class CLASSIX:
                 else:
                     plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), fontsize=fontsize, bbox=bbox)
 
-        plt.axis(axis) # the axis here may not be consistent, so hide.
+        plt.scatter(self.s_pca[:,0], self.s_pca[:,1], label='group centers', marker=sp_marker, linewidth=1.8*width, c=sp_mcolor)
+
         plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
         plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
+        plt.legend(bbox_to_anchor=(1, -0.1), ncols=2)
+
+        if axis:
+            plt.axis('on')
+            if self.s_pca.shape[1] > 1:
+                plt.xlabel("1st principal component")
+                plt.ylabel("2st principal component")
+            else:
+                plt.xlabel("1st principal component")
+        else:
+            plt.axis('off') # the axis here may not be consistent, so hide.
 
         if savefig:
             if not os.path.exists("img"):
@@ -1519,7 +1702,8 @@ class CLASSIX:
                 fm = 'img/explain_viz.'+fmt
                 plt.savefig(fm, bbox_inches='tight')
                 
-            print("successfully save")
+            print("image successfully save as", fm)
+            
 
         plt.show()
             
@@ -1619,7 +1803,7 @@ class CLASSIX:
         fig, ax = plt.subplots(figsize=figsize)
         for i in range(self.splist_.shape[0]):
             ax.scatter(P[i,0], P[i,1], s=markersize, c='k', marker='.')
-            if plot_boundary:
+            if plot_boundary and self.data.shape[1] <= 2:
                 ax.add_patch(plt.Circle((P[i, 0], P[i, 1]), self.radius, 
                                         color=bound_color, fill=False, clip_on=False)
                             )
@@ -1865,10 +2049,8 @@ def calculate_cluster_centers(data, labels):
 
 
 # ##########################################################################################################
-# *************************** <!-- the independent functions of checking overlap ***************************
-# *******************************  determine if two groups should be merged ********************************
-
-
+# **************<!-- the independent functions of finding shortest path between two objects ***************
+# ##########################################################################################################
 
 
 
