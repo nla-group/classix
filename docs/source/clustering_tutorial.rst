@@ -391,3 +391,15 @@ Then to track or compare any data by indexing, you can enter like
 
 The output documentation describes how two data objects are separated into two clusters, and also how far or close they are.
 
+
+.. code:: python
+
+    clx.explain(16943, 17143,  plot=True, sp_fontsize=10, fmt='png')
+
+.. image:: images/None16943_17143.png
+
+.. parsed-literal::
+    
+    The data point 16943 is in group 11 and the data point 17143 is in group 16, 
+    both of which were merged into cluster #2. 
+    These two groups are connected via groups 11 <-> 12 <-> 14 <-> 16.
