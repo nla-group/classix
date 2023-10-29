@@ -1258,13 +1258,26 @@ class CLASSIX:
                         ax.scatter(x_pca[:, 0], x_pca[:, 1], label='cluster '+str(i), 
                                    marker=".", c=self.cluster_color[i], linewidth=width)
                         
-                    for i in set(cluster_labels_m):
                         s_pca = self.s_pca[np.where(self.sp_info.Cluster == i)[0], :]
                         if i == 0:
                             ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, label='group centers', 
                                    s=sp_size, c=sp_mcolor, linewidth=1.8*width)
                         else:
                             ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=1.8*width)
+
+                        s_pca = self.s_pca[self.sp_info.Cluster == i]
+                        for ii in range(s_pca.shape[0]):
+                            if sp_fontsize is None:
+                                ax.text(s_pca[ii, 0], s_pca[ii, 1],
+                                        s=str(self.sp_info.Group[self.sp_info.Cluster == i].astype(int).values[ii]),
+                                        bbox=sp_bbox
+                                )
+                            else:
+                                ax.text(s_pca[ii, 0], s_pca[ii, 1],
+                                        s=str(self.sp_info.Group[self.sp_info.Cluster == i].astype(int).values[ii]),
+                                        fontsize=sp_fontsize, bbox=sp_bbox
+                                )
+
 
                     for i in set(group_labels_m):
                         s_pca = self.s_pca[i]
@@ -1276,6 +1289,7 @@ class CLASSIX:
                                                      color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
                     
                     ax.set_aspect('equal', adjustable='datalim')
+
                     if dp_fontsize is None:
                         for ii in range(len(indexlist)):
                             if isinstance(index1, int) or isinstance(index1, str):
@@ -1287,7 +1301,8 @@ class CLASSIX:
                             
                             ax.text(_object[0], _object[1], s=str(_index), bbox=dp_bbox, color=ind_color)
                             ax.scatter(_object[0], _object[1], marker="*", s=ind_msize,
-                                       label='data point {} '.format(_index)+'(cluster #{})'.format(cluster_labels_m[ii]))
+                                       label='data point {} '.format(_index)+'(cluster #{0}, group #{1})'.format(
+                                           cluster_labels_m[ii], group_labels_m[ii]))
                     else:
                         
                         for ii in range(len(indexlist)):
