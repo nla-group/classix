@@ -217,20 +217,17 @@ Following the previous steps, we can analyze the specific data by refering to th
 
 .. code:: python
 
-    clx.explain(10,  plot=True, savefig=True, fmt='PNG')
+    clx.explain(73, plot=True)
 
 
 Output:
 
 .. parsed-literal::
 
-    ----------------------------------------
-     Group  NrPts  Cluster Coordinates Label
-     109     5       3      0.49 0.54    10 
-    ----------------------------------------
-    The data point 10 is in group 109, which has been merged into cluster #3.
+    image successfully save as img/None73.png
 
-.. image:: images/ex1110.png
+
+.. image:: images/None73.png
 
 Track multiple objects
 ------------------------------
@@ -241,20 +238,15 @@ Example to show two objects in different clusters:
 
 .. code:: python
     
-    clx.explain(0, 998,  plot=True, savefig=True, fmt='png', figname='ex1')
+    clx.explain(773,2,  plot=True)
 
 .. parsed-literal::
 
-    ----------------------------------------
-     Group  NrPts  Cluster Coordinates   Label
-      54      4      1      0.13 -0.49     0  
-      39     27      2     -0.48 -1.02   998  
-    ----------------------------------------
-    The data point 0 is in group 54, which has been merged into cluster 1.
-    The data point 998 is in group 39, which has been merged into cluster 2.
+    The data point 773 is in group 37, which has been merged into cluster 1.
+    The data point 2 is in group 40, which has been merged into cluster 2.
     There is no path of overlapping groups between these clusters.
 
-.. image:: images/ex10_998.png
+.. image:: images/None773_2.png
 
 Example to show two objects in the same clusters:
 
@@ -264,35 +256,22 @@ Example to show two objects in the same clusters:
 
 .. parsed-literal::
     
-    ----------------------------------------
-     Group  NrPts  Cluster Coordinates   Label
-      37     17      1      0.15 -0.66   773  
-      50      4      1     -0.27 -0.75   792  
-    ----------------------------------------
     The data point 773 is in group 37 and the data point 792 is in group 50, 
     both of which were merged into cluster #1. 
     These two groups are connected via groups 37 <-> 49 <-> 41 <-> 45 <-> 38 <-> 50.
-    connected_paths: [37, 49, 41, 45, 38, 50]
 
-.. image:: images/ex2773_792.png
+.. image:: images/None773_792.png
 
-If you want to show the paths connected the two points, setting the optional parameter ``add_arrow`` to ``True``. That is,
-
-.. code:: python
-    
-    clx.explain(773, 792,  plot=True, figsize=(9, 10), add_arrow=True)
-
-.. image:: images/ex3773_792.png
-
+If you want to show the paths connected the two points, setting the optional parameter ``add_arrow`` to ``True``.
 Here we also add ``figsize`` to resize the figure. More controled parameters for fancy arrow plot can be referred to detailed documentation of `classix.CLASSIX.explain <https://classix.readthedocs.io/en/latest/_autosummary/classix.CLASSIX.explain.html#classix.CLASSIX.explain>`_. 
 
 Additionally, if one want to index more than 2 objects, use numbrt parameters ``index{number}``, for example, indexing 3 objects information, use:
 
 .. code:: python
     
-    clx.explain(index1=773, index2=792, index3=199, plot=True)
+    clx.explain(index1=773, index2=292, index3=2, figsize=(10, 10))
 
-.. image:: images/ex4773_792_m.png
+.. image:: images/None773_292_m.png
 
 
 ++++++++++++++++++++++++++++
