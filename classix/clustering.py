@@ -1125,7 +1125,10 @@ class CLASSIX:
                         ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                     
                     ax.scatter(object1[0], object1[1], marker="*", s=ind_msize,
-                                label='data point {} '.format(index1)+'(cluster #{})'.format(cluster_label1))
+                                label='data point {} '.format(index1)+'(group center #{0}, cluster #{1})'.format(
+                                    agg_label1, cluster_label1
+                                    )
+                                )
                     
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
                                marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
@@ -1154,7 +1157,7 @@ class CLASSIX:
                     ax.set_aspect('equal', adjustable='datalim')
                     ax.plot()
 
-                    ax.legend()
+                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
                     if axis:
                         ax.axis('on')
                         if data.shape[1] > 1:
@@ -1301,8 +1304,8 @@ class CLASSIX:
                             
                             ax.text(_object[0], _object[1], s=str(_index), bbox=dp_bbox, color=ind_color)
                             ax.scatter(_object[0], _object[1], marker="*", s=ind_msize,
-                                       label='data point {} '.format(_index)+'(cluster #{0}, group #{1})'.format(
-                                           cluster_labels_m[ii], group_labels_m[ii]))
+                                       label='data point {} '.format(_index)+'(group center #{0}, cluster #{1})'.format(
+                                           group_labels_m[ii], cluster_labels_m[ii]))
                     else:
                         
                         for ii in range(len(indexlist)):
@@ -1314,7 +1317,7 @@ class CLASSIX:
                             ax.text(_object[0], _object[1], s=str(_index), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                             ax.scatter(_object[0], _object[1], marker="*", s=ind_msize)
                     
-                    ax.legend()
+                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
 
                     if axis:
                         ax.axis('on')
@@ -1471,11 +1474,13 @@ class CLASSIX:
                         
 
                     ax.scatter(object1[0], object1[1], marker="*", s=ind_msize, 
-                               label='data point {} '.format(index1)+'(cluster #{})'.format(cluster_label1)
+                               label='data point {} '.format(index1)+'(group center #{0}, cluster #{1})'.format(
+                                   agg_label1, cluster_label1)
                             )
                     
                     ax.scatter(object2[0], object2[1], marker="*", s=ind_msize,
-                                label='data point {} '.format(index2)+'(cluster #{})'.format(cluster_label2)
+                                label='data point {} '.format(index2)+'(group center #{0}, cluster #{1})'.format(
+                                    agg_label2, cluster_label2)
                             )
                     
                     for i in range(s_pca.shape[0]):
@@ -1581,7 +1586,7 @@ class CLASSIX:
                                                             )
                                             )
                                 
-                    ax.legend()
+                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
 
                     if axis:
                         ax.axis('on')
@@ -1672,7 +1677,7 @@ class CLASSIX:
 
         plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
         plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
-        plt.legend()
+        plt.legend(bbox_to_anchor=(1, -0.1), ncols=2)
 
         if axis:
             plt.axis('on')
