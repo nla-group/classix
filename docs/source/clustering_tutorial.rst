@@ -357,7 +357,7 @@ setting ``sp_fontsize`` larger or change the shape by tunning appropriate value 
 
     clx.explain(plot=True, figsize=(24,10), sp_fontsize=12)
 
-.. image:: images/kamil_explain_viz.png
+.. image:: images/case_explain_viz.png
 
 .. parsed-literal::
 
@@ -365,22 +365,10 @@ setting ``sp_fontsize`` larger or change the shape by tunning appropriate value 
     The radius parameter was set to 1.00 and MinPts was set to 0. 
     As the provided data has been scaled by a factor of 1/2.46,
     data points within a radius of R=1.00*2.46=2.46 were aggregated into groups. 
-    In total 3920623 comparisons were required (1.93 comparisons per data point). 
+    In total 7577284 comparisons were required (3.73 comparisons per data point). 
     This resulted in 36 groups, each uniquely associated with a starting point. 
     These 36 groups were subsequently merged into 4 clusters. 
-    A list of all starting points is shown below.
-    ----------------------------------------
-    Group   NrPts  Cluster  Coordinates 
-    0     10560     1      16.35 3.26 
-    1      1800     2      15.81 1.85 
-    2      2580     1      15.38 3.47 
-    3       656     1      14.83 4.33 
-    4       177     1      13.87 4.59 
-                ......
-    33    123548     0      -0.89 1.92 
-    34       274     0       -1.2 0.96 
-    35        65     0       -1.87 1.7 
-    ----------------------------------------
+    In order to see a visual representation of the clustered data, use .explain(plot=True). 
     In order to explain the clustering of individual data points, 
     use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
 
@@ -391,14 +379,14 @@ Then to track or compare any data by indexing, you can enter like
 
 .. code:: python
 
-    clx.explain(14940, 16943,  plot=True, savefig=True, sp_fontsize=10)
+    clx.explain(14940, 16943,  plot=True, sp_fontsize=10)
 
-.. image:: images/kamil_14940_16943.png
+.. image:: images/None14940_16943.png
 
 .. parsed-literal::
 
-    The data point 14940 is in group 7, which has been merged into cluster 1.
-    The data point 16943 is in group 11, which has been merged into cluster 3.
+    The data point 14940 is in group 7, which has been merged into cluster 0.
+    The data point 16943 is in group 11, which has been merged into cluster 2.
     There is no path of overlapping groups between these clusters.
 
 The output documentation describes how two data objects are separated into two clusters, and also how far or close they are.
