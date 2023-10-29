@@ -155,11 +155,6 @@ clx.explain(773, 792, plot=True)
 Output:
 
 ```
-----------------------------------------
- Group  NrPts  Cluster Coordinates   Label
-  37     17      1      0.15 -0.66   773  
-  50      4      1     -0.27 -0.75   792  
-----------------------------------------
 The data point 773 is in group 37 and the data point 792 is in group 50, 
 both of which were merged into cluster #1. 
 These two groups are connected via groups 37 <-> 49 <-> 41 <-> 45 <-> 38 <-> 50.
