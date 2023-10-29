@@ -98,17 +98,7 @@ Similar to the previous example, we refer ``group_merge`` to 'distance', then ad
     In total 4610 comparisons were required (4.61 comparisons per data point). 
     This resulted in 163 groups, each uniquely associated with a starting point. 
     These 163 groups were subsequently merged into 7 clusters. 
-    A list of all starting points is shown below.
-    ----------------------------------------
-     Group  NrPts  Cluster Coordinates 
-       0      2      0      1.07 -1.15 
-       1      7      0      1.25 -1.01 
-       2      2      0      1.14 -1.07 
-      ---      lines omitted        ---
-     160      2      6      -1.02 1.18 
-     161      3      6       -0.86 1.3 
-     162      1      6      -1.17 1.32 
-    ----------------------------------------
+
     In order to explain the clustering of individual data points, 
     use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
 
