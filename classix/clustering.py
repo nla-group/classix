@@ -1702,7 +1702,7 @@ class CLASSIX:
                 fm = 'img/explain_viz.'+fmt
                 plt.savefig(fm, bbox_inches='tight')
                 
-            print("successfully save")
+            print("image successfully save as", fm)
             
 
         plt.show()
