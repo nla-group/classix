@@ -161,7 +161,7 @@ Though in most cases, the scale setting is not necessary, when the small ``radiu
 Explainable Clustering
 +++++++++++++++++++++++
 
-CLASSIX provides an appealing explanation for clustering results, either in a global view or by specific indexing. CLASSIX provides a very flexible and customized interface for clustering explain method, while the default setting is enough for most researchers and engineers. For more details, please read the API reference of `classix.CLASSIX.explain <https://classix.readthedocs.io/en/latest/_autosummary/classix.CLASSIX.explain.html#classix.CLASSIX.explain>`_. In the following section, we will illustrate CLASSIX explain method in a straightforward manner.
+CLASSIX provides an appealing explanation for clustering results, either in a global view or by specific indexing. CLASSIX provides a very flexible and customized interface for clustering explain method, while the default setting is enough for most researchers and engineers. For more details, please read the API reference of `classix.CLASSIX.explain <https://classix.readthedocs.io/en/latest/_autosummary/classix.CLASSIX.explain.html#classix.CLASSIX.explain>`_. In the following section, we will illustrate CLASSIX ``explain`` method in a straightforward manner.
 
 If we would like to make plot accompany just remember to set ``plot`` to ``True``.
 
