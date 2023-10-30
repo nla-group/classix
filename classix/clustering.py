@@ -1646,7 +1646,7 @@ class CLASSIX:
     
     
     
-    def explain_viz(self, figsize=(12, 8), figstyle="seaborn", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
+    def explain_viz(self, figsize=(12, 8), figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
                     savefig=False, fontsize=None, bbox={'facecolor': 'tomato', 'alpha': 0.3, 'pad': 2}, axis="off", fmt="pdf"):
         """Visualize the starting point and data points"""
         
@@ -1657,7 +1657,6 @@ class CLASSIX:
             for i in np.unique(self.labels_):
                 self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
         
-        plt.style.use('default') # clear the privous figure style
         plt.style.use(style=figstyle)
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = bcolor
