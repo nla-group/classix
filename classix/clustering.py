@@ -361,7 +361,7 @@ class CLASSIX:
         List for connected group labels.
 
 
-    Methods:
+    Methods
     ----------
     fit(data):
         Cluster data while the parameters of the model will be saved. The labels can be extracted by calling ``self.labels_``.
