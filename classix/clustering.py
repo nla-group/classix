@@ -372,6 +372,9 @@ class CLASSIX:
     predict(data):
         After clustering the in-sample data, predict the out-sample data.
         Data will be allocated to the clusters with the nearest starting point in the stage of aggregation. Default values.
+
+    gc2ind(spid):
+        Return the group center (i.e., starting point) location in the data.
         
     explain(index1, index2, ...): 
         Explain the computed clustering. 
@@ -1328,7 +1331,7 @@ class CLASSIX:
                             ax.text(_object[0], _object[1], s=str(_index), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                             ax.scatter(_object[0], _object[1], marker="*", s=ind_msize)
                     
-                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=5)
+                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
 
                     if axis:
                         ax.axis('on')
