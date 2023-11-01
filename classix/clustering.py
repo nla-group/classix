@@ -773,7 +773,7 @@ class CLASSIX:
     
     
     def explain(self, index1=None, index2=None, showalldata=True, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
-                plot=False, figsize=(11, 6), figstyle="default", savefig=False, bcolor="#f5f9f9", ind_color="k", width=1.5, 
+                plot=False, figsize=(8, 6), figstyle="default", savefig=False, bcolor="#f5f9f9", ind_color="k", width=1.5, 
                 ind_msize=180, sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, 
                 sp_fontsize=None, sp_bbox=None, sp_cmarker="+", sp_csize=110, sp_ccolor="crimson", sp_clinewidths=2.7, 
                 dp_fcolor="bisque", dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
@@ -834,7 +834,7 @@ class CLASSIX:
         plot : boolean, default=False
             Determine if visulize the explaination. 
         
-        figsize : tuple, default=(10, 6)
+        figsize : tuple, default=(8, 6)
             Determine the size of visualization figure. 
 
         figstyle : str, default="seaborn"
@@ -1046,25 +1046,25 @@ class CLASSIX:
             data_size = data.shape[0]
             feat_dim = data.shape[1]
             
-            print("""A clustering of {length:.0f} data points with {dim:.0f} features has been performed. """.format(length=data_size, dim=feat_dim))
-            print("""The radius parameter was set to {tol:.2f} and MinPts was set to {minPts:.0f}. """.format(tol=self.radius, minPts=self.minPts))
-            print("""As the provided data has been scaled by a factor of 1/{scl:.2f},\ndata points within a radius of R={tol:.2f}*{scl:.2f}={tolscl:.2f} were aggregated into groups. """.format(
+            print("""CLASSIX clustered {length:.0f} data points with {dim:.0f} features. """.format(length=data_size, dim=feat_dim))
+            print("""The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}. """.format(tol=self.radius, minPts=self.minPts))
+            print("""As the provided data was auto-scaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together. """.format(
                 scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius
             ))
-            print("""In total {dist:.0f} comparisons were required ({avg:.2f} comparisons per data point). """.format(dist=self.dist_nr, avg=self.dist_nr/data_size))
-            print("""This resulted in {groups:.0f} groups, each uniquely associated with a starting point. """.format(groups=self.splist_.shape[0]))
+            print("""In total, {dist:.0f} distances were computed ({avg:.1f} per data point). """.format(dist=self.dist_nr, avg=self.dist_nr/data_size))
+            print("""This resulted in {groups:.0f} groups, each with a unique group center. """.format(groups=self.splist_.shape[0]))
             print("""These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. """.format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_))))
             
             if showsplist:
-                print("""A list of all starting points is shown below.""")
+                print("""A list of all group centers is shown below.""")
                 print(dash_line)
                 print(self.sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
                 print(dash_line)       
             else:
-                print("""In order to see a visual representation of the clustered data, use .explain(plot=True). """)
+                print("""For a visualisation of the clusters, use .explain(plot=True). """)
                 
             print("""In order to explain the clustering of individual data points, \n"""
-                  """use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.""")
+                  """use .explain(ind1) or .explain(ind1, ind2) with data indices.""")
             
         else: # index is not None, explain(index1)
             if isinstance(index1, int):
@@ -1168,7 +1168,7 @@ class CLASSIX:
                         ax.axis('on')
                         if data.shape[1] > 1:
                             ax.set_xlabel("1st principal component")
-                            ax.set_ylabel("2st principal component")
+                            ax.set_ylabel("2nd principal component")
                         else:
                             ax.set_xlabel("1st principal component")
                     else:
@@ -1602,7 +1602,7 @@ class CLASSIX:
                         ax.axis('on')
                         if data.shape[1] > 1:
                             ax.set_xlabel("1st principal component")
-                            ax.set_ylabel("2st principal component")
+                            ax.set_ylabel("2nd principal component")
                         else:
                             ax.set_xlabel("1st principal component")
                     else:
@@ -1656,7 +1656,7 @@ class CLASSIX:
     
     
     
-    def explain_viz(self, showalldata=False, figsize=(12, 8), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
+    def explain_viz(self, showalldata=False, figsize=(8, 6), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
                     savefig=False, fontsize=None, bbox={'facecolor': 'tomato', 'alpha': 0.3, 'pad': 2}, axis="off", fmt="pdf"):
         """Visualize the starting point and data points"""
         
@@ -1676,7 +1676,8 @@ class CLASSIX:
         plt.style.use(style=figstyle)
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = bcolor
-        
+
+        '''
         for i in np.unique(self.labels_):
             x_pca_part = self.x_pca[selectInd][self.labels_[selectInd] == i,:]
             plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker=".", linewidth=width, c=self.cluster_color[i], 
@@ -1688,20 +1689,28 @@ class CLASSIX:
                         plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), bbox=bbox)
                     else:
                         plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), fontsize=fontsize, bbox=bbox)
+        '''
+        plt.scatter(self.x_pca[:,0], self.x_pca[:,1], marker=".", linewidth=width, c=self.labels_)
+        
 
         if showallgroups:
             plt.scatter(self.s_pca[:,0], self.s_pca[:,1], label='group centers', 
                         marker=sp_marker, linewidth=0.9*width, c=sp_mcolor)
 
-        plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
-        plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
-        plt.legend(bbox_to_anchor=(1, -0.1), ncols=5)
+        #plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
+        #plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
+        #plt.legend(loc='lower center', bbox_to_anchor=(0.5, -0.25), ncol=5)
+        plt.axis('equal')
+        plt.tight_layout()
+        #plt.axis('tight')
+        plt.title("""{num_clusters:.0f} clusters (radius={tol:.2f}, minPts={minPts:.0f})""".format(num_clusters=len(np.unique(self.labels_)),tol=self.radius, minPts=self.minPts))
+
 
         if axis:
             plt.axis('on')
             if self.s_pca.shape[1] > 1:
                 plt.xlabel("1st principal component")
-                plt.ylabel("2st principal component")
+                plt.ylabel("2nd principal component")
             else:
                 plt.xlabel("1st principal component")
         else:
@@ -1775,7 +1784,7 @@ class CLASSIX:
         
     
     def visualize_linkage(self, scale=1.5, 
-                          figsize=(8,8),
+                          figsize=(8,6),
                           labelsize=24, 
                           markersize=320,
                           plot_boundary=False,
