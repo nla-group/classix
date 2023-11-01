@@ -1329,7 +1329,7 @@ class CLASSIX:
                             ax.text(_object[0], _object[1], s=str(_index), fontsize=dp_fontsize, bbox=dp_bbox, color=ind_color)
                             ax.scatter(_object[0], _object[1], marker="*", s=ind_msize)
                     
-                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=5)
+                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
 
                     if axis:
                         ax.axis('on')
