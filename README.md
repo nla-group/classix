@@ -1,11 +1,6 @@
 <h1 align="center">
-  CLASSIX :honeybee:
-
+  CLASSIX: Fast and explainable clustering in Python
 </h1>
-
-<h3 align="center">
-  <strong> Fast and explainable clustering based on sorting </strong>  
-</h3>
 
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
 [![License: MIT](https://anaconda.org/conda-forge/classixclustering/badges/license.svg)](https://github.com/nla-group/classix/blob/master/LICENSE)
@@ -23,7 +18,7 @@
 
 ## :sparkles: Features
 
-CLASSIX is a fast and explainable clustering algorithm based on sorting. Here are a few highlights:
+CLASSIX is a fast, memory-efficient, and explainable clustering algorithm. Here are a few highlights:
 
 - Ability to cluster low and high-dimensional data of arbitrary shape efficiently
 - Ability to detect and deal with outliers in the data
@@ -31,14 +26,14 @@ CLASSIX is a fast and explainable clustering algorithm based on sorting. Here ar
 - Full reproducibility of all tests in the accompanying paper
 - Support of Cython compilation
 
-``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter ``radius`` for the group aggregation and a ``minPts`` parameter controlling the minimal cluster size. 
+``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter ``radius`` for the group aggregation and a ``minPts`` parameter controlling the minimal cluster size. 
 
 
 **Here is a video abstract of CLASSIX:** 
 
 [<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/classix_video_screenshot.png width=720 />](https://www.youtube.com/watch?v=K94zgRjFEYo)
  
-A detailed documentation (work in progress), including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/). 
+A detailed documentation, including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/). 
 
 ## :rocket: Install
 
@@ -59,7 +54,7 @@ import classix
 classix.cython_is_available(verbose=1)
 ```
 
-If needed, you can disable Cython  using
+If needed, you can disable Cython using
 
 ```Python
 classix.__enable_cython__ = False
@@ -107,34 +102,35 @@ clx = CLASSIX(radius=0.1, minPts=99)
 clx.fit(X)
 ```
 
-The cluster labels of each data point are available in ``clx.labels_``. CLASSIX can visualize the clustering result as follows. 
+The cluster labels of each data point are available in ``clx.labels_``. 
 
 ## :mortar_board: The explain method
 
 #### Example 1
-CLASSIX provides an API for the easy visualization of clusters (different clusters are marked by distinct colors) and to explain the assignment of data points to their clusters. To get an overview of the data, the location of starting points, and their associated groups, type:
+
+CLASSIX is an explainable clustering method. To get an initial overview of the clustering, type:
 
 ```Python
 clx.explain(plot=True)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=750 />
 
-The starting points, shown as the small red boxes, can be thought of as a coarse representation of the data. Each starting point is associated with a group of data points, and groups are merged into clusters. The `explain` method returns a textual summary of the clustering:
+The group centers, shown as the small red boxes, can be thought of as a coarse representation of the data. Each group center is associated with a group of data points, and groups are merged into clusters. The `explain` method returns a textual summary of the clustering:
 
 ```
 A clustering of 1000 data points with 2 features has been performed. 
-The radius parameter was set to 0.10 and MinPts was set to 99. 
+The radius parameter was set to 0.10 and minPts was set to 99. 
 As the provided data has been scaled by a factor of 1/8.12,
 data points within a radius of R=0.10*8.12=0.81 were aggregated into groups. 
-In total 7003 comparisons were required (7.00 comparisons per data point). 
-This resulted in 163 groups, each uniquely associated with a starting point. 
+In total, 7003 distances were computed (7.0 per data point). 
+This resulted in 163 groups, each uniquely associated with a group center. 
 These 163 groups were subsequently merged into 7 clusters. 
 In order to see a visual representation of the clustered data, use .explain(plot=True). 
 In order to explain the clustering of individual data points, 
 use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
 ```
 
-In the above table, *Group* denotes the group label, *NrPts* denotes the number of data points in the group, *Cluster* is the cluster label assigned to the group, and the final column shows the normalized *Coordinates* of the starting point. In order to explain the cluster assignment of a particular data point, simply provide its index to the explain method:
+In order to explain the cluster assignment of a particular data point, simply provide its index to the explain method:
 
 ```Python
 clx.explain(73, plot=True)
