@@ -4,7 +4,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2022 Stefan Güttel, Xinye Chen
+# Copyright (c) 2023 Stefan Güttel, Xinye Chen
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
