@@ -754,15 +754,17 @@ class CLASSIX:
         labels = labels[np.argsort(ind)]
 
         if self.verbose == 1:
-            print("""The {datalen} data points were aggregated into {num_group} groups.""".format(datalen=len(data), num_group=splist.shape[0]))
-            print("""In total {dist:.0f} comparisons were required ({avg:.2f} comparisons per data point). """.format(dist=self.dist_nr, avg=self.dist_nr/len(data)))
-            print("""The {num_group} groups were merged into {c_size} clusters with the following sizes: """.format(
+            print("""CLASSIX aggregated the {datalen} data points into {num_group} groups. """.format(datalen=len(data), num_group=splist.shape[0]))
+            print("""In total, {dist:.0f} distances were computed ({avg:.1f} per data point). """.format(dist=self.dist_nr, avg=self.dist_nr/len(data)))
+            print("""The {num_group} groups were merged into {c_size} clusters with sizes: """.format(
                 num_group=splist.shape[0], c_size=len(self.old_cluster_count)))
-            
+
             
             self.pprint_format(self.old_cluster_count)
-            if self.minPts != 0 and SIZE_NOISE_LABELS > 0:
-                print("As MinPts is {minPts}, the number of clusters has been further reduced to {r}.".format(
+
+            
+            if self.minPts > 1 and SIZE_NOISE_LABELS > 0:
+                print("As minPts is {minPts}, the number of clusters has been further reduced to {r}.".format(
                     minPts=self.minPts, r=len(np.unique(labels))
                 ))
                 
@@ -1918,8 +1920,13 @@ class CLASSIX:
         cluster = 0
         if isinstance(items, dict):
             for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True): 
-                print("      * cluster {} : {}".format(cluster, value))
+                if cluster > 19:
+                    print("      ... truncated ...")
+                    break
+                    
+                print("      * cluster {:2} : {}".format(cluster, value))
                 cluster = cluster + 1
+                
                 
         elif isinstance(items, list) or isinstance(items, tuple):
             for item in items:
@@ -1930,13 +1937,13 @@ class CLASSIX:
 
             
     def __repr__(self):
-        _name = "CLASSIX(sorting={0.sorting!r}, radius={0.radius!r}, minPts={0.minPts!r}, group_merging={0.group_merging!r})".format(self)
+        _name = "CLASSIX(radius={0.radius!r}, minPts={0.minPts!r}, group_merging={0.group_merging!r})".format(self)
         return _name 
 
     
     
     def __str__(self):
-        _name = 'CLASSIX(sorting={0.sorting!r}, radius={0.radius!r}, minPts={0.minPts!r}, group_merging={0.group_merging!r})'.format(self)
+        _name = 'CLASSIX(radius={0.radius!r}, minPts={0.minPts!r}, group_merging={0.group_merging!r})'.format(self)
         return _name
     
     
