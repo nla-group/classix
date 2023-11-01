@@ -764,7 +764,7 @@ class CLASSIX:
 
             
             if self.minPts > 1 and SIZE_NOISE_LABELS > 0:
-                print("As minPts is {minPts}, the number of clusters has been further reduced to {r}.".format(
+                print("As minPts is {minPts}, the number of clusters has been reduced to {r}.".format(
                     minPts=self.minPts, r=len(np.unique(labels))
                 ))
                 
