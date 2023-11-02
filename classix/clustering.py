@@ -1512,7 +1512,6 @@ class CLASSIX:
                         marker=sp_marker, linewidth=0.9*width, c=sp_mcolor)
 
         plt.axis('equal')
-        plt.tight_layout()
         plt.title("""{num_clusters:.0f} clusters (radius={tol:.2f}, minPts={minPts:.0f})""".format(num_clusters=len(np.unique(self.labels_)),tol=self.radius, minPts=self.minPts))
 
         if axis:
