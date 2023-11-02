@@ -776,7 +776,7 @@ class CLASSIX:
     
     
     def explain(self, index1=None, index2=None, showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
-                plot=False, figsize=(8, 6), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5, 
+                plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5, 
                 obj_msize=160, sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, 
                 sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, sp_ccolor="crimson", sp_clinewidths=2.7, 
                 dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,
@@ -835,10 +835,10 @@ class CLASSIX:
         plot : boolean, default=False
             Determine if visulize the explaination. 
         
-        figsize : tuple, default=(8, 6)
-            Determine the size of visualization figure. 
+        figsize : tuple, default=(9, 6)
+            Determine the size of explain figure. 
 
-        figstyle : str, default="seaborn"
+        figstyle : str, default="default"
             Determine the style of visualization.
             see reference: https://matplotlib.org/stable/gallery/style_sheets/style_sheets_reference.html
         
@@ -1140,14 +1140,14 @@ class CLASSIX:
                     
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
                                marker='.', s=sp_csize*0.3, c='lime', linewidths=sp_clinewidths, 
-                               label='group center #{0}'.format(agg_label1)
+                               label='group center {0}'.format(agg_label1)
                                )
 
                         
                     ax.set_aspect('equal', adjustable='datalim')
                     ax.plot()
 
-                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
+                    ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.2), ncols=3)
                     
                     if axis:
                         ax.axis('on')
@@ -1293,7 +1293,7 @@ class CLASSIX:
                     s_pca = self.s_pca[union_ind]
                     
                     ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", c=self.labels_[selectInd], linewidth=width)
-                    ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=0.9*width)
+                    ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=0.9*width, alpha=0.4)
 
                     
                     if show_obj_grp_circle:
@@ -1303,6 +1303,26 @@ class CLASSIX:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1]), self.radius, fill=False,
                                         color='cyan', alpha=alpha, lw=cline_width*1.5, clip_on=False))
                                         
+                    
+
+                    
+                    if isinstance(index1, int) or isinstance(index1, str):
+                        if dp_fontsize is None:
+                            ax.text(object1[0], object1[1], s=' '+str(index1), ha='left', va='bottom', zorder=1, bbox=dp_bbox, color=obj_color)
+                            ax.text(object2[0], object2[1], s=' '+str(index2), ha='left', va='bottom', zorder=1, bbox=dp_bbox, color=obj_color)
+                        else:
+                            ax.text(object1[0], object1[1], s=' '+str(index1), ha='left', va='bottom', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
+                            ax.text(object2[0], object2[1], s=' '+str(index2), ha='left', va='bottom', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
+                    else:
+                        if dp_fontsize is None:
+                            ax.text(object1[0], object1[1], s=' '+'index 1', ha='left', va='bottom', zorder=1, bbox=dp_bbox, color=obj_color)
+                            ax.text(object2[0], object2[1], s=' '+'index 2', ha='left', va='bottom', zorder=1, bbox=dp_bbox, color=obj_color)
+                        else:
+                            ax.text(object1[0], object1[1], s=' '+'index 1', ha='left', va='bottom', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
+                            ax.text(object2[0], object2[1], s=' '+'index 2', ha='left', va='bottom', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
+
+
+
                     ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, 
                                label='data point {} '.format(index1)+'(cluster #{0})'.format(
                                    cluster_label1)
@@ -1313,22 +1333,8 @@ class CLASSIX:
                                     cluster_label2)
                             )
 
+
                     
-                    if isinstance(index1, int) or isinstance(index1, str):
-                        if dp_fontsize is None:
-                            ax.text(object1[0], object1[1], s=str(index1), ha='left', zorder=1, bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s=str(index2), ha='left', zorder=1, bbox=dp_bbox, color=obj_color)
-                        else:
-                            ax.text(object1[0], object1[1], s=str(index1), ha='left', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s=str(index2), ha='left', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                    else:
-                        if dp_fontsize is None:
-                            ax.text(object1[0], object1[1], s='index 1', ha='left', zorder=1, bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s='index 2', ha='left', zorder=1, bbox=dp_bbox, color=obj_color)
-                        else:
-                            ax.text(object1[0], object1[1], s='index 1', ha='left', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s='index 2', ha='left', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                        
                     
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
@@ -1370,12 +1376,12 @@ class CLASSIX:
 
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
                             marker='.', s=sp_csize*0.3, c='lime', linewidths=sp_clinewidths, 
-                            label='group center #{0}'.format(agg_label1)
+                            label='group center {0}'.format(agg_label1)
                             )
 
                     ax.scatter(self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1], 
                             marker='.', s=sp_csize*0.3, c='cyan', linewidths=sp_clinewidths, 
-                            label='group center #{0}'.format(agg_label2)
+                            label='group center {0}'.format(agg_label2)
                             )
                     
                     nr_cps = len(connected_paths)
@@ -1436,7 +1442,7 @@ class CLASSIX:
                                                             )
                                             )
                                 
-                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
+                    ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.25), ncols=3)
                     
                     ax.set_title("""{num_clusters:.0f} clusters (radius={tol:.2f}, minPts={minPts:.0f})""".format(
                         num_clusters=len(np.unique(self.labels_)),tol=self.radius, minPts=self.minPts))
@@ -1502,7 +1508,7 @@ class CLASSIX:
     
 
 
-    def explain_viz(self, showalldata=False, figsize=(8, 6), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
+    def explain_viz(self, showalldata=False, figsize=(10, 7), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
                     savefig=False, axis="off", fmt="pdf"):
         """Visualize the starting point and data points"""
         
@@ -1607,7 +1613,7 @@ class CLASSIX:
         
     
     def visualize_linkage(self, scale=1.5, 
-                          figsize=(8,6),
+                          figsize=(10,7),
                           labelsize=24, 
                           markersize=320,
                           plot_boundary=False,
