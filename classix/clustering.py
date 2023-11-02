@@ -1315,9 +1315,6 @@ class CLASSIX:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1]), self.radius, fill=False,
                                         color='cyan', alpha=alpha, lw=cline_width*1.5, clip_on=False))
                                         
-                    
-
-                    
                     if isinstance(index1, int) or isinstance(index1, str):
                         if dp_fontsize is None:
                             ax.text(object1[0], object1[1], s=' '+str(index1), ha='left', va='bottom', zorder=1, bbox=dp_bbox, color=obj_color)
@@ -1541,7 +1538,7 @@ class CLASSIX:
         plt.rcParams['axes.facecolor'] = bcolor
 
         plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], marker=".", linewidth=width, c=self.labels_[selectInd])
-        
+
         if showallgroups:
             for j in range(self.s_pca.shape[0]):
                 if fontsize is None:
