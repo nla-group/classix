@@ -1,6 +1,6 @@
 import warnings
 
-__version__ = '0.8.9'                  
+__version__ = '0.9.1'                  
 __enable_cython__ = True 
 
     
