@@ -98,7 +98,7 @@ X, y = datasets.make_blobs(n_samples=1000, centers=10, n_features=2, cluster_std
 
 
 # Call CLASSIX
-clx = CLASSIX(radius=0.1, minPts=99)
+clx = CLASSIX(radius=0.1, minPts=99, verbose=0)
 clx.fit(X)
 ```
 
@@ -118,16 +118,16 @@ clx.explain(plot=True)
 The group centers, shown as the small red boxes, can be thought of as a coarse representation of the data. Each group center is associated with a group of data points, and groups are merged into clusters. The `explain` method returns a textual summary of the clustering:
 
 ```
-A clustering of 1000 data points with 2 features has been performed. 
+CLASSIX clustered 1000 data points with 2 features. 
 The radius parameter was set to 0.10 and minPts was set to 99. 
-As the provided data has been scaled by a factor of 1/8.12,
-data points within a radius of R=0.10*8.12=0.81 were aggregated into groups. 
+As the provided data was auto-scaled by a factor of 1/8.12,
+points within a radius R=0.10*8.12=0.81 were grouped together. 
 In total, 7003 distances were computed (7.0 per data point). 
-This resulted in 163 groups, each uniquely associated with a group center. 
+This resulted in 163 groups, each with a unique group center. 
 These 163 groups were subsequently merged into 7 clusters. 
-In order to see a visual representation of the clustered data, use .explain(plot=True). 
+For a visualisation of the clusters, use .explain(plot=True). 
 In order to explain the clustering of individual data points, 
-use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
+use .explain(ind1) or .explain(ind1, ind2) with data indices.
 ```
 
 In order to explain the cluster assignment of a particular data point, simply provide its index to the explain method:
@@ -177,7 +177,7 @@ X = pd.DataFrame(X, index=['Anna', 'Bert', 'Carl', 'Tom', 'Bob'])
 
 clx = CLASSIX(radius=0.6)
 clx.fit_transform(X)
-clx.explain(index1='Carl', index2='Bert', plot=True, sp_fontsize=12, showallgroups=True)
+clx.explain(index1='Carl', index2='Bert', plot=True, showallgroups=True, sp_fontsize=12)
 ```
 
 Output:
