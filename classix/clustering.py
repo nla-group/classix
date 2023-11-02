@@ -775,11 +775,11 @@ class CLASSIX:
         return labels 
     
     
-    def explain(self, index1=None, index2=None, showalldata=True, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
+    def explain(self, index1=None, index2=None, showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
                 plot=False, figsize=(8, 6), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5, 
-                obj_msize=180, sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, 
-                sp_fontsize=None, sp_bbox=None, sp_cmarker="+", sp_csize=110, sp_ccolor="crimson", sp_clinewidths=2.7, 
-                dp_fcolor="bisque", dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
+                obj_msize=160, sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, 
+                sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, sp_ccolor="crimson", sp_clinewidths=2.7, 
+                dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,
                 show_all_grp_circle=False, show_connected_grp_circle=False, show_obj_grp_circle=True,  color="red", connect_color="green", alpha=0.5, cline_width=2, 
                 add_arrow=True, arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
                 arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', figname=None, fmt="pdf"):
@@ -972,9 +972,6 @@ class CLASSIX:
             dp_bbox['facecolor'] = dp_fcolor
             dp_bbox['alpha'] = dp_alpha
             dp_bbox['pad'] = dp_pad
-        
-        if dp_fontsize is None and sp_fontsize is not None:
-            dp_fontsize = sp_fontsize
 
         if self.inverse_ind is None:
             self.inverse_ind = np.argsort(self.ind)
@@ -1088,6 +1085,13 @@ class CLASSIX:
                 cluster_label1 = self.label_change[agg_label1]
                 
                 if plot == True:
+
+                    if self.x_pca.shape[0] > 1e5 and not showalldata:
+                        warnings.warn("Too many data points for plot. Randomly subsampled 1e5 points.")
+                        selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
+                    else:
+                        selectInd = np.arange(self.x_pca.shape[0])
+
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
                     
@@ -1095,29 +1099,29 @@ class CLASSIX:
 
                     s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
                     
-                    ax.scatter(self.x_pca[:, 0], self.x_pca[:, 1], marker=".", linewidth=0.5*width, 
-                               c=self.labels_)
+                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", linewidth=0.5*width, 
+                               c=self.labels_[selectInd])
                     
                     ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers', 
                                s=sp_size, linewidth=0.9*width, c=sp_mcolor)
                     
-                    if dp_fontsize is None:
-                        ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=obj_color,)
-                    else:
-                        ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                    
+                    if show_obj_grp_circle:
+                        ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
+                                                color='lime', alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                        
                     ax.scatter(object1[0], object1[1], marker="*", s=obj_msize,
                                 label='data point {} '.format(index1)+'(cluster #{0})'.format(
                                     cluster_label1
                                     )
                                 )
                     
-
-                    ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
-                               marker='.', s=sp_csize*0.3, c='lime', linewidths=sp_clinewidths, 
-                               label='group center #{0}'.format(agg_label1)
-                               )
+                    if dp_fontsize is None:
+                        ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=obj_color, zorder=1, ha='left')
+                    else:
+                        ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox,
+                                 color=obj_color, zorder=1, ha='left')
                     
+
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
                             ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color,
@@ -1127,23 +1131,27 @@ class CLASSIX:
                             if sp_fontsize is None:
                                 ax.text(s_pca[i, 0], s_pca[i, 1],
                                         s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
-                                        bbox=sp_bbox
+                                        bbox=sp_bbox, zorder=1, ha='left'
                                 )
                             else:
                                 ax.text(s_pca[i, 0], s_pca[i, 1],
                                         s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
-                                        fontsize=sp_fontsize, bbox=sp_bbox
+                                        fontsize=sp_fontsize, bbox=sp_bbox, zorder=1, ha='left'
                                 )
 
+
                     
-                    if show_obj_grp_circle:
-                        ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
-                                                color='lime', alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                    ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
+                               marker='.', s=sp_csize*0.3, c='lime', linewidths=sp_clinewidths, 
+                               label='group center #{0}'.format(agg_label1)
+                               )
+
                         
                     ax.set_aspect('equal', adjustable='datalim')
                     ax.plot()
 
                     ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
+                    
                     if axis:
                         ax.axis('on')
                         if data.shape[1] > 1:
@@ -1272,6 +1280,13 @@ class CLASSIX:
                         connected_paths = []
                         
                 if plot == True:
+
+                    if self.x_pca.shape[0] > 1e5 and not showalldata:
+                        warnings.warn("Too many data points for plot. Randomly subsampled 1e5 points.")
+                        selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
+                    else:
+                        selectInd = np.arange(self.x_pca.shape[0])
+
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
                     ax.set_facecolor(bcolor)
@@ -1280,25 +1295,17 @@ class CLASSIX:
                     union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
                     s_pca = self.s_pca[union_ind]
                     
-                    ax.scatter(self.x_pca[:, 0], self.x_pca[:, 1], marker=".", c=self.labels_, linewidth=width)
+                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", c=self.labels_[selectInd], linewidth=width)
                     ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=0.9*width)
-                    
-                    if isinstance(index1, int) or isinstance(index1, str):
-                        if dp_fontsize is None:
-                            ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s=str(index2), bbox=dp_bbox, color=obj_color)
-                        else:
-                            ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s=str(index2), fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                    else:
-                        if dp_fontsize is None:
-                            ax.text(object1[0], object1[1], s='index 1', bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s='index 2', bbox=dp_bbox, color=obj_color)
-                        else:
-                            ax.text(object1[0], object1[1], s='index 1', fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s='index 2', fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                        
 
+                    
+                    if show_obj_grp_circle:
+                        ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False,
+                                        color='lime', alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                        
+                        ax.add_patch(plt.Circle((self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1]), self.radius, fill=False,
+                                        color='cyan', alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                        
                     ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, 
                                label='data point {} '.format(index1)+'(cluster #{0})'.format(
                                    cluster_label1)
@@ -1308,16 +1315,23 @@ class CLASSIX:
                                 label='data point {} '.format(index2)+'(cluster #{0})'.format(
                                     cluster_label2)
                             )
-                    
-                    ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
-                            marker='.', s=sp_csize*0.3, c='lime', linewidths=sp_clinewidths, 
-                            label='group center #{0}'.format(agg_label1)
-                            )
 
-                    ax.scatter(self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1], 
-                            marker='.', s=sp_csize*0.3, c='cyan', linewidths=sp_clinewidths, 
-                            label='group center #{0}'.format(agg_label2)
-                            )
+                    
+                    if isinstance(index1, int) or isinstance(index1, str):
+                        if dp_fontsize is None:
+                            ax.text(object1[0], object1[1], s=str(index1), ha='left', zorder=1, bbox=dp_bbox, color=obj_color)
+                            ax.text(object2[0], object2[1], s=str(index2), ha='left', zorder=1, bbox=dp_bbox, color=obj_color)
+                        else:
+                            ax.text(object1[0], object1[1], s=str(index1), ha='left', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
+                            ax.text(object2[0], object2[1], s=str(index2), ha='left', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
+                    else:
+                        if dp_fontsize is None:
+                            ax.text(object1[0], object1[1], s='index 1', ha='left', zorder=1, bbox=dp_bbox, color=obj_color)
+                            ax.text(object2[0], object2[1], s='index 2', ha='left', zorder=1, bbox=dp_bbox, color=obj_color)
+                        else:
+                            ax.text(object1[0], object1[1], s='index 1', ha='left', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
+                            ax.text(object2[0], object2[1], s='index 2', ha='left', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
+                        
                     
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
@@ -1348,23 +1362,25 @@ class CLASSIX:
                                         s=self.sp_info.Group[
                                             (self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2)
                                             ].values[i].astype(int).astype(str),
-                                        bbox=sp_bbox
+                                        zorder=1, ha='left', bbox=sp_bbox
                                 )
 
                             else:
                                 ax.text(s_pca[i, 0], s_pca[i, 1], 
                                         s=self.sp_info.Group[union_ind].values[i].astype(int).astype(str),
-                                        fontsize=sp_fontsize, bbox=sp_bbox
+                                        fontsize=sp_fontsize, ha='left', bbox=sp_bbox
                                 )
 
-                    if show_obj_grp_circle:
-                        ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False,
-                                        color='cyan', alpha=alpha, lw=cline_width*1.5, clip_on=False))
-                        
-                        ax.add_patch(plt.Circle((self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1]), self.radius, fill=False,
-                                        color='lime', alpha=alpha, lw=cline_width*1.5, clip_on=False))
-                            
+                    ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
+                            marker='.', s=sp_csize*0.3, c='lime', linewidths=sp_clinewidths, 
+                            label='group center #{0}'.format(agg_label1)
+                            )
 
+                    ax.scatter(self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1], 
+                            marker='.', s=sp_csize*0.3, c='cyan', linewidths=sp_clinewidths, 
+                            label='group center #{0}'.format(agg_label2)
+                            )
+                    
                     nr_cps = len(connected_paths)
                     
                     if add_arrow:
@@ -1505,7 +1521,7 @@ class CLASSIX:
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = bcolor
 
-        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], marker=".", linewidth=width, c=self.labels_)
+        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], marker=".", linewidth=width, c=self.labels_[selectInd])
         
         if showallgroups:
             plt.scatter(self.s_pca[:,0], self.s_pca[:,1], label='group centers', 
@@ -1546,963 +1562,6 @@ class CLASSIX:
             
         return
     
-
-
-    def explain_zoomin(self, index1=None, index2=None, showalldata=True, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
-                plot=False, figsize=(8, 6), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5, 
-                obj_msize=180, sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, 
-                sp_fontsize=None, sp_bbox=None, sp_cmarker="+", sp_csize=110, sp_ccolor="crimson", sp_clinewidths=2.7, 
-                dp_fcolor="bisque", dp_alpha=0.6, dp_pad=2, dp_fontsize=None, dp_bbox=None,
-                show_all_grp_circle=False, show_connected_grp_circle=False, show_obj_grp_circle=True,  
-                cmap="turbo", cmin=0.07, cmax=0.97, color="red", connect_color="green", alpha=0.5, cline_width=0.5, 
-                add_arrow=True, arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
-                arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', figname=None, fmt="pdf", *argv, **kwargs):
-        
-        """
-        'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
-        'self.explain(object1/index1, object2/index2) # prints an explanation why object1 and object2 are either in the same or distinct clusters
-        'self.explain(index=1=object1/index1, index2=object2/index2, index3=..., index4, ...) # print the location of multiple data points associated
-                                                                                               with the information of groups and clusters.
-        
-        Here we unify the terminology:
-            [-] data points
-            [-] groups (made up of data points, formed by aggregation)
-            [-] clusters (made up of groups)
-        
-        
-        Parameters
-        ----------
-        index1 : int or numpy.ndarray, optional
-            Input object1 [with index 'index1'] for explanation.
-        
-        index2 : int or numpy.ndarray, optional
-            Input object2 [with index 'index2'] for explanation, and compare objects [with indices 'index1' and 'index2'].
-        
-        showalldata : boolean, default=False
-            Whether or not to show all data points in global view when too many data points for plot.
-
-        showallgroups : boolean, default=False
-            Whether or not to show the start points marker.
-
-        showsplist : boolean, default=False
-            Whether or not to show the starting points information, which include the number of data points (NumPts), 
-            corresponding clusters, and associated coordinates. This only applies to both index1 and index2 are "NULL".
-            Default as True. 
-        
-        max_colwidth : int, optional
-            Max width to truncate each column in characters. By default, no limit.
-            
-        replace_name : str or list, optional
-            Replace the index with name. 
-            * For example: as for indices 1 and 1300 we have 
-            
-            ``classix.explain(1, 1300, plot=False, figstyle="seaborn") # or classix.explain(obj1, obj4)``
-            
-            The data point 1 is in group 9 and the data point 1300 is in group 8, both of which were merged into cluster #0. 
-            These two groups are connected via groups 9 -> 2 -> 8.
-            * if we specify the replace name, then the output will be
-            
-            ``classix.explain(1, 1300, replace_name=["Peter Meyer", "Anna Fields"], figstyle="seaborn")``
-            
-            The data point Peter Meyer is in group 9 and the data point Anna Fields is in group 8, both of which were merged into cluster #0. 
-            These two groups are connected via groups 9 -> 2 -> 8.
-
-        plot : boolean, default=False
-            Determine if visulize the explaination. 
-        
-        figsize : tuple, default=(8, 6)
-            Determine the size of visualization figure. 
-
-        figstyle : str, default="seaborn"
-            Determine the style of visualization.
-            see reference: https://matplotlib.org/stable/gallery/style_sheets/style_sheets_reference.html
-        
-        savefig : boolean, default=False
-            Determine if save figure, the figure will be saved in the folder named "img".
-        
-        bcolor : str, default="#f5f9f9"
-            Color for figure background.
-        
-        obj_color : str, default as "k"
-            Color for the text of data of index1 and index2.
-        
-        obj_msize : float, optional:
-            Size for markers for data of index1 and index2.
-    
-        sp_fcolor : str, default='tomato'
-            The color marked for starting points text box. 
-        
-        sp_marker : str, default="+"
-            The marker for the start points.
-        
-        sp_size : int, default=66
-            The marker size for the start points.
-        
-        sp_mcolor : str, default='k'
-            The color marked for startpoint points scatter marker.
-
-        sp_alpha : float, default=0.3
-            The value setting for transprency of text box for starting points. 
-            
-        sp_pad : int, default=2
-            The size of text box for starting points. 
-        
-        sp_bbox : dict, optional
-            Dict with properties for patches.FancyBboxPatch for starting points.
-    
-        sp_fontsize : int, optional
-            The fontsize for text marked for starting points. 
-
-        sp_cmarker : str, default="+"
-            The marker for the connected starting points.
-        
-        sp_csize : int, default=100
-            The marker size for the connected starting points.
-        
-        sp_ccolor : str, default="crimson"
-            The marker color for the connected starting points.
-        
-        sp_clinewidths : str, default=2.5
-            The marker width for the connected starting points. 
-
-        dp_fcolor : str, default='bisque'
-            The color marked for specified data objects text box. 
-            
-        dp_alpha : float, default=0.3
-            The value setting for transprency of text box for specified data objects. 
-            
-        dp_pad : int, default=2
-            The size of text box for specified data objects. 
-            
-        dp_fontsize : int, optional
-            The fontsize for text marked for specified data objects.    
-                      
-        dp_bbox : dict, optional
-            Dict with properties for patches.FancyBboxPatch for specified data objects.
-        
-        show_all_grp_circle : bool, default=False
-            Whether or not to show all groups' periphery within the objects' clusters 
-            (only applies to when data dimension is less than or equal to 2).
-        
-        show_connected_grp_circle : bool, default=False
-            Whether or not to show all connected groups' periphery within the objects' clusters 
-            (only applies to when data dimension is less than or equal to 2).
-        
-        show_obj_grp_circle : bool, default=True
-            Whether or not to show the groups' periphery of the objects
-            (only applies to when data dimension is less than or equal to 2).
-        
-        cmap : str, default='turbo'
-            The colormap to be employed.
-        
-        cmin : int or float, default=0.07
-            The minimum color range.
-         
-        cmax : int or float, default=0.97
-            The maximum color range.
-            
-        color : str, default='red'
-            Color for text of starting points labels in visualization. 
-        
-        alpha : float, default=0.5
-            Scalar or None. 
-    
-        cline_width : float, default=0.5
-            Set the patch linewidth of circle for starting points.
-
-        add_arrow : bool, default=False 
-            Whether or not add arrows for connected paths.
-
-        arrow_linestyle : str, default='--' 
-            Linestyle for arrow.
-        
-        arrow_fc : str, default='darkslategrey' 
-            Face color for arrow.
-
-        arrow_ec : str, default='k'
-            Edge color for arrow.
-
-        arrow_linewidth : float, default=1
-            Set the linewidth of the arrow edges.
-
-        directed_arrow : int, default=0
-            Whether or not the edges for arrows is directed.
-            Values at {-1, 0, 1}, 0 refers to undirected, -1 refers to the edge direction opposite to 1.
-        
-        shrinkA, shrinkB : float, default=2
-            Shrinking factor of the tail and head of the arrow respectively.
-
-        figname : str, optional
-            Set the figure name for the image to be saved.
-            
-        fmt : str
-            Specify the format of the image to be saved, default as 'pdf', other choice: png.
-        
-        """
-        import re
-        from scipy.sparse.linalg import svds
-        from matplotlib import pyplot as plt
-        import matplotlib.colors as colors
-        
-        # -----------------------------second method--------------------------------
-        if sp_bbox is None:
-            sp_bbox = dict()
-            sp_bbox['facecolor'] = sp_fcolor
-            sp_bbox['alpha'] = sp_alpha
-            sp_bbox['pad'] = sp_pad
-       
-        if dp_bbox is None:
-            dp_bbox = dict()
-            dp_bbox['facecolor'] = dp_fcolor
-            dp_bbox['alpha'] = dp_alpha
-            dp_bbox['pad'] = dp_pad
-        
-        if dp_fontsize is None and sp_fontsize is not None:
-            dp_fontsize = sp_fontsize
-
-        if cmap is not None:
-            _cmap = plt.cm.get_cmap(cmap)
-            _interval = np.linspace(cmin, cmax, len(set(self.labels_))) 
-            self.cluster_color = list()
-            for c in _interval:
-                rgba = _cmap(c) 
-                color_hex = colors.rgb2hex(rgba) 
-                self.cluster_color.append(str(color_hex)) 
-        else:
-            self.cluster_color = dict()
-            for i in np.unique(self.labels_):
-                self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
-
-        if self.inverse_ind is None:
-            self.inverse_ind = np.argsort(self.ind)
-
-            groups_ = np.array(self.groups_)
-            self.label_change = dict(zip(groups_[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
-
-        data = self.data[self.inverse_ind]
-        groups_ = np.array(self.groups_)
-        groups_ = groups_[self.inverse_ind]
-        
-        if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
-            
-            if data.shape[1] > 2:
-                warnings.warn("If the group periphery is displayed, the group radius in the visualization might not be accurate.")
-                # scaled_data = data - data.mean(axis=0)
-                _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
-                self.x_pca = np.matmul(data, self._V[np.argsort(self._s)].T)
-                self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
-                
-            elif data.shape[1] == 2:
-                self.x_pca = data.copy()
-                self.s_pca = data[self.ind[self.splist_[:, 0]]] 
-
-            else: # when data is one-dimensional, no PCA transform
-                self.x_pca = np.ones((len(data.copy()), 2))
-                self.x_pca[:, 0] = data[:, 0]
-                self.s_pca = np.ones((len(self.splist_), 2))
-                self.s_pca[:, 0] = data[self.ind[self.splist_[:, 0]]].reshape(-1) 
-                
-            self.form_starting_point_clusters_table()
-            
-        if index1 is None and index2 is not None:
-            raise ValueError("Please enter a valid value for index1.")
-        
-        
-        # pd.options.display.max_colwidth = colwidth
-        dash_line = "--------"*5 
-            
-        indexlist = [i for i in kwargs.keys() if 'index' in re.split('(\d+)',i)]
-        indexvalues = [i for i in kwargs.values()]
-        
-        if index1 is None: # analyze in the general way with a global view
-            if plot == True:
-                self.explain_viz_zoomin(showalldata=showalldata, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, sp_marker=sp_marker,
-                                 sp_mcolor=sp_mcolor, width=width, fontsize=sp_fontsize, bbox=sp_bbox, axis=axis, fmt=fmt)
-                
-            data_size = data.shape[0]
-            feat_dim = data.shape[1]
-            
-            print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features. ".format(length=data_size, dim=feat_dim))
-            print("The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}. ".format(tol=self.radius, minPts=self.minPts))
-            print("As the provided data was auto-scaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together. ".format(
-                scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius
-            ))
-            print("In total, {dist:.0f} distances were computed ({avg:.1f} per data point). ".format(dist=self.dist_nr, avg=self.dist_nr/data_size))
-            print("This resulted in {groups:.0f} groups, each with a unique group center. ".format(groups=self.splist_.shape[0]))
-            print("These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. ".format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_))))
-            
-            if showsplist:
-                print("A list of all group centers is shown below.")
-                print(dash_line)
-                print(self.sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
-                print(dash_line)       
-            else:
-                print("For a visualisation of the clusters, use .explain(plot=True). ")
-                
-            print("""In order to explain the clustering of individual data points, \n"""
-                  """use .explain(ind1) or .explain(ind1, ind2) with data indices.""")
-            
-        else: # index is not None, explain(index1)
-            if isinstance(index1, int):
-                object1 = self.x_pca[index1] # data has been normalized
-                agg_label1 = groups_[index1] # get the group index for object1
-            
-            elif isinstance(index1, str):
-                if index1 in self.index_data:
-                    if len(set(self.index_data)) != len(self.index_data):
-                        warnings.warn("The index of data is duplicate.")
-                        object1 = self.x_pca[np.where(self.index_data == index1)[0]][0]
-                        agg_label1 = groups_[np.where(self.index_data == index1)[0][0]]
-                    else:
-                        object1 = self.x_pca[self.index_data == index1][0]
-                        agg_label1 = groups_[self.index_data == index1][0]
-                        
-                else:
-                    raise ValueError("Please enter a legal value for index1.")
-                    
-            elif isinstance(index1, list) or isinstance(index1, np.ndarray):
-                index1 = np.array(index1)
-                object1 = (index1 - self._mu) / self._scl # allow for out-sample data
-                
-                if data.shape[1] > 2:
-                    object1 = np.matmul(object1, self._V[np.argsort(self._s)].T)
-                    
-                agg_label1 = np.argmin(np.linalg.norm(self.s_pca - object1, axis=1, ord=2)) # get the group index for object1
-
-                    
-            else:
-                raise ValueError("Please enter a legal value for index1.")
-                
-            
-            # explain one object
-            if index2 is None:
-                if replace_name is not None:
-                    if isinstance(replace_name, list):
-                        index1 = replace_name[0]
-                    else:
-                        index1 = replace_name
-                else:
-                    index1 = index1
-
-                cluster_label1 = self.label_change[agg_label1]
-                
-                if plot == True:
-                    plt.style.use(style=figstyle)
-                    fig, ax = plt.subplots(figsize=figsize)
-                    
-                    ax.set_facecolor(bcolor)
-
-                    x_pca = self.x_pca[self.labels_ == cluster_label1]
-                    s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
-                    
-                    ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", linewidth=width, 
-                               c=self.cluster_color[cluster_label1])
-                    
-                    ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers', 
-                               s=sp_size, linewidth=0.9*width, c=sp_mcolor)
-                    
-                    if dp_fontsize is None:
-                        ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=obj_color,)
-                    else:
-                        ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                    
-                    ax.scatter(object1[0], object1[1], marker="*", s=obj_msize,
-                                label='data point {} '.format(index1)+'(group center #{0})'.format(
-                                    agg_label1
-                                    )
-                                )
-                    
-                    ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
-                               marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
-                    
-                    for i in range(s_pca.shape[0]):
-                        if data.shape[1] <= 2 and show_all_grp_circle:
-                            ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color,
-                                                     alpha=alpha, lw=cline_width, clip_on=False))
-                        
-                        if showallgroups:
-                            if sp_fontsize is None:
-                                ax.text(s_pca[i, 0], s_pca[i, 1],
-                                        s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
-                                        bbox=sp_bbox
-                                )
-                            else:
-                                ax.text(s_pca[i, 0], s_pca[i, 1],
-                                        s=str(self.sp_info.Group[self.sp_info.Cluster == cluster_label1].astype(int).values[i]),
-                                        fontsize=sp_fontsize, bbox=sp_bbox
-                                )
-
-                    if show_obj_grp_circle:
-                        ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
-                                                color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
-                        
-                    ax.set_aspect('equal', adjustable='datalim')
-                    ax.plot()
-
-                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
-                    if axis:
-                        ax.axis('on')
-                        if data.shape[1] > 1:
-                            ax.set_xlabel("1st principal component")
-                            ax.set_ylabel("2nd principal component")
-                        else:
-                            ax.set_xlabel("1st principal component")
-                    else:
-                        ax.axis('off') # the axis here may not be consistent, so hide.
-                    
-                    ax.set_title("Cluster #{0}".format(cluster_label1))
-
-                    if savefig:
-                        if not os.path.exists("img"):
-                            os.mkdir("img")
-                        if fmt == 'pdf':
-                            fm = 'img/' + str(figname) + str(index1) +'.pdf'
-                            plt.savefig(fm, bbox_inches='tight')
-                        elif fmt == 'png':
-                            fm = 'img/' + str(figname) + str(index1) +'.png'
-                            plt.savefig(fm, bbox_inches='tight')
-                        else:
-                            fm = 'img/' + str(figname) + str(index1) +'.'+fmt
-                            plt.savefig(fm, bbox_inches='tight')
-                        
-                        print("image successfully save as", fm)
-                    
-                    plt.show()
-                    
-                
-                if showsplist:
-                    select_sp_info = self.sp_info.iloc[[agg_label1]].copy(deep=True)
-                    select_sp_info.loc[:, 'Label'] = str(np.round(index1,3))
-                    print(dash_line)
-                    print(select_sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
-                    print(dash_line)       
-
-                print(
-                    """The data point %(index1)s is in group %(agg_id)i, which has been merged into cluster #%(m_c)i."""% {
-                        "index1":index1, "agg_id":agg_label1, "m_c":cluster_label1
-                    }
-                )
-
-            # explain two objects relationship
-            else: # explain(index1, index2, ...)
-
-                if len(indexlist) > 0: # A more general case, index1=.., index2=.., index3=..
-                                        # need to ensure all index input are with the same style, either index or data values
-                    kwargs['index1'] = index1
-                    kwargs['index2'] = index2
-                    indexlist = ['index1', 'index2'] + indexlist
-                    indexvalues = [index1, index2] + indexvalues
-                    
-                    if isinstance(index1, int):
-                        objects = np.array([self.x_pca[kwargs[i]] for i in indexlist]) # data has been normalized
-                        group_labels_m = np.array([int(groups_[kwargs[i]]) for i in indexlist])
-                        
-                    elif isinstance(index1, str):
-                        objects = list()
-                        group_labels_m = list()
-                        
-                        for _index in indexlist:
-                            if _index in self.index_data:
-                                if len(set(self.index_data)) != len(self.index_data):
-                                    warnings.warn("The index of data is duplicate.")
-                                    _object = self.x_pca[np.where(self.index_data == index1)[0]][0]
-                                    temp_label = groups_(np.where(self.index_data == _index)[0][0])
-                                else:
-                                    _object = self.x_pca[self.index_data == index1][0]
-                                    temp_label = groups_(self.index_data == _index)
-                                    
-                                objects.append(_object)
-                                group_labels_m.append(temp_label)
-                                
-                            else:
-                                raise ValueError("Please enter a legal value for index.")
-                        
-                        objects = np.array(objects)
-                        group_labels_m = np.array(group_labels_m)
-                        
-                        
-                    elif isinstance(index1, list) or isinstance(index1, np.ndarray):
-                        objects = np.array([np.array((kwargs[i] - self._mu) / self._scl) for i in indexlist])
-
-                        if data.shape[1] > 2:
-                            objects = np.array([np.matmul(ii, self._V[np.argsort(self._s)].T) for ii in objects])
-
-                        group_labels_m = np.array([np.argmin(np.linalg.norm(self.s_pca - ii, axis=1, ord=2)) for ii in objects]) # get the group index for object1
-                        
-                    else:
-                        raise ValueError("Please enter a legal value for index.")
-                                
-                    cluster_labels_m = np.array([self.label_change[i] for i in group_labels_m])
-
-                    plt.style.use(style=figstyle)
-                    fig, ax = plt.subplots(figsize=figsize)
-                    ax.set_facecolor(bcolor)
-                    
-                    for i in set(cluster_labels_m):
-                        x_pca = self.x_pca[self.labels_ == i, :]
-                        ax.scatter(x_pca[:, 0], x_pca[:, 1], label='cluster '+str(i), 
-                                   marker=".", c=self.cluster_color[i], linewidth=width)
-                        
-                        s_pca = self.s_pca[np.where(self.sp_info.Cluster == i)[0], :]
-                        if i == 0:
-                            ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, label='group centers', 
-                                   s=sp_size, c=sp_mcolor, linewidth=0.9*width)
-                        else:
-                            ax.scatter(s_pca[:,0], s_pca[:,1], marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=0.9*width)
-
-                        s_pca = self.s_pca[self.sp_info.Cluster == i]
-
-                        if showallgroups:
-                            for ii in range(s_pca.shape[0]):
-                                if sp_fontsize is None:
-                                    ax.text(s_pca[ii, 0], s_pca[ii, 1],
-                                            s=str(self.sp_info.Group[self.sp_info.Cluster == i].astype(int).values[ii]),
-                                            bbox=sp_bbox
-                                    )
-                                else:
-                                    ax.text(s_pca[ii, 0], s_pca[ii, 1],
-                                            s=str(self.sp_info.Group[self.sp_info.Cluster == i].astype(int).values[ii]),
-                                            fontsize=sp_fontsize, bbox=sp_bbox
-                                    )
-
-
-                    for i in set(group_labels_m):
-                        s_pca = self.s_pca[i]
-                        ax.scatter(s_pca[0], s_pca[1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, linewidths=sp_clinewidths)
-                                   # ax.scatter(s_pca[0], s_pca[1], marker=sp_marker, c=sp_mcolor)
-                        
-                        if data.shape[1] <= 2 and show_obj_grp_circle:
-                            ax.add_patch(plt.Circle((s_pca[0], s_pca[1]), self.radius, fill=False,
-                                                     color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
-                    
-                    ax.set_aspect('equal', adjustable='datalim')
-
-                    if dp_fontsize is None:
-                        for ii in range(len(indexlist)):
-                            if isinstance(index1, int) or isinstance(index1, str):
-                                _index = indexvalues[ii]
-                            else:
-                                _index = indexlist[ii]
-                                
-                            _object = objects[ii]
-                            
-                            ax.text(_object[0], _object[1], s=str(_index), bbox=dp_bbox, color=obj_color)
-                            ax.scatter(_object[0], _object[1], marker="*", s=obj_msize,
-                                       label='data point {} '.format(_index)+'(group center #{0})'.format(
-                                           group_labels_m[ii]))
-                    else:
-                        
-                        for ii in range(len(indexlist)):
-                            if isinstance(index1, int) or isinstance(index1, str):
-                                _index = indexvalues[ii]
-                            else:
-                                _index = indexlist[ii]
-                            
-                            ax.text(_object[0], _object[1], s=str(_index), fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                            ax.scatter(_object[0], _object[1], marker="*", s=obj_msize)
-                    
-                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
-
-                    if axis:
-                        ax.axis('on')
-                        if data.shape[1] > 1:
-                            ax.set_xlabel("1st principal component")
-                            ax.set_ylabel("2nd principal component")
-                        else:
-                            ax.set_xlabel("1st principal component")
-                    else:
-                        ax.axis('off') # the axis here may not be consistent, so hide.
-
-                    ax.plot()
-                    if savefig:
-                        if not os.path.exists("img"):
-                            os.mkdir("img")
-                        if fmt == 'pdf':
-                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'_m.pdf'
-                            plt.savefig(fm, bbox_inches='tight')
-                        elif fmt == 'png':
-                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'_m.png'
-                            plt.savefig(fm, bbox_inches='tight')
-                        else:
-                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'_m.'+fmt
-                            plt.savefig(fm, bbox_inches='tight')
-                        
-                        print("image successfully save as ", fm)
-                    
-                    plt.show()
-                    return 
-                
-                if isinstance(index2, int):
-                    object2 = self.x_pca[index2] # data has been normalized
-                    agg_label2 = groups_[index2] # get the group index for object2
-                    
-                elif isinstance(index2, str):
-                    if index2 in self.index_data:
-                        if len(set(self.index_data)) != len(self.index_data):
-                            warnings.warn("The index of data is duplicate.")
-                            object2 = self.x_pca[np.where(self.index_data == index2)[0][0]][0]
-                            agg_label2 = groups_[np.where(self.index_data == index2)[0][0]]
-                        else:
-                            object2 = self.x_pca[self.index_data == index2][0]
-                            agg_label2 = groups_[self.index_data == index2][0]
-                    else:
-                        raise ValueError("Please enter a legal value for index2.")
-                        
-                elif isinstance(index2, list) or isinstance(index2, np.ndarray):
-                    index2 = np.array(index2)
-                    object2 = (index2 - self._mu) / self._scl # allow for out-sample data
-                    
-                    if data.shape[1] > 2:
-                        object2 = np.matmul(object2, self._V[np.argsort(self._s)].T)
-                    
-                    agg_label2 = np.argmin(np.linalg.norm(self.s_pca - object2, axis=1, ord=2)) # get the group index for object2
-                
-                else:
-                    raise ValueError("Please enter a legal value for index2.")
-
-                if showsplist:
-                    
-                    select_sp_info = self.sp_info.iloc[[agg_label1, agg_label2]].copy(deep=True)
-                    if isinstance(index1, int) or isinstance(index1, str):
-                        select_sp_info.loc[:, 'Label'] = [index1, index2]
-                    else:
-                        select_sp_info.loc[:, 'Label'] = [str(np.round(index1, 3)), str(np.round(index2, 3))]
-                        
-                    print(dash_line)
-                    print(select_sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
-                    print(dash_line)       
-
-                if replace_name is not None:
-                    if isinstance(replace_name, list) or isinstance(replace_name, np.ndarray):
-                        try:
-                            index1 = replace_name[0]
-                            index2 = replace_name[1]
-                        except:
-                            index1 = replace_name[0]
-                            
-                else:
-                    index1 = index1
-                    index2 = index2
-
-                cluster_label1, cluster_label2 = self.label_change[agg_label1], self.label_change[agg_label2]
-
-                
-                if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
-                    connected_paths = [agg_label1]
-                else:
-                    from scipy.sparse import csr_matrix
-                    
-                    if self.connected_pairs_ is None:
-                        distm = pairwise_distances(self.s_pca)
-                        distm = (distm <= self.radius*self.scale).astype(int)
-                        self.connected_pairs_ = return_csr_matrix_indices(csr_matrix(distm)).tolist() # list
-                        
-                    if cluster_label1 == cluster_label2: # when ind1 & ind2 are in the same cluster but diff group
-                        # deprecated (24/07/2021)  from scipy.sparse.csgraph import shortest_path -> Dijkstra’s algorithm 
-                        # path_graph = pairs_to_graph(self.connected_pairs_, N=self.splist_.shape[0], sparse=True)
-                        ## apply Dijkstra’s algorithm with Fibonacci heaps for shortest path finding
-                        # dist_matrix, predecessors = shortest_path(csgraph=path_graph, method="D", directed=False, return_predecessors=True) 
-                        # connected_paths = get_shortest_path(predecessors, agg_label1, agg_label2)
-
-                        connected_paths = find_shortest_path(agg_label1,
-                                                             self.connected_pairs_,
-                                                             self.splist_.shape[0],
-                                                             agg_label2
-                        )
-                        
-                        connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
-                        
-                    else: 
-                        connected_paths = []
-                        
-                if plot == True:
-                    plt.style.use(style=figstyle)
-                    fig, ax = plt.subplots(figsize=figsize)
-                    ax.set_facecolor(bcolor)
-                    
-                    # select indices
-                    union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
-                    s_pca = self.s_pca[union_ind]
-                    
-                    if cluster_label1 == cluster_label2:
-                        x_pca = self.x_pca[self.labels_ == cluster_label1]
-                        ax.scatter(x_pca[:, 0], x_pca[:, 1], marker=".", label='cluster #'+str(cluster_label1),
-                                    c=self.cluster_color[cluster_label1], linewidth=width)
-                    else:
-                        x_pca1 = self.x_pca[self.labels_ == cluster_label1]
-                        x_pca2 = self.x_pca[self.labels_ == cluster_label2]
-                        ax.scatter(x_pca1[:, 0], x_pca1[:, 1], marker=".", label='cluster #'+str(cluster_label1),
-                                    c=self.cluster_color[cluster_label1], linewidth=width)
-                        
-                        ax.scatter(x_pca2[:, 0], x_pca2[:, 1], marker=".", label='cluster #'+str(cluster_label2),
-                                    c=self.cluster_color[cluster_label2], linewidth=width)
-                        
-                    ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size,
-                                c=sp_mcolor, linewidth=0.9*width)
-                    
-                    if isinstance(index1, int) or isinstance(index1, str):
-                        if dp_fontsize is None:
-                            ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s=str(index2), bbox=dp_bbox, color=obj_color)
-                        else:
-                            ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s=str(index2), fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                    else:
-                        if dp_fontsize is None:
-                            ax.text(object1[0], object1[1], s='index 1', bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s='index 2', bbox=dp_bbox, color=obj_color)
-                        else:
-                            ax.text(object1[0], object1[1], s='index 1', fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                            ax.text(object2[0], object2[1], s='index 2', fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-                        
-
-                    ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, 
-                               label='data point {} '.format(index1)+'(group center #{0})'.format(
-                                   agg_label1)
-                            )
-                    
-                    ax.scatter(object2[0], object2[1], marker="*", s=obj_msize,
-                                label='data point {} '.format(index2)+'(group center #{0})'.format(
-                                    agg_label2)
-                            )
-                    
-                    for i in range(s_pca.shape[0]):
-                        if data.shape[1] <= 2 and show_all_grp_circle:
-                                ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
-                                                    color=color, alpha=alpha, lw=cline_width, clip_on=False)
-                                                    )
-                                
-                        if union_ind[i] in connected_paths:
-                            # draw circle for connected starting points or not, 
-                            # and also determine the marker of the connected starting points.
-                            if union_ind[i] == connected_paths[0]: 
-                                ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, 
-                                       label='connected group centers', c=sp_ccolor, linewidths=sp_clinewidths)
-                            else:
-                                ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, 
-                                           linewidths=sp_clinewidths)
-                                
-                            if data.shape[1] <= 2:
-                                if show_connected_grp_circle:
-                                    ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
-                                                    color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
-                                    
-                            
-                        ax.set_aspect('equal', adjustable='datalim')
-                        
-                        if showallgroups:
-                            if sp_fontsize is None:
-                                ax.text(s_pca[i, 0], s_pca[i, 1], 
-                                        s=self.sp_info.Group[
-                                            (self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2)
-                                            ].values[i].astype(int).astype(str),
-                                        bbox=sp_bbox
-                                )
-
-                            else:
-                                ax.text(s_pca[i, 0], s_pca[i, 1], 
-                                        s=self.sp_info.Group[union_ind].values[i].astype(int).astype(str),
-                                        fontsize=sp_fontsize, bbox=sp_bbox
-                                )
-
-                    if show_obj_grp_circle:
-                        ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False,
-                                        color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
-                        
-                        ax.add_patch(plt.Circle((self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1]), self.radius, fill=False,
-                                        color=connect_color, alpha=alpha, lw=cline_width, clip_on=False))
-                        
-                    nr_cps = len(connected_paths)
-                    
-                    if add_arrow:
-                        for i in range(nr_cps - 1):
-                            arrowStart=(self.s_pca[connected_paths[i], 0], self.s_pca[connected_paths[i], 1])
-                            arrowStop=(self.s_pca[connected_paths[i+1], 0], self.s_pca[connected_paths[i+1], 1])
-
-                            if directed_arrow == 0:
-                                ax.annotate("", arrowStop, 
-                                            xytext=arrowStart, 
-                                            arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=arrow_shrinkA, 
-                                                            shrinkB=arrow_shrinkB, 
-                                                            edgecolor=arrow_fc,
-                                                            facecolor=arrow_ec,
-                                                            linestyle=arrow_linestyle,
-                                                            linewidth=arrow_linewidth
-                                                            )
-                                            )
-                                
-                                ax.annotate("", arrowStart,
-                                            xytext=arrowStop, 
-                                            arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=arrow_shrinkA, 
-                                                            shrinkB=arrow_shrinkB, 
-                                                            edgecolor=arrow_fc,
-                                                            facecolor=arrow_ec,
-                                                            linestyle=arrow_linestyle,
-                                                            linewidth=arrow_linewidth
-                                                            )
-                                            )
-                                    
-                            elif directed_arrow == 1:
-                                ax.annotate("", arrowStop,
-                                            xytext=arrowStart,
-                                            arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=arrow_shrinkA, 
-                                                            shrinkB=arrow_shrinkB, 
-                                                            edgecolor=arrow_fc,
-                                                            facecolor=arrow_ec,
-                                                            linestyle=arrow_linestyle
-                                                            )
-                                            )
-
-                            else:
-                                ax.annotate("", arrowStart,
-                                            xytext=arrowStop, 
-                                            arrowprops=dict(arrowstyle="-|>",
-                                                            shrinkA=arrow_shrinkA, 
-                                                            shrinkB=arrow_shrinkB, 
-                                                            edgecolor=arrow_fc,
-                                                            facecolor=arrow_ec,
-                                                            linestyle=arrow_linestyle,
-
-                                                            )
-                                            )
-                                
-                    ax.legend(bbox_to_anchor=(1, -0.1), ncols=2)
-                    
-                    if cluster_label1 == cluster_label2:
-                        ax.set_title("Cluster #{0}".format(cluster_label1))
-
-                    if axis:
-                        ax.axis('on')
-                        if data.shape[1] > 1:
-                            ax.set_xlabel("1st principal component")
-                            ax.set_ylabel("2nd principal component")
-                        else:
-                            ax.set_xlabel("1st principal component")
-                    else:
-                        ax.axis('off') # the axis here may not be consistent, so hide.
-                        
-                    ax.plot()
-                    if savefig:
-                        if not os.path.exists("img"):
-                            os.mkdir("img")
-                        if fmt == 'pdf':
-                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'.pdf'
-                            plt.savefig(fm, bbox_inches='tight')
-                        elif fmt == 'png':
-                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'.png'
-                            plt.savefig(fm, bbox_inches='tight')
-                        else:
-                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'.'+fmt
-                            plt.savefig(fm, bbox_inches='tight')
-                            
-                        print("image successfully save as", fm)
-                        
-                    plt.show()
-
-                    if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
-                        print("The data points %(index1)s and %(index2)s are in the same group %(agg_id)i, hence were merged into the same cluster #%(m_c)i"%{
-                            "index1":index1, "index2":index2, "agg_id":agg_label1, "m_c":cluster_label1}
-                        )
-                    else:
-                        if cluster_label1 == cluster_label2:
-                            print(
-                            """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
-                                """\nboth of which were merged into cluster #%(cluster)i. """% {
-                                "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
-                            )
-                            
-                            print("""These two groups are connected via groups %(connected)s.""" % {
-                                "connected":connected_paths_vis}
-                            )
-                        else: 
-                            connected_paths = []
-                            print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
-                                "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1})
-
-                            print("""The data point %(index2)s is in group %(agg_id2)i, which has been merged into cluster %(c_id2)s.""" % {
-                                "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2})   
-                            
-                            print("""There is no path of overlapping groups between these clusters.""")
-
-                    self.connected_paths = connected_paths
-        return 
-    
-
-    
-    
-    def explain_viz_zoomin(self, showalldata=False, figsize=(8, 6), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
-                    savefig=False, fontsize=None, bbox={'facecolor': 'tomato', 'alpha': 0.3, 'pad': 2}, axis="off", fmt="pdf"):
-        """Visualize the starting point and data points"""
-        from matplotlib import pyplot as plt
-
-        if self.x_pca.shape[0] > 1e5 and not showalldata:
-            warnings.warn("Too many data points for plot. Randomly subsampled 1e5 points.")
-            selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
-        else:
-            selectInd = np.arange(self.x_pca.shape[0])
-
-        if self.cluster_color is None:
-            self.cluster_color = dict()
-            for i in np.unique(self.labels_):
-                self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
-        
-        plt.style.use(style=figstyle)
-        plt.figure(figsize=figsize)
-        plt.rcParams['axes.facecolor'] = bcolor
-        
-        for i in np.unique(self.labels_):
-            x_pca_part = self.x_pca[selectInd][self.labels_[selectInd] == i,:]
-            plt.scatter(x_pca_part[:,0], x_pca_part[:,1], marker=".", linewidth=width, c=self.cluster_color[i], 
-                        label='cluster '+str(i))
-            
-            if showallgroups:
-                for j in range(self.s_pca.shape[0]):
-                    if fontsize is None:
-                        plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), bbox=bbox)
-                    else:
-                        plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), fontsize=fontsize, bbox=bbox)
-
-        if showallgroups:
-            plt.scatter(self.s_pca[:,0], self.s_pca[:,1], label='group centers', 
-                        marker=sp_marker, linewidth=0.9*width, c=sp_mcolor)
-
-        plt.xlim([np.min(self.x_pca[:,0])-0.1, np.max(self.x_pca[:,0])+0.1])
-        plt.ylim([np.min(self.x_pca[:,1])-0.1, np.max(self.x_pca[:,1])+0.1])
-        plt.legend(bbox_to_anchor=(1, -0.1), ncols=5)
-
-        if axis:
-            plt.axis('on')
-            if self.s_pca.shape[1] > 1:
-                plt.xlabel("1st principal component")
-                plt.ylabel("2st principal component")
-            else:
-                plt.xlabel("1st principal component")
-        else:
-            plt.axis('off') # the axis here may not be consistent, so hide.
-
-        if savefig:
-            if not os.path.exists("img"):
-                os.mkdir("img")
-            if fmt == 'pdf':
-                fm = 'img/explain_viz.pdf'
-                plt.savefig(fm, bbox_inches='tight')
-            elif fmt == 'png':
-                fm = 'img/explain_viz.png'
-                plt.savefig(fm, bbox_inches='tight')
-            else:
-                fm = 'img/explain_viz.'+fmt
-                plt.savefig(fm, bbox_inches='tight')
-                
-            print("image successfully save as", fm)
-            
-
-        plt.show()
-            
-        return
-        
         
 
     def form_starting_point_clusters_table(self, aggregate=False):
