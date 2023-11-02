@@ -175,9 +175,9 @@ X = pd.DataFrame(X, index=['Anna', 'Bert', 'Carl', 'Tom', 'Bob'])
 # Tom  |  0.957658 |  3.264680
 # Bob  | -2.451818 |  2.797037
 
-clx = CLASSIX(radius=0.5)
+clx = CLASSIX(radius=0.6)
 clx.fit_transform(X)
-clx.explain(index1='Tom', index2='Bert', plot=True, sp_fontsize=12)
+clx.explain(index1='Carl', index2='Bert', plot=True, sp_fontsize=12, showallgroups=True)
 ```
 
 Output:
@@ -185,13 +185,8 @@ Output:
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=500 />
 
 ```
-----------------------------------------
- Group  NrPts  Cluster Coordinates  Label
-   3      1       0      0.76 0.65    Tom
-   1      1       1     -0.9 -0.55   Bert
-----------------------------------------
-The data point Tom is in group 3, which has been merged into cluster 0.
-The data point Bert is in group 1, which has been merged into cluster 1.
+The data point Carl is in group 1, which has been merged into cluster 1.
+The data point Bert is in group 0, which has been merged into cluster 0.
 There is no path of overlapping groups between these clusters.
 ```
 
