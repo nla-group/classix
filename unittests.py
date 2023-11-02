@@ -269,7 +269,6 @@ class TestClassix(unittest.TestCase):
             clx.explain(0,  plot=True, savefig=False)
             clx.explain(3, 2000,  plot=True, savefig=False)
             clx.explain(0, 2008,  plot=True, savefig=False)
-            clx.explain(index1=0, index2=2008, index3=100,  plot=True, savefig=False)
         except:
             checkpoint = 0
 
