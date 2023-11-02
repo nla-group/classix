@@ -1143,11 +1143,10 @@ class CLASSIX:
                                label='group center {0}'.format(agg_label1)
                                )
 
-                        
                     ax.set_aspect('equal', adjustable='datalim')
                     ax.plot()
 
-                    ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.2), ncols=3)
+                    ax.legend(ncols=3, loc='best') # bbox_to_anchor=(0.5, -0.2)
                     
                     if axis:
                         ax.axis('on')
@@ -1333,9 +1332,6 @@ class CLASSIX:
                                     cluster_label2)
                             )
 
-
-                    
-                    
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
                                 ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
@@ -1347,7 +1343,7 @@ class CLASSIX:
                             # and also determine the marker of the connected starting points.
                             if union_ind[i] == connected_paths[0]: 
                                 ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, 
-                                       label='connected group centers', c=sp_ccolor, linewidths=sp_clinewidths)
+                                       label='connected groups', c=sp_ccolor, linewidths=sp_clinewidths)
                             else:
                                 ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, 
                                            linewidths=sp_clinewidths)
@@ -1442,8 +1438,15 @@ class CLASSIX:
                                                             )
                                             )
                                 
-                    ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.25), ncols=3)
-                    
+
+                    if cluster_label1 == cluster_label2: # change the order of legend
+                        handles, lg_labels = ax.get_legend_handles_labels()
+                        lg_labels = [lg_labels[i] for i in [0,3,1,2,4,5]]
+                        handles = [handles[i] for i in [0,3,1,2,4,5]]
+                        ax.legend(handles, lg_labels, ncols=3, loc='best')
+                    else:
+                        ax.legend(ncols=3, loc='best')
+
                     ax.set_title("""{num_clusters:.0f} clusters (radius={tol:.2f}, minPts={minPts:.0f})""".format(
                         num_clusters=len(np.unique(self.labels_)),tol=self.radius, minPts=self.minPts))
                     
