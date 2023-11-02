@@ -779,7 +779,7 @@ class CLASSIX:
                 plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5, 
                 obj_msize=160, sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, 
                 sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, sp_ccolor="crimson", sp_clinewidths=2.7, 
-                dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,
+                dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None, cmap="turbo", cmin=0.07, cmax=0.97,
                 show_all_grp_circle=False, show_connected_grp_circle=False, show_obj_grp_circle=True,  color="red", connect_color="green", alpha=0.5, cline_width=2, 
                 add_arrow=True, arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
                 arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', figname=None, fmt="pdf"):
@@ -973,6 +973,19 @@ class CLASSIX:
             dp_bbox['alpha'] = dp_alpha
             dp_bbox['pad'] = dp_pad
 
+        if cmap is not None:
+            _cmap = plt.cm.get_cmap(cmap)
+            _interval = np.linspace(cmin, cmax, len(set(self.labels_))) 
+            self.cluster_color = list()
+            for c in _interval:
+                rgba = _cmap(c) 
+                color_hex = colors.rgb2hex(rgba) 
+                self.cluster_color.append(str(color_hex)) 
+        else:
+            self.cluster_color = dict()
+            for i in np.unique(self.labels_):
+                self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
+
         if self.inverse_ind is None:
             self.inverse_ind = np.argsort(self.ind)
 
@@ -1014,8 +1027,8 @@ class CLASSIX:
         
         if index1 is None: # analyze in the general way with a global view
             if plot == True:
-                self.explain_viz(showalldata=showalldata, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, sp_marker=sp_marker,
-                                 sp_mcolor=sp_mcolor, width=width, axis=axis, fmt=fmt)
+                self.explain_viz(showalldata=showalldata, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, 
+                                 fontsize=sp_fontsize, bbox=sp_bbox, sp_marker=sp_marker, sp_mcolor=sp_mcolor, width=width, axis=axis, fmt=fmt)
                 
             data_size = data.shape[0]
             feat_dim = data.shape[1]
@@ -1512,7 +1525,7 @@ class CLASSIX:
 
 
     def explain_viz(self, showalldata=False, figsize=(10, 7), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
-                    savefig=False, axis="off", fmt="pdf"):
+                    savefig=False, fontsize=None, bbox=None, axis="off", fmt="pdf"):
         """Visualize the starting point and data points"""
         
         from matplotlib import pyplot as plt
@@ -1529,6 +1542,13 @@ class CLASSIX:
 
         plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], marker=".", linewidth=width, c=self.labels_[selectInd])
         
+        if showallgroups:
+            for j in range(self.s_pca.shape[0]):
+                if fontsize is None:
+                    plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), zorder=1, ha='left', bbox=bbox)
+                else:
+                    plt.text(self.s_pca[j, 0], self.s_pca[j, 1], str(j), zorder=1, ha='left', fontsize=fontsize, bbox=bbox)
+
         if showallgroups:
             plt.scatter(self.s_pca[:,0], self.s_pca[:,1], label='group centers', 
                         marker=sp_marker, linewidth=0.9*width, c=sp_mcolor)
