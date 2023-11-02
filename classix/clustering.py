@@ -1102,25 +1102,22 @@ class CLASSIX:
                     ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", linewidth=0.5*width, 
                                c=self.labels_[selectInd])
                     
-                    ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers', 
-                               s=sp_size, linewidth=0.9*width, c=sp_mcolor)
+                    ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers in cluster #{0}'.format(cluster_label1), 
+                               s=sp_size, linewidth=0.9*width, c=sp_mcolor, alpha=0.4)
                     
                     if show_obj_grp_circle:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
                                                 color='lime', alpha=alpha, lw=cline_width*1.5, clip_on=False))
                         
-                    ax.scatter(object1[0], object1[1], marker="*", s=obj_msize,
-                                label='data point {} '.format(index1)+'(cluster #{0})'.format(
-                                    cluster_label1
-                                    )
-                                )
+                    
                     
                     if dp_fontsize is None:
-                        ax.text(object1[0], object1[1], s=str(index1), bbox=dp_bbox, color=obj_color, zorder=1, ha='left')
+                        ax.text(object1[0], object1[1], s=' ' + str(index1), bbox=dp_bbox, color=obj_color, zorder=1, ha='left', va='bottom')
                     else:
-                        ax.text(object1[0], object1[1], s=str(index1), fontsize=dp_fontsize, bbox=dp_bbox,
-                                 color=obj_color, zorder=1, ha='left')
-                    
+                        ax.text(object1[0], object1[1], s=' ' + str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color, zorder=1, ha='left', va='bottom')
+
+
+                    ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, label='data point {} '.format(index1))
 
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
