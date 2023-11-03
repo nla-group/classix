@@ -121,23 +121,6 @@ We repeatedly run each algorithm 10 times and get the average runtime for compar
     plt.title('CLASSIX',  fontsize=20)
     plt.show()
     
-    sum_time = 0
-    clx = CLASSIX(sorting='pca', radius=1, verbose=0, group_merging='distance', mergeTinyGroups=False)
-    
-    for i in range(sample_size):
-        st = time.time()
-        clx.fit_transform(data)
-        et = time.time()
-        sum_time = sum_time + et - st
-    
-    timing.append(sum_time/sample_size)
-    print("Average consume time: ", sum_time/sample_size)
-    plt.figure(figsize=(24,10))
-    plt.scatter(data[:,0], data[:,1], c=clx.labels_, cmap='jet')
-    plt.tick_params(axis='both',  labelsize=15)
-    plt.title('CLASSIX - mergeTinyGroups',  fontsize=20)
-    plt.show()
-    
 .. image:: images/DBSCAN.png
 .. image:: images/HDBSCAN.png
 .. image:: images/Quickshiftpp.png
