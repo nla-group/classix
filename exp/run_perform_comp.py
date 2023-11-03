@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from numpy.linalg import norm
-from classix.aggregation_test import aggregate
+from aggregation_test import aggregate
 from classix import CLASSIX
 from quickshift.QuickshiftPP import *
 from sklearn import metrics
@@ -362,11 +362,11 @@ def run_comp_sort():
             X_pca = shift_scale(X, "pca")
             #labels_no,sp_no, nr_dist_no = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=True)
             #labels_nm, sp_nm, nr_dist_nm = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=True)
-            labels_pca, sp_pca, nr_dist_pca = aggregate(X_pca, tol=0.3, sorting='pca', early_stopping=True)
+            labels_pca, sp_pca, nr_dist_pca, _ = aggregate(X_pca, tol=0.3, sorting='pca', early_stopping=True)
 
             #nlabels_no, nsp_no, nnr_dist_no = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=False)
             #nlabels_nm, nsp_nm, nnr_dist_nm = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=False)
-            nlabels_pca, nsp_pca, nnr_dist_pca = aggregate(X_pca, tol=0.3, sorting='pca', early_stopping=False)
+            nlabels_pca, nsp_pca, nnr_dist_pca, _ = aggregate(X_pca, tol=0.3, sorting='pca', early_stopping=False)
             nr_dist_size.append(nr_dist_pca/i)
             nr_dist_size_n.append(nnr_dist_pca/i)
 
@@ -379,11 +379,11 @@ def run_comp_sort():
             X_pca = shift_scale(X, "pca")
             #labels_no,sp_no, nr_dist_no = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=True)
             #labels_nm, sp_nm, nr_dist_nm = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=True)
-            labels_pca, sp_pca, nr_dist_pca = aggregate(X_pca, tol=0.3, sorting='pca', early_stopping=True)
+            labels_pca, sp_pca, nr_dist_pca, _ = aggregate(X_pca, tol=0.3, sorting='pca', early_stopping=True)
 
             #nlabels_no, nsp_no, nnr_dist_no = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=False)
             #nlabels_nm, nsp_nm, nnr_dist_nm = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=False)
-            nlabels_pca, nsp_pca, nnr_dist_pca = aggregate(X_pca, tol=0.3, sorting='pca', early_stopping=False)
+            nlabels_pca, nsp_pca, nnr_dist_pca, _ = aggregate(X_pca, tol=0.3, sorting='pca', early_stopping=False)
             nr_dist_dim.append(nr_dist_pca/10000)
             nr_dist_dim_n.append(nnr_dist_pca/10000)        
         return nr_dist_size, nr_dist_size_n, nr_dist_dim, nr_dist_dim_n
