@@ -4,7 +4,7 @@ import seaborn as sns
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
-from classix.aggregation_test import aggregate
+from aggregation_test import aggregate
 from sklearn.metrics.cluster import adjusted_mutual_info_score as ami
 from sklearn.metrics.cluster import adjusted_rand_score as ari
 
@@ -67,13 +67,13 @@ def count_distance():
         X_orthant = shift_scale(X, "norm-orthant")
         X_mean = shift_scale(X, "norm-mean")
         X_pca = shift_scale(X, "pca")
-        labels_no,sp_no, nr_dist_no = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=True)
-        labels_nm, sp_nm, nr_dist_nm = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=True)
-        labels_pca, sp_pca, nr_dist_pca = aggregate(X_pca, tol=0.5, sorting='pca', early_stopping=True)
+        labels_no,sp_no, nr_dist_no, _ = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=True)
+        labels_nm, sp_nm, nr_dist_nm, _ = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=True)
+        labels_pca, sp_pca, nr_dist_pca, _ = aggregate(X_pca, tol=0.5, sorting='pca', early_stopping=True)
 
-        nlabels_no, nsp_no, nnr_dist_no = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=False)
-        nlabels_nm, nsp_nm, nnr_dist_nm = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=False)
-        nlabels_pca, nsp_pca, nnr_dist_pca = aggregate(X_pca, tol=0.5, sorting='pca', early_stopping=False)
+        nlabels_no, nsp_no, nnr_dist_no, _ = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=False)
+        nlabels_nm, nsp_nm, nnr_dist_nm, _ = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=False)
+        nlabels_pca, nsp_pca, nnr_dist_pca, _ = aggregate(X_pca, tol=0.5, sorting='pca', early_stopping=False)
         
         nr_dist_centers_num[i] = [nr_dist_no, nr_dist_nm, nr_dist_pca]
         centers_num_ln[i] = [len(sp_no), len(sp_nm), len(sp_pca)]
@@ -93,13 +93,13 @@ def count_distance():
         X_mean = shift_scale(X, "norm-mean")
         X_pca = shift_scale(X, "pca")
         
-        labels_no,sp_no, nr_dist_no = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=True)
-        labels_nm, sp_nm, nr_dist_nm = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=True)
-        labels_pca, sp_pca, nr_dist_pca = aggregate(X_pca, tol=0.5, sorting='pca', early_stopping=True)
+        labels_no,sp_no, nr_dist_no, _ = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=True)
+        labels_nm, sp_nm, nr_dist_nm, _ = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=True)
+        labels_pca, sp_pca, nr_dist_pca, _ = aggregate(X_pca, tol=0.5, sorting='pca', early_stopping=True)
         
-        nlabels_no, nsp_no, nnr_dist_no = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=False)
-        nlabels_nm, nsp_nm, nnr_dist_nm = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=False)
-        nlabels_pca, nsp_pca, nnr_dist_pca = aggregate(X_pca, tol=0.5, sorting='pca', early_stopping=False)
+        nlabels_no, nsp_no, nnr_dist_no, _ = aggregate(X_orthant, tol=0.5, sorting='norm-orthant', early_stopping=False)
+        nlabels_nm, nsp_nm, nnr_dist_nm, _ = aggregate(X_mean, tol=0.5, sorting='norm-mean', early_stopping=False)
+        nlabels_pca, nsp_pca, nnr_dist_pca, _ = aggregate(X_pca, tol=0.5, sorting='pca', early_stopping=False)
         
         nr_dist_fdim_num[num] = np.array([nr_dist_no, nr_dist_nm, nr_dist_pca])
         fdim_num_ln[num] = np.array([len(sp_no), len(sp_nm), len(sp_pca)])
@@ -133,7 +133,7 @@ def count_distance():
 
 def exp_aggregate_nr_dist(data, tol=0.15, sorting='pca', early_stopping=True):
     data = shift_scale(data, sorting)
-    labels, splist, nr_dist = aggregate(data, sorting=sorting, tol=tol, early_stopping=early_stopping)
+    labels, splist, nr_dist, _ = aggregate(data, sorting=sorting, tol=tol, early_stopping=early_stopping)
     return nr_dist, labels
 
 
