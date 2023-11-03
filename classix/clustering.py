@@ -993,7 +993,7 @@ class CLASSIX:
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
             
             if data.shape[1] > 2:
-                warnings.warn("If the group periphery is displayed, the group radius in the visualization might not be accurate.")
+                warnings.warn("If the group periphery is displayed, the group radius in the plot might not be accurate.")
                 _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
                 self.x_pca = np.matmul(data, self._V[np.argsort(self._s)].T)
                 self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
