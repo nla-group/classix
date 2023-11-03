@@ -1846,8 +1846,18 @@ class CLASSIX:
     
     @minPts.setter
     def minPts(self, value):
-        if not isinstance(value, float) or not isinstance(value,int):
-            raise TypeError('Expected a float or int type')
+        if isinstance(value, str):
+            raise TypeError('Expected a float or int type.')
+        
+        if isinstance(value, bool):
+            raise TypeError('Expected a float or int type.')
+        
+        if isinstance(value, dict):
+            raise TypeError('Expected a float or int type.')
+        
+        if hasattr(value, "__len__"):
+            raise TypeError('Expected a scalar.')
+        
         if value < 0 or (0 < value & value < 1):
             raise ValueError('Noise_scale must be 0 or greater than 1.')
         
