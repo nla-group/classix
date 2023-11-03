@@ -34,7 +34,6 @@ import pandas as pd
 from numpy.linalg import norm
 
 
-
 def cython_is_available(verbose=0):
     "Check if CLASSIX is using cython."
     
@@ -319,6 +318,9 @@ class CLASSIX:
         If allocate the outliers to the closest groups, hence the corresponding clusters. 
         If False, all outliers will be labeled as -1.
 
+    mergeTinyGroups : boolean, default=True
+        If it is False, then group merging will ignore all groups with <minPts points, otherwise not.
+    
     algorithm : str, default='bf'
         Algorithm to merge connected groups.
 
@@ -386,13 +388,12 @@ class CLASSIX:
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
     """
         
-    def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, 
+    def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, mergeTinyGroups=True,
                  memory=False, verbose=1): 
 
 
         self.verbose = verbose
         self.minPts = minPts
-
 
         self.sorting = sorting
         self.radius = radius
@@ -403,13 +404,13 @@ class CLASSIX:
         self.norm = norm # usually, we do not use this parameter
         self.scale = scale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
+        self.mergeTinyGroups = mergeTinyGroups
 
         self.sp_info = None
         self.groups_ = None
         self.clean_index_ = None
         self.labels_ = None
         self.connected_pairs_ = None
-        self.cluster_color = None
         self.connected_paths = None
         self.half_nrm2 = None
         self.inverse_ind = None
@@ -440,20 +441,20 @@ class CLASSIX:
                 import platform
                 
                 if platform.system() == 'Windows':
-                    from .merging_cm_win import density_merging, distance_merging
+                    from .merging_cm_win import density_merging, distance_merging, distance_merging_mtg
                 else:
-                    from .merging_cm import density_merging, distance_merging
+                    from .merging_cm import density_merging, distance_merging, distance_merging_mtg
 
             except (ModuleNotFoundError, ValueError):
                 if not self.__enable_aggregation_cython__:
                     from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
                 
-                from .merging import density_merging, distance_merging
+                from .merging import density_merging, distance_merging, distance_merging_mtg
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
             from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
-            from .merging import density_merging, distance_merging
+            from .merging import density_merging, distance_merging, distance_merging_mtg
             warnings.warn("This run of CLASSIX is not using Cython.")
 
         if not self.memory:
@@ -466,8 +467,11 @@ class CLASSIX:
             self._aggregate = aggregate
 
         self._density_merging = density_merging
-        self._distance_merging = distance_merging
-            
+        
+        if self.mergeTinyGroups:
+            self._distance_merging = distance_merging
+        else:
+            self._distance_merging = distance_merging_mtg
 
             
     def fit(self, data):
@@ -741,6 +745,7 @@ class CLASSIX:
             labels = self.reassign_labels(labels) 
 
         else:
+            
             labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merging(data=data, 
                                                                     labels=agg_labels,
                                                                     splist=splist,
@@ -751,6 +756,7 @@ class CLASSIX:
                                                                     half_nrm2=self.half_nrm2
                                                                 )
             
+
 
 
         labels = labels[np.argsort(ind)]
@@ -764,7 +770,6 @@ class CLASSIX:
             
             self.pprint_format(self.old_cluster_count)
 
-            
             if self.minPts > 1 and SIZE_NOISE_LABELS > 0:
                 print("As minPts is {minPts}, the number of clusters has been reduced to {r}.".format(
                     minPts=self.minPts, r=len(np.unique(labels))
@@ -776,12 +781,11 @@ class CLASSIX:
     
     
     def explain(self, index1=None, index2=None, showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
-                plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5, 
-                obj_msize=160, sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, 
-                sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, sp_ccolor="crimson", sp_clinewidths=2.7, 
-                dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None, cmap="turbo", cmin=0.07, cmax=0.97,
-                show_all_grp_circle=False, show_connected_grp_circle=False, show_obj_grp_circle=True,  color="red", connect_color="green", alpha=0.5, cline_width=2, 
-                add_arrow=True, arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
+                plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5,  obj_msize=160, sp_fcolor="tomato",
+                sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, 
+                sp_ccolor="crimson", sp_clinewidths=2.7,  dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,  show_all_grp_circle=False,
+                show_connected_grp_circle=False, show_obj_grp_circle=True,  color="red", connect_color="green", alpha=0.5, cline_width=2,  add_arrow=True, 
+                arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
                 arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', figname=None, fmt="pdf"):
         
         """
@@ -948,6 +952,9 @@ class CLASSIX:
         shrinkA, shrinkB : float, default=2
             Shrinking factor of the tail and head of the arrow respectively.
 
+        axis : boolean, default=True
+            Whether or not add x,y axes to plot.
+
         figname : str, optional
             Set the figure name for the image to be saved.
             
@@ -955,7 +962,6 @@ class CLASSIX:
             Specify the format of the image to be saved, default as 'pdf', other choice: png.
         
         """
-        import re
         from scipy.sparse.linalg import svds
         from matplotlib import pyplot as plt
         import matplotlib.colors as colors
@@ -973,18 +979,6 @@ class CLASSIX:
             dp_bbox['alpha'] = dp_alpha
             dp_bbox['pad'] = dp_pad
 
-        if cmap is not None:
-            _cmap = plt.cm.get_cmap(cmap)
-            _interval = np.linspace(cmin, cmax, len(set(self.labels_))) 
-            self.cluster_color = list()
-            for c in _interval:
-                rgba = _cmap(c) 
-                color_hex = colors.rgb2hex(rgba) 
-                self.cluster_color.append(str(color_hex)) 
-        else:
-            self.cluster_color = dict()
-            for i in np.unique(self.labels_):
-                self.cluster_color[i] = '#%06X' % np.random.randint(0, 0xFFFFFF)
 
         if self.inverse_ind is None:
             self.inverse_ind = np.argsort(self.ind)
@@ -1000,7 +994,6 @@ class CLASSIX:
             
             if data.shape[1] > 2:
                 warnings.warn("If the group periphery is displayed, the group radius in the visualization might not be accurate.")
-                # scaled_data = data - data.mean(axis=0)
                 _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
                 self.x_pca = np.matmul(data, self._V[np.argsort(self._s)].T)
                 self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
@@ -1196,7 +1189,6 @@ class CLASSIX:
                     
                 
                 if showsplist:
-                    # print(f"A list of information for {index1} is shown below.")
                     select_sp_info = self.sp_info.iloc[[agg_label1]].copy(deep=True)
                     select_sp_info.loc[:, 'Label'] = str(np.round(index1,3))
                     print(dash_line)
@@ -1329,8 +1321,6 @@ class CLASSIX:
                         else:
                             ax.text(object1[0], object1[1], s=' '+'index 1', ha='left', va='bottom', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
                             ax.text(object2[0], object2[1], s=' '+'index 2', ha='left', va='bottom', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-
-
 
                     ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, 
                                label='data point {} '.format(index1)+'(cluster #{0})'.format(
@@ -1632,12 +1622,7 @@ class CLASSIX:
         
         
     
-    def visualize_linkage(self, scale=1.5, 
-                          figsize=(10,7),
-                          labelsize=24, 
-                          markersize=320,
-                          plot_boundary=False,
-                          bound_color='red', path='.', fmt='pdf'):
+    def visualize_linkage(self, scale=1.5, figsize=(10,7), labelsize=24, markersize=320, plot_boundary=False, bound_color='red', path='.', fmt='pdf'):
         
         """Visualize the linkage in the distance clustering.
         
@@ -1861,11 +1846,12 @@ class CLASSIX:
     
     @minPts.setter
     def minPts(self, value):
-        if not isinstance(value, float) and not isinstance(value,int):
+        if not isinstance(value, float) or not isinstance(value,int):
             raise TypeError('Expected a float or int type')
         if value < 0 or (0 < value & value < 1):
             raise ValueError('Noise_scale must be 0 or greater than 1.')
-        self._minPts = value
+        
+        self._minPts = int(round(value))
     
     
 

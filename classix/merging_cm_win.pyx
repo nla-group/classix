@@ -4,7 +4,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2022 Stefan Güttel, Xinye Chen
+# Copyright (c) 2023 Stefan Güttel, Xinye Chen
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -45,13 +45,153 @@ np.import_array()
 @cython.binding(True)
 
 
+cpdef distance_merging_mtg(double[:, :] data, list labels,
+                       np.ndarray[np.int32_t, ndim=2] splist,  double radius, int minPts, double scale, 
+                       double[:] sort_vals, double[:] half_nrm2):
+
+    """
+    Implement CLASSIX's merging without merging tiny groups
+    
+    Parameters
+    ----------
+    data : numpy.ndarray
+        The input that is array-like of shape (n_samples,).
+    
+    labels : list
+        aggregation labels
+
+    splist : numpy.ndarray
+        Represent the list of starting points information formed in the aggregation. 
+        list of [ starting point index of current group, sorting values, and number of group elements ].
+
+    ind : numpy.ndarray
+        Sort values.
+
+    radius : float
+        The tolerance to control the aggregation. If the distance between the starting point 
+        of a group and another data point is less than or equal to the tolerance,
+        the point is allocated to that group. For details, we refer users to [1].
+
+    minPts : int, default=0
+        The threshold, in the range of [0, infity] to determine the noise degree.
+        When assgin it 0, algorithm won't check noises.
+
+    scale : float, default 1.5
+        Design for distance-clustering, when distance between the two starting points 
+        associated with two distinct groups smaller than scale*radius, then the two groups merge.
+
+        
+    Returns
+    -------
+    labels : numpy.ndarray
+        The merging labels.
+    
+    old_cluster_count : int
+        The number of clusters without outliers elimination.
+    
+    SIZE_NOISE_LABELS : int
+        The number of clusters marked as outliers.
+    
+    References
+    ----------
+    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
+
+    """
+
+    cdef long[:] splist_indices = splist[:, 0]
+    cdef np.ndarray[np.npy_bool, ndim=1, cast=True] gp_nr = splist[:, 1] >= minPts
+    cdef np.ndarray[np.int32_t, ndim=1] arr_labels = np.array(labels)
+    cdef double[:, :] spdata = data.base[splist_indices]
+    cdef np.ndarray[np.int32_t, ndim=1] sp_cluster_labels = arr_labels[splist_indices]   
+    cdef double[:] sort_vals_sp = sort_vals.base[splist_indices]
+    cdef double[:] half_nrm2_sp = half_nrm2.base[splist_indices]
+    cdef np.ndarray[np.float64_t, ndim=1] eucl
+    cdef np.ndarray[np.int32_t, ndim=1] copy_sp_cluster_labels
+    
+    cdef long long[:] inds, ii
+    cdef long[:] spl
+    cdef Py_ssize_t fdim =  splist.shape[0]
+    cdef Py_ssize_t i, iii, j, ell, last_j
+    cdef double[:] xi
+    cdef long long[:] merge_ind
+    cdef int minlab
+    cdef np.ndarray[np.float64_t, ndim=1] dist
+    
+    radius = scale*radius
+    cdef double scaled_radius = (radius)**2/2
+
+    for i in range(fdim):
+        if not gp_nr[i]:    # tiny groups can not take over large ones
+            continue
+
+        xi = spdata[i, :]
+
+        last_j = np.searchsorted(sort_vals_sp, radius + sort_vals_sp[i], side='right')
+        eucl = half_nrm2_sp.base[i:last_j] - np.matmul(spdata.base[i:last_j,:], xi)
+        inds = i + np.where((eucl <= scaled_radius - half_nrm2_sp[i]) & gp_nr[i:last_j])[0]
+
+        spl = np.unique(sp_cluster_labels[inds])
+        minlab = np.min(spl)
+
+        for ell in spl:
+            sp_cluster_labels[sp_cluster_labels==ell] = minlab
+
+
+    cdef long[:] ul = np.unique(sp_cluster_labels)
+    cdef Py_ssize_t nr_u = len(ul)
+
+    cdef long[:] cs = np.zeros(nr_u, dtype=int)
+    
+    cdef np.ndarray[np.npy_bool, ndim=1, cast=True] cid
+    cdef np.ndarray[np.int32_t, ndim=1] grp_sizes = splist[:, 1]
+
+    for i in range(nr_u):
+        cid = sp_cluster_labels==ul[i]
+        sp_cluster_labels[cid] = i
+        cs[i] = np.sum(grp_sizes[cid])
+
+    old_cluster_count = collections.Counter(sp_cluster_labels[arr_labels])
+    cdef long long[:] ncid = np.nonzero(cs.base < minPts)[0]
+
+    cdef Py_ssize_t SIZE_NOISE_LABELS = ncid.size
+
+    if SIZE_NOISE_LABELS > 0:
+        copy_sp_cluster_labels = sp_cluster_labels.copy()
+
+        for i in ncid:
+            ii = np.nonzero(copy_sp_cluster_labels==i)[0]
+            
+            for iii in ii:
+                xi = spdata[iii, :]    # starting point of one tiny group
+                
+                dist = half_nrm2_sp - np.matmul(spdata, xi) + half_nrm2_sp[iii]
+                merge_ind = np.argsort(dist)
+                for j in merge_ind:
+                    if cs[copy_sp_cluster_labels[j]] >= minPts:
+                        sp_cluster_labels[iii] = copy_sp_cluster_labels[j]
+                        break
+
+        ul = np.unique(sp_cluster_labels)
+        nr_u = len(ul)
+        cs = np.zeros(nr_u, dtype=int)
+
+        for i in range(nr_u):
+            cid = sp_cluster_labels==ul[i]
+            sp_cluster_labels[cid] = i
+            cs[i] = np.sum(grp_sizes[cid])
+
+    arr_labels = sp_cluster_labels[arr_labels]
+
+    return arr_labels, old_cluster_count, SIZE_NOISE_LABELS
+
+
 
 cpdef distance_merging(double[:, :] data, list labels,
                        np.ndarray[np.int32_t, ndim=2] splist,  double radius, int minPts, double scale, 
                        double[:] sort_vals, double[:] half_nrm2):
 
     """
-    Implement CLASSIX's merging with brute force computation
+    Implement CLASSIX's merging with early stopping and BLAS routines
     
     Parameters
     ----------
