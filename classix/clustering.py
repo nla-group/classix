@@ -383,6 +383,13 @@ class CLASSIX:
         The indices index1 and index2 are optional parameters (int) corresponding to the 
         indices of the data points. 
         
+    load_group_centers(self):
+        Load group centers.
+    
+    load_cluster_centers(self):
+        Load cluster centers.
+    
+    
     References
     ----------
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
@@ -419,7 +426,6 @@ class CLASSIX:
         if self.verbose:
             print(self)
         
-        self.splist_indices = [None]
         self.index_data = []
         self.memory = memory
 
@@ -605,9 +611,11 @@ class CLASSIX:
         num_of_points = data.shape[0]
 
         if self.label_change is None:
+            
             if self.inverse_ind is None:
                 self.inverse_ind = np.argsort(self.ind)
                 groups = np.array(self.groups_)
+                
             self.label_change = dict(zip(groups[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
 
         if not memory:
@@ -757,9 +765,8 @@ class CLASSIX:
                                                                 )
             
 
-
-
-        labels = labels[np.argsort(ind)]
+        self.inverse_ind = np.argsort(ind)
+        labels = labels[self.inverse_ind]
 
         if self.verbose == 1:
             print("""CLASSIX aggregated the {datalen} data points into {num_group} groups. """.format(datalen=len(data), num_group=splist.shape[0]))
@@ -986,11 +993,9 @@ class CLASSIX:
             dp_bbox['pad'] = dp_pad
 
 
-        if self.inverse_ind is None:
-            self.inverse_ind = np.argsort(self.ind)
-
+        if self.label_change is None:
             groups_ = np.array(self.groups_)
-            self.label_change = dict(zip(groups_[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
+            self.label_change = dict(zip(groups_[self.inverse_ind], self.labels_)) # how object change group to cluster.
 
         data = self.data[self.inverse_ind]
         groups_ = np.array(self.groups_)
@@ -1709,12 +1714,23 @@ class CLASSIX:
         return self.ind[self.splist_[spid, 0]]
 
 
+    
+    def load_group_centers(self):
+        """Load group centers."""
+            
+        if self.grp_centers is None:
+            self.grp_centers = calculate_cluster_centers(self.data, self.groups_)
+            return self.grp_centers
+        else:
+            return self.grp_centers
+        
+        
 
     def load_cluster_centers(self):
         """Load cluster centers."""
-        
+            
         if self.centers is None:
-            self.centers = calculate_cluster_centers(self.data*self._scl + self._mu, self.labels_)
+            self.centers = calculate_cluster_centers(self.data[self.inverse_ind], self.labels_)
             return self.centers
         else:
             return self.centers
@@ -1733,16 +1749,6 @@ class CLASSIX:
         return centers
 
     
-    def load_splist_indices(self):
-        """Get the starting point indices."""
-        
-        if self.splist_indices is not None:
-            self.splist_indices = np.full(self.data.shape[0], 0, dtype=int)
-            self.splist_indices[self.splist_[:,0].astype(int)] = 1
-            
-        return self.splist_indices
-
-
     
     def outlier_filter(self, min_samples=None, min_samples_rate=0.1): # percent
         """Filter outliers in terms of ``min_samples`` or ``min_samples_rate``. """
