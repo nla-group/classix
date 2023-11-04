@@ -780,11 +780,11 @@ class CLASSIX:
         return labels 
     
     
-    def explain(self, index1=None, index2=None, showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
-                plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5,  obj_msize=160, sp_fcolor="tomato",
-                sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, 
+    def explain(self, index1=None, index2=None, cmap='Set3', showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
+                plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5,  obj_msize=160, sp1_color='lime', sp2_color='cyan',
+                sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, 
                 sp_ccolor="crimson", sp_clinewidths=2.7,  dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,  show_all_grp_circle=False,
-                show_connected_grp_circle=False, show_obj_grp_circle=True,  color="red", connect_color="green", alpha=0.5, cline_width=2,  add_arrow=True, 
+                show_connected_grp_circle=False, show_obj_grp_circle=True, color="red", connect_color="green", alpha=0.5, cline_width=2,  add_arrow=True, 
                 arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
                 arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', dist_include=False, figname=None, fmt="pdf"):
         
@@ -806,7 +806,10 @@ class CLASSIX:
         
         index2 : int or numpy.ndarray, optional
             Input object2 [with index 'index2'] for explanation, and compare objects [with indices 'index1' and 'index2'].
-            
+        
+        cmap : str, default='Set3'
+            Colormaps for scatter plot. 
+        
         showalldata : boolean, default=False
             Whether or not to show all data points in global view when too many data points for plot.
 
@@ -1023,7 +1026,7 @@ class CLASSIX:
         
         if index1 is None: # analyze in the general way with a global view
             if plot == True:
-                self.explain_viz(showalldata=showalldata, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, 
+                self.explain_viz(showalldata=showalldata, cmap=cmap, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, 
                                  fontsize=sp_fontsize, bbox=sp_bbox, sp_marker=sp_marker, sp_mcolor=sp_mcolor, width=width, axis=axis, fmt=fmt)
                 
             data_size = data.shape[0]
@@ -1109,14 +1112,15 @@ class CLASSIX:
                     s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
                     
                     ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", linewidth=0.5*width, 
-                               c=self.labels_[selectInd])
+                               cmap=cmap, c=self.labels_[selectInd]
+                              )
                     
                     ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers in cluster #{0}'.format(cluster_label1), 
                                s=sp_size, linewidth=0.9*width, c=sp_mcolor, alpha=0.4)
                     
                     if show_obj_grp_circle:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
-                                                color='lime', alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                                color=sp1_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
                         
                     
                     if dp_fontsize is None:
@@ -1147,7 +1151,7 @@ class CLASSIX:
 
                     
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
-                               marker='.', s=sp_csize*0.3, c='lime', linewidths=sp_clinewidths, 
+                               marker='.', s=sp_csize*0.3, c=sp1_color, linewidths=sp_clinewidths, 
                                label='group center {0}'.format(agg_label1)
                                )
 
@@ -1308,16 +1312,16 @@ class CLASSIX:
                     union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
                     s_pca = self.s_pca[union_ind]
                     
-                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", c=self.labels_[selectInd], linewidth=width)
+                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", c=self.labels_[selectInd], linewidth=width, cmap=cmap)
                     ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=0.9*width, alpha=0.4)
 
                     
                     if show_obj_grp_circle:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False,
-                                        color='lime', alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                        color=sp1_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
                         
                         ax.add_patch(plt.Circle((self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1]), self.radius, fill=False,
-                                        color='cyan', alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                        color=sp2_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
                                         
                     if isinstance(index1, int) or isinstance(index1, str):
                         if dp_fontsize is None:
@@ -1383,12 +1387,12 @@ class CLASSIX:
                                 )
 
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
-                            marker='.', s=sp_csize*0.3, c='lime', linewidths=sp_clinewidths, 
+                            marker='.', s=sp_csize*0.3, c=sp1_color, linewidths=sp_clinewidths, 
                             label='group center {0}'.format(agg_label1)
                             )
 
                     ax.scatter(self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1], 
-                            marker='.', s=sp_csize*0.3, c='cyan', linewidths=sp_clinewidths, 
+                            marker='.', s=sp_csize*0.3, c=sp2_color, linewidths=sp_clinewidths, 
                             label='group center {0}'.format(agg_label2)
                             )
                     
@@ -1528,7 +1532,7 @@ class CLASSIX:
     
 
 
-    def explain_viz(self, showalldata=False, figsize=(10, 7), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
+    def explain_viz(self, showalldata=False, cmap='Set3', figsize=(10, 7), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
                     savefig=False, fontsize=None, bbox=None, axis="off", fmt="pdf"):
         """Visualize the starting point and data points"""
         
@@ -1544,7 +1548,7 @@ class CLASSIX:
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = bcolor
 
-        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], marker=".", linewidth=width, c=self.labels_[selectInd])
+        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], marker=".", linewidth=width, c=self.labels_[selectInd], cmap=cmap)
 
         if showallgroups:
             for j in range(self.s_pca.shape[0]):
