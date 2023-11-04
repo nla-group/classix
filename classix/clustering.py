@@ -389,7 +389,7 @@ class CLASSIX:
     """
         
     def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, mergeTinyGroups=True,
-                 memory=False, verbose=1): 
+                 memory=True, verbose=1): 
 
 
         self.verbose = verbose
