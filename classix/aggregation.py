@@ -98,12 +98,12 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
         rhs = half_r2 - half_nrm2[i] # right-hand side of norm ineq.
         last_j = np.searchsorted(sort_vals, tol + sort_vals[i], side='right')
         ips = np.matmul(data[i+1:last_j,:], clustc.T)
-        nr_dist += last_j - i - 1
-
+        
         for j in range(i+1, last_j):
             if labels[j] >= 0:
                 continue
 
+            nr_dist += 1
             if half_nrm2[j] - ips[j-i-1] <= rhs:
                 num_group += 1
                 labels[j] = lab
