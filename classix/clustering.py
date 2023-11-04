@@ -1274,20 +1274,17 @@ class CLASSIX:
                 else:
                     from scipy.sparse import csr_matrix
                     
-                    if self.connected_pairs_ is None and not dist_include:
-                        distm = pairwise_distances(self.s_pca)
-                        distm = (distm <= self.radius*self.scale).astype(int)
-                        csr_dist_m = csr_matrix(distm)
-                        self.connected_pairs_ = return_csr_matrix_indices(csr_dist_m).tolist() # list
+                    
+                    distm = pairwise_distances(self.s_pca)
+                    distm = (distm <= self.radius*self.scale).astype(int)
+                    csr_dist_m = csr_matrix(distm)
                         
                     if cluster_label1 == cluster_label2:
                         if dist_include:
-                            connected_paths = find_shortest_dist_path(agg_label1,
-                                                                     csr_matrix(distm),
-                                                                     agg_label2
-                            )
+                            connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2)
                             
                         else:
+                            self.connected_pairs_ = return_csr_matrix_indices(csr_dist_m).tolist() # list
                             connected_paths = find_shortest_path(agg_label1,
                                                              self.connected_pairs_,
                                                              self.splist_.shape[0],
