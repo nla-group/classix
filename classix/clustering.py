@@ -293,7 +293,7 @@ class CLASSIX:
            is at least as high the smaller density of both groups. This option uses the disjoint 
            set structure to speedup merging.
         
-        - 'distance': two groups are merged if the distance of their starting points is at 
+        - 'distance': two groups are merged if the distance of their group centers is at 
            most scale*radius (the parameter above). This option uses the disjoint 
            set structure to speedup merging.
         
@@ -311,7 +311,7 @@ class CLASSIX:
         If normalize the data associated with the sorting, default as True. 
         
     scale : float
-        Design for distance-clustering, when distance between the two starting points 
+        Design for distance-clustering, when distance between the two group centers 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
 
     post_alloc : boolean, default=True
@@ -344,7 +344,7 @@ class CLASSIX:
         Groups labels of aggregation.
     
     splist_ : numpy.ndarray
-        List of starting points formed in the aggregation.
+        List of group centers formed in the aggregation.
         
     labels_ : numpy.ndarray
         Clustering class labels for data objects 
@@ -638,7 +638,7 @@ class CLASSIX:
             Groups labels of aggregation.
         
         splist: numpy.ndarray
-            List formed in the aggregation storing starting points.
+            List formed in the aggregation storing group centers.
         
         ind : numpy.ndarray
             Sort values.
@@ -786,7 +786,7 @@ class CLASSIX:
                 sp_ccolor="crimson", sp_clinewidths=2.7,  dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,  show_all_grp_circle=False,
                 show_connected_grp_circle=False, show_obj_grp_circle=True,  color="red", connect_color="green", alpha=0.5, cline_width=2,  add_arrow=True, 
                 arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
-                arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', figname=None, fmt="pdf"):
+                arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', dist_include=False, figname=None, fmt="pdf"):
         
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
@@ -806,7 +806,7 @@ class CLASSIX:
         
         index2 : int or numpy.ndarray, optional
             Input object2 [with index 'index2'] for explanation, and compare objects [with indices 'index1' and 'index2'].
-        
+            
         showalldata : boolean, default=False
             Whether or not to show all data points in global view when too many data points for plot.
 
@@ -814,7 +814,7 @@ class CLASSIX:
             Whether or not to show the start points marker.
 
         showsplist : boolean, default=False
-            Whether or not to show the starting points information, which include the number of data points (NumPts), 
+            Whether or not to show the group centers information, which include the number of data points (NumPts), 
             corresponding clusters, and associated coordinates. This only applies to both index1 and index2 are "NULL".
             Default as True. 
         
@@ -859,7 +859,7 @@ class CLASSIX:
             Size for markers for data of index1 and index2.
     
         sp_fcolor : str, default='tomato'
-            The color marked for starting points text box. 
+            The color marked for group centers text box. 
         
         sp_marker : str, default="+"
             The marker for the start points.
@@ -871,28 +871,28 @@ class CLASSIX:
             The color marked for startpoint points scatter marker.
 
         sp_alpha : float, default=0.3
-            The value setting for transprency of text box for starting points. 
+            The value setting for transprency of text box for group centers. 
             
         sp_pad : int, default=2
-            The size of text box for starting points. 
+            The size of text box for group centers. 
         
         sp_bbox : dict, optional
-            Dict with properties for patches.FancyBboxPatch for starting points.
+            Dict with properties for patches.FancyBboxPatch for group centers.
     
         sp_fontsize : int, optional
-            The fontsize for text marked for starting points. 
+            The fontsize for text marked for group centers. 
 
         sp_cmarker : str, default="+"
-            The marker for the connected starting points.
+            The marker for the connected group centers.
         
         sp_csize : int, default=100
-            The marker size for the connected starting points.
+            The marker size for the connected group centers.
         
         sp_ccolor : str, default="crimson"
-            The marker color for the connected starting points.
+            The marker color for the connected group centers.
         
         sp_clinewidths : str, default=2.5
-            The marker width for the connected starting points. 
+            The marker width for the connected group centers. 
 
         dp_fcolor : str, default='bisque'
             The color marked for specified data objects text box. 
@@ -922,13 +922,13 @@ class CLASSIX:
             (only applies to when data dimension is less than or equal to 2).
 
         color : str, default='red'
-            Color for text of starting points labels in visualization. 
+            Color for text of group centers labels in visualization. 
         
         alpha : float, default=0.5
             Scalar or None. 
     
         cline_width : float, default=2
-            Set the patch linewidth of circle for starting points.
+            Set the patch linewidth of circle for group centers.
 
         add_arrow : bool, default=False 
             Whether or not add arrows for connected paths.
@@ -954,7 +954,10 @@ class CLASSIX:
 
         axis : boolean, default=True
             Whether or not add x,y axes to plot.
-
+        
+        dist_include : boolean, default
+            Whether or not to include distance information to compute the shortest path between objects. 
+            
         figname : str, optional
             Set the figure name for the image to be saved.
             
@@ -993,20 +996,20 @@ class CLASSIX:
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
             
             if data.shape[1] > 2:
-                warnings.warn("If the group periphery is displayed, the group radius in the plot might not be accurate.")
+                warnings.warn("Note that with data having more than two features, the group circles in the plot may appear bigger than they are.")
                 _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
                 self.x_pca = np.matmul(data, self._V[np.argsort(self._s)].T)
                 self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
                 
             elif data.shape[1] == 2:
                 self.x_pca = data.copy()
-                self.s_pca = data[self.ind[self.splist_[:, 0]]] 
+                self.s_pca = self.data[self.splist_[:, 0]] 
 
             else: # when data is one-dimensional, no PCA transform
                 self.x_pca = np.ones((len(data.copy()), 2))
                 self.x_pca[:, 0] = data[:, 0]
                 self.s_pca = np.ones((len(self.splist_), 2))
-                self.s_pca[:, 0] = data[self.ind[self.splist_[:, 0]]].reshape(-1) 
+                self.s_pca[:, 0] = self.data[self.splist_[:, 0]].reshape(-1) 
                 
             self.form_starting_point_clusters_table()
             
@@ -1115,7 +1118,6 @@ class CLASSIX:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
                                                 color='lime', alpha=alpha, lw=cline_width*1.5, clip_on=False))
                         
-                    
                     
                     if dp_fontsize is None:
                         ax.text(object1[0], object1[1], s=' ' + str(index1), bbox=dp_bbox, color=obj_color, zorder=1, ha='left', va='bottom')
@@ -1263,25 +1265,35 @@ class CLASSIX:
                 else:
                     from scipy.sparse import csr_matrix
                     
-                    if self.connected_pairs_ is None:
+                    if self.connected_pairs_ is None and not dist_include:
                         distm = pairwise_distances(self.s_pca)
                         distm = (distm <= self.radius*self.scale).astype(int)
-                        self.connected_pairs_ = return_csr_matrix_indices(csr_matrix(distm)).tolist() # list
+                        csr_dist_m = csr_matrix(distm)
+                        self.connected_pairs_ = return_csr_matrix_indices(csr_dist_m).tolist() # list
                         
                     if cluster_label1 == cluster_label2:
-                        connected_paths = find_shortest_path(agg_label1,
+                        if dist_include:
+                            connected_paths = find_shortest_dist_path(agg_label1,
+                                                                     csr_matrix(distm),
+                                                                     agg_label2
+                            )
+                            
+                        else:
+                            connected_paths = find_shortest_path(agg_label1,
                                                              self.connected_pairs_,
                                                              self.splist_.shape[0],
                                                              agg_label2
-                        )
+                            )
                         
-                        connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
+                        if len(connected_paths)<=2:
+                            connected_paths_vis = None
+                        else:    
+                            connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
                         
                     else: 
                         connected_paths = []
                         
                 if plot == True:
-
                     if self.x_pca.shape[0] > 1e5 and not showalldata:
                         warnings.warn("Too many data points for plot. Randomly subsampled 1e5 points.")
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
@@ -1339,8 +1351,8 @@ class CLASSIX:
                                                     )
                                 
                         if union_ind[i] in connected_paths:
-                            # draw circle for connected starting points or not, 
-                            # and also determine the marker of the connected starting points.
+                            # draw circle for connected group centers or not, 
+                            # and also determine the marker of the connected group centers.
                             if union_ind[i] == connected_paths[0]: 
                                 ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, 
                                        label='connected groups', c=sp_ccolor, linewidths=sp_clinewidths)
@@ -1381,9 +1393,9 @@ class CLASSIX:
                             )
                     
                     nr_cps = len(connected_paths)
-                    
+
                     if add_arrow:
-                        for i in range(nr_cps - 1):
+                        for i in range(nr_cps-1):
                             arrowStart=(self.s_pca[connected_paths[i], 0], self.s_pca[connected_paths[i], 1])
                             arrowStop=(self.s_pca[connected_paths[i+1], 0], self.s_pca[connected_paths[i+1], 1])
 
@@ -1492,10 +1504,15 @@ class CLASSIX:
                                 """\nboth of which were merged into cluster #%(cluster)i. """% {
                                 "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
                             )
-                            
-                            print("""These two groups are connected via groups %(connected)s.""" % {
-                                "connected":connected_paths_vis}
-                            )
+
+                            if connected_paths_vis is None:
+                                print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label1, 1.5*self.radius*self.scale))
+                                print('This is because at least one of the groups was reassigned due to the minPts condition.')
+                            else:
+
+                                print("""These two groups are connected via groups %(connected)s.""" % {
+                                    "connected":connected_paths_vis}
+                                )
                         else: 
                             connected_paths = []
                             print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
@@ -1578,7 +1595,7 @@ class CLASSIX:
         
 
     def form_starting_point_clusters_table(self, aggregate=False):
-        """form the columns details for starting points and clusters information"""
+        """form the columns details for group centers and clusters information"""
         
         # won't change the original order of self.splist_
         cols = ["Group", "NrPts"]
@@ -1630,17 +1647,17 @@ class CLASSIX:
         Parameters
         ----------
         scale : float
-            Design for distance-clustering, when distance between the two starting points 
+            Design for distance-clustering, when distance between the two group centers 
             associated with two distinct groups smaller than scale*radius, then the two groups merge.
         
         labelsize : int 
             The fontsize of ticks. 
             
         markersize : int 
-            The size of the markers for starting points.
+            The size of the markers for group centers.
             
         plot_boundary : boolean
-            If it is true, will plot the boundary of groups for the starting points.
+            If it is true, will plot the boundary of groups for the group centers.
             
         bound_color : str
             The color for the boundary for groups with the specified radius.
@@ -1879,7 +1896,7 @@ def pairwise_distances(X):
 
 
 def visualize_connections(data, splist, radius=0.5, scale=1.5):
-    """Calculate the connected components for graph constructed by starting points given radius and scale."""
+    """Calculate the connected components for graph constructed by group centers given radius and scale."""
 
     from scipy.sparse.csgraph import connected_components
     
@@ -1935,6 +1952,40 @@ def calculate_cluster_centers(data, labels):
 # ##########################################################################################################
 
 
+def find_shortest_dist_path(source_node=None, graph=None, target_node=None):
+    """ Compute shortest path considering the distances
+    
+    Parameters
+    ----------
+    source_node: int
+        A given source vertex.
+    
+    graph : scipy.sparse._csr.csr_matrix
+        Input as a sparse matrix format.
+        
+    target_node: int, default=None
+        Find the shortest paths from source node to target node.
+        If not None, function returns the shortest path between source node and target node,
+        otherwise returns table storing shortest path information.
+    
+    Returns
+    -------
+    shortest_path_to_target: list
+        The shortest path between source node and target node
+        
+    """
+    from scipy.sparse.csgraph import shortest_path
+    dist_matrix, predecessors = shortest_path(csgraph=graph, directed=False, indices=source_node, return_predecessors=True)
+    shortest_path_to_target = []
+    shortest_path_to_target.append(target_node)
+    if predecessors[target_node] != -9999:
+        predecessor = predecessors[target_node] 
+        while predecessor != -9999:
+            shortest_path_to_target.append(predecessor)
+            predecessor = predecessors[predecessor] 
+            
+    return shortest_path_to_target
+
 
 
 def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, target_node=None):
@@ -1967,35 +2018,37 @@ def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, t
         The shortest path between source node and target node
     
     """
-    visited_nodes = [False]*num_nodes
     queque = list()
     graph = pairs_to_graph(connected_pairs, num_nodes) # return sparse matrix
-    dist_info = np.empty((num_nodes, 3), dtype=int) # node, dist, last node
+    dist_info = np.empty((num_nodes, 4), dtype=int) # node, dist, last node
     
     dist_info[:,0] = np.arange(num_nodes)
-    dist_info[:,1] = num_nodes # np.iinfo(np.int64).max
+    dist_info[:,1] = 0
     dist_info[:,2] = -1
+    dist_info[:,3] = 0
     
-    source_node = int(source_node)
-    queque.append(source_node+1)
-    dist_info[source_node,1] = 0
+    queque.append(int(source_node))
+    dist_info[source_node, 1] = 0
 
     while(np.any(queque)):
         node = queque.pop(0)
-        if not visited_nodes[node-1]:
-            neighbor = list()
-            visited_nodes[node-1] = True
-            for i in range(int(num_nodes)):
-                if graph[node-1, i] == 1 and not visited_nodes[i] and not i+1 in queque:
-                    neighbor.append(i+1)
-                    dist_info[i, 1], dist_info[i, 2] = dist_info[node-1, 1]+1, node-1
-            queque = queque + neighbor
-            
+        
+        neighbor = list()
+        dist_info[node, 3] = 1
+
+        for i in range(int(num_nodes)):
+            if graph[node, i] == 1 and dist_info[i,3] == 0:
+                neighbor.append(i)
+                dist_info[i, 1], dist_info[i, 2] = dist_info[node, 1] + 1, node
+                dist_info[i, 3] = 1
+
+        queque = queque + neighbor
+    
     if target_node != None:
         shortest_path_to_target = list()
-        if dist_info[target_node,1] == np.iinfo(np.int64).min:
-            print("no path between {} and {}".format(source_node, target_node))
-            return None
+        if dist_info[target_node,2] == -1:
+            # print("no path between {} and {}".format(source_node, target_node))
+            return [target_node]
         
         predecessor = target_node
         while(dist_info[predecessor, 2] != -1):
@@ -2016,12 +2069,13 @@ def pairs_to_graph(pairs, num_nodes, sparse=True):
     
     graph = np.full((num_nodes, num_nodes), -99, dtype=int)
     for i in range(num_nodes):
-        graph[i, i] = 0
+        graph[i, i] = 1
     
     for pair in pairs:
         graph[pair[0], pair[1]] = graph[pair[1], pair[0]] = 1
     if sparse:
         graph = csr_matrix(graph)
+        
     return graph
 
 
@@ -2033,7 +2087,6 @@ def return_csr_matrix_indices(csr_mat):
     
     shape_dim1, shape_dim2 = csr_mat.shape
     length_range = csr_mat.indices
-
     indices = np.empty(len(length_range), dtype=csr_mat.indices.dtype)
     _sparsetools.expandptr(shape_dim1, csr_mat.indptr, indices)
     return np.array(list(zip(indices, length_range)))
