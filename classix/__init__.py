@@ -1,5 +1,5 @@
 
-__version__ = '0.9.4'                  
+__version__ = '0.9.5'                  
 __enable_cython__ = True 
 
 
