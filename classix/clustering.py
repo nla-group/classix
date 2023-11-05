@@ -434,7 +434,7 @@ class CLASSIX:
         if self.verbose:
             print(self)
         
-        self.index_data = []
+        self.index_data = None
         self.memory = memory
 
         from . import __enable_cython__
@@ -800,8 +800,8 @@ class CLASSIX:
                 sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, 
                 sp_ccolor="crimson", sp_clinewidths=2.7,  dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,  show_all_grp_circle=False,
                 show_connected_grp_circle=False, show_obj_grp_circle=True, color="red", connect_color="green", alpha=0.5, cline_width=2,  add_arrow=True, 
-                arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
-                arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', include_dist=False, figname=None, fmt="pdf"):
+                arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1, arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, 
+                axis='off', include_dist=False, show_connected_label=True, figname=None, fmt="pdf"):
         
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
@@ -973,8 +973,11 @@ class CLASSIX:
         axis : boolean, default=True
             Whether or not add x,y axes to plot.
         
-        include_dist : boolean, default
+        include_dist : boolean, default=False
             Whether or not to include distance information to compute the shortest path between objects. 
+            
+        show_connected_label : boolean, default=True
+            Whether or not to show the named labels of the connected data points, where the named labels are given by pandas dataframe index.
             
         figname : str, optional
             Set the figure name for the image to be saved.
@@ -1065,23 +1068,26 @@ class CLASSIX:
             
         else: # index is not None, explain(index1)
             if isinstance(index1, int):
+                index1_id = index1
                 object1 = self.x_pca[index1] # data has been normalized
                 agg_label1 = groups_[index1] # get the group index for object1
             
             elif isinstance(index1, str):
                 if index1 in self.index_data:
+                    index1_id = np.where(self.index_data == index1)[0]
                     if len(set(self.index_data)) != len(self.index_data):
                         warnings.warn("The index of data is duplicate.")
-                        object1 = self.x_pca[np.where(self.index_data == index1)[0]][0]
-                        agg_label1 = groups_[np.where(self.index_data == index1)[0][0]]
+                        object1 = self.x_pca[index1_id][0]
+                        agg_label1 = groups_[index1_id]
                     else:
-                        object1 = self.x_pca[self.index_data == index1][0]
-                        agg_label1 = groups_[self.index_data == index1][0]
+                        object1 = self.x_pca[index1_id][0]
+                        agg_label1 = groups_[index1_id][0]
                         
                 else:
                     raise ValueError("Please enter a legal value for index1.")
                     
             elif isinstance(index1, list) or isinstance(index1, np.ndarray):
+                index1_id = -1
                 index1 = np.array(index1)
                 object1 = (index1 - self._mu) / self._scl # allow for out-sample data
                 
@@ -1159,8 +1165,6 @@ class CLASSIX:
                                         fontsize=sp_fontsize, bbox=sp_bbox, zorder=1, ha='left'
                                 )
 
-
-                    
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
                                marker='.', s=sp_csize*0.3, c=sp1_color, linewidths=sp_clinewidths, 
                                label='group center {0}'.format(agg_label1)
@@ -1221,22 +1225,25 @@ class CLASSIX:
             # explain two objects relationship
             else: 
                 if isinstance(index2, int):
+                    index2_id = index2
                     object2 = self.x_pca[index2] # data has been normalized
                     agg_label2 = groups_[index2] # get the group index for object2
                     
                 elif isinstance(index2, str):
                     if index2 in self.index_data:
+                        index2_id = np.where(self.index_data == index2)[0]
                         if len(set(self.index_data)) != len(self.index_data):
                             warnings.warn("The index of data is duplicate.")
-                            object2 = self.x_pca[np.where(self.index_data == index2)[0][0]][0]
-                            agg_label2 = groups_[np.where(self.index_data == index2)[0][0]]
+                            object2 = self.x_pca[index2_id][0]
+                            agg_label2 = groups_[index2_id]
                         else:
-                            object2 = self.x_pca[self.index_data == index2][0]
-                            agg_label2 = groups_[self.index_data == index2][0]
+                            object2 = self.x_pca[index2_id][0]
+                            agg_label2 = groups_[index2_id][0]
                     else:
                         raise ValueError("Please enter a legal value for index2.")
                         
                 elif isinstance(index2, list) or isinstance(index2, np.ndarray):
+                    index2_id = -1
                     index2 = np.array(index2)
                     object2 = (index2 - self._mu) / self._scl # allow for out-sample data
                     
@@ -1274,7 +1281,6 @@ class CLASSIX:
 
                 cluster_label1, cluster_label2 = self.label_change[agg_label1], self.label_change[agg_label2]
 
-                
                 if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
                     connected_paths = [agg_label1]
                 else:
@@ -1296,7 +1302,8 @@ class CLASSIX:
                                                              agg_label2
                             )
                         
-                        if len(connected_paths)<=2:
+                        print("connected_paths:", connected_paths)
+                        if len(connected_paths)<=1:
                             connected_paths_vis = None
                         else:    
                             connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
@@ -1517,12 +1524,30 @@ class CLASSIX:
                             )
 
                             if connected_paths_vis is None:
-                                print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label1, 1.5*self.radius*self.scale))
+                                print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.scale))
                                 print('This is because at least one of the groups was reassigned due to the minPts condition.')
                             else:
                                 print("""\nThe two groups are connected via groups %(connected)s.""" % {
                                     "connected":connected_paths_vis}
                                 )
+                                
+                                if self.index_data is not None and show_connected_label:
+                                    show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
+                                    print("connected_paths:", connected_paths)
+                                    show_connected_df["Index"] = [index1_id] + self.gcIndices(connected_paths).tolist() + [index2_id] 
+                                    
+                                    show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
+                                    show_connected_df["Label"] = [index1] + self.index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [index2] 
+                                else:
+                                    show_connected_df = pd.DataFrame(columns=["Index", "Group"])
+                                    show_connected_df["Index"] = [index1_id] + self.gcIndices(connected_paths).tolist() + [index2_id] 
+                                    show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
+                                    
+                                print('\n', show_connected_df.to_markdown(index=False))
+                                
+                                if not plot:
+                                    print("Use .explain(..., plot=True) for a visual representation.")
+                                
                         else: 
                             connected_paths = []
                             print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
@@ -1993,16 +2018,18 @@ def find_shortest_dist_path(source_node=None, graph=None, target_node=None):
     """
     from scipy.sparse.csgraph import shortest_path
     dist_matrix, predecessors = shortest_path(csgraph=graph, directed=False, indices=source_node, return_predecessors=True)
-    shortest_path_to_target = []
-    shortest_path_to_target.append(target_node)
+
     if predecessors[target_node] != -9999:
+        shortest_path_to_target = []
+        shortest_path_to_target.append(target_node)
         predecessor = predecessors[target_node] 
         while predecessor != -9999:
             shortest_path_to_target.append(predecessor)
             predecessor = predecessors[predecessor] 
             
-    return shortest_path_to_target
-
+        return shortest_path_to_target
+    else:
+        return []
 
 
 def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, target_node=None):
@@ -2054,7 +2081,7 @@ def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, t
         dist_info[node, 3] = 1
 
         for i in range(int(num_nodes)):
-            if graph[node, i] == 1 and dist_info[i,3] == 0:
+            if graph[node, i] == 1 and dist_info[i, 3] == 0:
                 neighbor.append(i)
                 dist_info[i, 1], dist_info[i, 2] = dist_info[node, 1] + 1, node
                 dist_info[i, 3] = 1
@@ -2063,15 +2090,15 @@ def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, t
     
     if target_node != None:
         shortest_path_to_target = list()
-        if dist_info[target_node,2] == -1:
-            # print("no path between {} and {}".format(source_node, target_node))
+        if dist_info[target_node, 2] == -1:
             return [target_node]
         
         predecessor = target_node
+        shortest_path_to_target.append(predecessor)
         while(dist_info[predecessor, 2] != -1):
-            shortest_path_to_target.append(predecessor)
             predecessor = dist_info[predecessor, 2]
-            
+            shortest_path_to_target.append(predecessor)
+
         shortest_path_to_target.append(source_node)
         shortest_path_to_target.reverse()
         return shortest_path_to_target
