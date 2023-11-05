@@ -328,15 +328,19 @@ class CLASSIX:
         
         - 'set': Use disjoint set structure to merge connected groups.
 
-    memory: bool, default=True
+    memory : boolean, default=True
         If cython memoryviews is disable, a fast algorithm with less efficient momory comsuming is triggered
           since precomputation for aggregation is used. 
         Setting it True will use a memory efficient computing.  
         If cython memoryviews is effective, thie parameter can be ignored. 
-
+    
     verbose : boolean or int, default=1
         Whether print the logs or not.
-             
+ 
+    short_log_form : boolean, default=True
+        Whether or not to use short log form to truncate the clusters list. 
+        
+        
              
     Attributes
     ----------
@@ -396,7 +400,7 @@ class CLASSIX:
     """
         
     def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, mergeTinyGroups=True,
-                 memory=True, verbose=1): 
+                 memory=True, verbose=1, short_log_form=True): 
 
 
         self.verbose = verbose
@@ -412,7 +416,8 @@ class CLASSIX:
         self.scale = scale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
         self.mergeTinyGroups = mergeTinyGroups
-
+        self.truncate = short_log_form
+        
         self.sp_info = None
         self.groups_ = None
         self.clean_index_ = None
@@ -423,7 +428,7 @@ class CLASSIX:
         self.inverse_ind = None
         self.label_change = None
         self.grp_centers = None
-
+        
         if self.verbose:
             print(self)
         
@@ -776,7 +781,7 @@ class CLASSIX:
                 num_group=splist.shape[0], c_size=len(self.old_cluster_count)))
 
             
-            self.pprint_format(self.old_cluster_count)
+            self.pprint_format(self.old_cluster_count, truncate=self.truncate)
 
             if self.minPts > 1 and SIZE_NOISE_LABELS > 0:
                 print("As minPts is {minPts}, the number of clusters has been reduced to {r}.".format(
@@ -1038,14 +1043,13 @@ class CLASSIX:
             data_size = data.shape[0]
             feat_dim = data.shape[1]
             
-            print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features. ".format(length=data_size, dim=feat_dim))
-            print("The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}. ".format(tol=self.radius, minPts=self.minPts))
-            print("As the provided data was auto-scaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together. ".format(
-                scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius
-            ))
-            print("In total, {dist:.0f} distances were computed ({avg:.1f} per data point). ".format(dist=self.dist_nr, avg=self.dist_nr/data_size))
-            print("This resulted in {groups:.0f} groups, each with a unique group center. ".format(groups=self.splist_.shape[0]))
-            print("These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. ".format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_))))
+            print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features. ".format(length=data_size, dim=feat_dim) + 
+                "The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}. ".format(tol=self.radius, minPts=self.minPts) +
+                "As the provided data was auto-scaled by a factor of 1/{scl:.2f}, points within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.".format(scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius) + 
+                "In total, {dist:.0f} distances were computed ({avg:.1f} per data point). ".format(dist=self.dist_nr, avg=self.dist_nr/data_size) + 
+                "This resulted in {groups:.0f} groups, each with a unique group center. ".format(groups=self.splist_.shape[0]) + 
+                "These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. ".format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_)))
+                 )
             
             if showsplist:
                 print("A list of all group centers is shown below.")
@@ -1053,10 +1057,9 @@ class CLASSIX:
                 print(self.sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
                 print(dash_line)       
             else:
-                print("For a visualisation of the clusters, use .explain(plot=True). ")
-                
-            print("""In order to explain the clustering of individual data points, \n"""
-                  """use .explain(ind1) or .explain(ind1, ind2) with data indices.""")
+                print("\nFor a visualisation of the clusters, use .explain(plot=True). " +
+                      """In order to explain the clustering of individual data points, """ + 
+                      """use .explain(ind1) or .explain(ind1, ind2) with data indices.""")
             
         else: # index is not None, explain(index1)
             if isinstance(index1, int):
@@ -1274,7 +1277,6 @@ class CLASSIX:
                     connected_paths = [agg_label1]
                 else:
                     from scipy.sparse import csr_matrix
-                    
                     
                     distm = pairwise_distances(self.s_pca)
                     distm = (distm <= self.radius*self.scale).astype(int)
@@ -1771,15 +1773,16 @@ class CLASSIX:
 
     
 
-    def pprint_format(self, items):
+    def pprint_format(self, items, truncate=True):
         """Format item value for clusters. """
         
         cluster = 0
         if isinstance(items, dict):
             for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True): 
                 if cluster > 19:
-                    print("      ... truncated ...")
-                    break
+                    if truncate:
+                        print("      ... truncated ...")
+                        break
                     
                 print("      * cluster {:2} : {}".format(cluster, value))
                 cluster = cluster + 1
