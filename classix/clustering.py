@@ -379,7 +379,7 @@ class CLASSIX:
         After clustering the in-sample data, predict the out-sample data.
         Data will be allocated to the clusters with the nearest starting point in the stage of aggregation. Default values.
 
-    gc2ind(spid):
+    gcIndices(ids):
         Return the group center (i.e., starting point) location in the data.
         
     explain(index1, index2, ...): 
@@ -429,6 +429,8 @@ class CLASSIX:
         self.label_change = None
         self.grp_centers = None
         
+        self._gcIndices = np.frompyfunc(self.gc2ind, 1, 1)
+                     
         if self.verbose:
             print(self)
         
@@ -1709,6 +1711,11 @@ class CLASSIX:
         
 
 
+    def gcIndices(self, ids):
+        return self._gcIndices(ids)
+
+
+        
     def gc2ind(self, spid):
         return self.ind[self.splist_[spid, 0]]
 
