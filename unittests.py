@@ -244,7 +244,7 @@ class TestClassix(unittest.TestCase):
             clx.fit_transform(X)
             clx.load_group_centers()
             clx.load_cluster_centers()
-            clx.gcIndices(np.array([1, 2]))
+            clx.gcIndices([1, 2, 3, 4])
             clx.predict(X)
             clx.predict(X, memory=True)
             clx.explain(plot=True, figsize=(10,10),  savefig=True)
