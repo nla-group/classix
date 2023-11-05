@@ -799,7 +799,7 @@ class CLASSIX:
                 sp_ccolor="crimson", sp_clinewidths=2.7,  dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,  show_all_grp_circle=False,
                 show_connected_grp_circle=False, show_obj_grp_circle=True, color="red", connect_color="green", alpha=0.5, cline_width=2,  add_arrow=True, 
                 arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
-                arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', dist_include=False, figname=None, fmt="pdf"):
+                arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', include_dist=False, figname=None, fmt="pdf"):
         
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
@@ -971,7 +971,7 @@ class CLASSIX:
         axis : boolean, default=True
             Whether or not add x,y axes to plot.
         
-        dist_include : boolean, default
+        include_dist : boolean, default
             Whether or not to include distance information to compute the shortest path between objects. 
             
         figname : str, optional
@@ -1283,7 +1283,7 @@ class CLASSIX:
                     csr_dist_m = csr_matrix(distm)
                         
                     if cluster_label1 == cluster_label2:
-                        if dist_include:
+                        if include_dist:
                             connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2)
                             
                         else:
