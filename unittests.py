@@ -251,7 +251,7 @@ class TestClassix(unittest.TestCase):
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=1, savefig=True)
 
-            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=4999)
+            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=4999, mergeTinyGroups=False)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True)
         except:
             checkpoint = 0
