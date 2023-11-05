@@ -844,13 +844,13 @@ class CLASSIX:
             ``classix.explain(1, 1300, plot=False, figstyle="seaborn") # or classix.explain(obj1, obj4)``
             
             The data point 1 is in group 9 and the data point 1300 is in group 8, both of which were merged into cluster #0. 
-            These two groups are connected via groups 9 -> 2 -> 8.
+            The two groups are connected via groups 9 -> 2 -> 8.
             * if we specify the replace name, then the output will be
             
             ``classix.explain(1, 1300, replace_name=["Peter Meyer", "Anna Fields"], figstyle="seaborn")``
             
             The data point Peter Meyer is in group 9 and the data point Anna Fields is in group 8, both of which were merged into cluster #0. 
-            These two groups are connected via groups 9 -> 2 -> 8.
+            The two groups are connected via groups 9 -> 2 -> 8.
 
         plot : boolean, default=False
             Determine if visulize the explaination. 
@@ -1510,7 +1510,7 @@ class CLASSIX:
                         if cluster_label1 == cluster_label2:
                             print(
                             """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
-                                """\nboth of which were merged into cluster #%(cluster)i. """% {
+                                """both of which were merged into cluster #%(cluster)i. """% {
                                 "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
                             )
 
@@ -1518,8 +1518,7 @@ class CLASSIX:
                                 print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label1, 1.5*self.radius*self.scale))
                                 print('This is because at least one of the groups was reassigned due to the minPts condition.')
                             else:
-
-                                print("""These two groups are connected via groups %(connected)s.""" % {
+                                print("""\nThe two groups are connected via groups %(connected)s.""" % {
                                     "connected":connected_paths_vis}
                                 )
                         else: 
