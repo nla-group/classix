@@ -24,6 +24,7 @@
 import classix
 import unittest
 import numpy as np
+import pandas as pd
 import sklearn.datasets as data
 from classix import CLASSIX, loadData, cython_is_available
 from classix.clustering import calculate_cluster_centers
@@ -253,12 +254,26 @@ class TestClassix(unittest.TestCase):
 
             clx = CLASSIX(radius=0.5, group_merging='distance', minPts=4999, mergeTinyGroups=False)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True)
+            
         except:
             checkpoint = 0
 
         self.assertEqual(checkpoint, 1)
    
 
+    def test_explain_str_input(self):
+        X, _ = data.make_blobs(n_samples=5, centers=2, n_features=2, cluster_std=1.5, random_state=1)
+        X = pd.DataFrame(X, index=['Anna', 'Bert', 'Carl', 'Tom', 'Bob'])
+        
+        try:
+            clx = CLASSIX(radius=0.6)
+            clx.fit_transform(X)
+            clx.explain(index1='Carl', index2='Bert', plot=True, showallgroups=True, sp_fontsize=12)        
+        except:
+            checkpoint = 0
+        self.assertEqual(checkpoint, 1)
+
+    
     def test_explain_hdim(self):
         X, y = data.make_blobs(n_samples=5000, centers=2, n_features=20, 
                                cluster_std=1.5, random_state=1
