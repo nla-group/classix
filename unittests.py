@@ -230,7 +230,7 @@ class TestClassix(unittest.TestCase):
         self.assertEqual(checkpoint, 1)
 
 
-                
+    
     def test_explain(self):
         X, y = data.make_blobs(n_samples=5000, centers=2, n_features=2, 
                                cluster_std=1.5, random_state=1
@@ -265,6 +265,7 @@ class TestClassix(unittest.TestCase):
     def test_explain_str_input(self):
         X, _ = data.make_blobs(n_samples=5, centers=2, n_features=2, cluster_std=1.5, random_state=1)
         X = pd.DataFrame(X, index=['Anna', 'Bert', 'Carl', 'Tom', 'Bob'])
+        checkpoint = 1
         
         try:
             clx = CLASSIX(radius=0.6)
