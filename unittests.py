@@ -250,7 +250,7 @@ class TestClassix(unittest.TestCase):
             clx.explain(0,  plot=True, savefig=True)
             clx.explain(3, 2000,  plot=True, savefig=False)
             clx.explain(0, 2008,  plot=True, savefig=True)
-            clx.explain(2000, 2028,  plot=True, add_arrow=True, savefig=True)
+            clx.explain(2000, 2028,  plot=True, add_arrow=True, savefig=True, include_dist=True)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=0, savefig=True)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=1, savefig=True)
