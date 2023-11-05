@@ -30,7 +30,7 @@ from classix import CLASSIX, loadData, cython_is_available
 from classix.clustering import calculate_cluster_centers
 from classix import novel_normalization
 from classix import aggregation, aggregation_c, aggregation_cm
-from classix.merging import distance_merging, density_merging
+from classix.merging import distance_merging_mtg, distance_merging, density_merging
 import platform
 
 if platform.system() == 'Windows':
@@ -127,6 +127,9 @@ class TestClassix(unittest.TestCase):
                 
                 clx = CLASSIX(sorting='pca', group_merging='distance')
                 clx.fit_transform(X)
+
+                clx = CLASSIX(sorting='pca', group_merging='distance')
+                clx.fit_transform(X)
             except:
                 checkpoint = 0
                 break
@@ -152,7 +155,7 @@ class TestClassix(unittest.TestCase):
                 clx = CLASSIX(sorting='pca', group_merging='distance', memory=False)
                 clx.fit_transform(X)
 
-                clx = CLASSIX(sorting='pca', group_merging='distance', memory=True)
+                clx = CLASSIX(sorting='pca', group_merging='distance', memory=True, mergeTinyGroups=False)
                 clx.fit_transform(X)
             except:
                 checkpoint = 0
@@ -390,6 +393,7 @@ class TestClassix(unittest.TestCase):
             
             label_set3, _,_ = distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
             label_set4, _,_ = distance_merging_cm(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
+            label_set5, _,_ = distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
             
             for i in range(len(label_set2)):
                 if label_set1[i] != label_set2[i]:
