@@ -422,6 +422,7 @@ class CLASSIX:
         self.half_nrm2 = None
         self.inverse_ind = None
         self.label_change = None
+        self.grp_centers = None
 
         if self.verbose:
             print(self)
@@ -614,8 +615,8 @@ class CLASSIX:
             
             if self.inverse_ind is None:
                 self.inverse_ind = np.argsort(self.ind)
-                groups = np.array(self.groups_)
                 
+            groups = np.array(self.groups_)    
             self.label_change = dict(zip(groups[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
 
         if not memory:
