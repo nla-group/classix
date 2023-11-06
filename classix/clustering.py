@@ -1074,14 +1074,14 @@ class CLASSIX:
             
             elif isinstance(index1, str):
                 if index1 in self.index_data:
-                    index1_id = np.where(self.index_data == index1)[0]
+                    index1_id = np.where(self.index_data == index1)[0][0]
                     if len(set(self.index_data)) != len(self.index_data):
                         warnings.warn("The index of data is duplicate.")
-                        object1 = self.x_pca[index1_id][0]
+                        object1 = self.x_pca[index1_id]
                         agg_label1 = groups_[index1_id]
                     else:
-                        object1 = self.x_pca[index1_id][0]
-                        agg_label1 = groups_[index1_id][0]
+                        object1 = self.x_pca[index1_id]
+                        agg_label1 = groups_[index1_id]
                         
                 else:
                     raise ValueError("Please enter a legal value for index1.")
@@ -1231,14 +1231,14 @@ class CLASSIX:
                     
                 elif isinstance(index2, str):
                     if index2 in self.index_data:
-                        index2_id = np.where(self.index_data == index2)[0]
+                        index2_id = np.where(self.index_data == index2)[0][0]
                         if len(set(self.index_data)) != len(self.index_data):
                             warnings.warn("The index of data is duplicate.")
-                            object2 = self.x_pca[index2_id][0]
+                            object2 = self.x_pca[index2_id]
                             agg_label2 = groups_[index2_id]
                         else:
-                            object2 = self.x_pca[index2_id][0]
-                            agg_label2 = groups_[index2_id][0]
+                            object2 = self.x_pca[index2_id]
+                            agg_label2 = groups_[index2_id]
                     else:
                         raise ValueError("Please enter a legal value for index2.")
                         
@@ -1525,7 +1525,7 @@ class CLASSIX:
                                 connected_paths.reverse()
                                 if self.index_data is not None and show_connected_label:
                                     show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
-                                    show_connected_df["Index"] = [index1_id] + self.gcIndices(connected_paths).tolist() + [index2_id] 
+                                    show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
                                     
                                     show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
                                     show_connected_df["Label"] = [index1] + self.index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [index2] 
@@ -1534,7 +1534,7 @@ class CLASSIX:
                                     show_connected_df["Index"] = [index1_id] + self.gcIndices(connected_paths).tolist() + [index2_id] 
                                     show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
                                     
-                                print('\n', show_connected_df.to_markdown(index=False))
+                                print('\n', show_connected_df.to_string(index=False))
                                 
                                 if not plot:
                                     print("Use .explain(..., plot=True) for a visual representation.")
