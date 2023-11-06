@@ -623,9 +623,9 @@ class CLASSIX:
             if self.inverse_ind is None:
                 self.inverse_ind = np.argsort(self.ind)
                 
-            groups = np.array(self.groups_)    
-            self.label_change = dict(zip(groups[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
-
+            groups = np.asarray(self.groups_)    
+            self.label_change = dict(zip(groups[self.inverse_ind], self.labels_)) 
+                
         if not memory:
             xxt = np.einsum('ij,ij->i', splist, splist)
             for i in range(num_of_points):
@@ -741,7 +741,7 @@ class CLASSIX:
                 
                 self.clean_index_ = labels != maxid
                 agln = agg_labels[self.clean_index_]
-                self.label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
+                label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
                 # allocate the outliers to the corresponding closest cluster.
                 
                 self.group_outliers_ = np.unique(agg_labels[~self.clean_index_]) # abnormal groups
@@ -754,12 +754,11 @@ class CLASSIX:
                             np.linalg.norm(data[splist_clean[:, 0].astype(int)] - data[int(splist[nsp, 0])], axis=1, ord=2)
                             )
                         
-                        labels[agg_labels == nsp] = self.label_change[unique_agln[alloc_class]]
+                        labels[agg_labels == nsp] = label_change[unique_agln[alloc_class]]
                 else:
                     labels[np.isin(agg_labels, self.group_outliers_)] = -1
                 
-            labels = self.reassign_labels(labels) 
-
+            
         else:
             
             labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merging(data=data, 
@@ -772,7 +771,7 @@ class CLASSIX:
                                                                     half_nrm2=self.half_nrm2
                                                                 )
             
-
+            
         self.inverse_ind = np.argsort(ind)
         labels = labels[self.inverse_ind]
 
@@ -1003,13 +1002,12 @@ class CLASSIX:
             dp_bbox['alpha'] = dp_alpha
             dp_bbox['pad'] = dp_pad
 
-
-        if self.label_change is None:
-            groups_ = np.array(self.groups_)
-            self.label_change = dict(zip(groups_[self.inverse_ind], self.labels_)) # how object change group to cluster.
-
-        data = self.data[self.inverse_ind]
         groups_ = np.array(self.groups_)
+        
+        if self.label_change is None:
+            self.label_change = dict(zip(groups_[self.inverse_ind], self.labels_)) # how object change group to cluster.
+                
+        data = self.data[self.inverse_ind]
         groups_ = groups_[self.inverse_ind]
         
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
