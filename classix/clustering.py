@@ -1291,19 +1291,9 @@ class CLASSIX:
                     csr_dist_m = csr_matrix(distm)
                         
                     if cluster_label1 == cluster_label2:
-                        if include_dist:
-                            connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2)
+                        connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
                             
-                        else:
-                            self.connected_pairs_ = return_csr_matrix_indices(csr_dist_m).tolist() # list
-                            connected_paths = find_shortest_path(agg_label1,
-                                                             self.connected_pairs_,
-                                                             self.splist_.shape[0],
-                                                             agg_label2
-                            )
-                        
-                        print("connected_paths:", connected_paths)
-                        if len(connected_paths)<=1:
+                        if len(connected_paths)<1:
                             connected_paths_vis = None
                         else:    
                             connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
@@ -1469,11 +1459,12 @@ class CLASSIX:
                                             )
                                 
 
-                    if cluster_label1 == cluster_label2: # change the order of legend
+                    if cluster_label1 == cluster_label2 and len(connected_paths) > 1: # change the order of legend
                         handles, lg_labels = ax.get_legend_handles_labels()
                         lg_labels = [lg_labels[i] for i in [0,3,1,2,4,5]]
                         handles = [handles[i] for i in [0,3,1,2,4,5]]
                         ax.legend(handles, lg_labels, ncols=3, loc='best')
+
                     else:
                         ax.legend(ncols=3, loc='best')
 
@@ -1531,9 +1522,9 @@ class CLASSIX:
                                     "connected":connected_paths_vis}
                                 )
                                 
+                                connected_paths.reverse()
                                 if self.index_data is not None and show_connected_label:
                                     show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
-                                    print("connected_paths:", connected_paths)
                                     show_connected_df["Index"] = [index1_id] + self.gcIndices(connected_paths).tolist() + [index2_id] 
                                     
                                     show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
@@ -1994,8 +1985,10 @@ def calculate_cluster_centers(data, labels):
 # ##########################################################################################################
 
 
-def find_shortest_dist_path(source_node=None, graph=None, target_node=None):
-    """ Compute shortest path considering the distances
+def find_shortest_dist_path(source_node=None, graph=None, target_node=None, unweighted=True):
+    """ Get single-sourse shortest paths as well as distance from source node,
+    design especially for unweighted undirected graph. The time complexity is O(|V| + |E|)
+    where |V| is the number of vertices and |E| is the number of edges.
     
     Parameters
     ----------
@@ -2017,7 +2010,7 @@ def find_shortest_dist_path(source_node=None, graph=None, target_node=None):
         
     """
     from scipy.sparse.csgraph import shortest_path
-    dist_matrix, predecessors = shortest_path(csgraph=graph, directed=False, indices=source_node, return_predecessors=True)
+    dist_matrix, predecessors = shortest_path(csgraph=graph, directed=False, unweighted=unweighted, indices=source_node, return_predecessors=True)
 
     if predecessors[target_node] != -9999:
         shortest_path_to_target = []
@@ -2032,78 +2025,6 @@ def find_shortest_dist_path(source_node=None, graph=None, target_node=None):
         return []
 
 
-def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, target_node=None):
-    """Get single-sourse shortest paths as well as distance from source node,
-    design especially for unweighted undirected graph. The time complexity is O(|V| + |E|)
-    where |V| is the number of vertices and |E| is the number of edges.
-    
-    Parameters
-    ----------
-    source_node: int
-        A given source vertex.
-    
-    connected_pairs: list
-        The list stores connected nodes pairs.
-    
-    num_nodes: int
-        The number of nodes existed in the graph.
-        
-    target_node: int, default=None
-        Find the shortest paths from source node to target node.
-        If not None, function returns the shortest path between source node and target node,
-        otherwise returns table storing shortest path information.
-        
-    Returns
-    -------
-    dist_info: numpy.ndarray
-        The table storing shortest path information.
-    
-    shortest_path_to_target: list
-        The shortest path between source node and target node
-    
-    """
-    queque = list()
-    graph = pairs_to_graph(connected_pairs, num_nodes) # return sparse matrix
-    dist_info = np.empty((num_nodes, 4), dtype=int) # node, dist, last node
-    
-    dist_info[:,0] = np.arange(num_nodes)
-    dist_info[:,1] = 0
-    dist_info[:,2] = -1
-    dist_info[:,3] = 0
-    
-    queque.append(int(source_node))
-    dist_info[source_node, 1] = 0
-
-    while(np.any(queque)):
-        node = queque.pop(0)
-        
-        neighbor = list()
-        dist_info[node, 3] = 1
-
-        for i in range(int(num_nodes)):
-            if graph[node, i] == 1 and dist_info[i, 3] == 0:
-                neighbor.append(i)
-                dist_info[i, 1], dist_info[i, 2] = dist_info[node, 1] + 1, node
-                dist_info[i, 3] = 1
-
-        queque = queque + neighbor
-    
-    if target_node != None:
-        shortest_path_to_target = list()
-        if dist_info[target_node, 2] == -1:
-            return [target_node]
-        
-        predecessor = target_node
-        shortest_path_to_target.append(predecessor)
-        while(dist_info[predecessor, 2] != -1):
-            predecessor = dist_info[predecessor, 2]
-            shortest_path_to_target.append(predecessor)
-
-        shortest_path_to_target.append(source_node)
-        shortest_path_to_target.reverse()
-        return shortest_path_to_target
-    else:
-        return dist_info
 
     
 
@@ -2112,9 +2033,7 @@ def pairs_to_graph(pairs, num_nodes, sparse=True):
     from scipy.sparse import csr_matrix
     
     graph = np.full((num_nodes, num_nodes), -99, dtype=int)
-    for i in range(num_nodes):
-        graph[i, i] = 1
-    
+
     for pair in pairs:
         graph[pair[0], pair[1]] = graph[pair[1], pair[0]] = 1
     if sparse:
