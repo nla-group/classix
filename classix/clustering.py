@@ -1294,7 +1294,8 @@ class CLASSIX:
                         
                     if cluster_label1 == cluster_label2:
                         connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
-                            
+                        connected_paths.reverse()
+                        
                         if len(connected_paths)<1:
                             connected_paths_vis = None
                         else:    
@@ -1524,7 +1525,6 @@ class CLASSIX:
                                 "connected":connected_paths_vis}
                             )
 
-                            connected_paths.reverse()
                             if self.index_data is not None and show_connected_label:
                                 show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
