@@ -300,7 +300,7 @@ class TestClassix(unittest.TestCase):
 
 
     def test_explain_connected_groups(self):
-        X, y = datasets.make_blobs(n_samples=1000, centers=3, n_features=2, cluster_std=2, random_state=1)
+        X, y = data.make_blobs(n_samples=1000, centers=3, n_features=2, cluster_std=2, random_state=1)
         checkpoint = 1
         try:
             clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging='distance', short_log_form=True)
