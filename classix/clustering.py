@@ -2003,6 +2003,9 @@ def find_shortest_dist_path(source_node=None, graph=None, target_node=None, unwe
         If not None, function returns the shortest path between source node and target node,
         otherwise returns table storing shortest path information.
     
+    unweighted : bool, default=True
+        If True, then find unweighted distances, i.e., find the path such that the number of edges is minimized.
+        
     Returns
     -------
     shortest_path_to_target: list
