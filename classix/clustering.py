@@ -1748,7 +1748,7 @@ class CLASSIX:
     @property
     def groupCenters_(self):
         if hasattr(self, 'splist_'):
-            return self._gcIndices(self.splist.shape[0])
+            return self._gcIndices(self.splist_.shape[0])
         else:
             raise ValueError("Please use .fit() method first.")
             
