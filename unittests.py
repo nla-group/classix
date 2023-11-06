@@ -435,13 +435,22 @@ class TestClassix(unittest.TestCase):
         X, y = data.make_blobs(n_samples=5000, centers=2, n_features=20, 
                                cluster_std=1.5, random_state=1
         )
+        
+        group_merging1='error'
+        group_merging2=3
+        
         checkpoint = 0
-        group_merging='error'
         try:
-            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging=group_merging)
-        except:
+            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging=group_merging1)
+        except ValueError:
             checkpoint = 1
-            
+        self.assertEqual(checkpoint, 1)
+
+        checkpoint = 0
+        try:
+            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging=group_merging2)
+        except TypeError:
+            checkpoint = 1
         self.assertEqual(checkpoint, 1)
         
 
