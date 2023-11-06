@@ -93,7 +93,6 @@ def distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals,
 
     for i in range(splist.shape[0]):
         if not gp_nr[i]:    # tiny groups can not take over large ones
-            
             continue
 
         xi = spdata[i, :]

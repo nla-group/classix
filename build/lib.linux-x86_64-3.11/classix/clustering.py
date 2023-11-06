@@ -293,7 +293,7 @@ class CLASSIX:
            is at least as high the smaller density of both groups. This option uses the disjoint 
            set structure to speedup merging.
         
-        - 'distance': two groups are merged if the distance of their starting points is at 
+        - 'distance': two groups are merged if the distance of their group centers is at 
            most scale*radius (the parameter above). This option uses the disjoint 
            set structure to speedup merging.
         
@@ -311,7 +311,7 @@ class CLASSIX:
         If normalize the data associated with the sorting, default as True. 
         
     scale : float
-        Design for distance-clustering, when distance between the two starting points 
+        Design for distance-clustering, when distance between the two group centers 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
 
     post_alloc : boolean, default=True
@@ -328,15 +328,19 @@ class CLASSIX:
         
         - 'set': Use disjoint set structure to merge connected groups.
 
-    memory: bool, default=True
+    memory : boolean, default=True
         If cython memoryviews is disable, a fast algorithm with less efficient momory comsuming is triggered
           since precomputation for aggregation is used. 
         Setting it True will use a memory efficient computing.  
         If cython memoryviews is effective, thie parameter can be ignored. 
-
+    
     verbose : boolean or int, default=1
         Whether print the logs or not.
-             
+ 
+    short_log_form : boolean, default=True
+        Whether or not to use short log form to truncate the clusters list. 
+        
+        
              
     Attributes
     ----------
@@ -344,7 +348,7 @@ class CLASSIX:
         Groups labels of aggregation.
     
     splist_ : numpy.ndarray
-        List of starting points formed in the aggregation.
+        List of group centers formed in the aggregation.
         
     labels_ : numpy.ndarray
         Clustering class labels for data objects 
@@ -375,7 +379,7 @@ class CLASSIX:
         After clustering the in-sample data, predict the out-sample data.
         Data will be allocated to the clusters with the nearest starting point in the stage of aggregation. Default values.
 
-    gc2ind(spid):
+    gcIndices(ids):
         Return the group center (i.e., starting point) location in the data.
         
     explain(index1, index2, ...): 
@@ -383,13 +387,20 @@ class CLASSIX:
         The indices index1 and index2 are optional parameters (int) corresponding to the 
         indices of the data points. 
         
+    load_group_centers(self):
+        Load group centers.
+    
+    load_cluster_centers(self):
+        Load cluster centers.
+    
+    
     References
     ----------
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
     """
         
     def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, mergeTinyGroups=True,
-                 memory=False, verbose=1): 
+                 memory=True, verbose=1, short_log_form=True): 
 
 
         self.verbose = verbose
@@ -405,7 +416,8 @@ class CLASSIX:
         self.scale = scale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
         self.mergeTinyGroups = mergeTinyGroups
-
+        self.truncate = short_log_form
+        
         self.sp_info = None
         self.groups_ = None
         self.clean_index_ = None
@@ -415,12 +427,14 @@ class CLASSIX:
         self.half_nrm2 = None
         self.inverse_ind = None
         self.label_change = None
-
+        self.grp_centers = None
+        
+        self._gcIndices = np.frompyfunc(self.gc2ind, 1, 1)
+                     
         if self.verbose:
             print(self)
         
-        self.splist_indices = [None]
-        self.index_data = []
+        self.index_data = None
         self.memory = memory
 
         from . import __enable_cython__
@@ -605,11 +619,13 @@ class CLASSIX:
         num_of_points = data.shape[0]
 
         if self.label_change is None:
+            
             if self.inverse_ind is None:
                 self.inverse_ind = np.argsort(self.ind)
-                groups = np.array(self.groups_)
-            self.label_change = dict(zip(groups[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
-
+                
+            groups = np.asarray(self.groups_)    
+            self.label_change = dict(zip(groups[self.inverse_ind], self.labels_)) 
+                
         if not memory:
             xxt = np.einsum('ij,ij->i', splist, splist)
             for i in range(num_of_points):
@@ -638,7 +654,7 @@ class CLASSIX:
             Groups labels of aggregation.
         
         splist: numpy.ndarray
-            List formed in the aggregation storing starting points.
+            List formed in the aggregation storing group centers.
         
         ind : numpy.ndarray
             Sort values.
@@ -725,7 +741,7 @@ class CLASSIX:
                 
                 self.clean_index_ = labels != maxid
                 agln = agg_labels[self.clean_index_]
-                self.label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
+                label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
                 # allocate the outliers to the corresponding closest cluster.
                 
                 self.group_outliers_ = np.unique(agg_labels[~self.clean_index_]) # abnormal groups
@@ -738,12 +754,11 @@ class CLASSIX:
                             np.linalg.norm(data[splist_clean[:, 0].astype(int)] - data[int(splist[nsp, 0])], axis=1, ord=2)
                             )
                         
-                        labels[agg_labels == nsp] = self.label_change[unique_agln[alloc_class]]
+                        labels[agg_labels == nsp] = label_change[unique_agln[alloc_class]]
                 else:
                     labels[np.isin(agg_labels, self.group_outliers_)] = -1
                 
-            labels = self.reassign_labels(labels) 
-
+            
         else:
             
             labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merging(data=data, 
@@ -756,10 +771,9 @@ class CLASSIX:
                                                                     half_nrm2=self.half_nrm2
                                                                 )
             
-
-
-
-        labels = labels[np.argsort(ind)]
+            
+        self.inverse_ind = np.argsort(ind)
+        labels = labels[self.inverse_ind]
 
         if self.verbose == 1:
             print("""CLASSIX aggregated the {datalen} data points into {num_group} groups. """.format(datalen=len(data), num_group=splist.shape[0]))
@@ -768,7 +782,7 @@ class CLASSIX:
                 num_group=splist.shape[0], c_size=len(self.old_cluster_count)))
 
             
-            self.pprint_format(self.old_cluster_count)
+            self.pprint_format(self.old_cluster_count, truncate=self.truncate)
 
             if self.minPts > 1 and SIZE_NOISE_LABELS > 0:
                 print("As minPts is {minPts}, the number of clusters has been reduced to {r}.".format(
@@ -780,13 +794,13 @@ class CLASSIX:
         return labels 
     
     
-    def explain(self, index1=None, index2=None, showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
-                plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5,  obj_msize=160, sp_fcolor="tomato",
-                sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, 
+    def explain(self, index1=None, index2=None, cmap='Set3', showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
+                plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5,  obj_msize=160, sp1_color='lime', sp2_color='cyan',
+                sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, 
                 sp_ccolor="crimson", sp_clinewidths=2.7,  dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,  show_all_grp_circle=False,
-                show_connected_grp_circle=False, show_obj_grp_circle=True,  color="red", connect_color="green", alpha=0.5, cline_width=2,  add_arrow=True, 
-                arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1,
-                arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, axis='off', figname=None, fmt="pdf"):
+                show_connected_grp_circle=False, show_obj_grp_circle=True, color="red", connect_color="green", alpha=0.5, cline_width=2,  add_arrow=True, 
+                arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1, arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, 
+                axis='off', include_dist=False, show_connected_label=True, figname=None, fmt="pdf"):
         
         """
         'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
@@ -807,6 +821,9 @@ class CLASSIX:
         index2 : int or numpy.ndarray, optional
             Input object2 [with index 'index2'] for explanation, and compare objects [with indices 'index1' and 'index2'].
         
+        cmap : str, default='Set3'
+            Colormaps for scatter plot. 
+        
         showalldata : boolean, default=False
             Whether or not to show all data points in global view when too many data points for plot.
 
@@ -814,7 +831,7 @@ class CLASSIX:
             Whether or not to show the start points marker.
 
         showsplist : boolean, default=False
-            Whether or not to show the starting points information, which include the number of data points (NumPts), 
+            Whether or not to show the group centers information, which include the number of data points (NumPts), 
             corresponding clusters, and associated coordinates. This only applies to both index1 and index2 are "NULL".
             Default as True. 
         
@@ -828,13 +845,13 @@ class CLASSIX:
             ``classix.explain(1, 1300, plot=False, figstyle="seaborn") # or classix.explain(obj1, obj4)``
             
             The data point 1 is in group 9 and the data point 1300 is in group 8, both of which were merged into cluster #0. 
-            These two groups are connected via groups 9 -> 2 -> 8.
+            The two groups are connected via groups 9 -> 2 -> 8.
             * if we specify the replace name, then the output will be
             
             ``classix.explain(1, 1300, replace_name=["Peter Meyer", "Anna Fields"], figstyle="seaborn")``
             
             The data point Peter Meyer is in group 9 and the data point Anna Fields is in group 8, both of which were merged into cluster #0. 
-            These two groups are connected via groups 9 -> 2 -> 8.
+            The two groups are connected via groups 9 -> 2 -> 8.
 
         plot : boolean, default=False
             Determine if visulize the explaination. 
@@ -859,7 +876,7 @@ class CLASSIX:
             Size for markers for data of index1 and index2.
     
         sp_fcolor : str, default='tomato'
-            The color marked for starting points text box. 
+            The color marked for group centers text box. 
         
         sp_marker : str, default="+"
             The marker for the start points.
@@ -871,28 +888,28 @@ class CLASSIX:
             The color marked for startpoint points scatter marker.
 
         sp_alpha : float, default=0.3
-            The value setting for transprency of text box for starting points. 
+            The value setting for transprency of text box for group centers. 
             
         sp_pad : int, default=2
-            The size of text box for starting points. 
+            The size of text box for group centers. 
         
         sp_bbox : dict, optional
-            Dict with properties for patches.FancyBboxPatch for starting points.
+            Dict with properties for patches.FancyBboxPatch for group centers.
     
         sp_fontsize : int, optional
-            The fontsize for text marked for starting points. 
+            The fontsize for text marked for group centers. 
 
         sp_cmarker : str, default="+"
-            The marker for the connected starting points.
+            The marker for the connected group centers.
         
         sp_csize : int, default=100
-            The marker size for the connected starting points.
+            The marker size for the connected group centers.
         
         sp_ccolor : str, default="crimson"
-            The marker color for the connected starting points.
+            The marker color for the connected group centers.
         
         sp_clinewidths : str, default=2.5
-            The marker width for the connected starting points. 
+            The marker width for the connected group centers. 
 
         dp_fcolor : str, default='bisque'
             The color marked for specified data objects text box. 
@@ -922,13 +939,13 @@ class CLASSIX:
             (only applies to when data dimension is less than or equal to 2).
 
         color : str, default='red'
-            Color for text of starting points labels in visualization. 
+            Color for text of group centers labels in visualization. 
         
         alpha : float, default=0.5
             Scalar or None. 
     
         cline_width : float, default=2
-            Set the patch linewidth of circle for starting points.
+            Set the patch linewidth of circle for group centers.
 
         add_arrow : bool, default=False 
             Whether or not add arrows for connected paths.
@@ -954,7 +971,13 @@ class CLASSIX:
 
         axis : boolean, default=True
             Whether or not add x,y axes to plot.
-
+        
+        include_dist : boolean, default=False
+            Whether or not to include distance information to compute the shortest path between objects. 
+            
+        show_connected_label : boolean, default=True
+            Whether or not to show the named labels of the connected data points, where the named labels are given by pandas dataframe index.
+            
         figname : str, optional
             Set the figure name for the image to be saved.
             
@@ -979,34 +1002,31 @@ class CLASSIX:
             dp_bbox['alpha'] = dp_alpha
             dp_bbox['pad'] = dp_pad
 
-
-        if self.inverse_ind is None:
-            self.inverse_ind = np.argsort(self.ind)
-
-            groups_ = np.array(self.groups_)
-            self.label_change = dict(zip(groups_[self.inverse_ind].ravel(), self.labels_)) # how object change group to cluster.
-
-        data = self.data[self.inverse_ind]
         groups_ = np.array(self.groups_)
+        
+        if self.label_change is None:
+            self.label_change = dict(zip(groups_[self.inverse_ind], self.labels_)) # how object change group to cluster.
+                
+        data = self.data[self.inverse_ind]
         groups_ = groups_[self.inverse_ind]
         
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
             
             if data.shape[1] > 2:
-                warnings.warn("If the group periphery is displayed, the group radius in the visualization might not be accurate.")
+                warnings.warn("Note that with data having more than two features, the group circles in the plot may appear bigger than they are.")
                 _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
                 self.x_pca = np.matmul(data, self._V[np.argsort(self._s)].T)
                 self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
                 
             elif data.shape[1] == 2:
                 self.x_pca = data.copy()
-                self.s_pca = data[self.ind[self.splist_[:, 0]]] 
+                self.s_pca = self.data[self.splist_[:, 0]] 
 
             else: # when data is one-dimensional, no PCA transform
                 self.x_pca = np.ones((len(data.copy()), 2))
                 self.x_pca[:, 0] = data[:, 0]
                 self.s_pca = np.ones((len(self.splist_), 2))
-                self.s_pca[:, 0] = data[self.ind[self.splist_[:, 0]]].reshape(-1) 
+                self.s_pca[:, 0] = self.data[self.splist_[:, 0]].reshape(-1) 
                 
             self.form_starting_point_clusters_table()
             
@@ -1020,20 +1040,19 @@ class CLASSIX:
         
         if index1 is None: # analyze in the general way with a global view
             if plot == True:
-                self.explain_viz(showalldata=showalldata, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, 
+                self.explain_viz(showalldata=showalldata, cmap=cmap, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, 
                                  fontsize=sp_fontsize, bbox=sp_bbox, sp_marker=sp_marker, sp_mcolor=sp_mcolor, width=width, axis=axis, fmt=fmt)
                 
             data_size = data.shape[0]
             feat_dim = data.shape[1]
             
-            print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features. ".format(length=data_size, dim=feat_dim))
-            print("The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}. ".format(tol=self.radius, minPts=self.minPts))
-            print("As the provided data was auto-scaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together. ".format(
-                scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius
-            ))
-            print("In total, {dist:.0f} distances were computed ({avg:.1f} per data point). ".format(dist=self.dist_nr, avg=self.dist_nr/data_size))
-            print("This resulted in {groups:.0f} groups, each with a unique group center. ".format(groups=self.splist_.shape[0]))
-            print("These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. ".format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_))))
+            print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features. ".format(length=data_size, dim=feat_dim) + 
+                "The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}. ".format(tol=self.radius, minPts=self.minPts) +
+                "As the provided data was auto-scaled by a factor of 1/{scl:.2f}, points within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.".format(scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius) + 
+                "In total, {dist:.0f} distances were computed ({avg:.1f} per data point). ".format(dist=self.dist_nr, avg=self.dist_nr/data_size) + 
+                "This resulted in {groups:.0f} groups, each with a unique group center. ".format(groups=self.splist_.shape[0]) + 
+                "These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. ".format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_)))
+                 )
             
             if showsplist:
                 print("A list of all group centers is shown below.")
@@ -1041,30 +1060,32 @@ class CLASSIX:
                 print(self.sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
                 print(dash_line)       
             else:
-                print("For a visualisation of the clusters, use .explain(plot=True). ")
-                
-            print("""In order to explain the clustering of individual data points, \n"""
-                  """use .explain(ind1) or .explain(ind1, ind2) with data indices.""")
+                print("\nFor a visualisation of the clusters, use .explain(plot=True). " +
+                      """In order to explain the clustering of individual data points, """ + 
+                      """use .explain(ind1) or .explain(ind1, ind2) with data indices.""")
             
         else: # index is not None, explain(index1)
             if isinstance(index1, int):
+                index1_id = index1
                 object1 = self.x_pca[index1] # data has been normalized
                 agg_label1 = groups_[index1] # get the group index for object1
             
             elif isinstance(index1, str):
                 if index1 in self.index_data:
+                    index1_id = np.where(self.index_data == index1)[0][0]
                     if len(set(self.index_data)) != len(self.index_data):
                         warnings.warn("The index of data is duplicate.")
-                        object1 = self.x_pca[np.where(self.index_data == index1)[0]][0]
-                        agg_label1 = groups_[np.where(self.index_data == index1)[0][0]]
+                        object1 = self.x_pca[index1_id]
+                        agg_label1 = groups_[index1_id]
                     else:
-                        object1 = self.x_pca[self.index_data == index1][0]
-                        agg_label1 = groups_[self.index_data == index1][0]
+                        object1 = self.x_pca[index1_id]
+                        agg_label1 = groups_[index1_id]
                         
                 else:
                     raise ValueError("Please enter a legal value for index1.")
                     
             elif isinstance(index1, list) or isinstance(index1, np.ndarray):
+                index1_id = -1
                 index1 = np.array(index1)
                 object1 = (index1 - self._mu) / self._scl # allow for out-sample data
                 
@@ -1106,16 +1127,16 @@ class CLASSIX:
                     s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
                     
                     ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", linewidth=0.5*width, 
-                               c=self.labels_[selectInd])
+                               cmap=cmap, c=self.labels_[selectInd]
+                              )
                     
                     ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers in cluster #{0}'.format(cluster_label1), 
                                s=sp_size, linewidth=0.9*width, c=sp_mcolor, alpha=0.4)
                     
                     if show_obj_grp_circle:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
-                                                color='lime', alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                                color=sp1_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
                         
-                    
                     
                     if dp_fontsize is None:
                         ax.text(object1[0], object1[1], s=' ' + str(index1), bbox=dp_bbox, color=obj_color, zorder=1, ha='left', va='bottom')
@@ -1142,10 +1163,8 @@ class CLASSIX:
                                         fontsize=sp_fontsize, bbox=sp_bbox, zorder=1, ha='left'
                                 )
 
-
-                    
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
-                               marker='.', s=sp_csize*0.3, c='lime', linewidths=sp_clinewidths, 
+                               marker='.', s=sp_csize*0.3, c=sp1_color, linewidths=sp_clinewidths, 
                                label='group center {0}'.format(agg_label1)
                                )
 
@@ -1204,22 +1223,25 @@ class CLASSIX:
             # explain two objects relationship
             else: 
                 if isinstance(index2, int):
+                    index2_id = index2
                     object2 = self.x_pca[index2] # data has been normalized
                     agg_label2 = groups_[index2] # get the group index for object2
                     
                 elif isinstance(index2, str):
                     if index2 in self.index_data:
+                        index2_id = np.where(self.index_data == index2)[0][0]
                         if len(set(self.index_data)) != len(self.index_data):
                             warnings.warn("The index of data is duplicate.")
-                            object2 = self.x_pca[np.where(self.index_data == index2)[0][0]][0]
-                            agg_label2 = groups_[np.where(self.index_data == index2)[0][0]]
+                            object2 = self.x_pca[index2_id]
+                            agg_label2 = groups_[index2_id]
                         else:
-                            object2 = self.x_pca[self.index_data == index2][0]
-                            agg_label2 = groups_[self.index_data == index2][0]
+                            object2 = self.x_pca[index2_id]
+                            agg_label2 = groups_[index2_id]
                     else:
                         raise ValueError("Please enter a legal value for index2.")
                         
                 elif isinstance(index2, list) or isinstance(index2, np.ndarray):
+                    index2_id = -1
                     index2 = np.array(index2)
                     object2 = (index2 - self._mu) / self._scl # allow for out-sample data
                     
@@ -1257,31 +1279,27 @@ class CLASSIX:
 
                 cluster_label1, cluster_label2 = self.label_change[agg_label1], self.label_change[agg_label2]
 
-                
                 if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
                     connected_paths = [agg_label1]
                 else:
                     from scipy.sparse import csr_matrix
                     
-                    if self.connected_pairs_ is None:
-                        distm = pairwise_distances(self.s_pca)
-                        distm = (distm <= self.radius*self.scale).astype(int)
-                        self.connected_pairs_ = return_csr_matrix_indices(csr_matrix(distm)).tolist() # list
+                    distm = pairwise_distances(self.s_pca)
+                    distm = (distm <= self.radius*self.scale).astype(int)
+                    csr_dist_m = csr_matrix(distm)
                         
                     if cluster_label1 == cluster_label2:
-                        connected_paths = find_shortest_path(agg_label1,
-                                                             self.connected_pairs_,
-                                                             self.splist_.shape[0],
-                                                             agg_label2
-                        )
-                        
-                        connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
+                        connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
+                            
+                        if len(connected_paths)<1:
+                            connected_paths_vis = None
+                        else:    
+                            connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
                         
                     else: 
                         connected_paths = []
                         
                 if plot == True:
-
                     if self.x_pca.shape[0] > 1e5 and not showalldata:
                         warnings.warn("Too many data points for plot. Randomly subsampled 1e5 points.")
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
@@ -1296,16 +1314,16 @@ class CLASSIX:
                     union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
                     s_pca = self.s_pca[union_ind]
                     
-                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", c=self.labels_[selectInd], linewidth=width)
+                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", c=self.labels_[selectInd], linewidth=width, cmap=cmap)
                     ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=0.9*width, alpha=0.4)
 
                     
                     if show_obj_grp_circle:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False,
-                                        color='lime', alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                        color=sp1_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
                         
                         ax.add_patch(plt.Circle((self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1]), self.radius, fill=False,
-                                        color='cyan', alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                        color=sp2_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
                                         
                     if isinstance(index1, int) or isinstance(index1, str):
                         if dp_fontsize is None:
@@ -1339,8 +1357,8 @@ class CLASSIX:
                                                     )
                                 
                         if union_ind[i] in connected_paths:
-                            # draw circle for connected starting points or not, 
-                            # and also determine the marker of the connected starting points.
+                            # draw circle for connected group centers or not, 
+                            # and also determine the marker of the connected group centers.
                             if union_ind[i] == connected_paths[0]: 
                                 ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, 
                                        label='connected groups', c=sp_ccolor, linewidths=sp_clinewidths)
@@ -1371,19 +1389,19 @@ class CLASSIX:
                                 )
 
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
-                            marker='.', s=sp_csize*0.3, c='lime', linewidths=sp_clinewidths, 
+                            marker='.', s=sp_csize*0.3, c=sp1_color, linewidths=sp_clinewidths, 
                             label='group center {0}'.format(agg_label1)
                             )
 
                     ax.scatter(self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1], 
-                            marker='.', s=sp_csize*0.3, c='cyan', linewidths=sp_clinewidths, 
+                            marker='.', s=sp_csize*0.3, c=sp2_color, linewidths=sp_clinewidths, 
                             label='group center {0}'.format(agg_label2)
                             )
                     
                     nr_cps = len(connected_paths)
-                    
+
                     if add_arrow:
-                        for i in range(nr_cps - 1):
+                        for i in range(nr_cps-1):
                             arrowStart=(self.s_pca[connected_paths[i], 0], self.s_pca[connected_paths[i], 1])
                             arrowStop=(self.s_pca[connected_paths[i+1], 0], self.s_pca[connected_paths[i+1], 1])
 
@@ -1439,11 +1457,12 @@ class CLASSIX:
                                             )
                                 
 
-                    if cluster_label1 == cluster_label2: # change the order of legend
+                    if cluster_label1 == cluster_label2 and len(connected_paths) > 1: # change the order of legend
                         handles, lg_labels = ax.get_legend_handles_labels()
                         lg_labels = [lg_labels[i] for i in [0,3,1,2,4,5]]
                         handles = [handles[i] for i in [0,3,1,2,4,5]]
                         ax.legend(handles, lg_labels, ncols=3, loc='best')
+
                     else:
                         ax.legend(ncols=3, loc='best')
 
@@ -1489,13 +1508,35 @@ class CLASSIX:
                         if cluster_label1 == cluster_label2:
                             print(
                             """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
-                                """\nboth of which were merged into cluster #%(cluster)i. """% {
+                                """both of which were merged into cluster #%(cluster)i. """% {
                                 "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
                             )
-                            
-                            print("""These two groups are connected via groups %(connected)s.""" % {
-                                "connected":connected_paths_vis}
-                            )
+
+                            if connected_paths_vis is None:
+                                print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.scale))
+                                print('This is because at least one of the groups was reassigned due to the minPts condition.')
+                            else:
+                                print("""\nThe two groups are connected via groups %(connected)s.""" % {
+                                    "connected":connected_paths_vis}
+                                )
+                                
+                                connected_paths.reverse()
+                                if self.index_data is not None and show_connected_label:
+                                    show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
+                                    show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
+                                    
+                                    show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
+                                    show_connected_df["Label"] = [index1] + self.index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [index2] 
+                                else:
+                                    show_connected_df = pd.DataFrame(columns=["Index", "Group"])
+                                    show_connected_df["Index"] = [index1_id] + self.gcIndices(connected_paths).tolist() + [index2_id] 
+                                    show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
+                                    
+                                print('\n', show_connected_df.to_string(index=False), '\n')
+                                
+                                if not plot:
+                                    print("Use .explain(..., plot=True) for a visual representation.")
+                                
                         else: 
                             connected_paths = []
                             print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
@@ -1511,7 +1552,7 @@ class CLASSIX:
     
 
 
-    def explain_viz(self, showalldata=False, figsize=(10, 7), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
+    def explain_viz(self, showalldata=False, cmap='Set3', figsize=(10, 7), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
                     savefig=False, fontsize=None, bbox=None, axis="off", fmt="pdf"):
         """Visualize the starting point and data points"""
         
@@ -1527,7 +1568,7 @@ class CLASSIX:
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = bcolor
 
-        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], marker=".", linewidth=width, c=self.labels_[selectInd])
+        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], marker=".", linewidth=width, c=self.labels_[selectInd], cmap=cmap)
 
         if showallgroups:
             for j in range(self.s_pca.shape[0]):
@@ -1578,7 +1619,7 @@ class CLASSIX:
         
 
     def form_starting_point_clusters_table(self, aggregate=False):
-        """form the columns details for starting points and clusters information"""
+        """form the columns details for group centers and clusters information"""
         
         # won't change the original order of self.splist_
         cols = ["Group", "NrPts"]
@@ -1630,17 +1671,17 @@ class CLASSIX:
         Parameters
         ----------
         scale : float
-            Design for distance-clustering, when distance between the two starting points 
+            Design for distance-clustering, when distance between the two group centers 
             associated with two distinct groups smaller than scale*radius, then the two groups merge.
         
         labelsize : int 
             The fontsize of ticks. 
             
         markersize : int 
-            The size of the markers for starting points.
+            The size of the markers for group centers.
             
         plot_boundary : boolean
-            If it is true, will plot the boundary of groups for the starting points.
+            If it is true, will plot the boundary of groups for the group centers.
             
         bound_color : str
             The color for the boundary for groups with the specified radius.
@@ -1684,16 +1725,32 @@ class CLASSIX:
         
 
 
+    def gcIndices(self, ids):
+        return self._gcIndices(ids)
+
+
+        
     def gc2ind(self, spid):
         return self.ind[self.splist_[spid, 0]]
 
 
+    
+    def load_group_centers(self):
+        """Load group centers."""
+            
+        if self.grp_centers is None:
+            self.grp_centers = calculate_cluster_centers(self.data, self.groups_)
+            return self.grp_centers
+        else:
+            return self.grp_centers
+        
+        
 
     def load_cluster_centers(self):
         """Load cluster centers."""
-        
+            
         if self.centers is None:
-            self.centers = calculate_cluster_centers(self.data*self._scl + self._mu, self.labels_)
+            self.centers = calculate_cluster_centers(self.data[self.inverse_ind], self.labels_)
             return self.centers
         else:
             return self.centers
@@ -1712,16 +1769,6 @@ class CLASSIX:
         return centers
 
     
-    def load_splist_indices(self):
-        """Get the starting point indices."""
-        
-        if self.splist_indices is not None:
-            self.splist_indices = np.full(self.data.shape[0], 0, dtype=int)
-            self.splist_indices[self.splist_[:,0].astype(int)] = 1
-            
-        return self.splist_indices
-
-
     
     def outlier_filter(self, min_samples=None, min_samples_rate=0.1): # percent
         """Filter outliers in terms of ``min_samples`` or ``min_samples_rate``. """
@@ -1746,15 +1793,16 @@ class CLASSIX:
 
     
 
-    def pprint_format(self, items):
+    def pprint_format(self, items, truncate=True):
         """Format item value for clusters. """
         
         cluster = 0
         if isinstance(items, dict):
             for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True): 
                 if cluster > 19:
-                    print("      ... truncated ...")
-                    break
+                    if truncate:
+                        print("      ... truncated ...")
+                        break
                     
                 print("      * cluster {:2} : {}".format(cluster, value))
                 cluster = cluster + 1
@@ -1879,7 +1927,7 @@ def pairwise_distances(X):
 
 
 def visualize_connections(data, splist, radius=0.5, scale=1.5):
-    """Calculate the connected components for graph constructed by starting points given radius and scale."""
+    """Calculate the connected components for graph constructed by group centers given radius and scale."""
 
     from scipy.sparse.csgraph import connected_components
     
@@ -1935,10 +1983,8 @@ def calculate_cluster_centers(data, labels):
 # ##########################################################################################################
 
 
-
-
-def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, target_node=None):
-    """Get single-sourse shortest paths as well as distance from source node,
+def find_shortest_dist_path(source_node=None, graph=None, target_node=None, unweighted=True):
+    """ Get single-sourse shortest paths as well as distance from source node,
     design especially for unweighted undirected graph. The time complexity is O(|V| + |E|)
     where |V| is the number of vertices and |E| is the number of edges.
     
@@ -1947,66 +1993,39 @@ def find_shortest_path(source_node=None, connected_pairs=None, num_nodes=None, t
     source_node: int
         A given source vertex.
     
-    connected_pairs: list
-        The list stores connected nodes pairs.
-    
-    num_nodes: int
-        The number of nodes existed in the graph.
+    graph : scipy.sparse._csr.csr_matrix
+        Input as a sparse matrix format.
         
     target_node: int, default=None
         Find the shortest paths from source node to target node.
         If not None, function returns the shortest path between source node and target node,
         otherwise returns table storing shortest path information.
+    
+    unweighted : bool, default=True
+        If True, then find unweighted distances, i.e., find the path such that the number of edges is minimized.
         
     Returns
     -------
-    dist_info: numpy.ndarray
-        The table storing shortest path information.
-    
     shortest_path_to_target: list
         The shortest path between source node and target node
-    
-    """
-    visited_nodes = [False]*num_nodes
-    queque = list()
-    graph = pairs_to_graph(connected_pairs, num_nodes) # return sparse matrix
-    dist_info = np.empty((num_nodes, 3), dtype=int) # node, dist, last node
-    
-    dist_info[:,0] = np.arange(num_nodes)
-    dist_info[:,1] = num_nodes # np.iinfo(np.int64).max
-    dist_info[:,2] = -1
-    
-    source_node = int(source_node)
-    queque.append(source_node+1)
-    dist_info[source_node,1] = 0
-
-    while(np.any(queque)):
-        node = queque.pop(0)
-        if not visited_nodes[node-1]:
-            neighbor = list()
-            visited_nodes[node-1] = True
-            for i in range(int(num_nodes)):
-                if graph[node-1, i] == 1 and not visited_nodes[i] and not i+1 in queque:
-                    neighbor.append(i+1)
-                    dist_info[i, 1], dist_info[i, 2] = dist_info[node-1, 1]+1, node-1
-            queque = queque + neighbor
-            
-    if target_node != None:
-        shortest_path_to_target = list()
-        if dist_info[target_node,1] == np.iinfo(np.int64).min:
-            print("no path between {} and {}".format(source_node, target_node))
-            return None
         
-        predecessor = target_node
-        while(dist_info[predecessor, 2] != -1):
+    """
+    from scipy.sparse.csgraph import shortest_path
+    dist_matrix, predecessors = shortest_path(csgraph=graph, directed=False, unweighted=unweighted, indices=source_node, return_predecessors=True)
+
+    if predecessors[target_node] != -9999:
+        shortest_path_to_target = []
+        shortest_path_to_target.append(target_node)
+        predecessor = predecessors[target_node] 
+        while predecessor != -9999:
             shortest_path_to_target.append(predecessor)
-            predecessor = dist_info[predecessor, 2]
+            predecessor = predecessors[predecessor] 
             
-        shortest_path_to_target.append(source_node)
-        shortest_path_to_target.reverse()
         return shortest_path_to_target
     else:
-        return dist_info
+        return []
+
+
 
     
 
@@ -2015,13 +2034,12 @@ def pairs_to_graph(pairs, num_nodes, sparse=True):
     from scipy.sparse import csr_matrix
     
     graph = np.full((num_nodes, num_nodes), -99, dtype=int)
-    for i in range(num_nodes):
-        graph[i, i] = 0
-    
+
     for pair in pairs:
         graph[pair[0], pair[1]] = graph[pair[1], pair[0]] = 1
     if sparse:
         graph = csr_matrix(graph)
+        
     return graph
 
 
@@ -2033,7 +2051,6 @@ def return_csr_matrix_indices(csr_mat):
     
     shape_dim1, shape_dim2 = csr_mat.shape
     length_range = csr_mat.indices
-
     indices = np.empty(len(length_range), dtype=csr_mat.indices.dtype)
     _sparsetools.expandptr(shape_dim1, csr_mat.indptr, indices)
     return np.array(list(zip(indices, length_range)))
