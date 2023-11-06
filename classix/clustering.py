@@ -774,14 +774,19 @@ class CLASSIX:
             
         self.inverse_ind = np.argsort(ind)
         labels = labels[self.inverse_ind]
-
+        
         if self.verbose == 1:
+            nr_old_clust_count = len(self.old_cluster_count)
             print("""CLASSIX aggregated the {datalen} data points into {num_group} groups. """.format(datalen=len(data), num_group=splist.shape[0]))
             print("""In total, {dist:.0f} distances were computed ({avg:.1f} per data point). """.format(dist=self.dist_nr, avg=self.dist_nr/len(data)))
-            print("""The {num_group} groups were merged into {c_size} clusters with sizes: """.format(
-                num_group=splist.shape[0], c_size=len(self.old_cluster_count)))
-
+            print("""The {num_group} groups were merged into {c_size} clusters.""".format(
+                num_group=splist.shape[0], c_size=nr_old_clust_count))
             
+            if nr_old_clust_count > 20:
+                print("The largest 20 clusters have the following sizes:")
+            else:
+                print("The clusters have the following sizes:")
+                
             self.pprint_format(self.old_cluster_count, truncate=self.truncate)
 
             if self.minPts > 1 and SIZE_NOISE_LABELS > 0:
@@ -792,6 +797,7 @@ class CLASSIX:
             print("Try the .explain() method to explain the clustering.")
 
         return labels 
+    
     
     
     def explain(self, index1=None, index2=None, cmap='Set3', showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
@@ -1834,22 +1840,13 @@ class CLASSIX:
     def pprint_format(self, items, truncate=True):
         """Format item value for clusters. """
         
-        cluster = 0
-        if isinstance(items, dict):
-            for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True): 
-                if cluster > 19:
-                    if truncate:
-                        print("      ... truncated ...")
-                        break
-                    
-                print("      * cluster {:2} : {}".format(cluster, value))
-                cluster = cluster + 1
-                
-                
-        elif isinstance(items, list) or isinstance(items, tuple):
-            for item in items:
-                print("      * ", item)
+        cluster_sizes = [str(value) for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True)]
+        
+        if truncate:
+            cluster_sizes = cluster_sizes[:20]
             
+        print("  ", ",".join(cluster_sizes))
+                
         return 
             
 
