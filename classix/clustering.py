@@ -1756,7 +1756,8 @@ class CLASSIX:
     @property
     def clusterSizes_(self):
         if hasattr(self, 'splist_'):
-            return collections.Counter(self.labels_)
+            counter = collections.Counter(self.labels_)
+            return np.array(list(counter.values()))[np.argsort(list(counter.keys()))]
         else:
             raise ValueError("Please use .fit() method first.")
 
