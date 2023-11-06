@@ -1775,7 +1775,7 @@ class CLASSIX:
     def load_group_centers(self):
         """Load group centers."""
             
-        if hasattr(self, 'grp_centers'):
+        if not hasattr(self, 'grp_centers'):
             self.grp_centers = calculate_cluster_centers(self.data, self.groups_)
             return self.grp_centers
         else:
@@ -1786,7 +1786,7 @@ class CLASSIX:
     def load_cluster_centers(self):
         """Load cluster centers."""
             
-        if hasattr(self, 'centers'):
+        if not hasattr(self, 'centers'):
             self.centers = calculate_cluster_centers(self.data[self.inverse_ind], self.labels_)
             return self.centers
         else:
