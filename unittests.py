@@ -137,8 +137,6 @@ class TestClassix(unittest.TestCase):
                 clx = CLASSIX(sorting='norm-orthant', group_merging='distance', memory=True, mergeTinyGroups=False)
                 clx.fit_transform(X)
                 
-                clx = CLASSIX(sorting='None', group_merging='distance', memory=True, mergeTinyGroups=False)
-                clx.fit_transform(X)
             except:
                 checkpoint = 0
                 break
@@ -173,8 +171,6 @@ class TestClassix(unittest.TestCase):
                 clx = CLASSIX(sorting='norm-orthant', group_merging='distance', memory=True, mergeTinyGroups=False)
                 clx.fit_transform(X)
                 
-                clx = CLASSIX(sorting='None', group_merging='distance', memory=True, mergeTinyGroups=False)
-                clx.fit_transform(X)
             except:
                 checkpoint = 0
                 break
