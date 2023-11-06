@@ -28,7 +28,7 @@ import warnings
 
 import os
 import copy
-
+import collections
 import numpy as np
 import pandas as pd
 from numpy.linalg import norm
@@ -366,7 +366,13 @@ class CLASSIX:
     connected_pairs_ : list
         List for connected group labels.
 
+    clusterSizes_ : dict
+        The cardinality of each cluster.
 
+    groupCenters_ : array
+        The indices for starting point corresponding to original data order.
+
+    
     Methods
     ----------
     fit(data):
@@ -618,9 +624,8 @@ class CLASSIX:
         splist = data[indices]
         num_of_points = data.shape[0]
 
-        if self.label_change is None:
-            
-            if self.inverse_ind is None:
+        if not hasattr(self, 'label_change'):
+            if not hasattr(self, 'inverse_ind'):
                 self.inverse_ind = np.argsort(self.ind)
                 
             groups = np.asarray(self.groups_)    
@@ -689,7 +694,6 @@ class CLASSIX:
             The clusters labels of the data
         """
         
-        import collections
         if self.memory: self.half_nrm2 = norm(data, axis=1, ord=2)**2 * 0.5 # precomputation
 
         if method == 'density':
@@ -1004,7 +1008,7 @@ class CLASSIX:
 
         groups_ = np.array(self.groups_)
         
-        if self.label_change is None:
+        if not hasattr(self, 'label_change'):
             self.label_change = dict(zip(groups_[self.inverse_ind], self.labels_)) # how object change group to cluster.
                 
         data = self.data[self.inverse_ind]
@@ -1074,18 +1078,21 @@ class CLASSIX:
                 agg_label1 = groups_[index1] # get the group index for object1
             
             elif isinstance(index1, str):
-                if index1 in self.index_data:
-                    index1_id = np.where(self.index_data == index1)[0][0]
-                    if len(set(self.index_data)) != len(self.index_data):
-                        warnings.warn("The index of data is duplicate.")
-                        object1 = self.x_pca[index1_id]
-                        agg_label1 = groups_[index1_id]
+                if hasattr(self, 'index_data'):
+                    if index1 in self.index_data:
+                        index1_id = np.where(self.index_data == index1)[0][0]
+                        if len(set(self.index_data)) != len(self.index_data):
+                            warnings.warn("The index of data is duplicate.")
+                            object1 = self.x_pca[index1_id]
+                            agg_label1 = groups_[index1_id]
+                        else:
+                            object1 = self.x_pca[index1_id]
+                            agg_label1 = groups_[index1_id]
+                            
                     else:
-                        object1 = self.x_pca[index1_id]
-                        agg_label1 = groups_[index1_id]
-                        
+                        raise ValueError("Please enter a legal value for index1.")
                 else:
-                    raise ValueError("Please enter a legal value for index1.")
+                    raise ValueError("Please use .fit() method first.")
                     
             elif isinstance(index1, list) or isinstance(index1, np.ndarray):
                 index1_id = -1
@@ -1236,18 +1243,22 @@ class CLASSIX:
                     agg_label2 = groups_[index2] # get the group index for object2
                     
                 elif isinstance(index2, str):
-                    if index2 in self.index_data:
-                        index2_id = np.where(self.index_data == index2)[0][0]
-                        if len(set(self.index_data)) != len(self.index_data):
-                            warnings.warn("The index of data is duplicate.")
-                            object2 = self.x_pca[index2_id]
-                            agg_label2 = groups_[index2_id]
+                    if hasattr(self, 'index_data'):
+                        if index2 in self.index_data:
+                            index2_id = np.where(self.index_data == index2)[0][0]
+                            if len(set(self.index_data)) != len(self.index_data):
+                                warnings.warn("The index of data is duplicate.")
+                                object2 = self.x_pca[index2_id]
+                                agg_label2 = groups_[index2_id]
+                            else:
+                                object2 = self.x_pca[index2_id]
+                                agg_label2 = groups_[index2_id]
                         else:
-                            object2 = self.x_pca[index2_id]
-                            agg_label2 = groups_[index2_id]
+                            raise ValueError("Please enter a legal value for index2.")
                     else:
-                        raise ValueError("Please enter a legal value for index2.")
-                        
+                        raise ValueError("Please use .fit() method first.")
+
+                
                 elif isinstance(index2, list) or isinstance(index2, np.ndarray):
                     index2_id = -1
                     index2 = np.array(index2)
@@ -1738,6 +1749,23 @@ class CLASSIX:
         
 
 
+    @property
+    def groupCenters_(self):
+        if hasattr(self, 'splist_'):
+            return self._gcIndices(self.splist.shape[0])
+        else:
+            raise ValueError("Please use .fit() method first.")
+            
+    
+    @property
+    def clusterSizes_(self):
+        if hasattr(self, 'splist_'):
+            return collections.Counter(self.labels_)
+        else:
+            raise ValueError("Please use .fit() method first.")
+
+
+    
     def gcIndices(self, ids):
         return self._gcIndices(ids)
 
