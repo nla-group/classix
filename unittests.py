@@ -303,7 +303,11 @@ class TestClassix(unittest.TestCase):
         X, y = data.make_blobs(n_samples=1000, centers=3, n_features=2, cluster_std=2, random_state=1)
         checkpoint = 1
         try:
-            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging='distance', short_log_form=True)
+            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging='distance')
+            clx.fit(X)
+            clx.explain(773, 22, plot=True,  add_arrow=True, include_dist=False)
+
+            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging='density')
             clx.fit(X)
             clx.explain(773, 22, plot=True,  add_arrow=True, include_dist=False)
         except:
