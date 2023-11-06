@@ -293,6 +293,8 @@ class TestClassix(unittest.TestCase):
         try:
             clx = CLASSIX(radius=0.6)
             clx.fit_transform(X)
+            print(clx.clusterSizes_)
+            print(clx.groupCenters_)
             clx.explain(index1='Carl', index2='Bert', plot=True, showallgroups=True, sp_fontsize=12)        
         except:
             checkpoint = 0
