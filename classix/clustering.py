@@ -1013,7 +1013,6 @@ class CLASSIX:
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
             
             if data.shape[1] > 2:
-                warnings.warn("Note that with data having more than two features, the group circles in the plot may appear bigger than they are.")
                 _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
                 self.x_pca = np.matmul(data, self._V[np.argsort(self._s)].T)
                 self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
@@ -1046,11 +1045,11 @@ class CLASSIX:
             data_size = data.shape[0]
             feat_dim = data.shape[1]
             
-            print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features. ".format(length=data_size, dim=feat_dim) + 
-                "The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}. ".format(tol=self.radius, minPts=self.minPts) +
-                "As the provided data was auto-scaled by a factor of 1/{scl:.2f}, points within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.".format(scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius) + 
-                "In total, {dist:.0f} distances were computed ({avg:.1f} per data point). ".format(dist=self.dist_nr, avg=self.dist_nr/data_size) + 
-                "This resulted in {groups:.0f} groups, each with a unique group center. ".format(groups=self.splist_.shape[0]) + 
+            print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features.\n".format(length=data_size, dim=feat_dim) + 
+                "The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}.\n".format(tol=self.radius, minPts=self.minPts) +
+                "As the provided data was auto-scaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.\n".format(scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius) + 
+                "In total, {dist:.0f} distances were computed ({avg:.1f} per data point).\n".format(dist=self.dist_nr, avg=self.dist_nr/data_size) + 
+                "This resulted in {groups:.0f} groups, each with a unique group center.\n".format(groups=self.splist_.shape[0]) + 
                 "These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. ".format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_)))
                  )
             
@@ -1061,12 +1060,12 @@ class CLASSIX:
                 print(dash_line)       
             else:
                 if plot:
-                    print("\nIn order to explain the clustering of individual data points, " + 
-                          "use .explain(ind1) or .explain(ind1, ind2) with data indices.")
+                    print("\nTo explain the clustering of individual data points, use\n " + 
+                          ".explain(index1) or .explain(index1,index2) with data indices.")
                 else:
-                    print("\nFor a visualisation of the clusters, use .explain(plot=True). " +
-                          "In order to explain the clustering of individual data points, " + 
-                          "use .explain(ind1) or .explain(ind1, ind2) with data indices.")
+                    print("\nFor a visualisation of the clusters, use .explain(plot=True).\n" +
+                          "To explain the clustering of individual data points, use\n" + 
+                          ".explain(index1) or .explain(index1,index2) with data indices.")
             
         else: # index is not None, explain(index1)
             if isinstance(index1, int):
@@ -1118,10 +1117,13 @@ class CLASSIX:
                 if plot == True:
 
                     if self.x_pca.shape[0] > 1e5 and not showalldata:
-                        warnings.warn("Too many data points for plot. Randomly subsampled 1e5 points.")
+                        print("Too many data points for plot. Randomly subsampled 1e5 points.")
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
                     else:
                         selectInd = np.arange(self.x_pca.shape[0])
+                        
+                    if data.shape[1] > 2:
+                        print("With data having more than two features, the group circles in\nthe plot may appear bigger than they are.")
 
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
@@ -1219,10 +1221,12 @@ class CLASSIX:
                     print(dash_line)       
 
                 print(
-                    """The data point %(index1)s is in group %(agg_id)i, which has been merged into cluster #%(m_c)i."""% {
+                    """Data point %(index1)s is in group %(agg_id)i, which was merged into cluster #%(m_c)i."""% {
                         "index1":index1, "agg_id":agg_label1, "m_c":cluster_label1
                     }
                 )
+                if not plot:
+                    print("Use .explain(..., plot=True) for a visual representation.")
 
             # explain two objects relationship
             else: 
@@ -1294,6 +1298,7 @@ class CLASSIX:
                         
                     if cluster_label1 == cluster_label2:
                         connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
+                        
                         connected_paths.reverse()
                         
                         if len(connected_paths)<1:
@@ -1306,10 +1311,13 @@ class CLASSIX:
                         
                 if plot == True:
                     if self.x_pca.shape[0] > 1e5 and not showalldata:
-                        warnings.warn("Too many data points for plot. Randomly subsampled 1e5 points.")
+                        print("Too many data points for plot. Randomly subsampled 1e5 points.")
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
                     else:
                         selectInd = np.arange(self.x_pca.shape[0])
+                        
+                    if data.shape[1] > 2:
+                        print("With data having more than two features, the group circles in\nthe plot may appear bigger than they are.")
 
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
@@ -1512,8 +1520,8 @@ class CLASSIX:
                 else:
                     if cluster_label1 == cluster_label2:
                         print(
-                        """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
-                            """both of which were merged into cluster #%(cluster)i. """% {
+                        """Data point %(index1)s is in group %(agg_id1)s.\nData point %(index2)s is in group %(agg_id2)s.\n"""
+                            """Both groups were merged into cluster #%(cluster)i. """% {
                             "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
                         )
 
@@ -1521,10 +1529,11 @@ class CLASSIX:
                             print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.scale))
                             print('This is because at least one of the groups was reassigned due to the minPts condition.')
                         else:
-                            print("""\nThe two groups are connected via groups %(connected)s.""" % {
+                            print("""\nThe two groups are connected via groups\n %(connected)s.""" % {
                                 "connected":connected_paths_vis}
                             )
 
+                            
                             if self.index_data is not None and show_connected_label:
                                 show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
@@ -1536,22 +1545,22 @@ class CLASSIX:
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
 
-                            print('\n', show_connected_df.to_string(index=False), '\n')
+                            print('\nHere is a list of connected data points with\ntheir global data indices and group numbers:\n\n', show_connected_df.to_string(index=False), '\n')
 
                             if not plot:
                                 print("Use .explain(..., plot=True) for a visual representation.")
 
                     else: 
                         connected_paths = []
-                        print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
+                        print("""Data point %(index1)s is in group %(agg_id1)i, which was merged into cluster %(c_id1)s.""" % {
                             "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1})
 
-                        print("""The data point %(index2)s is in group %(agg_id2)i, which has been merged into cluster %(c_id2)s.""" % {
+                        print("""Data point %(index2)s is in group %(agg_id2)i, which was merged into cluster %(c_id2)s.""" % {
                             "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2})   
 
                         print("""There is no path of overlapping groups between these clusters.""")
 
-                    self.connected_paths = connected_paths
+                self.connected_paths = connected_paths
         return 
     
 
@@ -1563,11 +1572,11 @@ class CLASSIX:
         from matplotlib import pyplot as plt
 
         if self.x_pca.shape[0] > 1e5 and not showalldata:
-            warnings.warn("Too many data points for plot. Randomly subsampled 1e5 points.")
+            print("Too many data points for plot. Randomly subsampled 1e5 points.")
             selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
         else:
             selectInd = np.arange(self.x_pca.shape[0])
-
+        
         plt.style.use(style=figstyle)
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = bcolor
