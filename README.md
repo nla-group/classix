@@ -113,7 +113,7 @@ CLASSIX is an explainable clustering method. To get an initial overview of the c
 ```Python
 clx.explain(plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=750 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=650 />
 
 The group centers, shown as the small red boxes, can be thought of as a coarse representation of the data. Each group center is associated with a group of data points, and groups are merged into clusters. The `explain` method returns a textual summary of the clustering:
 
@@ -135,7 +135,7 @@ In order to explain the cluster assignment of a particular data point, simply pr
 ```Python
 clx.explain(73, plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None73.png width=750 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None73.png width=650 />
 Output:
 
 ```
@@ -147,7 +147,7 @@ We can also query why two data points ended up in the same cluster, or not:
 ```Python
 clx.explain(773, 792, plot=True)
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None773_792.png width=750 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None773_792.png width=650 />
 Output:
 
 ```
@@ -182,7 +182,7 @@ clx.explain(index1='Carl', index2='Bert', plot=True, showallgroups=True, sp_font
 
 Output:
 
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=500 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=750 />
 
 ```
 The data point Carl is in group 1, which has been merged into cluster 1.
