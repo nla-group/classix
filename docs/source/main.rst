@@ -13,9 +13,12 @@ CLASSIX API Reference
    classix.CLASSIX.explain_viz
    classix.CLASSIX.visualize_linkage
    classix.CLASSIX.load_cluster_centers
-   classix.CLASSIX.load_splist_indices
+   classix.CLASSIX.load_group_centers
+   classix.CLASSIX.gcIndices
    classix.CLASSIX.form_starting_point_clusters_table
    classix.CLASSIX.calculate_group_centers
    classix.CLASSIX.outlier_filter
    classix.CLASSIX.pprint_format
    classix.CLASSIX.reassign_labels
+   classix.CLASSIX.gc2ind
+   
