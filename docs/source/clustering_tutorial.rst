@@ -197,8 +197,13 @@ The output is:
                 ......
           * cluster 13 : 1
     As MinPts is 99, the number of clusters has been further reduced to 7.
-.. image:: images/explain_viz.png
+    Try the .explain() method to explain the clustering.
 
+.. image:: images/explain_viz.png
+.. parsed-literal::
+        CLASSIX clustered 1000 data points with 2 features. The radius parameter was set to 0.10 and minPts was set to 99. As the provided data was auto-scaled by a factor of 1/8.12, points within a radius R=0.10*8.12=0.81 were grouped together.In total, 4610 distances were computed (4.6 per data point). This resulted in 163 groups, each with a unique group center. These 163 groups were subsequently merged into 7 clusters. 
+    
+    In order to explain the clustering of individual data points, use .explain(ind1) or .explain(ind1, ind2) with data indices.
 
 Track single object
 ------------------------------
@@ -246,9 +251,19 @@ Example to show two objects in the same clusters:
 
 .. parsed-literal::
     
-    The data point 773 is in group 37 and the data point 792 is in group 50, 
-    both of which were merged into cluster #1. 
-    These two groups are connected via groups 37 <-> 49 <-> 41 <-> 45 <-> 38 <-> 50.
+    The data point 773 is in group 37 and the data point 792 is in group 50, both of which were merged into cluster #1. 
+    
+    The two groups are connected via groups 50 <-> 38 <-> 45 <-> 41 <-> 49 <-> 37.
+    
+      Index  Group
+       773     37
+       882     37
+       726     49
+       438     41
+       772     45
+       117     38
+       207     50
+       792     50 
 
 .. image:: images/None773_792.png
 
@@ -351,16 +366,9 @@ setting ``sp_fontsize`` larger or change the shape by tunning appropriate value 
 
 .. parsed-literal::
 
-    A clustering of 2028780 data points with 2 features has been performed. 
-    The radius parameter was set to 1.00 and MinPts was set to 0. 
-    As the provided data has been scaled by a factor of 1/2.46,
-    data points within a radius of R=1.00*2.46=2.46 were aggregated into groups. 
-    In total 7577284 comparisons were required (3.73 comparisons per data point). 
-    This resulted in 36 groups, each uniquely associated with a starting point. 
-    These 36 groups were subsequently merged into 4 clusters. 
-    In order to see a visual representation of the clustered data, use .explain(plot=True). 
-    In order to explain the clustering of individual data points, 
-    use .explain(ind1) or .explain(ind1, ind2) with indices of the data points.
+    CLASSIX clustered 2028780 data points with 2 features. The radius parameter was set to 1.00 and minPts was set to 0. As the provided data was auto-scaled by a factor of 1/2.46, points within a radius R=1.00*2.46=2.46 were grouped together.In total, 3920623 distances were computed (1.9 per data point). This resulted in 36 groups, each with a unique group center. These 36 groups were subsequently merged into 4 clusters. 
+    
+    In order to explain the clustering of individual data points, use .explain(ind1) or .explain(ind1, ind2) with data indices.
 
 We can see most of data objects are allocated to groups 26~33, which correspond to cluster 0. 
 
@@ -374,7 +382,7 @@ Then to track or compare any data by indexing, you can enter like
 .. image:: images/None14940_16943.png
 
 .. parsed-literal::
-
+    
     The data point 14940 is in group 7, which has been merged into cluster 0.
     The data point 16943 is in group 11, which has been merged into cluster 2.
     There is no path of overlapping groups between these clusters.
@@ -390,6 +398,14 @@ The output documentation describes how two data objects are separated into two c
 
 .. parsed-literal::
     
-    The data point 16943 is in group 11 and the data point 17143 is in group 16, 
-    both of which were merged into cluster #2. 
-    These two groups are connected via groups 11 <-> 12 <-> 14 <-> 16.
+    The data point 16943 is in group 11 and the data point 17143 is in group 16, both of which were merged into cluster #2. 
+    
+    The two groups are connected via groups 16 <-> 15 <-> 12 <-> 11.
+    
+      Index  Group
+     16943     11
+     17029     11
+     16961     12
+     17147     15
+     17570     16
+     17143     16 
