@@ -1504,52 +1504,52 @@ class CLASSIX:
                         
                     plt.show()
 
-                    if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
-                        print("The data points %(index1)s and %(index2)s are in the same group %(agg_id)i, hence were merged into the same cluster #%(m_c)i"%{
-                            "index1":index1, "index2":index2, "agg_id":agg_label1, "m_c":cluster_label1}
+                if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
+                    print("The data points %(index1)s and %(index2)s are in the same group %(agg_id)i, hence were merged into the same cluster #%(m_c)i"%{
+                        "index1":index1, "index2":index2, "agg_id":agg_label1, "m_c":cluster_label1}
+                    )
+                else:
+                    if cluster_label1 == cluster_label2:
+                        print(
+                        """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
+                            """both of which were merged into cluster #%(cluster)i. """% {
+                            "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
                         )
-                    else:
-                        if cluster_label1 == cluster_label2:
-                            print(
-                            """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
-                                """both of which were merged into cluster #%(cluster)i. """% {
-                                "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
+
+                        if connected_paths_vis is None:
+                            print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.scale))
+                            print('This is because at least one of the groups was reassigned due to the minPts condition.')
+                        else:
+                            print("""\nThe two groups are connected via groups %(connected)s.""" % {
+                                "connected":connected_paths_vis}
                             )
 
-                            if connected_paths_vis is None:
-                                print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.scale))
-                                print('This is because at least one of the groups was reassigned due to the minPts condition.')
-                            else:
-                                print("""\nThe two groups are connected via groups %(connected)s.""" % {
-                                    "connected":connected_paths_vis}
-                                )
-                                
-                                connected_paths.reverse()
-                                if self.index_data is not None and show_connected_label:
-                                    show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
-                                    show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
-                                    
-                                    show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
-                                    show_connected_df["Label"] = [index1] + self.index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [index2] 
-                                else:
-                                    show_connected_df = pd.DataFrame(columns=["Index", "Group"])
-                                    show_connected_df["Index"] = [index1_id] + self.gcIndices(connected_paths).tolist() + [index2_id] 
-                                    show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
-                                    
-                                print('\n', show_connected_df.to_string(index=False), '\n')
-                                
-                                if not plot:
-                                    print("Use .explain(..., plot=True) for a visual representation.")
-                                
-                        else: 
-                            connected_paths = []
-                            print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
-                                "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1})
+                            connected_paths.reverse()
+                            if self.index_data is not None and show_connected_label:
+                                show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
+                                show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
 
-                            print("""The data point %(index2)s is in group %(agg_id2)i, which has been merged into cluster %(c_id2)s.""" % {
-                                "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2})   
-                            
-                            print("""There is no path of overlapping groups between these clusters.""")
+                                show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
+                                show_connected_df["Label"] = [index1] + self.index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [index2] 
+                            else:
+                                show_connected_df = pd.DataFrame(columns=["Index", "Group"])
+                                show_connected_df["Index"] = [index1_id] + self.gcIndices(connected_paths).tolist() + [index2_id] 
+                                show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
+
+                            print('\n', show_connected_df.to_string(index=False), '\n')
+
+                            if not plot:
+                                print("Use .explain(..., plot=True) for a visual representation.")
+
+                    else: 
+                        connected_paths = []
+                        print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
+                            "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1})
+
+                        print("""The data point %(index2)s is in group %(agg_id2)i, which has been merged into cluster %(c_id2)s.""" % {
+                            "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2})   
+
+                        print("""There is no path of overlapping groups between these clusters.""")
 
                     self.connected_paths = connected_paths
         return 
