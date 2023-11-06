@@ -398,10 +398,9 @@ class TestClassix(unittest.TestCase):
         checkpoint = 1
         minPts = 10
         scale = 1.5
-
-        try:
-            data = np.random.randn(10000, 2)
-            checkpoint = 1
+        data = np.random.randn(10000, 2)
+        checkpoint = 1
+        try:    
             labels, splist, nr_dist, ind, sort_vals, data, half_nrm2 = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5) #
             splist = np.asarray(splist)
             
@@ -432,7 +431,20 @@ class TestClassix(unittest.TestCase):
         self.assertEqual(checkpoint, 1)
 
 
-    
+    def test_group_merging_error_type(self):
+        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=20, 
+                               cluster_std=1.5, random_state=1
+        )
+        checkpoint = 0
+        group_merging='error'
+        try:
+            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging=group_merging)
+        except:
+            checkpoint = 1
+            
+        self.assertEqual(checkpoint, 1)
+        
+
     def test_misc(self):
         checkpoint = 1
         try:
