@@ -1060,9 +1060,13 @@ class CLASSIX:
                 print(self.sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
                 print(dash_line)       
             else:
-                print("\nFor a visualisation of the clusters, use .explain(plot=True). " +
-                      """In order to explain the clustering of individual data points, """ + 
-                      """use .explain(ind1) or .explain(ind1, ind2) with data indices.""")
+                if plot:
+                    print("\nIn order to explain the clustering of individual data points, " + 
+                          "use .explain(ind1) or .explain(ind1, ind2) with data indices.")
+                else:
+                    print("\nFor a visualisation of the clusters, use .explain(plot=True). " +
+                          "In order to explain the clustering of individual data points, " + 
+                          "use .explain(ind1) or .explain(ind1, ind2) with data indices.")
             
         else: # index is not None, explain(index1)
             if isinstance(index1, int):
