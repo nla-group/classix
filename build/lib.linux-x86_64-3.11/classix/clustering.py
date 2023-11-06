@@ -28,14 +28,14 @@ import warnings
 
 import os
 import copy
-
+import collections
 import numpy as np
 import pandas as pd
 from numpy.linalg import norm
 
 
 def cython_is_available(verbose=0):
-    "Check if CLASSIX is using cython."
+    """Check if CLASSIX is using Cython."""
     
     __cython_type__ = "memoryview"
     
@@ -67,27 +67,27 @@ def cython_is_available(verbose=0):
 
         except (ModuleNotFoundError, ValueError):
             if verbose:
-                print("This CLASSIX is not using Cython.")
+                print("CLASSIX is currently not using Cython.")
             return False
     else:
         if verbose:
-            print("Currently, the Cython implementation is disabled. Please try to set ``__enable_cython__`` to True to enable Cython if needed.")
+            print("Cython is currently disabled. Please set ``__enable_cython__`` to True to enable Cython.")
         return False
     
     
     
 def loadData(name='vdu_signals'):
-    """Obtain the built-in data.
+    """Load built-in sample data.
     
     Parameters
     ----------
     name: str, {'vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 'Phoneme', 'Wine'}, default='vdu_signals'
-        The support build-in datasets for CLASSIX.
+        The supported build-in datasets.
 
     Returns
     -------
     X, y: numpy.ndarray
-        Data and ground-truth labels.    
+        Data and ground-truth labels (if available).    
     """
     
     current_dir, current_filename = os.path.split(__file__)
@@ -164,7 +164,7 @@ def loadData(name='vdu_signals'):
         
 
 def get_data(current_dir='', name='vdu_signals'):
-    """Download the built-in data."""
+    """Download the built-in sample data."""
     import requests
     
     if name == 'vdu_signals':
@@ -263,8 +263,7 @@ def get_data(current_dir='', name='vdu_signals'):
 class CLASSIX:
     """CLASSIX: Fast and explainable clustering based on sorting.
     
-    The user only need to concern the hyperparameters of ``sorting``, ``radius``, and ``minPts`` in the most cases.
-    If want a flexible clustering, might consider other hyperparameters such as ``group_merging``, ``scale``, and ``post_alloc``.
+    The main parameters are ``radius`` and ``minPts``.
     
     Parameters
     ----------
@@ -281,13 +280,13 @@ class CLASSIX:
 
         
     radius : float, default=0.5
-        Tolerance to control the aggregation. If the distance between a starting point 
+        Tolerance to control the aggregation. If the distance between a group center 
         and an object is less than or equal to the tolerance, the object will be allocated 
-        to the group which the starting point belongs to. For details, we refer users to [1].
+        to the group which the group center belongs to. For details, we refer to [1].
 
     
     group_merging : str, {'density', 'distance', None}, default='distance'
-        The method for merging the groups. 
+        The method for the merging of groups. 
         
         - 'density': two groups are merged if the density of data points in their intersection 
            is at least as high the smaller density of both groups. This option uses the disjoint 
@@ -298,13 +297,13 @@ class CLASSIX:
            set structure to speedup merging.
         
         For more details, we refer to [1].
-        If the users set group_merging to None, the clustering will only return the labels formed by aggregation as cluster labels.
+        If group_merging is set to None, the method will return the labels formed by aggregation as cluster labels.
 
     
-    minPts : int, default=0
-        Clusters with less than minPts points are classified as abnormal clusters.  
+    minPts : int, default=1
+        Clusters with fewer than minPts points are classified as abnormal clusters.  
         The data points in an abnormal cluster will be redistributed to the nearest normal cluster. 
-        When set to 0, no redistribution is performed. 
+        When set to 1, no redistribution is performed. 
 
     
     norm : boolean, default=True
@@ -319,7 +318,7 @@ class CLASSIX:
         If False, all outliers will be labeled as -1.
 
     mergeTinyGroups : boolean, default=True
-        If it is False, then group merging will ignore all groups with <minPts points, otherwise not.
+        If this is False, the group merging will ignore all groups with < minPts points.
     
     algorithm : str, default='bf'
         Algorithm to merge connected groups.
@@ -329,19 +328,18 @@ class CLASSIX:
         - 'set': Use disjoint set structure to merge connected groups.
 
     memory : boolean, default=True
-        If cython memoryviews is disable, a fast algorithm with less efficient momory comsuming is triggered
-          since precomputation for aggregation is used. 
+        If Cython memoryviews is disable, a fast algorithm with less efficient memory 
+          consumption is triggered since precomputation for aggregation is used. 
         Setting it True will use a memory efficient computing.  
-        If cython memoryviews is effective, thie parameter can be ignored. 
+        If Cython memoryviews is effective, thie parameter can be ignored. 
     
     verbose : boolean or int, default=1
-        Whether print the logs or not.
+        Whether to print the logs or not.
  
     short_log_form : boolean, default=True
         Whether or not to use short log form to truncate the clusters list. 
         
-        
-             
+              
     Attributes
     ----------
     groups_ : list
@@ -366,7 +364,13 @@ class CLASSIX:
     connected_pairs_ : list
         List for connected group labels.
 
+    clusterSizes_ : array
+        The cardinality of each cluster.
 
+    groupCenters_ : array
+        The indices for starting point corresponding to original data order.
+
+    
     Methods
     ----------
     fit(data):
@@ -399,7 +403,7 @@ class CLASSIX:
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
     """
         
-    def __init__(self, sorting="pca", radius=0.5, minPts=0, group_merging="distance", norm=True, scale=1.5, post_alloc=True, mergeTinyGroups=True,
+    def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", norm=True, scale=1.5, post_alloc=True, mergeTinyGroups=True,
                  memory=True, verbose=1, short_log_form=True): 
 
 
@@ -411,7 +415,6 @@ class CLASSIX:
         self.group_merging = group_merging
         self.sp_to_c_info = False # combine with visualization and data analysis, ensure call PCA and form groups information table only once
 
-        self.centers = None
         self.norm = norm # usually, we do not use this parameter
         self.scale = scale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
@@ -425,9 +428,6 @@ class CLASSIX:
         self.connected_pairs_ = None
         self.connected_paths = None
         self.half_nrm2 = None
-        self.inverse_ind = None
-        self.label_change = None
-        self.grp_centers = None
         
         self._gcIndices = np.frompyfunc(self.gc2ind, 1, 1)
                      
@@ -618,9 +618,8 @@ class CLASSIX:
         splist = data[indices]
         num_of_points = data.shape[0]
 
-        if self.label_change is None:
-            
-            if self.inverse_ind is None:
+        if not hasattr(self, 'label_change'):
+            if not hasattr(self, 'inverse_ind'):
                 self.inverse_ind = np.argsort(self.ind)
                 
             groups = np.asarray(self.groups_)    
@@ -641,7 +640,7 @@ class CLASSIX:
     
     
     
-    def merging(self, data, agg_labels, splist, ind, sort_vals, radius=0.5, method="distance", minPts=0):
+    def merging(self, data, agg_labels, splist, ind, sort_vals, radius=0.5, method="distance", minPts=1):
         """
         Merge groups after aggregation. 
 
@@ -689,7 +688,6 @@ class CLASSIX:
             The clusters labels of the data
         """
         
-        import collections
         if self.memory: self.half_nrm2 = norm(data, axis=1, ord=2)**2 * 0.5 # precomputation
 
         if method == 'density':
@@ -774,14 +772,19 @@ class CLASSIX:
             
         self.inverse_ind = np.argsort(ind)
         labels = labels[self.inverse_ind]
-
+        
         if self.verbose == 1:
+            nr_old_clust_count = len(self.old_cluster_count)
             print("""CLASSIX aggregated the {datalen} data points into {num_group} groups. """.format(datalen=len(data), num_group=splist.shape[0]))
             print("""In total, {dist:.0f} distances were computed ({avg:.1f} per data point). """.format(dist=self.dist_nr, avg=self.dist_nr/len(data)))
-            print("""The {num_group} groups were merged into {c_size} clusters with sizes: """.format(
-                num_group=splist.shape[0], c_size=len(self.old_cluster_count)))
-
+            print("""The {num_group} groups were merged into {c_size} clusters.""".format(
+                num_group=splist.shape[0], c_size=nr_old_clust_count))
             
+            if nr_old_clust_count > 20:
+                print("The largest 20 clusters have the following sizes:")
+            else:
+                print("The clusters have the following sizes:")
+                
             self.pprint_format(self.old_cluster_count, truncate=self.truncate)
 
             if self.minPts > 1 and SIZE_NOISE_LABELS > 0:
@@ -789,12 +792,13 @@ class CLASSIX:
                     minPts=self.minPts, r=len(np.unique(labels))
                 ))
                 
-            print("Try the .explain() method to explain the clustering.")
+            print("Use the verbose=0 parameter to supress this info.\nUse the .explain() method to explain the clustering.")
 
         return labels 
     
     
-    def explain(self, index1=None, index2=None, cmap='Set3', showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
+    
+    def explain(self, index1=None, index2=None, cmap='jet', showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
                 plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5,  obj_msize=160, sp1_color='lime', sp2_color='cyan',
                 sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, 
                 sp_ccolor="crimson", sp_clinewidths=2.7,  dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,  show_all_grp_circle=False,
@@ -1004,7 +1008,7 @@ class CLASSIX:
 
         groups_ = np.array(self.groups_)
         
-        if self.label_change is None:
+        if not hasattr(self, 'label_change'):
             self.label_change = dict(zip(groups_[self.inverse_ind], self.labels_)) # how object change group to cluster.
                 
         data = self.data[self.inverse_ind]
@@ -1013,7 +1017,6 @@ class CLASSIX:
         if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
             
             if data.shape[1] > 2:
-                warnings.warn("Note that with data having more than two features, the group circles in the plot may appear bigger than they are.")
                 _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
                 self.x_pca = np.matmul(data, self._V[np.argsort(self._s)].T)
                 self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
@@ -1046,11 +1049,11 @@ class CLASSIX:
             data_size = data.shape[0]
             feat_dim = data.shape[1]
             
-            print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features. ".format(length=data_size, dim=feat_dim) + 
-                "The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}. ".format(tol=self.radius, minPts=self.minPts) +
-                "As the provided data was auto-scaled by a factor of 1/{scl:.2f}, points within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.".format(scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius) + 
-                "In total, {dist:.0f} distances were computed ({avg:.1f} per data point). ".format(dist=self.dist_nr, avg=self.dist_nr/data_size) + 
-                "This resulted in {groups:.0f} groups, each with a unique group center. ".format(groups=self.splist_.shape[0]) + 
+            print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features.\n".format(length=data_size, dim=feat_dim) + 
+                "The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}.\n".format(tol=self.radius, minPts=self.minPts) +
+                "As the provided data was auto-scaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.\n".format(scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius) + 
+                "In total, {dist:.0f} distances were computed ({avg:.1f} per data point).\n".format(dist=self.dist_nr, avg=self.dist_nr/data_size) + 
+                "This resulted in {groups:.0f} groups, each with a unique group center.\n".format(groups=self.splist_.shape[0]) + 
                 "These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. ".format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_)))
                  )
             
@@ -1060,9 +1063,13 @@ class CLASSIX:
                 print(self.sp_info.to_string(justify='center', index=False, max_colwidth=max_colwidth))
                 print(dash_line)       
             else:
-                print("\nFor a visualisation of the clusters, use .explain(plot=True). " +
-                      """In order to explain the clustering of individual data points, """ + 
-                      """use .explain(ind1) or .explain(ind1, ind2) with data indices.""")
+                if plot:
+                    print("\nTo explain the clustering of individual data points, use\n " + 
+                          ".explain(index1) or .explain(index1,index2) with data indices.")
+                else:
+                    print("\nFor a visualisation of the clusters, use .explain(plot=True).\n" +
+                          "To explain the clustering of individual data points, use\n" + 
+                          ".explain(index1) or .explain(index1,index2) with data indices.")
             
         else: # index is not None, explain(index1)
             if isinstance(index1, int):
@@ -1071,18 +1078,21 @@ class CLASSIX:
                 agg_label1 = groups_[index1] # get the group index for object1
             
             elif isinstance(index1, str):
-                if index1 in self.index_data:
-                    index1_id = np.where(self.index_data == index1)[0][0]
-                    if len(set(self.index_data)) != len(self.index_data):
-                        warnings.warn("The index of data is duplicate.")
-                        object1 = self.x_pca[index1_id]
-                        agg_label1 = groups_[index1_id]
+                if hasattr(self, 'index_data'):
+                    if index1 in self.index_data:
+                        index1_id = np.where(self.index_data == index1)[0][0]
+                        if len(set(self.index_data)) != len(self.index_data):
+                            warnings.warn("The index of data is duplicate.")
+                            object1 = self.x_pca[index1_id]
+                            agg_label1 = groups_[index1_id]
+                        else:
+                            object1 = self.x_pca[index1_id]
+                            agg_label1 = groups_[index1_id]
+                            
                     else:
-                        object1 = self.x_pca[index1_id]
-                        agg_label1 = groups_[index1_id]
-                        
+                        raise ValueError("Please enter a legal value for index1.")
                 else:
-                    raise ValueError("Please enter a legal value for index1.")
+                    raise ValueError("Please use .fit() method first.")
                     
             elif isinstance(index1, list) or isinstance(index1, np.ndarray):
                 index1_id = -1
@@ -1114,10 +1124,13 @@ class CLASSIX:
                 if plot == True:
 
                     if self.x_pca.shape[0] > 1e5 and not showalldata:
-                        warnings.warn("Too many data points for plot. Randomly subsampled 1e5 points.")
+                        print("Too many data points for plot. Randomly subsampled 1e5 points.")
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
                     else:
                         selectInd = np.arange(self.x_pca.shape[0])
+                        
+                    if data.shape[1] > 2:
+                        print("With data having more than two features, the group circles in\nthe plot may appear bigger than they are.")
 
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
@@ -1126,8 +1139,8 @@ class CLASSIX:
 
                     s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
                     
-                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", linewidth=0.5*width, 
-                               cmap=cmap, c=self.labels_[selectInd]
+                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], s=60, marker=".", linewidth=0.0*width, 
+                               cmap=cmap, alpha=0.5, c=self.labels_[selectInd]
                               )
                     
                     ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers in cluster #{0}'.format(cluster_label1), 
@@ -1215,10 +1228,12 @@ class CLASSIX:
                     print(dash_line)       
 
                 print(
-                    """The data point %(index1)s is in group %(agg_id)i, which has been merged into cluster #%(m_c)i."""% {
+                    """Data point %(index1)s is in group %(agg_id)i, which was merged into cluster #%(m_c)i."""% {
                         "index1":index1, "agg_id":agg_label1, "m_c":cluster_label1
                     }
                 )
+                if not plot:
+                    print("Use .explain(..., plot=True) for a visual representation.")
 
             # explain two objects relationship
             else: 
@@ -1228,18 +1243,22 @@ class CLASSIX:
                     agg_label2 = groups_[index2] # get the group index for object2
                     
                 elif isinstance(index2, str):
-                    if index2 in self.index_data:
-                        index2_id = np.where(self.index_data == index2)[0][0]
-                        if len(set(self.index_data)) != len(self.index_data):
-                            warnings.warn("The index of data is duplicate.")
-                            object2 = self.x_pca[index2_id]
-                            agg_label2 = groups_[index2_id]
+                    if hasattr(self, 'index_data'):
+                        if index2 in self.index_data:
+                            index2_id = np.where(self.index_data == index2)[0][0]
+                            if len(set(self.index_data)) != len(self.index_data):
+                                warnings.warn("The index of data is duplicate.")
+                                object2 = self.x_pca[index2_id]
+                                agg_label2 = groups_[index2_id]
+                            else:
+                                object2 = self.x_pca[index2_id]
+                                agg_label2 = groups_[index2_id]
                         else:
-                            object2 = self.x_pca[index2_id]
-                            agg_label2 = groups_[index2_id]
+                            raise ValueError("Please enter a legal value for index2.")
                     else:
-                        raise ValueError("Please enter a legal value for index2.")
-                        
+                        raise ValueError("Please use .fit() method first.")
+
+                
                 elif isinstance(index2, list) or isinstance(index2, np.ndarray):
                     index2_id = -1
                     index2 = np.array(index2)
@@ -1290,7 +1309,9 @@ class CLASSIX:
                         
                     if cluster_label1 == cluster_label2:
                         connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
-                            
+                        
+                        connected_paths.reverse()
+                        
                         if len(connected_paths)<1:
                             connected_paths_vis = None
                         else:    
@@ -1301,10 +1322,13 @@ class CLASSIX:
                         
                 if plot == True:
                     if self.x_pca.shape[0] > 1e5 and not showalldata:
-                        warnings.warn("Too many data points for plot. Randomly subsampled 1e5 points.")
+                        print("Too many data points for plot. Randomly subsampled 1e5 points.")
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
                     else:
                         selectInd = np.arange(self.x_pca.shape[0])
+                        
+                    if data.shape[1] > 2:
+                        print("With data having more than two features, the group circles in\nthe plot may appear bigger than they are.")
 
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
@@ -1314,7 +1338,7 @@ class CLASSIX:
                     union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
                     s_pca = self.s_pca[union_ind]
                     
-                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], marker=".", c=self.labels_[selectInd], linewidth=width, cmap=cmap)
+                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], s=60, marker=".", c=self.labels_[selectInd], linewidth=0*width, cmap=cmap, alpha=0.5)
                     ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=0.9*width, alpha=0.4)
 
                     
@@ -1500,54 +1524,54 @@ class CLASSIX:
                         
                     plt.show()
 
-                    if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
-                        print("The data points %(index1)s and %(index2)s are in the same group %(agg_id)i, hence were merged into the same cluster #%(m_c)i"%{
-                            "index1":index1, "index2":index2, "agg_id":agg_label1, "m_c":cluster_label1}
+                if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
+                    print("The data points %(index1)s and %(index2)s are in the same group %(agg_id)i, hence were merged into the same cluster #%(m_c)i"%{
+                        "index1":index1, "index2":index2, "agg_id":agg_label1, "m_c":cluster_label1}
+                    )
+                else:
+                    if cluster_label1 == cluster_label2:
+                        print(
+                        """Data point %(index1)s is in group %(agg_id1)s.\nData point %(index2)s is in group %(agg_id2)s.\n"""
+                            """Both groups were merged into cluster #%(cluster)i. """% {
+                            "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
                         )
-                    else:
-                        if cluster_label1 == cluster_label2:
-                            print(
-                            """The data point %(index1)s is in group %(agg_id1)s and the data point %(index2)s is in group %(agg_id2)s, """
-                                """both of which were merged into cluster #%(cluster)i. """% {
-                                "index1":index1, "index2":index2, "cluster":cluster_label1, "agg_id1":agg_label1, "agg_id2":agg_label2}
+
+                        if connected_paths_vis is None:
+                            print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.scale))
+                            print('This is because at least one of the groups was reassigned due to the minPts condition.')
+                        else:
+                            print("""\nThe two groups are connected via groups\n %(connected)s.""" % {
+                                "connected":connected_paths_vis}
                             )
 
-                            if connected_paths_vis is None:
-                                print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.scale))
-                                print('This is because at least one of the groups was reassigned due to the minPts condition.')
-                            else:
-                                print("""\nThe two groups are connected via groups %(connected)s.""" % {
-                                    "connected":connected_paths_vis}
-                                )
-                                
-                                connected_paths.reverse()
-                                if self.index_data is not None and show_connected_label:
-                                    show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
-                                    show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
-                                    
-                                    show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
-                                    show_connected_df["Label"] = [index1] + self.index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [index2] 
-                                else:
-                                    show_connected_df = pd.DataFrame(columns=["Index", "Group"])
-                                    show_connected_df["Index"] = [index1_id] + self.gcIndices(connected_paths).tolist() + [index2_id] 
-                                    show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
-                                    
-                                print('\n', show_connected_df.to_string(index=False), '\n')
-                                
-                                if not plot:
-                                    print("Use .explain(..., plot=True) for a visual representation.")
-                                
-                        else: 
-                            connected_paths = []
-                            print("""The data point %(index1)s is in group %(agg_id1)i, which has been merged into cluster %(c_id1)s.""" % {
-                                "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1})
-
-                            print("""The data point %(index2)s is in group %(agg_id2)i, which has been merged into cluster %(c_id2)s.""" % {
-                                "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2})   
                             
-                            print("""There is no path of overlapping groups between these clusters.""")
+                            if self.index_data is not None and show_connected_label:
+                                show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
+                                show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
 
-                    self.connected_paths = connected_paths
+                                show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
+                                show_connected_df["Label"] = [index1] + self.index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [index2] 
+                            else:
+                                show_connected_df = pd.DataFrame(columns=["Index", "Group"])
+                                show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
+                                show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
+
+                            print('\nHere is a list of connected data points with\ntheir global data indices and group numbers:\n\n', show_connected_df.to_string(index=False), '\n')
+
+                            if not plot:
+                                print("Use .explain(..., plot=True) for a visual representation.")
+
+                    else: 
+                        connected_paths = []
+                        print("""Data point %(index1)s is in group %(agg_id1)i, which was merged into cluster %(c_id1)s.""" % {
+                            "index1":index1, "agg_id1":agg_label1, "c_id1":cluster_label1})
+
+                        print("""Data point %(index2)s is in group %(agg_id2)i, which was merged into cluster %(c_id2)s.""" % {
+                            "index2":index2, "agg_id2":agg_label2, "c_id2":cluster_label2})   
+
+                        print("""There is no path of overlapping groups between these clusters.""")
+
+                self.connected_paths = connected_paths
         return 
     
 
@@ -1559,16 +1583,16 @@ class CLASSIX:
         from matplotlib import pyplot as plt
 
         if self.x_pca.shape[0] > 1e5 and not showalldata:
-            warnings.warn("Too many data points for plot. Randomly subsampled 1e5 points.")
+            print("Too many data points for plot. Randomly subsampled 1e5 points.")
             selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
         else:
             selectInd = np.arange(self.x_pca.shape[0])
-
+        
         plt.style.use(style=figstyle)
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = bcolor
 
-        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], marker=".", linewidth=width, c=self.labels_[selectInd], cmap=cmap)
+        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], s=60, marker=".", linewidth=0*width, c=self.labels_[selectInd], cmap=cmap, alpha=0.5)
 
         if showallgroups:
             for j in range(self.s_pca.shape[0]):
@@ -1725,6 +1749,24 @@ class CLASSIX:
         
 
 
+    @property
+    def groupCenters_(self):
+        if hasattr(self, 'splist_'):
+            return self._gcIndices(np.arange(self.splist_.shape[0]))
+        else:
+            raise ValueError("Please use .fit() method first.")
+            
+    
+    @property
+    def clusterSizes_(self):
+        if hasattr(self, 'splist_'):
+            counter = collections.Counter(self.labels_)
+            return np.array(list(counter.values()))[np.argsort(list(counter.keys()))]
+        else:
+            raise ValueError("Please use .fit() method first.")
+
+
+    
     def gcIndices(self, ids):
         return self._gcIndices(ids)
 
@@ -1738,7 +1780,7 @@ class CLASSIX:
     def load_group_centers(self):
         """Load group centers."""
             
-        if self.grp_centers is None:
+        if not hasattr(self, 'grp_centers'):
             self.grp_centers = calculate_cluster_centers(self.data, self.groups_)
             return self.grp_centers
         else:
@@ -1749,7 +1791,7 @@ class CLASSIX:
     def load_cluster_centers(self):
         """Load cluster centers."""
             
-        if self.centers is None:
+        if not hasattr(self, 'centers'):
             self.centers = calculate_cluster_centers(self.data[self.inverse_ind], self.labels_)
             return self.centers
         else:
@@ -1796,22 +1838,17 @@ class CLASSIX:
     def pprint_format(self, items, truncate=True):
         """Format item value for clusters. """
         
-        cluster = 0
-        if isinstance(items, dict):
-            for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True): 
-                if cluster > 19:
-                    if truncate:
-                        print("      ... truncated ...")
-                        break
-                    
-                print("      * cluster {:2} : {}".format(cluster, value))
-                cluster = cluster + 1
-                
-                
-        elif isinstance(items, list) or isinstance(items, tuple):
-            for item in items:
-                print("      * ", item)
+        cluster_sizes = [str(value) for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True)]
+        
+        if truncate:
+            if len(cluster_sizes) > 20: 
+                dotstr = ',...'
+                cluster_sizes = cluster_sizes[:20]
+            else: 
+                dotstr = '.'
             
+        print(" ", ",".join(cluster_sizes) + dotstr)
+                
         return 
             
 
@@ -1854,7 +1891,7 @@ class CLASSIX:
     
     @sorting.setter
     def sorting(self, value):
-        if not isinstance(value, str):
+        if not isinstance(value, str) and not isinstance(value, type(None)):
             raise TypeError('Expected a string type')
         if value not in ['pca', 'norm-mean', 'norm-orthant'] and value != None:
             raise ValueError(
@@ -1871,7 +1908,7 @@ class CLASSIX:
     
     @group_merging.setter
     def group_merging(self, value):
-        if not isinstance(value, str) and not isinstance(None, type(None)):
+        if not isinstance(value, str) and not isinstance(value, type(None)):
             raise TypeError('Expected a string type or None.')
         if value not in ['density', 
                          'distance'
@@ -1883,8 +1920,6 @@ class CLASSIX:
         self._group_merging = value
         
 
-    
-    
     
     @property
     def minPts(self):
@@ -2028,22 +2063,6 @@ def find_shortest_dist_path(source_node=None, graph=None, target_node=None, unwe
 
 
     
-
-def pairs_to_graph(pairs, num_nodes, sparse=True):
-    """Transform the pairs represented by list into graph."""
-    from scipy.sparse import csr_matrix
-    
-    graph = np.full((num_nodes, num_nodes), -99, dtype=int)
-
-    for pair in pairs:
-        graph[pair[0], pair[1]] = graph[pair[1], pair[0]] = 1
-    if sparse:
-        graph = csr_matrix(graph)
-        
-    return graph
-
-
-
 def return_csr_matrix_indices(csr_mat): 
     """Return sparce matrix indices."""
 
