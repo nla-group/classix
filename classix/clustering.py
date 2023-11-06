@@ -1871,7 +1871,7 @@ class CLASSIX:
     
     @group_merging.setter
     def group_merging(self, value):
-        if not isinstance(value, str) and not isinstance(None, type(None)):
+        if not isinstance(value, str) and not isinstance(value, type(None)):
             raise TypeError('Expected a string type or None.')
         if value not in ['density', 
                          'distance'
@@ -1883,8 +1883,6 @@ class CLASSIX:
         self._group_merging = value
         
 
-    
-    
     
     @property
     def minPts(self):
