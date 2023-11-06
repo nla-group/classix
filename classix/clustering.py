@@ -1533,7 +1533,7 @@ class CLASSIX:
                                 show_connected_df["Label"] = [index1] + self.index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [index2] 
                             else:
                                 show_connected_df = pd.DataFrame(columns=["Index", "Group"])
-                                show_connected_df["Index"] = [index1_id] + self.gcIndices(connected_paths).tolist() + [index2_id] 
+                                show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
 
                             print('\n', show_connected_df.to_string(index=False), '\n')
