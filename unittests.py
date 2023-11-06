@@ -298,6 +298,19 @@ class TestClassix(unittest.TestCase):
 
         self.assertEqual(checkpoint, 1)
 
+
+    def test_explain_connected_groups(self):
+        X, y = datasets.make_blobs(n_samples=1000, centers=3, n_features=2, cluster_std=2, random_state=1)
+        checkpoint = 1
+        try:
+            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging='distance', short_log_form=True)
+            clx.fit(X)
+            clx.explain(773, 22, plot=True,  add_arrow=True, include_dist=False)
+        except:
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+        
         
     def test_built_in_data(self):
         checkpoint = 1
