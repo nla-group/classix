@@ -305,6 +305,6 @@ This project is licensed under the terms of the [MIT license](https://github.com
 
 <p align="left">
   <a>
-    <img alt="CLASSIX" src="https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/nla_group.jpg" width="240" />
+    <img alt="CLASSIX" src="https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/nla_logo.jpg" width="240" />
   </a>
 </p>
