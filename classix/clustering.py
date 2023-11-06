@@ -2028,22 +2028,6 @@ def find_shortest_dist_path(source_node=None, graph=None, target_node=None, unwe
 
 
     
-
-def pairs_to_graph(pairs, num_nodes, sparse=True):
-    """Transform the pairs represented by list into graph."""
-    from scipy.sparse import csr_matrix
-    
-    graph = np.full((num_nodes, num_nodes), -99, dtype=int)
-
-    for pair in pairs:
-        graph[pair[0], pair[1]] = graph[pair[1], pair[0]] = 1
-    if sparse:
-        graph = csr_matrix(graph)
-        
-    return graph
-
-
-
 def return_csr_matrix_indices(csr_mat): 
     """Return sparce matrix indices."""
 
