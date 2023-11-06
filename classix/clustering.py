@@ -417,7 +417,6 @@ class CLASSIX:
         self.group_merging = group_merging
         self.sp_to_c_info = False # combine with visualization and data analysis, ensure call PCA and form groups information table only once
 
-        self.centers = None
         self.norm = norm # usually, we do not use this parameter
         self.scale = scale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
@@ -431,9 +430,6 @@ class CLASSIX:
         self.connected_pairs_ = None
         self.connected_paths = None
         self.half_nrm2 = None
-        self.inverse_ind = None
-        self.label_change = None
-        self.grp_centers = None
         
         self._gcIndices = np.frompyfunc(self.gc2ind, 1, 1)
                      
@@ -1779,7 +1775,7 @@ class CLASSIX:
     def load_group_centers(self):
         """Load group centers."""
             
-        if self.grp_centers is None:
+        if hasattr(self, 'grp_centers'):
             self.grp_centers = calculate_cluster_centers(self.data, self.groups_)
             return self.grp_centers
         else:
@@ -1790,7 +1786,7 @@ class CLASSIX:
     def load_cluster_centers(self):
         """Load cluster centers."""
             
-        if self.centers is None:
+        if hasattr(self, 'centers'):
             self.centers = calculate_cluster_centers(self.data[self.inverse_ind], self.labels_)
             return self.centers
         else:
