@@ -151,9 +151,19 @@ clx.explain(773, 792, plot=True)
 Output:
 
 ```
-The data point 773 is in group 37 and the data point 792 is in group 50, 
-both of which were merged into cluster #1. 
-These two groups are connected via groups 37 <-> 49 <-> 41 <-> 45 <-> 38 <-> 50.
+The data point 773 is in group 37 and the data point 792 is in group 50, both of which were merged into cluster #1. 
+
+The two groups are connected via groups 50 <-> 38 <-> 45 <-> 41 <-> 49 <-> 37.
+
+  Index  Group
+   773     37
+   882     37
+   726     49
+   438     41
+   772     45
+   117     38
+   207     50
+   792     50 
 ```
 
 #### Example 2
