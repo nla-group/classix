@@ -1534,7 +1534,7 @@ class CLASSIX:
                                     show_connected_df["Index"] = [index1_id] + self.gcIndices(connected_paths).tolist() + [index2_id] 
                                     show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
                                     
-                                print('\n', show_connected_df.to_string(index=False))
+                                print('\n', show_connected_df.to_string(index=False), '\n')
                                 
                                 if not plot:
                                     print("Use .explain(..., plot=True) for a visual representation.")
