@@ -252,10 +252,11 @@ class TestClassix(unittest.TestCase):
             clx.explain(3, 2000,  plot=True, savefig=False)
             clx.explain(0, 2008,  plot=True, savefig=True)
             clx.explain(2000, 2028,  plot=True, add_arrow=True, savefig=True, include_dist=True)
-            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=0, savefig=True)
+            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=0, showsplist=True, savefig=True)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=1, savefig=True)
-
+            clx.explain(index1=[0, 0], index2=[4,5], plot=True, add_arrow=True, directed_arrow=1)
+            clx.explain(index1=np.array([6, 6]), index2=np.array([6, 6]), plot=True, add_arrow=True, directed_arrow=1)
             clx = CLASSIX(radius=0.5, group_merging='distance', minPts=4999, mergeTinyGroups=False)
             clx.fit(X)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True)
