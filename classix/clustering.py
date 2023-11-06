@@ -1854,7 +1854,7 @@ class CLASSIX:
     
     @sorting.setter
     def sorting(self, value):
-        if not isinstance(value, str):
+        if not isinstance(value, str) and not isinstance(value, type(None)):
             raise TypeError('Expected a string type')
         if value not in ['pca', 'norm-mean', 'norm-orthant'] and value != None:
             raise ValueError(
