@@ -257,7 +257,11 @@ def get_data(current_dir='', name='vdu_signals'):
                     
 
 
-
+class NotFittedError(ValueError, AttributeError):
+    """Exception class to raise if estimator is used before fitting.
+    """
+        
+        
 
 # ******************************************** the main wrapper ********************************************
 class CLASSIX:
@@ -422,8 +426,6 @@ class CLASSIX:
         
         self.sp_info = None
         self.clean_index_ = None
-        self.labels_ = None
-        self.connected_pairs_ = None
         self.connected_paths = None
         self.half_nrm2 = None
         
@@ -617,14 +619,17 @@ class CLASSIX:
         indices = self.splist_[:,0].astype(int)
         splist = data[indices]
         num_of_points = data.shape[0]
-
-        if not hasattr(self, 'label_change'):
-            if not hasattr(self, 'inverse_ind'):
-                self.inverse_ind = np.argsort(self.ind)
-                
-            groups = np.asarray(self.groups_)    
-            self.label_change = dict(zip(groups[self.inverse_ind], self.labels_)) 
-                
+        
+        
+        if hasattr(self, 'labels_'):
+            if not hasattr(self, 'label_change'):
+                if not hasattr(self, 'inverse_ind'):
+                    self.inverse_ind = np.argsort(self.ind)
+                groups = np.asarray(self.groups_)    
+                self.label_change = dict(zip(groups[self.inverse_ind], self.labels_)) 
+        else:
+            raise NotFittedError("Please use .fit() method first.")
+            
         if not memory:
             xxt = np.einsum('ij,ij->i', splist, splist)
             for i in range(num_of_points):
@@ -1006,13 +1011,17 @@ class CLASSIX:
             dp_bbox['alpha'] = dp_alpha
             dp_bbox['pad'] = dp_pad
 
-        groups_ = np.array(self.groups_)
+
         
-        if not hasattr(self, 'label_change'):
-            self.label_change = dict(zip(groups_[self.inverse_ind], self.labels_)) # how object change group to cluster.
-                
+        if hasattr(self, 'labels_'):
+            groups_ = np.array(self.groups_)
+            groups_ = groups_[self.inverse_ind]
+            if not hasattr(self, 'label_change'):
+                self.label_change = dict(zip(groups_, self.labels_)) # how object change group to cluster.
+        else:
+            raise NotFittedError("Please use .fit() method first.")
+            
         data = self.data[self.inverse_ind]
-        groups_ = groups_[self.inverse_ind]
         
         if not hasattr(self, 'self.sp_to_c_info'): #  ensure call PCA and form groups information table only once
             
@@ -1668,7 +1677,62 @@ class CLASSIX:
         return
     
         
-
+    
+    def getPath(self, index1, index2, include_dist=False):
+        """
+        Get the connected data points between index1 data and index2 data.
+        
+        Parameters
+        ----------
+        index1 : int
+            Index for data point.
+        
+        index2 : int
+            Index for data point.
+            
+        Returns
+        -------
+        connected_points : numpy.ndarray
+            connected data points.
+            
+        """
+        from scipy.sparse import csr_matrix
+        
+        if hasattr(self, 'labels_'):
+            groups_ = np.array(self.groups_)
+            groups_ = groups_[self.inverse_ind]
+        else:
+            raise NotFittedError("Please use .fit() method first.")
+            
+        agg_label1 = groups_[index1] 
+        agg_label2 = groups_[index2] 
+        
+        if not include_dist and hasattr(self, 'connected_pairs_'): # precomputed distance
+            num_nodes = self.splist_.shape[0]
+            graph = np.full((num_nodes, num_nodes), np.inf, dtype=int)
+            for i in range(num_nodes):
+                graph[i, i] = 0
+                
+            pairs = np.asarray(self.connected_pairs_, dtype=int)
+            for pair in pairs:
+                graph[pair[0], pair[1]] = graph[pair[1], pair[0]] = 1
+                
+            csr_dist_m = csr_matrix(distm)
+            connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=include_dist)
+            connected_paths.reverse()
+                
+        else:
+            distm = pairwise_distances(self.data[self.splist_[:, 0]])
+            distm = (distm <= self.radius*self.scale).astype(int)
+            csr_dist_m = csr_matrix(distm)
+            connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
+            connected_paths.reverse()
+        
+        connected_points = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1, index2])
+        return connected_points
+    
+        
+        
     def form_starting_point_clusters_table(self, aggregate=False):
         """form the columns details for group centers and clusters information"""
         
@@ -1781,8 +1845,9 @@ class CLASSIX:
         if hasattr(self, 'splist_'):
             return self._gcIndices(np.arange(self.splist_.shape[0]))
         else:
-            raise ValueError("Please use .fit() method first.")
+            raise NotFittedError("Please use .fit() method first.")
             
+    
     
     @property
     def clusterSizes_(self):
@@ -1790,9 +1855,9 @@ class CLASSIX:
             counter = collections.Counter(self.labels_)
             return np.array(list(counter.values()))[np.argsort(list(counter.keys()))]
         else:
-            raise ValueError("Please use .fit() method first.")
+            raise NotFittedError("Please use .fit() method first.")
 
-
+    
     
     def gcIndices(self, ids):
         return self._gcIndices(ids)
@@ -1847,7 +1912,6 @@ class CLASSIX:
             
         return [i[0] for i in self.old_cluster_count.items() if i[1] < min_samples]
     
-
 
 
     def reassign_labels(self, labels):
