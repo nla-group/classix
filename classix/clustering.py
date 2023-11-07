@@ -401,7 +401,10 @@ class CLASSIX:
     load_cluster_centers(self):
         Load cluster centers.
     
-    
+    getPath(index1, index2, include_dist=False):
+        Return the indices of connected data points between index1 data and index2 data.
+        
+        
     References
     ----------
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
@@ -613,13 +616,6 @@ class CLASSIX:
         labels : numpy.ndarray
             The predicted clustering labels.
         """
-        labels = list()
-
-        data = (np.asarray(data) - self._mu) / self._scl
-        indices = self.splist_[:,0].astype(int)
-        splist = data[indices]
-        num_of_points = data.shape[0]
-        
         
         if hasattr(self, 'labels_'):
             if not hasattr(self, 'label_change'):
@@ -630,6 +626,12 @@ class CLASSIX:
         else:
             raise NotFittedError("Please use .fit() method first.")
             
+        labels = list()
+        data = (np.asarray(data) - self._mu) / self._scl
+        indices = self.splist_[:,0].astype(int)
+        splist = data[indices]
+        num_of_points = data.shape[0]
+        
         if not memory:
             xxt = np.einsum('ij,ij->i', splist, splist)
             for i in range(num_of_points):
@@ -1680,7 +1682,7 @@ class CLASSIX:
     
     def getPath(self, index1, index2, include_dist=False):
         """
-        Get the connected data points between index1 data and index2 data.
+        Get the indices of connected data points between index1 data and index2 data.
         
         Parameters
         ----------
