@@ -1306,7 +1306,7 @@ class CLASSIX:
                 else:
                     from scipy.sparse import csr_matrix
                     
-                    distm = pairwise_distances(self.s_pca)
+                    distm = pairwise_distances(self.data[self.splist_[:, 0]])
                     distm = (distm <= self.radius*self.scale).astype(int)
                     csr_dist_m = csr_matrix(distm)
                         
