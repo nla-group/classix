@@ -160,7 +160,7 @@ class TestClassix(unittest.TestCase):
 
                 clx.getPath(3, 10, include_dist=False)
                 clx.getPath(3, 20, include_dist=False)
-                clx.getPath(3, 30, include_dist=False)
+                clx.getPath(3, 30, include_dist=True)
                 
                 clx = CLASSIX(sorting='pca', group_merging='distance', minPts=150)
                 clx.fit_transform(X)
