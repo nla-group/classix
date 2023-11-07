@@ -342,7 +342,7 @@ class CLASSIX:
               
     Attributes
     ----------
-    groups_ : list
+    groups_ : numpy.ndarray
         Groups labels of aggregation.
     
     splist_ : numpy.ndarray
@@ -413,7 +413,6 @@ class CLASSIX:
         self.sorting = sorting
         self.radius = radius
         self.group_merging = group_merging
-        self.sp_to_c_info = False # combine with visualization and data analysis, ensure call PCA and form groups information table only once
 
         self.norm = norm # usually, we do not use this parameter
         self.scale = scale # For distance measure, usually, we do not use this parameter
@@ -422,7 +421,6 @@ class CLASSIX:
         self.truncate = short_log_form
         
         self.sp_info = None
-        self.groups_ = None
         self.clean_index_ = None
         self.labels_ = None
         self.connected_pairs_ = None
@@ -553,10 +551,12 @@ class CLASSIX:
         self.splist_ = np.array(self.splist_)
         
         if self.group_merging is None:
-            self.labels_ = copy.deepcopy(self.groups_) 
+            self.inverse_ind = np.argsort(self.ind)
+            self.labels_ = copy.deepcopy(self.groups_[self.inverse_ind]) 
         
         elif self.group_merging.lower()=='none':
-            self.labels_ = copy.deepcopy(self.groups_) 
+            self.inverse_ind = np.argsort(self.ind)
+            self.labels_ = copy.deepcopy(self.groups_[self.inverse_ind]) 
         
         else:
             self.labels_ = self.merging(
@@ -1014,7 +1014,7 @@ class CLASSIX:
         data = self.data[self.inverse_ind]
         groups_ = groups_[self.inverse_ind]
         
-        if not self.sp_to_c_info: #  ensure call PCA and form groups information table only once
+        if not hasattr(self, 'self.sp_to_c_info'): #  ensure call PCA and form groups information table only once
             
             if data.shape[1] > 2:
                 _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
@@ -1156,8 +1156,11 @@ class CLASSIX:
                     else:
                         ax.text(object1[0], object1[1], s=' ' + str(index1), fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color, zorder=1, ha='left', va='bottom')
 
-
-                    ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, label='data point {} '.format(index1))
+                    
+                    if isinstance(index1, str):
+                        ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, label='{} '.format(index1))
+                    else:
+                        ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, label='data point {} '.format(index1))
 
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
@@ -1363,13 +1366,25 @@ class CLASSIX:
                         else:
                             ax.text(object1[0], object1[1], s=' '+'index 1', ha='left', va='bottom', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
                             ax.text(object2[0], object2[1], s=' '+'index 2', ha='left', va='bottom', zorder=1, fontsize=dp_fontsize, bbox=dp_bbox, color=obj_color)
-
-                    ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, 
+                    
+                    if isinstance(index1, str):
+                        ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, 
+                               label='{} '.format(index1)+'(cluster #{0})'.format(
+                                   cluster_label1)
+                            )
+                    else:
+                        ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, 
                                label='data point {} '.format(index1)+'(cluster #{0})'.format(
                                    cluster_label1)
                             )
                     
-                    ax.scatter(object2[0], object2[1], marker="*", s=obj_msize,
+                    if isinstance(index2, str):
+                        ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, 
+                               label='{} '.format(index1)+'(cluster #{0})'.format(
+                                   cluster_label1)
+                            )
+                    else:
+                        ax.scatter(object2[0], object2[1], marker="*", s=obj_msize,
                                 label='data point {} '.format(index2)+'(cluster #{0})'.format(
                                     cluster_label2)
                             )
@@ -1379,24 +1394,7 @@ class CLASSIX:
                                 ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
                                                     color=color, alpha=alpha, lw=cline_width*1.5, clip_on=False)
                                                     )
-                                
-                        if union_ind[i] in connected_paths:
-                            # draw circle for connected group centers or not, 
-                            # and also determine the marker of the connected group centers.
-                            if union_ind[i] == connected_paths[0]: 
-                                ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, 
-                                       label='connected groups', c=sp_ccolor, linewidths=sp_clinewidths)
-                            else:
-                                ax.scatter(s_pca[i,0], s_pca[i,1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, 
-                                           linewidths=sp_clinewidths)
-                                
-                            if data.shape[1] <= 2:
-                                if show_connected_grp_circle:
-                                    ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
-                                                    color=connect_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
-                                    
-                        ax.set_aspect('equal', adjustable='datalim')
-                        
+
                         if showallgroups:
                             if sp_fontsize is None:
                                 ax.text(s_pca[i, 0], s_pca[i, 1], 
@@ -1411,7 +1409,23 @@ class CLASSIX:
                                         s=self.sp_info.Group[union_ind].values[i].astype(int).astype(str),
                                         fontsize=sp_fontsize, ha='left', bbox=sp_bbox
                                 )
+                                
+                    for i in connected_paths:
+                        # draw circle for connected group centers or not, 
+                        # and also determine the marker of the connected group centers.
+                        if i == connected_paths[0]: 
+                            ax.scatter(self.s_pca[i,0], self.s_pca[i,1], marker=sp_cmarker, s=sp_csize, 
+                                   label='connected groups', c=sp_ccolor, linewidths=sp_clinewidths)
+                        else:
+                            ax.scatter(self.s_pca[i,0], self.s_pca[i,1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, 
+                                       linewidths=sp_clinewidths)
 
+                        if data.shape[1] <= 2:
+                            if show_connected_grp_circle:
+                                ax.add_patch(plt.Circle((self.s_pca[i, 0], self.s_pca[i, 1]), self.radius, fill=False,
+                                                color=connect_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                    
+                    
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
                             marker='.', s=sp_csize*0.3, c=sp1_color, linewidths=sp_clinewidths, 
                             label='group center {0}'.format(agg_label1)
@@ -1489,7 +1503,8 @@ class CLASSIX:
 
                     else:
                         ax.legend(ncols=3, loc='best')
-
+                    
+                    ax.set_aspect('equal', adjustable='datalim')
                     ax.set_title("""{num_clusters:.0f} clusters (radius={tol:.2f}, minPts={minPts:.0f})""".format(
                         num_clusters=len(np.unique(self.labels_)),tol=self.radius, minPts=self.minPts))
                     
@@ -1682,7 +1697,7 @@ class CLASSIX:
         self.sp_info["NrPts"] = self.splist_[:, 1].astype(int)
         self.sp_info["Cluster"] = [self.label_change[i] for i in range(self.splist_.shape[0])]
         self.sp_info["Coordinates"] = coord 
-        self.sp_to_c_info = True
+        self.sp_to_c_info = True 
         return
         
         
