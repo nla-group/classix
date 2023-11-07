@@ -1565,7 +1565,19 @@ class CLASSIX:
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
 
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
-                                show_connected_df["Label"] = [index1] + self.index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [index2] 
+                                
+                                if isinstance(index1, int):
+                                    table_index1 = self.index_data[index1]
+                                else:
+                                    table_index1 = index1
+                                    
+                                if isinstance(index2, int):
+                                    table_index2 = self.index_data[index2]
+                                else:
+                                    table_index2 = index2
+                                    
+                                show_connected_df["Label"] = [table_index1] + self.index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [table_index2] 
+                                
                             else:
                                 show_connected_df = pd.DataFrame(columns=["Index", "Group"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
