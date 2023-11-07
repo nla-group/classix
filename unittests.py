@@ -267,11 +267,12 @@ class TestClassix(unittest.TestCase):
             clx.load_group_centers()
             clx.load_cluster_centers()
             clx.gcIndices([1, 2, 3, 4])
-            clx.form_starting_point_clusters_table(aggregate=True)
+            
             clx.predict(X)
             clx.predict(X, memory=True)
             clx.explain(plot=True, showsplist=True, figsize=(10,10),  savefig=True)
             clx.explain(0,  plot=True, savefig=True, showsplist=True)
+            clx.form_starting_point_clusters_table(aggregate=True)
             clx.explain(3, 2000,  plot=True, savefig=False)
             clx.explain(0, 2008,  plot=True, savefig=True)
             clx.explain(2000, 2028,  plot=True, add_arrow=True, savefig=True, include_dist=True)
