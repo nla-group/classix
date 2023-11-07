@@ -801,8 +801,8 @@ class CLASSIX:
     def explain(self, index1=None, index2=None, cmap='jet', showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
                 plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5,  obj_msize=160, sp1_color='lime', sp2_color='cyan',
                 sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, 
-                sp_ccolor="crimson", sp_clinewidths=2.7,  dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,  show_all_grp_circle=False,
-                show_connected_grp_circle=False, show_obj_grp_circle=True, color="red", connect_color="green", alpha=0.5, cline_width=2,  add_arrow=True, 
+                sp_ccolor="crimson", sp_clinewidths=2.7,  dp_fcolor="white", dp_alpha=0.5, dp_pad=2, dp_fontsize=10, dp_bbox=None,  show_all_grp_circle=False,
+                show_connected_grp_circle=False, show_obj_grp_circle=True, color="red", connect_color="green", alpha=0.3, cline_width=2,  add_arrow=True, 
                 arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1, arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, 
                 axis='off', include_dist=False, show_connected_label=True, figname=None, fmt="pdf"):
         
@@ -915,10 +915,10 @@ class CLASSIX:
         sp_clinewidths : str, default=2.5
             The marker width for the connected group centers. 
 
-        dp_fcolor : str, default='bisque'
+        dp_fcolor : str, default='white'
             The color marked for specified data objects text box. 
             
-        dp_alpha : float, default=0.3
+        dp_alpha : float, default=0.5
             The value setting for transprency of text box for specified data objects. 
             
         dp_pad : int, default=2
@@ -945,8 +945,8 @@ class CLASSIX:
         color : str, default='red'
             Color for text of group centers labels in visualization. 
         
-        alpha : float, default=0.5
-            Scalar or None. 
+        alpha : float, default=0.3
+            Transparency of data points. Scalar or None. 
     
         cline_width : float, default=2
             Set the patch linewidth of circle for group centers.
@@ -1140,7 +1140,7 @@ class CLASSIX:
                     s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
                     
                     ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], s=60, marker=".", linewidth=0.0*width, 
-                               cmap=cmap, alpha=0.5, c=self.labels_[selectInd]
+                               cmap=cmap, alpha=alpha, c=self.labels_[selectInd]
                               )
                     
                     ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers in cluster #{0}'.format(cluster_label1), 
@@ -1148,7 +1148,7 @@ class CLASSIX:
                     
                     if show_obj_grp_circle:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
-                                                color=sp1_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                                color=sp1_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
                         
                     
                     if dp_fontsize is None:
@@ -1165,7 +1165,7 @@ class CLASSIX:
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
                             ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color,
-                                                     alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                                     alpha=0.5, lw=cline_width*1.5, clip_on=False))
                         
                         if showallgroups:
                             if sp_fontsize is None:
@@ -1341,16 +1341,16 @@ class CLASSIX:
                     union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
                     s_pca = self.s_pca[union_ind]
                     
-                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], s=60, marker=".", c=self.labels_[selectInd], linewidth=0*width, cmap=cmap, alpha=0.5)
+                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], s=60, marker=".", c=self.labels_[selectInd], linewidth=0*width, cmap=cmap, alpha=alpha)
                     ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=0.9*width, alpha=0.4)
 
                     
                     if show_obj_grp_circle:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False,
-                                        color=sp1_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                        color=sp1_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
                         
                         ax.add_patch(plt.Circle((self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1]), self.radius, fill=False,
-                                        color=sp2_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                        color=sp2_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
                                         
                     if isinstance(index1, int) or isinstance(index1, str):
                         if dp_fontsize is None:
@@ -1392,7 +1392,7 @@ class CLASSIX:
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
                                 ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
-                                                    color=color, alpha=alpha, lw=cline_width*1.5, clip_on=False)
+                                                    color=color, alpha=0.5, lw=cline_width*1.5, clip_on=False)
                                                     )
 
                         if showallgroups:
@@ -1423,7 +1423,7 @@ class CLASSIX:
                         if data.shape[1] <= 2:
                             if show_connected_grp_circle:
                                 ax.add_patch(plt.Circle((self.s_pca[i, 0], self.s_pca[i, 1]), self.radius, fill=False,
-                                                color=connect_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                                color=connect_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
                                     
                     
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
@@ -1619,7 +1619,7 @@ class CLASSIX:
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = bcolor
 
-        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], s=60, marker=".", linewidth=0*width, c=self.labels_[selectInd], cmap=cmap, alpha=0.5)
+        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], s=60, marker=".", linewidth=0*width, c=self.labels_[selectInd], cmap=cmap, alpha=alpha)
 
         if showallgroups:
             for j in range(self.s_pca.shape[0]):
