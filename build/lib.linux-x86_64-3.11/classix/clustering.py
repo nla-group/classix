@@ -257,7 +257,11 @@ def get_data(current_dir='', name='vdu_signals'):
                     
 
 
-
+class NotFittedError(ValueError, AttributeError):
+    """Exception class to raise if estimator is used before fitting.
+    """
+        
+        
 
 # ******************************************** the main wrapper ********************************************
 class CLASSIX:
@@ -397,7 +401,10 @@ class CLASSIX:
     load_cluster_centers(self):
         Load cluster centers.
     
-    
+    getPath(index1, index2, include_dist=False):
+        Return the indices of connected data points between index1 data and index2 data.
+        
+        
     References
     ----------
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
@@ -422,8 +429,6 @@ class CLASSIX:
         
         self.sp_info = None
         self.clean_index_ = None
-        self.labels_ = None
-        self.connected_pairs_ = None
         self.connected_paths = None
         self.half_nrm2 = None
         
@@ -611,20 +616,22 @@ class CLASSIX:
         labels : numpy.ndarray
             The predicted clustering labels.
         """
+        
+        if hasattr(self, 'labels_'):
+            if not hasattr(self, 'label_change'):
+                if not hasattr(self, 'inverse_ind'):
+                    self.inverse_ind = np.argsort(self.ind)
+                groups = np.asarray(self.groups_)    
+                self.label_change = dict(zip(groups[self.inverse_ind], self.labels_)) 
+        else:
+            raise NotFittedError("Please use .fit() method first.")
+            
         labels = list()
-
         data = (np.asarray(data) - self._mu) / self._scl
         indices = self.splist_[:,0].astype(int)
         splist = data[indices]
         num_of_points = data.shape[0]
-
-        if not hasattr(self, 'label_change'):
-            if not hasattr(self, 'inverse_ind'):
-                self.inverse_ind = np.argsort(self.ind)
-                
-            groups = np.asarray(self.groups_)    
-            self.label_change = dict(zip(groups[self.inverse_ind], self.labels_)) 
-                
+        
         if not memory:
             xxt = np.einsum('ij,ij->i', splist, splist)
             for i in range(num_of_points):
@@ -801,8 +808,8 @@ class CLASSIX:
     def explain(self, index1=None, index2=None, cmap='jet', showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
                 plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5,  obj_msize=160, sp1_color='lime', sp2_color='cyan',
                 sp_fcolor="tomato", sp_marker="+", sp_size=72, sp_mcolor="k", sp_alpha=0.05, sp_pad=0.5, sp_fontsize=10, sp_bbox=None, sp_cmarker="+", sp_csize=110, 
-                sp_ccolor="crimson", sp_clinewidths=2.7,  dp_fcolor="bisque", dp_alpha=0.3, dp_pad=2, dp_fontsize=10, dp_bbox=None,  show_all_grp_circle=False,
-                show_connected_grp_circle=False, show_obj_grp_circle=True, color="red", connect_color="green", alpha=0.5, cline_width=2,  add_arrow=True, 
+                sp_ccolor="crimson", sp_clinewidths=2.7,  dp_fcolor="white", dp_alpha=0.5, dp_pad=2, dp_fontsize=10, dp_bbox=None,  show_all_grp_circle=False,
+                show_connected_grp_circle=False, show_obj_grp_circle=True, color="red", connect_color="green", alpha=0.3, cline_width=2,  add_arrow=True, 
                 arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1, arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, 
                 axis='off', include_dist=False, show_connected_label=True, figname=None, fmt="pdf"):
         
@@ -915,10 +922,10 @@ class CLASSIX:
         sp_clinewidths : str, default=2.5
             The marker width for the connected group centers. 
 
-        dp_fcolor : str, default='bisque'
+        dp_fcolor : str, default='white'
             The color marked for specified data objects text box. 
             
-        dp_alpha : float, default=0.3
+        dp_alpha : float, default=0.5
             The value setting for transprency of text box for specified data objects. 
             
         dp_pad : int, default=2
@@ -945,8 +952,8 @@ class CLASSIX:
         color : str, default='red'
             Color for text of group centers labels in visualization. 
         
-        alpha : float, default=0.5
-            Scalar or None. 
+        alpha : float, default=0.3
+            Transparency of data points. Scalar or None. 
     
         cline_width : float, default=2
             Set the patch linewidth of circle for group centers.
@@ -1006,13 +1013,17 @@ class CLASSIX:
             dp_bbox['alpha'] = dp_alpha
             dp_bbox['pad'] = dp_pad
 
-        groups_ = np.array(self.groups_)
+
         
-        if not hasattr(self, 'label_change'):
-            self.label_change = dict(zip(groups_[self.inverse_ind], self.labels_)) # how object change group to cluster.
-                
+        if hasattr(self, 'labels_'):
+            groups_ = np.array(self.groups_)
+            groups_ = groups_[self.inverse_ind]
+            if not hasattr(self, 'label_change'):
+                self.label_change = dict(zip(groups_, self.labels_)) # how object change group to cluster.
+        else:
+            raise NotFittedError("Please use .fit() method first.")
+            
         data = self.data[self.inverse_ind]
-        groups_ = groups_[self.inverse_ind]
         
         if not hasattr(self, 'self.sp_to_c_info'): #  ensure call PCA and form groups information table only once
             
@@ -1043,7 +1054,7 @@ class CLASSIX:
         
         if index1 is None: # analyze in the general way with a global view
             if plot == True:
-                self.explain_viz(showalldata=showalldata, cmap=cmap, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, 
+                self.explain_viz(showalldata=showalldata, alpha=alpha, cmap=cmap, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, 
                                  fontsize=sp_fontsize, bbox=sp_bbox, sp_marker=sp_marker, sp_mcolor=sp_mcolor, width=width, axis=axis, fmt=fmt)
                 
             data_size = data.shape[0]
@@ -1140,7 +1151,7 @@ class CLASSIX:
                     s_pca = self.s_pca[self.sp_info.Cluster == cluster_label1]
                     
                     ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], s=60, marker=".", linewidth=0.0*width, 
-                               cmap=cmap, alpha=0.5, c=self.labels_[selectInd]
+                               cmap=cmap, alpha=alpha, c=self.labels_[selectInd]
                               )
                     
                     ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers in cluster #{0}'.format(cluster_label1), 
@@ -1148,7 +1159,7 @@ class CLASSIX:
                     
                     if show_obj_grp_circle:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
-                                                color=sp1_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                                color=sp1_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
                         
                     
                     if dp_fontsize is None:
@@ -1165,7 +1176,7 @@ class CLASSIX:
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
                             ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color,
-                                                     alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                                     alpha=0.5, lw=cline_width*1.5, clip_on=False))
                         
                         if showallgroups:
                             if sp_fontsize is None:
@@ -1341,16 +1352,16 @@ class CLASSIX:
                     union_ind = np.where((self.sp_info.Cluster == cluster_label1) | (self.sp_info.Cluster == cluster_label2))[0]
                     s_pca = self.s_pca[union_ind]
                     
-                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], s=60, marker=".", c=self.labels_[selectInd], linewidth=0*width, cmap=cmap, alpha=0.5)
+                    ax.scatter(self.x_pca[selectInd, 0], self.x_pca[selectInd, 1], s=60, marker=".", c=self.labels_[selectInd], linewidth=0*width, cmap=cmap, alpha=alpha)
                     ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=0.9*width, alpha=0.4)
 
                     
                     if show_obj_grp_circle:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False,
-                                        color=sp1_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                        color=sp1_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
                         
                         ax.add_patch(plt.Circle((self.s_pca[agg_label2, 0], self.s_pca[agg_label2, 1]), self.radius, fill=False,
-                                        color=sp2_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                        color=sp2_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
                                         
                     if isinstance(index1, int) or isinstance(index1, str):
                         if dp_fontsize is None:
@@ -1392,7 +1403,7 @@ class CLASSIX:
                     for i in range(s_pca.shape[0]):
                         if data.shape[1] <= 2 and show_all_grp_circle:
                                 ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
-                                                    color=color, alpha=alpha, lw=cline_width*1.5, clip_on=False)
+                                                    color=color, alpha=0.5, lw=cline_width*1.5, clip_on=False)
                                                     )
 
                         if showallgroups:
@@ -1423,7 +1434,7 @@ class CLASSIX:
                         if data.shape[1] <= 2:
                             if show_connected_grp_circle:
                                 ax.add_patch(plt.Circle((self.s_pca[i, 0], self.s_pca[i, 1]), self.radius, fill=False,
-                                                color=connect_color, alpha=alpha, lw=cline_width*1.5, clip_on=False))
+                                                color=connect_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
                                     
                     
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
@@ -1603,7 +1614,7 @@ class CLASSIX:
     
 
 
-    def explain_viz(self, showalldata=False, cmap='Set3', figsize=(10, 7), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
+    def explain_viz(self, showalldata=False, alpha=0.5, cmap='Set3', figsize=(10, 7), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
                     savefig=False, fontsize=None, bbox=None, axis="off", fmt="pdf"):
         """Visualize the starting point and data points"""
         
@@ -1619,7 +1630,7 @@ class CLASSIX:
         plt.figure(figsize=figsize)
         plt.rcParams['axes.facecolor'] = bcolor
 
-        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], s=60, marker=".", linewidth=0*width, c=self.labels_[selectInd], cmap=cmap, alpha=0.5)
+        plt.scatter(self.x_pca[selectInd,0], self.x_pca[selectInd,1], s=60, marker=".", linewidth=0*width, c=self.labels_[selectInd], cmap=cmap, alpha=alpha)
 
         if showallgroups:
             for j in range(self.s_pca.shape[0]):
@@ -1668,7 +1679,68 @@ class CLASSIX:
         return
     
         
-
+    
+    def getPath(self, index1, index2, include_dist=False):
+        """
+        Get the indices of connected data points between index1 data and index2 data.
+        
+        Parameters
+        ----------
+        index1 : int
+            Index for data point.
+        
+        index2 : int
+            Index for data point.
+            
+        Returns
+        -------
+        connected_points : numpy.ndarray
+            connected data points.
+            
+        """
+        from scipy.sparse import csr_matrix
+        
+        if hasattr(self, 'labels_'):
+            groups_ = np.array(self.groups_)
+            groups_ = groups_[self.inverse_ind]
+        else:
+            raise NotFittedError("Please use .fit() method first.")
+            
+        if index1 == index2:
+            return np.array([index1, index2])
+        
+        agg_label1 = groups_[index1] 
+        agg_label2 = groups_[index2] 
+        
+        if not include_dist and hasattr(self, 'connected_pairs_'): # precomputed distance
+            num_nodes = self.splist_.shape[0]
+            distm = np.full((num_nodes, num_nodes), 0, dtype=int)
+            for i in range(num_nodes):
+                distm[i, i] = 0
+                
+            pairs = np.asarray(self.connected_pairs_, dtype=int)
+            for pair in pairs:
+                distm[pair[0], pair[1]] = distm[pair[1], pair[0]] = 1
+                
+            csr_dist_m = csr_matrix(distm)
+            connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=include_dist)
+            connected_paths.reverse()
+                
+        else:
+            distm = pairwise_distances(self.data[self.splist_[:, 0]])
+            distm = (distm <= self.radius*self.scale).astype(int)
+            csr_dist_m = csr_matrix(distm)
+            connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
+            connected_paths.reverse()
+        
+        if len(connected_paths) >= 1:
+            connected_points = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1, index2])
+            return connected_points
+        else:
+            return np.array([])
+            
+        
+        
     def form_starting_point_clusters_table(self, aggregate=False):
         """form the columns details for group centers and clusters information"""
         
@@ -1746,7 +1818,10 @@ class CLASSIX:
         """
         from scipy.sparse import csr_matrix
         from matplotlib import pyplot as plt
-                              
+
+        if not hasattr(self, 'splist_'):
+            raise NotFittedError("Please use .fit() method first.")
+            
         distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(scale,2))
         plt.rcParams['axes.facecolor'] = 'white'
 
@@ -1781,8 +1856,9 @@ class CLASSIX:
         if hasattr(self, 'splist_'):
             return self._gcIndices(np.arange(self.splist_.shape[0]))
         else:
-            raise ValueError("Please use .fit() method first.")
+            raise NotFittedError("Please use .fit() method first.")
             
+    
     
     @property
     def clusterSizes_(self):
@@ -1790,9 +1866,9 @@ class CLASSIX:
             counter = collections.Counter(self.labels_)
             return np.array(list(counter.values()))[np.argsort(list(counter.keys()))]
         else:
-            raise ValueError("Please use .fit() method first.")
+            raise NotFittedError("Please use .fit() method first.")
 
-
+    
     
     def gcIndices(self, ids):
         return self._gcIndices(ids)
@@ -1806,6 +1882,9 @@ class CLASSIX:
     
     def load_group_centers(self):
         """Load group centers."""
+        
+        if not hasattr(self, 'groups_'):
+            raise NotFittedError("Please use .fit() method first.")
             
         if not hasattr(self, 'grp_centers'):
             self.grp_centers = calculate_cluster_centers(self.data, self.groups_)
@@ -1817,6 +1896,9 @@ class CLASSIX:
 
     def load_cluster_centers(self):
         """Load cluster centers."""
+            
+        if not hasattr(self, 'labels_'):
+            raise NotFittedError("Please use .fit() method first.")
             
         if not hasattr(self, 'centers'):
             self.centers = calculate_cluster_centers(self.data[self.inverse_ind], self.labels_)
@@ -1847,7 +1929,6 @@ class CLASSIX:
             
         return [i[0] for i in self.old_cluster_count.items() if i[1] < min_samples]
     
-
 
 
     def reassign_labels(self, labels):
