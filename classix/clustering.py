@@ -1018,7 +1018,7 @@ class CLASSIX:
             
             if data.shape[1] > 2:
                 _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
-                self.x_pca = np.matmul(data, self._V[np.argsort(self._s)].T)
+                self.x_pca = np.matmul(data, self._V[(-self._s).argsort()].T)
                 self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
                 
             elif data.shape[1] == 2:
