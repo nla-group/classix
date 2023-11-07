@@ -1711,13 +1711,13 @@ class CLASSIX:
         
         if not include_dist and hasattr(self, 'connected_pairs_'): # precomputed distance
             num_nodes = self.splist_.shape[0]
-            graph = np.full((num_nodes, num_nodes), np.inf, dtype=int)
+            distm = np.full((num_nodes, num_nodes), 0, dtype=int)
             for i in range(num_nodes):
-                graph[i, i] = 0
+                distm[i, i] = 0
                 
             pairs = np.asarray(self.connected_pairs_, dtype=int)
             for pair in pairs:
-                graph[pair[0], pair[1]] = graph[pair[1], pair[0]] = 1
+                distm[pair[0], pair[1]] = distm[pair[1], pair[0]] = 1
                 
             csr_dist_m = csr_matrix(distm)
             connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=include_dist)
