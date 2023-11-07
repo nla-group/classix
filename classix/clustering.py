@@ -1706,6 +1706,9 @@ class CLASSIX:
         else:
             raise NotFittedError("Please use .fit() method first.")
             
+        if index1 == index2:
+            return np.array([index1, index2])
+        
         agg_label1 = groups_[index1] 
         agg_label2 = groups_[index2] 
         
@@ -1734,7 +1737,7 @@ class CLASSIX:
             connected_points = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1, index2])
             return connected_points
         else:
-            print("No connected data points exist between the two data points.")
+            return np.array([])
             
         
         
