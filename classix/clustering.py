@@ -1730,9 +1730,12 @@ class CLASSIX:
             connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
             connected_paths.reverse()
         
-        connected_points = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1, index2])
-        return connected_points
-    
+        if len(connected_paths) >= 1:
+            connected_points = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1, index2])
+            return connected_points
+        else:
+            print("No connected data points exist between the two data points.")
+            
         
         
     def form_starting_point_clusters_table(self, aggregate=False):
