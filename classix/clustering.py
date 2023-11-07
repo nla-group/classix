@@ -1812,7 +1812,10 @@ class CLASSIX:
         """
         from scipy.sparse import csr_matrix
         from matplotlib import pyplot as plt
-                              
+
+        if not hasattr(self, 'splist_'):
+            raise NotFittedError("Please use .fit() method first.")
+            
         distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(scale,2))
         plt.rcParams['axes.facecolor'] = 'white'
 
@@ -1873,6 +1876,9 @@ class CLASSIX:
     
     def load_group_centers(self):
         """Load group centers."""
+        
+        if not hasattr(self, 'groups_'):
+            raise NotFittedError("Please use .fit() method first.")
             
         if not hasattr(self, 'grp_centers'):
             self.grp_centers = calculate_cluster_centers(self.data, self.groups_)
@@ -1884,6 +1890,9 @@ class CLASSIX:
 
     def load_cluster_centers(self):
         """Load cluster centers."""
+            
+        if not hasattr(self, 'labels_'):
+            raise NotFittedError("Please use .fit() method first.")
             
         if not hasattr(self, 'centers'):
             self.centers = calculate_cluster_centers(self.data[self.inverse_ind], self.labels_)
