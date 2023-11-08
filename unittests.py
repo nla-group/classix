@@ -28,7 +28,7 @@ import pandas as pd
 import sklearn.datasets as data
 from classix import CLASSIX, loadData, cython_is_available
 from classix.clustering import calculate_cluster_centers
-from classix import novel_normalization
+from classix import normalization
 from classix import aggregation, aggregation_c, aggregation_cm
 from classix.merging import distance_merging_mtg, distance_merging, density_merging
 import platform
