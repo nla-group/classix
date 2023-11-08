@@ -208,7 +208,7 @@ The output is:
 Track single object
 ------------------------------
 
-Following the previous steps, we can analyze the specific data by refering to the index, for example here, we want to track the data with index 0:
+Following the previous steps, we can analyze the specific data by referring to the index, for example here, we want to track the data with index 0:
 
 .. code:: python
 
@@ -268,7 +268,7 @@ Example to show two objects in the same clusters:
 .. image:: images/None773_792.png
 
 If you want to show the paths connected the two points, setting the optional parameter ``add_arrow`` to ``True``.
-Here we also add ``figsize`` to resize the figure. More controled parameters for fancy arrow plot can be referred to detailed documentation of `classix.CLASSIX.explain <https://classix.readthedocs.io/en/latest/_autosummary/classix.CLASSIX.explain.html#classix.CLASSIX.explain>`_. 
+Here we also add ``figsize`` to resize the figure. More controlled parameters for fancy arrow plot can be referred to detailed documentation of `classix.CLASSIX.explain <https://classix.readthedocs.io/en/latest/_autosummary/classix.CLASSIX.explain.html#classix.CLASSIX.explain>`_. 
 
 Additionally, if one want to index more than 2 objects, use numbrt parameters ``index{number}``, for example, indexing 3 objects information, use:
 
@@ -293,7 +293,7 @@ Similar to above, we load the necessary data to produce the analytical result.
     import classix
 
 
-To load the industry data provided by Kamil, we can simply use the API ``load_data`` and require the paramter as ``vdu_signals``
+To load the industry data provided by Kamil, we can simply use the API ``load_data`` and require the parameter as ``vdu_signals``
 we leave the default parameters except setting radius to 1.
 
 .. code:: python
@@ -357,7 +357,7 @@ As above, we view the whole picture for data simply by
 
 To speed up the visualization, the default setting for CLASSIX is to show less than 1e5 points, if the number of data points surpasses the value, CLASSIX will randomly select 1e5 data points for the plot. If you want to show all data in the plot, set ``showalldata=True``, which is shown as above. 
 You can also specify other parameters to personalize the visualization to make it easier to analyze. For example, you can enlarge the fontsize of starting points labels by 
-setting ``sp_fontsize`` larger or change the shape by tunning appropriate value for ``figsize``. For more details about parameter settings, we refer to our API Reference. So, we try:
+setting ``sp_fontsize`` larger or change the shape by tuning appropriate value for ``figsize``. For more details about parameter settings, we refer to our API Reference. So, we try:
 
 .. code:: python
 

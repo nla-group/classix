@@ -258,9 +258,9 @@ If `group_merging='distance'` (the default value), two groups will be merged if 
 If `group_merging='density'`, two groups will be merged only if there are sufficiently many data points in their overlap. This merging procedure requires more computation and might be slow, but it can prove useful in cases of tightly packed clusters such in the above Gaussian blob example. 
 
 
-### How to interprete and modify the visualizations?
+### How to interpret and modify the visualizations?
 
-When there are many data points, the vizualisations produced by the `.explain` method might be difficult to interprete. There are several options that help producing better plots, e.g. when the boxes of starting points are too large so that they hide the data points. In this case, we may set ``sp_alpha`` smaller to get more transparency for the box of starting points or set ``sp_pad`` smaller to get the box smaller, or we can change the color of that by specifying ``sp_fcolor`` to a more shallow color. For more detail, we refer users to the documentation. Also, you can set `cmap` (e.g., `'bmh'`), `cmin` and `cmax` to customize a color map of the clusters.
+When there are many data points, the vizualisations produced by the `.explain` method might be difficult to interpret. There are several options that help producing better plots, e.g. when the boxes of starting points are too large so that they hide the data points. In this case, we may set ``sp_alpha`` smaller to get more transparency for the box of starting points or set ``sp_pad`` smaller to get the box smaller, or we can change the color of that by specifying ``sp_fcolor`` to a more shallow color. For more detail, we refer users to the documentation. Also, you can set `cmap` (e.g., `'bmh'`), `cmin` and `cmax` to customize a color map of the clusters.
 
 
 ## :art: Reproducibility 

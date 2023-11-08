@@ -124,7 +124,7 @@ Download this repository via:
     
     git clone https://github.com/nla-group/classix.git
 
-If you have any instaling issues, please be free to submit your questions in the `issues <https://github.com/nla-group/classix/issues>`_.
+If you have any installing issues, please be free to submit your questions in the `issues <https://github.com/nla-group/classix/issues>`_.
 
 .. admonition:: Note
 

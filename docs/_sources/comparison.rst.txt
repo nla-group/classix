@@ -25,7 +25,7 @@ Then we load the data:
     data = loadData('vdu_signals') # load the data
     print(data.shape) # (2028780, 2)
 
-This data has more than 2 million objects, which is very challenging for most clustering algorithm. Our experiments were runing on the environment settings:
+This data has more than 2 million objects, which is very challenging for most clustering algorithm. Our experiments were running on the environment settings:
 
     * Dell PowerEdge R740 Server
     * 2x Intel Xeon Silver 4114 2.2G (total 20 cores, 40 threads)

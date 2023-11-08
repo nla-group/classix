@@ -133,7 +133,7 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
         The input that is array-like of shape (n_samples,).
     
     sorting : str
-        The sorting way refered for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
+        The sorting way referred for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
     
     tol : float
         The tolerance to control the aggregation, if the distance between the starting point 
@@ -239,7 +239,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
         The input that is array-like of shape (n_samples,).
     
     sorting : str
-        The sorting way refered for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
+        The sorting way referred for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
     
     tol : float
         The tolerance to control the aggregation, if the distance between the starting point 

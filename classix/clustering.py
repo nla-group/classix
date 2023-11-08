@@ -82,7 +82,7 @@ def loadData(name='vdu_signals'):
     Parameters
     ----------
     name: str, {'vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 'Phoneme', 'Wine'}, default='vdu_signals'
-        The supported build-in datasets.
+        The supported built-in datasets.
 
     Returns
     -------
@@ -335,7 +335,7 @@ class CLASSIX:
         If Cython memoryviews is disable, a fast algorithm with less efficient memory 
           consumption is triggered since precomputation for aggregation is used. 
         Setting it True will use a memory efficient computing.  
-        If Cython memoryviews is effective, thie parameter can be ignored. 
+        If Cython memoryviews is effective, this parameter can be ignored. 
     
     verbose : boolean or int, default=1
         Whether to print the logs or not.
@@ -678,7 +678,7 @@ class CLASSIX:
 
         minPts : int, default=0
             The threshold, in the range of [0, infity] to determine the noise degree.
-            When assgin it 0, algorithm won't check noises.
+            When assign it 0, algorithm won't check noises.
 
         algorithm : str, default='bf'
             Algorithm to merge connected groups.
@@ -717,7 +717,7 @@ class CLASSIX:
             # but the existent clusters may have some very independent clusters which are possibly be "noise" clusters.
             # so the next step is extracting the clusters with very rare number of objects as potential "noises".
             # we calculate the percentiles of the number of clusters objects. For example, given the dataset size of 100,
-            # there are 4 clusters, the associated number of objects inside clusters are repectively of 5, 20, 25, 50. 
+            # there are 4 clusters, the associated number of objects inside clusters are respectively of 5, 20, 25, 50. 
             # The 10th percentlie (we set percent=10, noise_mergeScale=0.1) of (5, 20, 25, 50) is 14, 
             # and we calculate threshold = 100 * noise_mergeScale =  10. Obviously, the first cluster with number of objects 5
             # satisfies both condition 5 < 14 and 5 < 10, so we classify the objects inside first cluster as outlier.
@@ -731,7 +731,7 @@ class CLASSIX:
                 SIZE_NOISE_LABELS = len(potential_noise_labels) 
                 if SIZE_NOISE_LABELS == len(np.unique(labels)):
                     warnings.warn(
-                        "Setting of noise related parameters is not correct, degenerate to the method without noises dectection.", 
+                        "Setting of noise related parameters is not correct, degenerate to the method without noises detection.", 
                     DeprecationWarning)
                 else:
                     for i in np.unique(potential_noise_labels):
@@ -801,7 +801,7 @@ class CLASSIX:
                     minPts=self.minPts, r=len(np.unique(labels))
                 ))
                 
-            print("Use the verbose=0 parameter to supress this info.\nUse the .explain() method to explain the clustering.")
+            print("Use the verbose=0 parameter to suppress this info.\nUse the .explain() method to explain the clustering.")
 
         return labels 
     
@@ -867,7 +867,7 @@ class CLASSIX:
             The two groups are connected via groups 9 -> 2 -> 8.
 
         plot : boolean, default=False
-            Determine if visulize the explaination. 
+            Determine if visulize the explanation. 
         
         figsize : tuple, default=(9, 6)
             Determine the size of explain figure. 
@@ -901,7 +901,7 @@ class CLASSIX:
             The color marked for startpoint points scatter marker.
 
         sp_alpha : float, default=0.3
-            The value setting for transprency of text box for group centers. 
+            The value setting for transparency of text box for group centers. 
             
         sp_pad : int, default=2
             The size of text box for group centers. 
@@ -928,7 +928,7 @@ class CLASSIX:
             The color marked for specified data objects text box. 
             
         dp_alpha : float, default=0.5
-            The value setting for transprency of text box for specified data objects. 
+            The value setting for transparency of text box for specified data objects. 
             
         dp_pad : int, default=2
             The size of text box for specified data objects. 
