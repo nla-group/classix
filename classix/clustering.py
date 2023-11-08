@@ -157,7 +157,24 @@ def loadData(name='vdu_signals'):
             get_data(current_dir, 'Wine')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
-    if name not in ['vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 'Phoneme', 'Wine']:
+    if name == 'CovidENV':
+        DATA_PATH_X = os.path.join(current_dir, 'data/X_CovidENV.pkl')
+        DATA_PATH_Y = os.path.join(current_dir, 'data/y_CovidENV.npy')
+        if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            get_data(current_dir, 'CovidENV')
+        return pd.read_pickle(DATA_PATH_X), np.load(DATA_PATH_Y)
+    
+    if name == 'Covid3MC':
+        DATA_PATH_X = os.path.join(current_dir, 'data/X_Covid3MC.pkl')
+        DATA_PATH_Y = os.path.join(current_dir, 'data/y_Covid3MC.npy')
+        if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            get_data(current_dir, 'Covid3MC')
+        return pd.read_pickle(DATA_PATH_X), np.load(DATA_PATH_Y)
+    
+    
+    if name not in ['vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 
+                    'Banknote', 'Seeds', 'Phoneme', 'Wine', 'CovidENV', 'Covid3MC']:
+        
         warnings.warn("Currently not support this data.")
 
 
@@ -253,10 +270,29 @@ def get_data(current_dir='', name='vdu_signals'):
         with open(os.path.join(current_dir, 'data/y_Wine.npy'), 'wb') as handler:
             handler.write(y)
                     
-
+    elif name == 'CovidENV':
+        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_CovidENV.pkl"
+        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_CovidENV.npy"
+        x = requests.get(url_parent_x).content
+        y = requests.get(url_parent_y).content
+        with open(os.path.join(current_dir, 'data/X_CovidENV.pkl'), 'wb') as handler:
+            handler.write(x)
+        with open(os.path.join(current_dir, 'data/y_CovidENV.npy'), 'wb') as handler:
+            handler.write(y)
                     
 
-
+    elif name == 'Covid3MC':
+        url_parent_x = "https://github.com/nla-group/classix/raw/master/classix/source/X_Covid3MC.pkl"
+        url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Covid3MC.npy"
+        x = requests.get(url_parent_x).content
+        y = requests.get(url_parent_y).content
+        with open(os.path.join(current_dir, 'data/X_Covid3MC.pkl'), 'wb') as handler:
+            handler.write(x)
+        with open(os.path.join(current_dir, 'data/y_Covid3MC.npy'), 'wb') as handler:
+            handler.write(y)
+                    
+                
+                
 class NotFittedError(ValueError, AttributeError):
     """Exception class to raise if estimator is used before fitting.
     """
