@@ -297,7 +297,7 @@ class CLASSIX:
            set structure to speedup merging.
         
         - 'distance': two groups are merged if the distance of their group centers is at 
-           most scale*radius (the parameter above). This option uses the disjoint 
+           most mergeScale*radius (the parameter above). This option uses the disjoint 
            set structure to speedup merging.
         
         For more details, we refer to [1].
@@ -313,9 +313,9 @@ class CLASSIX:
     norm : boolean, default=True
         If normalize the data associated with the sorting, default as True. 
         
-    scale : float
+    mergeScale : float
         Design for distance-clustering, when distance between the two group centers 
-        associated with two distinct groups smaller than scale*radius, then the two groups merge.
+        associated with two distinct groups smaller than mergeScale*radius, then the two groups merge.
 
     post_alloc : boolean, default=True
         If allocate the outliers to the closest groups, hence the corresponding clusters. 
@@ -404,13 +404,15 @@ class CLASSIX:
     getPath(index1, index2, include_dist=False):
         Return the indices of connected data points between index1 data and index2 data.
         
-        
+    normalization(data):
+        Normalize the data according to the fitted model.
+
     References
     ----------
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
     """
         
-    def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", norm=True, scale=1.5, post_alloc=True, mergeTinyGroups=True,
+    def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", norm=True, mergeScale=1.5, post_alloc=True, mergeTinyGroups=True,
                  memory=True, verbose=1, short_log_form=True): 
 
 
@@ -422,7 +424,7 @@ class CLASSIX:
         self.group_merging = group_merging
 
         self.norm = norm # usually, we do not use this parameter
-        self.scale = scale # For distance measure, usually, we do not use this parameter
+        self.mergeScale = mergeScale # For distance measure, usually, we do not use this parameter
         self.post_alloc = post_alloc
         self.mergeTinyGroups = mergeTinyGroups
         self.truncate = short_log_form
@@ -514,33 +516,33 @@ class CLASSIX:
             data = data.astype('float64')
             
         if self.sorting == "norm-mean":
-            self._mu = data.mean(axis=0)
-            self.data = data - self._mu
-            self._scl = self.data.std()
-            if self._scl == 0: # prevent zero-division
-                self._scl = 1
-            self.data = self.data / self._scl
+            self.mu = data.mean(axis=0)
+            self.data = data - self.mu
+            self.dataScale = self.data.std()
+            if self.dataScale == 0: # prevent zero-division
+                self.dataScale = 1
+            self.data = self.data / self.dataScale
         
         elif self.sorting == "pca":
-            self._mu = data.mean(axis=0)
-            self.data = data - self._mu # mean center
+            self.mu = data.mean(axis=0)
+            self.data = data - self.mu # mean center
             rds = norm(self.data, axis=1) # distance of each data point from 0
-            self._scl = np.median(rds) # 50% of data points are within that radius
-            if self._scl == 0: # prevent zero-division
-                self._scl = 1
-            self.data = self.data / self._scl # now 50% of data are in unit ball 
+            self.dataScale = np.median(rds) # 50% of data points are within that radius
+            if self.dataScale == 0: # prevent zero-division
+                self.dataScale = 1
+            self.data = self.data / self.dataScale # now 50% of data are in unit ball 
             
         elif self.sorting == "norm-orthant":
-            self._mu = data.min(axis=0)
-            self.data = data - self._mu
-            self._scl = self.data.std()
-            if self._scl == 0: # prevent zero-division
-                self._scl = 1
-            self.data = self.data / self._scl
+            self.mu = data.min(axis=0)
+            self.data = data - self.mu
+            self.dataScale = self.data.std()
+            if self.dataScale == 0: # prevent zero-division
+                self.dataScale = 1
+            self.data = self.data / self.dataScale
             
         else:
-            self._mu, self._scl = 0, 1 # no normalization
-            self.data = (data - self._mu) / self._scl
+            self.mu, self.dataScale = 0, 1 # no normalization
+            self.data = (data - self.mu) / self.dataScale
         
         # aggregation
         if not self.memory:
@@ -627,7 +629,7 @@ class CLASSIX:
             raise NotFittedError("Please use .fit() method first.")
             
         labels = list()
-        data = (np.asarray(data) - self._mu) / self._scl
+        data = self.normalization(np.asarray(data))
         indices = self.splist_[:,0].astype(int)
         splist = data[indices]
         num_of_points = data.shape[0]
@@ -716,8 +718,8 @@ class CLASSIX:
             # so the next step is extracting the clusters with very rare number of objects as potential "noises".
             # we calculate the percentiles of the number of clusters objects. For example, given the dataset size of 100,
             # there are 4 clusters, the associated number of objects inside clusters are repectively of 5, 20, 25, 50. 
-            # The 10th percentlie (we set percent=10, noise_scale=0.1) of (5, 20, 25, 50) is 14, 
-            # and we calculate threshold = 100 * noise_scale =  10. Obviously, the first cluster with number of objects 5
+            # The 10th percentlie (we set percent=10, noise_mergeScale=0.1) of (5, 20, 25, 50) is 14, 
+            # and we calculate threshold = 100 * noise_mergeScale =  10. Obviously, the first cluster with number of objects 5
             # satisfies both condition 5 < 14 and 5 < 10, so we classify the objects inside first cluster as outlier.
             # And then we allocate the objects inside the outlier cluster into other closest cluster.
             # This method is quite effective at solving the noise arise from small tolerance (radius).
@@ -771,7 +773,7 @@ class CLASSIX:
                                                                     splist=splist,
                                                                     radius=radius,
                                                                     minPts=minPts,
-                                                                    scale=self.scale, 
+                                                                    scale=self.mergeScale, 
                                                                     sort_vals=sort_vals,
                                                                     half_nrm2=self.half_nrm2
                                                                 )
@@ -1062,7 +1064,7 @@ class CLASSIX:
             
             print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features.\n".format(length=data_size, dim=feat_dim) + 
                 "The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}.\n".format(tol=self.radius, minPts=self.minPts) +
-                "As the provided data was auto-scaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.\n".format(scl=self._scl, tol=self.radius, tolscl=self._scl*self.radius) + 
+                "As the provided data was auto-mergeScaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.\n".format(scl=self.dataScale, tol=self.radius, tolscl=self.dataScale*self.radius) + 
                 "In total, {dist:.0f} distances were computed ({avg:.1f} per data point).\n".format(dist=self.dist_nr, avg=self.dist_nr/data_size) + 
                 "This resulted in {groups:.0f} groups, each with a unique group center.\n".format(groups=self.splist_.shape[0]) + 
                 "These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. ".format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_)))
@@ -1108,7 +1110,7 @@ class CLASSIX:
             elif isinstance(index1, list) or isinstance(index1, np.ndarray):
                 index1_id = -1
                 index1 = np.array(index1)
-                object1 = (index1 - self._mu) / self._scl # allow for out-sample data
+                object1 = (index1 - self.mu) / self.dataScale # allow for out-sample data
                 
                 if data.shape[1] > 2:
                     object1 = np.matmul(object1, self._V[np.argsort(self._s)].T)
@@ -1276,7 +1278,7 @@ class CLASSIX:
                 elif isinstance(index2, list) or isinstance(index2, np.ndarray):
                     index2_id = -1
                     index2 = np.array(index2)
-                    object2 = (index2 - self._mu) / self._scl # allow for out-sample data
+                    object2 = (index2 - self.mu) / self.dataScale # allow for out-sample data
                     
                     if data.shape[1] > 2:
                         object2 = np.matmul(object2, self._V[np.argsort(self._s)].T)
@@ -1318,7 +1320,7 @@ class CLASSIX:
                     from scipy.sparse import csr_matrix
                     
                     distm = pairwise_distances(self.data[self.splist_[:, 0]])
-                    distm = (distm <= self.radius*self.scale).astype(int)
+                    distm = (distm <= self.radius*self.mergeScale).astype(int)
                     csr_dist_m = csr_matrix(distm)
                         
                     if cluster_label1 == cluster_label2:
@@ -1390,8 +1392,8 @@ class CLASSIX:
                             )
                     
                     if isinstance(index2, str):
-                        ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, 
-                               label='{} '.format(index1)+'(cluster #{0})'.format(
+                        ax.scatter(object2[0], object2[1], marker="*", s=obj_msize, 
+                               label='{} '.format(index2)+'(cluster #{0})'.format(
                                    cluster_label1)
                             )
                     else:
@@ -1514,7 +1516,7 @@ class CLASSIX:
 
                     else:
                         ax.legend(ncols=3, loc='best')
-                    
+
                     ax.set_aspect('equal', adjustable='datalim')
                     ax.set_title("""{num_clusters:.0f} clusters (radius={tol:.2f}, minPts={minPts:.0f})""".format(
                         num_clusters=len(np.unique(self.labels_)),tol=self.radius, minPts=self.minPts))
@@ -1563,7 +1565,7 @@ class CLASSIX:
                         )
 
                         if connected_paths_vis is None:
-                            print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.scale))
+                            print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.mergeScale))
                             print('This is because at least one of the groups was reassigned due to the minPts condition.')
                         else:
                             print("""\nThe two groups are connected via groups\n %(connected)s.""" % {
@@ -1728,7 +1730,7 @@ class CLASSIX:
                 
         else:
             distm = pairwise_distances(self.data[self.splist_[:, 0]])
-            distm = (distm <= self.radius*self.scale).astype(int)
+            distm = (distm <= self.radius*self.mergeScale).astype(int)
             csr_dist_m = csr_matrix(distm)
             connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
             connected_paths.reverse()
@@ -1845,10 +1847,23 @@ class CLASSIX:
         if not os.path.isdir(path):
             os.makedirs(path)
         if fmt == 'pdf':
-            fig.savefig(path + '/linkage_scale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.pdf', bbox_inches='tight')
+            fig.savefig(path + '/linkage_mergeScale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.pdf', bbox_inches='tight')
         else:
-            fig.savefig(path + '/linkage_scale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.png', bbox_inches='tight')
+            fig.savefig(path + '/linkage_mergeScale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.png', bbox_inches='tight')
         
+
+
+    def normalization(self, data):
+        """
+        Normalize the data by the fitted model.
+        """
+
+        if hasattr(self, 'labels_'):
+            return (data - self.mu) / self.dataScale 
+        else:
+            raise NotFittedError("Please use .fit() method first.")
+        
+
 
 
     @property
@@ -1939,6 +1954,7 @@ class CLASSIX:
         clabels = copy.deepcopy(labels)
         for i in range(len(sorted_dict)):
             clabels[labels == sorted_dict[i][0]]  = i
+
         return clabels
 
     
@@ -2050,7 +2066,7 @@ class CLASSIX:
             raise TypeError('Expected a scalar.')
         
         if value < 0 or (0 < value & value < 1):
-            raise ValueError('Noise_scale must be 0 or greater than 1.')
+            raise ValueError('Noise_mergeScale must be 0 or greater than 1.')
         
         self._minPts = int(round(value))
     
@@ -2070,7 +2086,7 @@ def pairwise_distances(X):
 
 
 def visualize_connections(data, splist, radius=0.5, scale=1.5):
-    """Calculate the connected components for graph constructed by group centers given radius and scale."""
+    """Calculate the connected components for graph constructed by group centers given radius and mergeScale."""
 
     from scipy.sparse.csgraph import connected_components
     
@@ -2082,31 +2098,31 @@ def visualize_connections(data, splist, radius=0.5, scale=1.5):
     
     
     
-def novel_normalization(data, base):
+def normalization(data, base):
     """Initial data preparation of CLASSIX."""
     if base == "norm-mean":
         _mu = data.mean(axis=0)
         ndata = data - _mu
-        _scl = ndata.std()
-        ndata = ndata / _scl
+        dataScale = ndata.std()
+        ndata = ndata / dataScale
 
     elif base == "pca":
         _mu = data.mean(axis=0)
         ndata = data - _mu # mean center
         rds = norm(ndata, axis=1) # distance of each data point from 0
-        _scl = np.median(rds) # 50% of data points are within that radius
-        ndata = ndata / _scl # now 50% of data are in unit ball 
+        dataScale = np.median(rds) # 50% of data points are within that radius
+        ndata = ndata / dataScale # now 50% of data are in unit ball 
 
     elif base == "norm-orthant":
         _mu = data.min(axis=0)
         ndata = data - _mu
-        _scl = ndata.std()
-        ndata = ndata / _scl
+        dataScale = ndata.std()
+        ndata = ndata / dataScale
 
     else:
-        _mu, _scl = 0, 1 # no normalization
-        ndata = (data - _mu) / _scl
-    return ndata, (_mu, _scl)
+        _mu, dataScale = 0, 1 # no normalization
+        ndata = (data - _mu) / dataScale
+    return ndata, (_mu, dataScale)
 
 
 
