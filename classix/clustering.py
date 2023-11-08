@@ -514,16 +514,16 @@ class CLASSIX:
             data = data.astype('float64')
             
         if self.sorting == "norm-mean":
-            self._mu = data.mean(axis=0)
-            self.data = data - self._mu
+            self.mu = data.mean(axis=0)
+            self.data = data - self.mu
             self.dataScale = self.data.std()
             if self.dataScale == 0: # prevent zero-division
                 self.dataScale = 1
             self.data = self.data / self.dataScale
         
         elif self.sorting == "pca":
-            self._mu = data.mean(axis=0)
-            self.data = data - self._mu # mean center
+            self.mu = data.mean(axis=0)
+            self.data = data - self.mu # mean center
             rds = norm(self.data, axis=1) # distance of each data point from 0
             self.dataScale = np.median(rds) # 50% of data points are within that radius
             if self.dataScale == 0: # prevent zero-division
@@ -531,16 +531,16 @@ class CLASSIX:
             self.data = self.data / self.dataScale # now 50% of data are in unit ball 
             
         elif self.sorting == "norm-orthant":
-            self._mu = data.min(axis=0)
-            self.data = data - self._mu
+            self.mu = data.min(axis=0)
+            self.data = data - self.mu
             self.dataScale = self.data.std()
             if self.dataScale == 0: # prevent zero-division
                 self.dataScale = 1
             self.data = self.data / self.dataScale
             
         else:
-            self._mu, self.dataScale = 0, 1 # no normalization
-            self.data = (data - self._mu) / self.dataScale
+            self.mu, self.dataScale = 0, 1 # no normalization
+            self.data = (data - self.mu) / self.dataScale
         
         # aggregation
         if not self.memory:
@@ -627,7 +627,7 @@ class CLASSIX:
             raise NotFittedError("Please use .fit() method first.")
             
         labels = list()
-        data = (np.asarray(data) - self._mu) / self.dataScale
+        data = (np.asarray(data) - self.mu) / self.dataScale
         indices = self.splist_[:,0].astype(int)
         splist = data[indices]
         num_of_points = data.shape[0]
@@ -1108,7 +1108,7 @@ class CLASSIX:
             elif isinstance(index1, list) or isinstance(index1, np.ndarray):
                 index1_id = -1
                 index1 = np.array(index1)
-                object1 = (index1 - self._mu) / self.dataScale # allow for out-sample data
+                object1 = (index1 - self.mu) / self.dataScale # allow for out-sample data
                 
                 if data.shape[1] > 2:
                     object1 = np.matmul(object1, self._V[np.argsort(self._s)].T)
@@ -1276,7 +1276,7 @@ class CLASSIX:
                 elif isinstance(index2, list) or isinstance(index2, np.ndarray):
                     index2_id = -1
                     index2 = np.array(index2)
-                    object2 = (index2 - self._mu) / self.dataScale # allow for out-sample data
+                    object2 = (index2 - self.mu) / self.dataScale # allow for out-sample data
                     
                     if data.shape[1] > 2:
                         object2 = np.matmul(object2, self._V[np.argsort(self._s)].T)
@@ -1843,6 +1843,10 @@ class CLASSIX:
         
 
 
+    def normalization(self):
+
+
+
     @property
     def groupCenters_(self):
         if hasattr(self, 'splist_'):
@@ -1931,6 +1935,7 @@ class CLASSIX:
         clabels = copy.deepcopy(labels)
         for i in range(len(sorted_dict)):
             clabels[labels == sorted_dict[i][0]]  = i
+
         return clabels
 
     
@@ -2074,7 +2079,7 @@ def visualize_connections(data, splist, radius=0.5, mergeScale=1.5):
     
     
     
-def novel_normalization(data, base):
+def normalization(data, base):
     """Initial data preparation of CLASSIX."""
     if base == "norm-mean":
         _mu = data.mean(axis=0)
