@@ -2077,13 +2077,13 @@ def pairwise_distances(X):
 
 
 
-def visualize_connections(data, splist, radius=0.5, mergeScale=1.5):
+def visualize_connections(data, splist, radius=0.5, scale=1.5):
     """Calculate the connected components for graph constructed by group centers given radius and mergeScale."""
 
     from scipy.sparse.csgraph import connected_components
     
     distm = pairwise_distances(data[splist[:,0].astype(int)])
-    tol = radius*mergeScale
+    tol = radius*scale
     distm = (distm <= tol).astype(int)
     n_components, labels = connected_components(csgraph=distm, directed=False, return_labels=True)
     return distm, n_components, labels
