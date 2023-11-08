@@ -484,7 +484,7 @@ We now compare the algorithms on synthetic Gaussian blobs with increasing number
 2.2 Varying cluster sizes of 5 and 20
 ~~~~~~~~~~~~~~~~~~~~~~
 
-We show how to run test for cluster size of 5 and 20 with increasing data size, which aims to evalute the clustering algorithmic performance with varying clusters as well as data sizes. For test code, we refer to `classix/exp/revision/size_revision1.ipynb <https://github.com/nla-group/classix/blob/master/exp/revision/size_revision1.ipynb>`_ and `classix/exp/revision/size_revision2.ipynb <https://github.com/nla-group/classix/blob/master/exp/revision/size_revision2.ipynb>`_ for the code scripts and associated results.
+We show how to run test for cluster size of 5 and 20 with increasing data size, which aims to evaluate the clustering algorithmic performance with varying clusters as well as data sizes. For test code, we refer to `classix/exp/revision/size_revision1.ipynb <https://github.com/nla-group/classix/blob/master/exp/revision/size_revision1.ipynb>`_ and `classix/exp/revision/size_revision2.ipynb <https://github.com/nla-group/classix/blob/master/exp/revision/size_revision2.ipynb>`_ for the code scripts and associated results.
 
 .. code:: python
 
@@ -759,7 +759,7 @@ We show how to run test for cluster size of 5 and 20 with increasing data size, 
 2.3 Additional test script
 ~~~~~~~~~~~~~~~~~~~~~~
 
-This test shows the averaging result with varying cluster size, researchers of interest can copy the following code and change the corresponding paramters, e.g., the ```dataset_n_clusters```.
+This test shows the averaging result with varying cluster size, researchers of interest can copy the following code and change the corresponding parameters, e.g., the ```dataset_n_clusters```.
 
 .. code:: python
 

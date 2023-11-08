@@ -74,7 +74,7 @@ cpdef distance_merging_mtg(double[:, :] data, list labels,
 
     minPts : int, default=0
         The threshold, in the range of [0, infity] to determine the noise degree.
-        When assgin it 0, algorithm won't check noises.
+        When assign it 0, algorithm won't check noises.
 
     scale : float, default 1.5
         Design for distance-clustering, when distance between the two starting points 
@@ -213,7 +213,7 @@ cpdef distance_merging(double[:, :] data, list labels,
 
     minPts : int, default=0
         The threshold, in the range of [0, infity] to determine the noise degree.
-        When assgin it 0, algorithm won't check noises.
+        When assign it 0, algorithm won't check noises.
 
     scale : float, default 1.5
         Design for distance-clustering, when distance between the two starting points 

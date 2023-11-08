@@ -60,7 +60,7 @@ The output is:
 Track single data
 ------------------------------
 
-Following the previous steps, we can analyze the specific data by refering to the index, for example here, we want to track the data with index 0:
+Following the previous steps, we can analyze the specific data by referring to the index, for example here, we want to track the data with index 0:
 
 .. code:: python
 
@@ -119,7 +119,7 @@ Similar to above, we load the necessary data to produce the analytical result.
     import classix
 
 
-To load the industry data provided by Kamil, we can simply use the API ``load_data`` and require the paramter as ``vdu_signals``
+To load the industry data provided by Kamil, we can simply use the API ``load_data`` and require the parameter as ``vdu_signals``
 we leave the default parameters except setting radius to 1.
 
 .. code:: python
@@ -182,7 +182,7 @@ As above, we view the whole picture for data simply by
     clx.explain(plot=True)
 
 You can also specify other parameters to personalize the visualization to make it easier to analyze. For example, you can enlarge the fontsize of starting points labels by 
-setting ``sp_fontsize`` larger or change the shape by tunning appropriate value for ``figsize``. For more details about parameter settings, we refer to our API Reference. So, we try:
+setting ``sp_fontsize`` larger or change the shape by tuning appropriate value for ``figsize``. For more details about parameter settings, we refer to our API Reference. So, we try:
 
 .. code:: python
 
