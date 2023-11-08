@@ -1843,7 +1843,8 @@ class CLASSIX:
         
 
 
-    def normalization(self):
+    def normalization(self, data):
+        return (data - self.mu) / self.dataScale 
 
 
 
