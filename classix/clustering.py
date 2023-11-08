@@ -404,7 +404,9 @@ class CLASSIX:
     getPath(index1, index2, include_dist=False):
         Return the indices of connected data points between index1 data and index2 data.
         
-        
+    normalization(data):
+        Normalize the data according to the fitted model.
+
     References
     ----------
     [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
@@ -627,7 +629,7 @@ class CLASSIX:
             raise NotFittedError("Please use .fit() method first.")
             
         labels = list()
-        data = (np.asarray(data) - self.mu) / self.dataScale
+        data = self.normalization(np.asarray(data))
         indices = self.splist_[:,0].astype(int)
         splist = data[indices]
         num_of_points = data.shape[0]
@@ -1844,7 +1846,15 @@ class CLASSIX:
 
 
     def normalization(self, data):
-        return (data - self.mu) / self.dataScale 
+        """
+        Normalize the data by the fitted model.
+        """
+
+        if hasattr(self, 'labels_'):
+            return (data - self.mu) / self.dataScale 
+        else:
+            raise NotFittedError("Please use .fit() method first.")
+        
 
 
 
