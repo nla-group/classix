@@ -1824,7 +1824,7 @@ class CLASSIX:
         if not hasattr(self, 'splist_'):
             raise NotFittedError("Please use .fit() method first.")
             
-        distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(mergeScale,2))
+        distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(scale,2))
         plt.rcParams['axes.facecolor'] = 'white'
 
         P = self.data[self.splist_[:, 0].astype(int)]
@@ -1847,9 +1847,9 @@ class CLASSIX:
         if not os.path.isdir(path):
             os.makedirs(path)
         if fmt == 'pdf':
-            fig.savefig(path + '/linkage_mergeScale_'+str(round(mergeScale,2))+'_tol_'+str(round(self.radius,2))+'.pdf', bbox_inches='tight')
+            fig.savefig(path + '/linkage_mergeScale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.pdf', bbox_inches='tight')
         else:
-            fig.savefig(path + '/linkage_mergeScale_'+str(round(mergeScale,2))+'_tol_'+str(round(self.radius,2))+'.png', bbox_inches='tight')
+            fig.savefig(path + '/linkage_mergeScale_'+str(round(scale,2))+'_tol_'+str(round(self.radius,2))+'.png', bbox_inches='tight')
         
 
 
