@@ -1392,8 +1392,8 @@ class CLASSIX:
                             )
                     
                     if isinstance(index2, str):
-                        ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, 
-                               label='{} '.format(index1)+'(cluster #{0})'.format(
+                        ax.scatter(object2[0], object2[1], marker="*", s=obj_msize, 
+                               label='{} '.format(index2)+'(cluster #{0})'.format(
                                    cluster_label1)
                             )
                     else:
@@ -1508,7 +1508,15 @@ class CLASSIX:
                                             )
                                 
 
-                    ax.legend(ncols=3, loc='best')
+                    if cluster_label1 == cluster_label2 and len(connected_paths) > 1: # change the order of legend
+                        handles, lg_labels = ax.get_legend_handles_labels()
+                        lg_labels = [lg_labels[i] for i in [0,3,1,2,4,5]]
+                        handles = [handles[i] for i in [0,3,1,2,4,5]]
+                        ax.legend(handles, lg_labels, ncols=3, loc='best')
+
+                    else:
+                        ax.legend(ncols=3, loc='best')
+
                     ax.set_aspect('equal', adjustable='datalim')
                     ax.set_title("""{num_clusters:.0f} clusters (radius={tol:.2f}, minPts={minPts:.0f})""".format(
                         num_clusters=len(np.unique(self.labels_)),tol=self.radius, minPts=self.minPts))
@@ -1816,7 +1824,7 @@ class CLASSIX:
         if not hasattr(self, 'splist_'):
             raise NotFittedError("Please use .fit() method first.")
             
-        distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(scale,2))
+        distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(mergeScale,2))
         plt.rcParams['axes.facecolor'] = 'white'
 
         P = self.data[self.splist_[:, 0].astype(int)]
