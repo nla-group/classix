@@ -1778,16 +1778,16 @@ class CLASSIX:
         
         
     
-    def visualize_linkage(self, mergeScale=1.5, figsize=(10,7), labelsize=24, markersize=320, plot_boundary=False, bound_color='red', path='.', fmt='pdf'):
+    def visualize_linkage(self, scale=1.5, figsize=(10,7), labelsize=24, markersize=320, plot_boundary=False, bound_color='red', path='.', fmt='pdf'):
         
         """Visualize the linkage in the distance clustering.
         
         
         Parameters
         ----------
-        mergeScale : float
+        scale : float
             Design for distance-clustering, when distance between the two group centers 
-            associated with two distinct groups smaller than mergeScale*radius, then the two groups merge.
+            associated with two distinct groups smaller than scale*radius, then the two groups merge.
         
         labelsize : int 
             The fontsize of ticks. 
