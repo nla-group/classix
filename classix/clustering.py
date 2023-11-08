@@ -1816,7 +1816,7 @@ class CLASSIX:
         if not hasattr(self, 'splist_'):
             raise NotFittedError("Please use .fit() method first.")
             
-        distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(mergeScale,2))
+        distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(scale,2))
         plt.rcParams['axes.facecolor'] = 'white'
 
         P = self.data[self.splist_[:, 0].astype(int)]
