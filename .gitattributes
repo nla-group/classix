@@ -1,2 +1,4 @@
 *.html linguist-detectable=false
 *.ipynb linguist-detectable=false
+classix/*.pkl filter=lfs diff=lfs merge=lfs -text
+classix/source/*.pkl filter=lfs diff=lfs merge=lfs -text
