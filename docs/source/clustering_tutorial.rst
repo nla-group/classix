@@ -309,7 +309,7 @@ we leave the default parameters except setting radius to 1.
 
 .. admonition:: Note
 
-    The method ``loadData`` also supports other typical UCI datasets for clustering, which include ``'vdu_signals'``, ``'Iris'``, ``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``, ``'Phoneme'``, ``'Wine'``, ``'CovidENV'`` and ``'Covid3MC'``.
+    The method ``loadData`` also supports other typical UCI datasets for clustering, which include ``'vdu_signals'``, ``'Iris'``, ``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``, ``'Phoneme'``, ``'Wine'``, ``'CovidENV'`` and ``'Covid3MC'``. The datasets ``'CovidENV'`` and ``'Covid3MC'`` are in dataframe formate while others are array format.
 
 
 
@@ -408,7 +408,7 @@ The output documentation describes how two data objects are separated into two c
     
     The data point 16943 is in group 11 and the data point 17143 is in group 16, both of which were merged into cluster #2. 
     
-    The two groups are connected via groups 16 <-> 15 <-> 12 <-> 11.
+    The two groups are connected via groups 11 <-> 12 <-> 15 <-> 16.
     
       Index  Group
      16943     11
