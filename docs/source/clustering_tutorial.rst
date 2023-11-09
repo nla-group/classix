@@ -309,7 +309,7 @@ we leave the default parameters except setting radius to 1.
 
 .. admonition:: Note
 
-    The method ``loadData`` also supports other typical UCI datasets for clustering, which include ``'vdu_signals'``, ``'Iris'``, ``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``, ``'Phoneme'``, ``'Wine'``, ``'CovidENV'`` and ``'Covid3MC'``. The datasets ``'CovidENV'`` and ``'Covid3MC'`` are in dataframe formate while others are array format.
+    The method ``loadData`` also supports other typical UCI datasets for clustering, which include ``'vdu_signals'``, ``'Iris'``, ``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``, ``'Phoneme'``, ``'Wine'``, ``'CovidENV'`` and ``'Covid3MC'``. The datasets ``'CovidENV'`` and ``'Covid3MC'`` are in dataframe format while others are array format.
 
 
 
