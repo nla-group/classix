@@ -279,6 +279,12 @@ Additionally, if one want to index more than 2 objects, use numbrt parameters ``
 .. image:: images/None773_292_m.png
 
 
+
+.. admonition:: Note
+
+    You can simply use ``clx.getPath(ind1,ind2)`` to track the path between data point ind1 and data point ind2. 
+
+
 ++++++++++++++++++++++++++++
 Case study of industry data
 ++++++++++++++++++++++++++++
@@ -303,7 +309,8 @@ we leave the default parameters except setting radius to 1.
 
 .. admonition:: Note
 
-    The method ``loadData`` also supports other typical UCI datasets for clustering, which include ``'vdu_signals'``, ``'Iris'``, ``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``, ``'Phoneme'``, and ``'Wine'``.
+    The method ``loadData`` also supports other typical UCI datasets for clustering, which include ``'vdu_signals'``, ``'Iris'``, ``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``, ``'Phoneme'``, ``'Wine'``, ``'CovidENV'`` and ``'Covid3MC'``.
+
 
 
 Then, we employ classix model to train the data and record the timing:
