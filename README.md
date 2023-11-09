@@ -26,8 +26,7 @@ CLASSIX is a fast, memory-efficient, and explainable clustering algorithm. Here 
 - Full reproducibility of all tests in the accompanying paper
 - Support of Cython compilation
 
-``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the data into groups of nearby data points, followed by a merging phase of groups into clusters. The algorithm is controlled by two parameters, namely the distance parameter ``radius`` for the group aggregation and a ``minPts`` parameter controlling the minimal cluster size. 
-
+``CLASSIX`` is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. 
 
 **Here is a video abstract of CLASSIX:** 
 
@@ -36,29 +35,6 @@ CLASSIX is a fast, memory-efficient, and explainable clustering algorithm. Here 
 A detailed documentation, including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/). 
 
 ## :rocket: Install
-
-CLASSIX has the following dependencies:
-
-- cython (recommend >= 0.27)
-- numpy >=1.17.3 (recommend update to 1.24.3+)
-- scipy >= 1.2.1
-- requests
-- matplotlib
-- pandas
-
-
-**If you want to compare the speed with other clustering algorithms in scikit-learn or other packages using Cython, please also use CLASSIX with Cython for a fair comparison.  To double check whether you are using the Cython installation or not, please use:**
-
-```Python
-import classix
-classix.cython_is_available(verbose=1)
-```
-
-If needed, you can disable Cython using
-
-```Python
-classix.__enable_cython__ = False
-```
 
 ### pip (recommended)
 To install the current CLASSIX release via PIP use:
@@ -108,14 +84,12 @@ The cluster labels of each data point are available in ``clx.labels_``.
 
 #### Example 1
 
-CLASSIX is an explainable clustering method. To get an initial overview of the clustering, type:
+CLASSIX is an explainable clustering method. To get an overview of the computed clusters, type:
 
 ```Python
 clx.explain(plot=True)
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=650 />
-
-The group centers, shown as the small red boxes, can be thought of as a coarse representation of the data. Each group center is associated with a group of data points, and groups are merged into clusters. The `explain` method returns a textual summary of the clustering:
 
 ```
 CLASSIX clustered 1000 data points with 2 features. 
@@ -166,6 +140,9 @@ The two groups are connected via groups 37 <-> 49 <-> 41 <-> 45 <-> 38 <-> 50.
    792     50 
 ```
 
+CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the data into groups of nearby data points, followed by a merging phase of groups into clusters. The ``radius`` parameter controls the size of the groups and ``minPts`` controls the minimal cluster size. CLASSIX explains that there is a path from data point 773 to data point 792 via the centers of the computed groups (37, 49, etc). 
+
+
 #### Example 2
 
 CLASSIX also supports dataframes and using dataframe indices to refer to data points:
@@ -204,9 +181,9 @@ There is no path of overlapping groups between these clusters.
 
 ### How to tune the parameters `radius` and `minPts`?
 
-Generally, we recommend first running CLASSIX with a relatively large `radius` parameter, such as `radius=1`, and `minPts=0`. It also helps to use `verbose=1` to get more detailed feedback from the method. Typically, the larger the `radius` parameter, the faster the method performs and the smaller the number of computed clusters. If the number of clusters is too small, successively reduce the `radius` parameter until a "good" (depending on context) number of meaningful clusters is obtained. 
+We recommend first running CLASSIX with a relatively large `radius` parameter, such as `radius=1`, and `minPts=1`. It also helps to use `verbose=1` to get more detailed feedback from the method. Typically, the larger the `radius` parameter, the faster the method performs and the smaller the number of computed clusters. If the number of clusters is too small, successively reduce the `radius` parameter until a "good" (depending on context) number of meaningful clusters is obtained. 
 
-If there are unwanted "noise" clusters containing just a small number of data points, increase the `minPts` parameter to remove them. If, for example, `minPts=14`, all clusters with fewer than 14 data points will be reassigned to larger clusters. Here is an example that demonstrates the effect of `minPts`:
+One can access the size of the clusters via `clx.clusterSizes_`. If there are unwanted "noise" clusters containing just a small number of data points, increase the `minPts` parameter to remove them. If, for example, `minPts=14`, all clusters with fewer than 14 data points will be reassigned to larger clusters. Here is an example that demonstrates the effect of `minPts`:
 
 ```Python
 from sklearn import datasets
@@ -258,10 +235,33 @@ If `group_merging='distance'` (the default value), two groups will be merged if 
 If `group_merging='density'`, two groups will be merged only if there are sufficiently many data points in their overlap. This merging procedure requires more computation and might be slow, but it can prove useful in cases of tightly packed clusters such in the above Gaussian blob example. 
 
 
-### How to interpret and modify the visualizations?
+### How to interpret and modify the visualisations?
 
-When there are many data points, the vizualisations produced by the `.explain` method might be difficult to interpret. There are several options that help producing better plots, e.g. when the boxes of starting points are too large so that they hide the data points. In this case, we may set ``sp_alpha`` smaller to get more transparency for the box of starting points or set ``sp_pad`` smaller to get the box smaller, or we can change the color of that by specifying ``sp_fcolor`` to a more shallow color. For more detail, we refer users to the documentation. Also, you can set `cmap` (e.g., `'bmh'`), `cmin` and `cmax` to customize a color map of the clusters.
+When there are many data points, the visualisations produced by the `.explain` method might be difficult to interpret. There are several options that help producing better plots, e.g. when the boxes of starting points are too large so that they hide the data points. In this case, we may set ``sp_alpha`` smaller to get more transparency for the box of starting points or set ``sp_pad`` smaller to get the box smaller, or we can change the color of that by specifying ``sp_fcolor`` to a more shallow color. For more detail, we refer users to the documentation. Also, you can set `cmap` (e.g., `'bmh'`), `cmin` and `cmax` to customize a color map of the clusters.
 
+### Dependencies 
+
+CLASSIX has the following dependencies:
+
+- cython (recommend >= 0.27)
+- numpy >=1.17.3 (recommend update to 1.24.3+)
+- scipy >= 1.2.1
+- requests
+- matplotlib
+- pandas
+
+If you want to compare the speed with other clustering algorithms in scikit-learn or other packages using Cython, please also use CLASSIX with Cython for a fair comparison. To double check whether you are using the Cython installation or not, please use:
+
+```Python
+import classix
+classix.cython_is_available(verbose=1)
+```
+
+If needed, you can disable Cython using
+
+```Python
+classix.__enable_cython__ = False
+```
 
 ## :art: Reproducibility 
 All experiments in the paper referenced below are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
