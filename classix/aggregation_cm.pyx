@@ -269,7 +269,7 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
     cdef double dist
     cdef list labels = [-1]*len_ind
     cdef list splist = list() # list of starting points
-    cdef Py_ssize_t i, ii, j, coord
+    cdef Py_ssize_t i, j, coord
     
     
     if sorting == "norm-mean" or sorting == "norm-orthant":
