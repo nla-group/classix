@@ -1258,14 +1258,22 @@ class CLASSIX:
                         if not os.path.exists("img"):
                             os.mkdir("img")
                         if fmt == 'pdf':
-                            fm = 'img/' + str(figname) + str(index1) +'.pdf'
+                            if figname is not None:
+                                fm = 'img/' + str(figname) + '.pdf'
+                            else:
+                                fm = 'img/sample.pdf'
                             plt.savefig(fm, bbox_inches='tight')
                         elif fmt == 'png':
-                            fm = 'img/' + str(figname) + str(index1) +'.png'
+                            if figname is not None:
+                                fm = 'img/' + str(figname)  + '.png'
+                            else:
+                                fm = 'img/sample.png'
                             plt.savefig(fm, bbox_inches='tight')
                         else:
-                            fm = 'img/' + str(figname) + str(index1) +'.'+fmt
-                            plt.savefig(fm, bbox_inches='tight')
+                            if figname is not None:
+                                fm = 'img/' + str(figname) + '.' + fmt
+                            else:
+                                fm = 'img/sample' + '.' + fmt
                         
                         print("image successfully save as", fm)
                     
@@ -1574,14 +1582,25 @@ class CLASSIX:
                     if savefig:
                         if not os.path.exists("img"):
                             os.mkdir("img")
+                            
                         if fmt == 'pdf':
-                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'.pdf'
+                            if figname is not None:
+                                fm = 'img/' + str(figname) + '.pdf'
+                            else:
+                                fm = 'img/sample.pdf'
                             plt.savefig(fm, bbox_inches='tight')
                         elif fmt == 'png':
-                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'.png'
+                            if figname is not None:
+                                fm = 'img/' + str(figname)  + '.png'
+                            else:
+                                fm = 'img/sample.png'
                             plt.savefig(fm, bbox_inches='tight')
                         else:
-                            fm = 'img/' + str(figname) + str(index1) + '_' + str(index2) +'.'+fmt
+                            if figname is not None:
+                                fm = 'img/' + str(figname) + '.' + fmt
+                            else:
+                                fm = 'img/sample' + '.' + fmt
+          
                             plt.savefig(fm, bbox_inches='tight')
                             
                         print("image successfully save as", fm)
