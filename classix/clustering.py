@@ -2018,13 +2018,12 @@ class CLASSIX:
         """Format item value for clusters. """
         
         cluster_sizes = [str(value) for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True)]
-        
+
+        dotstr = '.'
         if truncate:
             if len(cluster_sizes) > 20: 
                 dotstr = ',...'
                 cluster_sizes = cluster_sizes[:20]
-            else: 
-                dotstr = '.'
             
         print(" ", ",".join(cluster_sizes) + dotstr)
                 
