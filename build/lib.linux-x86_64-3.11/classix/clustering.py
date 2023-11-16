@@ -586,15 +586,15 @@ class CLASSIX:
                                                                                                     tol=self.radius
                                                                                                 ) 
             
-            self.splist_ = np.array(self.splist_)
-            self.half_nrm2 = self.half_nrm2[self.splist_[:, 0]]
+            
 
         else:
             self.groups_, self.splist_, self.dist_nr, self.ind, sort_vals, self.data = self._aggregate(data=self.data,
                                                                                                 sorting=self.sorting, 
                                                                                                 tol=self.radius
                                                                                             ) 
-            self.splist_ = np.array(self.splist_)
+        
+        self.splist_ = np.array(self.splist_)
         
         if self.group_merging is None:
             self.inverse_ind = np.argsort(self.ind)
@@ -735,14 +735,15 @@ class CLASSIX:
         clabels : numpy.ndarray 
             The clusters labels of the data
         """
-        
-        if self.memory: 
-            self.half_nrm2 = norm(data[splist[:, 0]], axis=1, ord=2)**2 * 0.5 # precomputation
-            
 
         if method == 'density':
+
+            if self.memory: 
+                self.half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
+
             agg_labels = np.asarray(agg_labels)
             labels = copy.deepcopy(agg_labels) 
+            
             self.merge_groups, self.connected_pairs_ = self._density_merging(data, splist, 
                                                                              radius, sort_vals=sort_vals, 
                                                                              half_nrm2=self.half_nrm2)
@@ -808,7 +809,13 @@ class CLASSIX:
                 
             
         else:
-            
+            if self.memory: 
+                spdata = data[splist[:, 0]]
+                self.half_nrm2 = np.einsum('ij,ij->i', spdata, spdata) * 0.5
+                # norm(data[splist[:, 0]], axis=1, ord=2)**2 * 0.5 # precomputation
+            else:
+                self.half_nrm2 = self.half_nrm2[self.splist_[:, 0]]
+
             labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merging(data=data, 
                                                                     labels=agg_labels,
                                                                     splist=splist,

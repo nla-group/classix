@@ -50,13 +50,26 @@ def precompute_aggregate_pca(data, sorting='pca', tol=0.5):
     Returns
     -------
     labels (list) : 
-        The group category of the data after aggregation.
+        The group categories of the data after aggregation.
     
     splist (list) : 
         The list of the starting points.
     
     nr_dist (int) :
         The number of pairwise distance calculations.
+
+    ind (numpy.ndarray):
+        Array storing Sorting indices.
+
+    sort_vals (numpy.ndarray):
+        Sorting values.
+    
+    data (numpy.ndarray):
+        Sorted data.
+    
+    half_nrm2 (numpy.ndarray):
+        Precomputed values for distance computation.
+
     """
     
     len_ind, fdim = data.shape
@@ -134,14 +147,27 @@ def precompute_aggregate(data, sorting="pca", tol=0.5):
     
     Returns
     -------
-    labels (numpy.ndarray) : 
-        The group category of the data after aggregation.
+    labels (list) : 
+        The group categories of the data after aggregation.
     
     splist (list) : 
         The list of the starting points.
     
     nr_dist (int) :
         The number of pairwise distance calculations.
+
+    ind (numpy.ndarray):
+        Array storing Sorting indices.
+
+    sort_vals (numpy.ndarray):
+        Sorting values.
+    
+    data (numpy.ndarray):
+        Sorted data.
+    
+    half_nrm2 (numpy.ndarray):
+        Precomputed values for distance computation.
+
     """
 
     splist = list() # store the starting points
@@ -233,7 +259,7 @@ def aggregate(data, sorting="pca", tol=0.5):
 
     Returns
     -------
-    labels (numpy.ndarray) : 
+    labels (list) : 
         The group categories of the data after aggregation.
     
     splist (list) : 
@@ -241,6 +267,16 @@ def aggregate(data, sorting="pca", tol=0.5):
     
     nr_dist (int) :
         The number of pairwise distance calculations.
+
+    ind (numpy.ndarray):
+        Array storing Sorting indices.
+
+    sort_vals (numpy.ndarray):
+        Sorting values.
+    
+    data (numpy.ndarray):
+        Sorted data.
+    
     """
 
     splist = list() # store the starting points

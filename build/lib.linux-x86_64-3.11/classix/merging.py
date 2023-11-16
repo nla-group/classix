@@ -60,7 +60,12 @@ def distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals,
         Design for distance-clustering, when distance between the two starting points 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
 
+    sort_vals : numpy.ndarray
+        Sorting values.
         
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
+
     Returns
     -------
     labels : numpy.ndarray
@@ -174,15 +179,20 @@ def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, hal
         of a group and another data point is less than or equal to the tolerance,
         the point is allocated to that group. For details, we refer users to [1].
 
-    minPts : int, default=0
+    minPts : int
         The threshold, in the range of [0, infity] to determine the noise degree.
         When assign it 0, algorithm won't check noises.
 
-    scale : float, default 1.5
+    scale : float
         Design for distance-clustering, when distance between the two starting points 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
 
+    sort_vals : numpy.ndarray
+        Sorting values.
         
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
+
     Returns
     -------
     labels : numpy.ndarray
@@ -271,6 +281,7 @@ def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, hal
 
 
 
+
 def density_merging(data, splist, radius, sort_vals, half_nrm2):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
@@ -289,20 +300,11 @@ def density_merging(data, splist, radius, sort_vals, half_nrm2):
         of a group and another data point is less than or equal to the tolerance,
         the point is allocated to that group. For details, we refer users to [1].
 
-    method : str, default='distance'
-        Method for group merging, Available options are:
-        
-        - 'density': two groups are merged if the density of data points in their intersection 
-           is at least as high the smaller density of both groups. This option uses the disjoint 
-           set structure to speedup merging.
-           
-        - 'distance': two groups are merged if the distance of their starting points is at 
-           most scale*radius (the parameter above). This option uses the disjoint 
-           set structure to speedup merging.
-    
-    scale : float
-        Design for distance-clustering, when distance between the two starting points 
-        associated with two distinct groups smaller than scale*radius, then the two groups merge.
+    sort_vals : numpy.ndarray
+        Sorting values.
+
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
 
         
     Returns
@@ -324,6 +326,7 @@ def density_merging(data, splist, radius, sort_vals, half_nrm2):
     splist_indices = splist[:, 0]
     sort_vals_sp = sort_vals[splist_indices]
     spdata = data[splist_indices]
+    half_nrm2_sp = half_nrm2[splist_indices]
 
     volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
 
@@ -339,9 +342,9 @@ def density_merging(data, splist, radius, sort_vals, half_nrm2):
         # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
         # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
         # AGGREGATION.
-        # index_overlap = euclid(2*half_nrm2[i+1:last_j], neigbor_sp, sp1) <= radius_2 # 2*distance_scale*radius
+        # index_overlap = euclid(2*half_nrm2_sp[i+1:last_j], neigbor_sp, sp1) <= radius_2 # 2*distance_scale*radius
 
-        index_overlap = half_nrm2[i+1:last_j] - np.matmul(neigbor_sp, sp1) <= radius_2 - half_nrm2[i]
+        index_overlap = half_nrm2_sp[i+1:last_j] - np.matmul(neigbor_sp, sp1) <= radius_2 - half_nrm2_sp[i]
         
         select_stps = i+1 + np.where(index_overlap)[0]
         # calculate their neighbors ...1)
@@ -372,7 +375,6 @@ def density_merging(data, splist, radius, sort_vals, half_nrm2):
         labels_set.append(np.where(labels == i)[0].tolist())
 
     return labels_set, connected_pairs_store 
-
 
 
 
