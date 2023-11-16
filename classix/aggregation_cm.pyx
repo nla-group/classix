@@ -54,13 +54,26 @@ cpdef precompute_aggregate_pca(double[:,:] data, str sorting='pca', double tol=0
     Returns
     -------
     labels (list) : 
-        The group category of the data after aggregation.
+        The group categories of the data after aggregation.
     
     splist (list) : 
         The list of the starting points.
     
     nr_dist (int) :
         The number of pairwise distance calculations.
+
+    ind (numpy.ndarray):
+        Array storing Sorting indices.
+
+    sort_vals (numpy.ndarray):
+        Sorting values.
+    
+    data (numpy.ndarray):
+        Sorted data.
+    
+    half_nrm2 (numpy.ndarray):
+        Precomputed values for distance computation.
+        
     """
 
     cdef Py_ssize_t len_ind, fdim, last_j
@@ -144,13 +157,26 @@ cpdef precompute_aggregate(double[:,:] data, str sorting, double tol=0.5):
     Returns
     -------
     labels (list) : 
-        The group category of the data after aggregation.
+        The group categories of the data after aggregation.
     
     splist (list) : 
         The list of the starting points.
     
     nr_dist (int) :
         The number of pairwise distance calculations.
+
+    ind (numpy.ndarray):
+        Array storing Sorting indices.
+
+    sort_vals (numpy.ndarray):
+        Sorting values.
+    
+    data (numpy.ndarray):
+        Sorted data.
+    
+    half_nrm2 (numpy.ndarray):
+        Precomputed values for distance computation.
+        
     """
 
     cdef Py_ssize_t fdim = data.shape[1] # feature dimension
@@ -250,13 +276,23 @@ cpdef aggregate(double[:,:] data, str sorting, double tol=0.5):
     Returns
     -------
     labels (list) : 
-        The group category of the data after aggregation.
+        The group categories of the data after aggregation.
     
     splist (list) : 
         The list of the starting points.
     
     nr_dist (int) :
         The number of pairwise distance calculations.
+
+    ind (numpy.ndarray):
+        Array storing Sorting indices.
+
+    sort_vals (numpy.ndarray):
+        Sorting values.
+    
+    data (numpy.ndarray):
+        Sorted data.
+    
     """
 
     cdef Py_ssize_t fdim = data.shape[1] # feature dimension

@@ -69,6 +69,19 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, str sortin
     
     nr_dist (int) :
         The number of pairwise distance calculations.
+
+    ind (numpy.ndarray):
+        Array storing Sorting indices.
+
+    sort_vals (numpy.ndarray):
+        Sorting values.
+    
+    data (numpy.ndarray):
+        Sorted data.
+    
+    half_nrm2 (numpy.ndarray):
+        Precomputed values for distance computation.
+
     """
     
     cdef int num_group
@@ -165,6 +178,19 @@ cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="p
     
     nr_dist (int) :
         The number of pairwise distance calculations.
+
+    ind (numpy.ndarray):
+        Array storing Sorting indices.
+
+    sort_vals (numpy.ndarray):
+        Sorting values.
+    
+    data (numpy.ndarray):
+        Sorted data.
+    
+    half_nrm2 (numpy.ndarray):
+        Precomputed values for distance computation.
+        
     """
     
     cdef int num_group
@@ -278,6 +304,16 @@ cpdef aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", float 
     
     nr_dist (int) :
         The number of pairwise distance calculations.
+
+    ind (numpy.ndarray):
+        Array storing Sorting indices.
+
+    sort_vals (numpy.ndarray):
+        Sorting values.
+    
+    data (numpy.ndarray):
+        Sorted data.
+
     """
     
     cdef int num_group

@@ -60,7 +60,12 @@ def distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals,
         Design for distance-clustering, when distance between the two starting points 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
 
+    sort_vals : numpy.ndarray
+        Sorting values.
         
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
+
     Returns
     -------
     labels : numpy.ndarray
@@ -174,15 +179,20 @@ def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, hal
         of a group and another data point is less than or equal to the tolerance,
         the point is allocated to that group. For details, we refer users to [1].
 
-    minPts : int, default=0
+    minPts : int
         The threshold, in the range of [0, infity] to determine the noise degree.
         When assign it 0, algorithm won't check noises.
 
-    scale : float, default 1.5
+    scale : float
         Design for distance-clustering, when distance between the two starting points 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
 
+    sort_vals : numpy.ndarray
+        Sorting values.
         
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
+
     Returns
     -------
     labels : numpy.ndarray
@@ -290,20 +300,11 @@ def density_merging(data, splist, radius, sort_vals, half_nrm2):
         of a group and another data point is less than or equal to the tolerance,
         the point is allocated to that group. For details, we refer users to [1].
 
-    method : str, default='distance'
-        Method for group merging, Available options are:
-        
-        - 'density': two groups are merged if the density of data points in their intersection 
-           is at least as high the smaller density of both groups. This option uses the disjoint 
-           set structure to speedup merging.
-           
-        - 'distance': two groups are merged if the distance of their starting points is at 
-           most scale*radius (the parameter above). This option uses the disjoint 
-           set structure to speedup merging.
-    
-    scale : float
-        Design for distance-clustering, when distance between the two starting points 
-        associated with two distinct groups smaller than scale*radius, then the two groups merge.
+    sort_vals : numpy.ndarray
+        Sorting values.
+
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
 
         
     Returns

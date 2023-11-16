@@ -64,9 +64,6 @@ cpdef distance_merging_mtg(double[:, :] data, list labels,
         Represent the list of starting points information formed in the aggregation. 
         list of [ starting point index of current group, sorting values, and number of group elements ].
 
-    ind : numpy.ndarray
-        Sort values.
-
     radius : float
         The tolerance to control the aggregation. If the distance between the starting point 
         of a group and another data point is less than or equal to the tolerance,
@@ -79,6 +76,12 @@ cpdef distance_merging_mtg(double[:, :] data, list labels,
     scale : float, default 1.5
         Design for distance-clustering, when distance between the two starting points 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
+
+    sort_vals : numpy.ndarray
+        Sorting values.
+        
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
 
         
     Returns
@@ -202,9 +205,6 @@ cpdef distance_merging(double[:, :] data, list labels,
         Represent the list of starting points information formed in the aggregation. 
         list of [ starting point index of current group, sorting values, and number of group elements ].
 
-    ind : numpy.ndarray
-        Sort values.
-
     radius : float
         The tolerance to control the aggregation. If the distance between the starting point 
         of a group and another data point is less than or equal to the tolerance,
@@ -217,6 +217,12 @@ cpdef distance_merging(double[:, :] data, list labels,
     scale : float, default 1.5
         Design for distance-clustering, when distance between the two starting points 
         associated with two distinct groups smaller than scale*radius, then the two groups merge.
+
+    sort_vals : numpy.ndarray
+        Sorting values.
+        
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
 
         
     Returns
@@ -331,27 +337,19 @@ cpdef density_merging(double[:, :] data, long[:, :] splist, double radius, doubl
         The input that is array-like of shape (n_samples,).
     
     splist : numpy.ndarray
-        List of starting points formed in the aggregation.
+        Represent the list of starting points information formed in the aggregation. 
+        list of [ starting point index of current group, sorting values, and number of group elements ]
 
     radius : float
         The tolerance to control the aggregation. If the distance between the starting point 
         of a group and another data point is less than or equal to the tolerance,
         the point is allocated to that group. For details, we refer users to [1].
 
-    method : str, default='distance'
-        Method for group merging, Available options are:
-        
-        - 'density': two groups are merged if the density of data points in their intersection 
-           is at least as high the smaller density of both groups. This option uses the disjoint 
-           set structure to speedup merging.
-           
-        - 'distance': two groups are merged if the distance of their starting points is at 
-           most scale*radius (the parameter above). This option uses the disjoint 
-           set structure to speedup merging.
-    
-    scale : float
-        Design for distance-clustering, when distance between the two starting points 
-        associated with two distinct groups smaller than scale*radius, then the two groups merge.
+    sort_vals : numpy.ndarray
+        Sorting values.
+
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
 
     Returns
     -------
