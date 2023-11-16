@@ -104,7 +104,6 @@ cpdef distance_merging_mtg(double[:, :] data, list labels,
     cdef double[:, :] spdata = data.base[splist_indices]
     cdef np.ndarray[np.int32_t, ndim=1] sp_cluster_labels = arr_labels[splist_indices]   
     cdef double[:] sort_vals_sp = sort_vals.base[splist_indices]
-    cdef double[:] half_nrm2_sp = half_nrm2.base[splist_indices]
     cdef np.ndarray[np.float64_t, ndim=1] eucl
     cdef np.ndarray[np.int32_t, ndim=1] copy_sp_cluster_labels
     
@@ -127,8 +126,8 @@ cpdef distance_merging_mtg(double[:, :] data, list labels,
         xi = spdata[i, :]
 
         last_j = np.searchsorted(sort_vals_sp, radius + sort_vals_sp[i], side='right')
-        eucl = half_nrm2_sp.base[i:last_j] - np.matmul(spdata.base[i:last_j,:], xi)
-        inds = i + np.where((eucl <= scaled_radius - half_nrm2_sp[i]) & gp_nr[i:last_j])[0]
+        eucl = half_nrm2.base[i:last_j] - np.matmul(spdata.base[i:last_j,:], xi)
+        inds = i + np.where((eucl <= scaled_radius - half_nrm2[i]) & gp_nr[i:last_j])[0]
 
         spl = np.unique(sp_cluster_labels[inds])
         minlab = np.min(spl)
@@ -164,7 +163,7 @@ cpdef distance_merging_mtg(double[:, :] data, list labels,
             for iii in ii:
                 xi = spdata[iii, :]    # starting point of one tiny group
                 
-                dist = half_nrm2_sp - np.matmul(spdata, xi) + half_nrm2_sp[iii]
+                dist = half_nrm2 - np.matmul(spdata, xi) + half_nrm2[iii]
                 merge_ind = np.argsort(dist)
                 for j in merge_ind:
                     if cs[copy_sp_cluster_labels[j]] >= minPts:
@@ -244,7 +243,6 @@ cpdef distance_merging(double[:, :] data, list labels,
     cdef double[:, :] spdata = data.base[splist_indices]
     cdef np.ndarray[np.int32_t, ndim=1] sp_cluster_labels = arr_labels[splist_indices]   
     cdef double[:] sort_vals_sp = sort_vals.base[splist_indices]
-    cdef double[:] half_nrm2_sp = half_nrm2.base[splist_indices]
     cdef np.ndarray[np.float64_t, ndim=1] eucl
     cdef np.ndarray[np.int32_t, ndim=1] copy_sp_cluster_labels
     
@@ -264,8 +262,8 @@ cpdef distance_merging(double[:, :] data, list labels,
         xi = spdata[i, :]
 
         last_j = np.searchsorted(sort_vals_sp, radius + sort_vals_sp[i], side='right')
-        eucl = half_nrm2_sp.base[i:last_j] - np.matmul(spdata.base[i:last_j,:], xi)
-        inds = i + np.where(eucl <= radius_2 - half_nrm2_sp[i])[0]
+        eucl = half_nrm2.base[i:last_j] - np.matmul(spdata.base[i:last_j,:], xi)
+        inds = i + np.where(eucl <= radius_2 - half_nrm2[i])[0]
 
         spl = np.unique(sp_cluster_labels[inds])
         minlab = np.min(spl)
@@ -301,7 +299,7 @@ cpdef distance_merging(double[:, :] data, list labels,
             for iii in ii:
                 xi = spdata[iii, :]    # starting point of one tiny group
                 
-                dist = half_nrm2_sp - np.matmul(spdata, xi) + half_nrm2_sp[iii]
+                dist = half_nrm2 - np.matmul(spdata, xi) + half_nrm2[iii]
                 merge_ind = np.argsort(dist)
                 for j in merge_ind:
                     if cs[copy_sp_cluster_labels[j]] >= minPts:
@@ -384,7 +382,6 @@ cpdef density_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=2] splist, 
     cdef int len_sp = splist.shape[0]
     cdef np.ndarray[np.int32_t, ndim=1] splist_indices = splist[:, 0]
     cdef double[:] sort_vals_sp = sort_vals.base[splist_indices]
-    cdef double[:] half_nrm2_sp = half_nrm2.base[splist_indices]
 
     cdef double[:, :] spdata = data.base[splist_indices]
 
@@ -402,7 +399,7 @@ cpdef density_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=2] splist, 
         last_j = np.searchsorted(sort_vals_sp, 2*radius + sort_vals_sp[i], side='right')
         neigbor_sp = spdata.base[i+1:last_j]
         
-        index_overlap = half_nrm2_sp.base[i+1:last_j] - np.matmul(neigbor_sp, sp1) <= radius_2 - half_nrm2_sp[i]
+        index_overlap = half_nrm2.base[i+1:last_j] - np.matmul(neigbor_sp, sp1) <= radius_2 - half_nrm2[i]
 
         select_stps = i+1 + np.where(index_overlap)[0]
 

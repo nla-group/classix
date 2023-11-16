@@ -82,7 +82,6 @@ def distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals,
     splist_indices = splist[:, 0]
     gp_nr = splist[:, 1] >= minPts
     spdata = data[splist_indices]
-    half_nrm2_sp = half_nrm2[splist_indices]
     sort_vals_sp = sort_vals[splist_indices]
 
     labels = np.asarray(labels)
@@ -96,10 +95,10 @@ def distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals,
             continue
 
         xi = spdata[i, :]
-        rhs = scaled_radius - half_nrm2_sp[i]
+        rhs = scaled_radius - half_nrm2[i]
         last_j = np.searchsorted(sort_vals_sp, radius + sort_vals_sp[i], side='right')
 
-        inds = (half_nrm2_sp[i:last_j] - np.matmul(spdata[i:last_j], xi) <= rhs)
+        inds = (half_nrm2[i:last_j] - np.matmul(spdata[i:last_j], xi) <= rhs)
         inds = i + np.where(inds&gp_nr[i:last_j])[0]
 
         spl = np.unique(sp_cluster_labels[inds])
@@ -132,7 +131,7 @@ def distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals,
             for iii in ii:
                 xi = spdata[iii, :]    # starting point of one tiny group
 
-                dist = half_nrm2_sp - np.matmul(spdata, xi) + half_nrm2_sp[iii]
+                dist = half_nrm2 - np.matmul(spdata, xi) + half_nrm2[iii]
                 merge_ind = np.argsort(dist)
                 for j in merge_ind:
                     if cs[copy_sp_cluster_label[j]] >= minPts:
@@ -206,8 +205,6 @@ def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, hal
     
     sort_vals_sp = sort_vals[splist_indices]
     spdata = data[splist_indices]
-    half_nrm2_sp = half_nrm2[splist_indices]
-    # np.einsum('ij,ij->i', data, data) <-> np.sum(data * data, axis=1)
     
     labels = np.asarray(labels)
     sp_cluster_labels = labels[splist_indices]
@@ -218,8 +215,8 @@ def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, hal
         xi = spdata[i, :]
 
         last_j = np.searchsorted(sort_vals_sp, radius + sort_vals_sp[i], side='right')
-        eucl = half_nrm2_sp[i:last_j] - np.matmul(spdata[i:last_j,:], xi)
-        inds = np.where(eucl <= radius_2 - half_nrm2_sp[i]) 
+        eucl = half_nrm2[i:last_j] - np.matmul(spdata[i:last_j,:], xi)
+        inds = np.where(eucl <= radius_2 - half_nrm2[i]) 
 
         inds = i + inds[0]
         spl = np.unique(sp_cluster_labels[inds])
@@ -252,7 +249,7 @@ def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, hal
             for iii in ii:
                 xi = spdata[iii, :]    # starting point of one tiny group
 
-                dist = half_nrm2_sp - np.matmul(spdata, xi) + half_nrm2_sp[iii]
+                dist = half_nrm2 - np.matmul(spdata, xi) + half_nrm2[iii]
                 merge_ind = np.argsort(dist)
                 for j in merge_ind:
                     if cs[copy_sp_cluster_label[j]] >= minPts:
@@ -327,7 +324,6 @@ def density_merging(data, splist, radius, sort_vals, half_nrm2):
     splist_indices = splist[:, 0]
     sort_vals_sp = sort_vals[splist_indices]
     spdata = data[splist_indices]
-    half_nrm2_sp = half_nrm2[splist_indices]
 
     volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
 
@@ -343,9 +339,9 @@ def density_merging(data, splist, radius, sort_vals, half_nrm2):
         # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
         # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
         # AGGREGATION.
-        # index_overlap = euclid(2*half_nrm2_sp[i+1:last_j], neigbor_sp, sp1) <= radius_2 # 2*distance_scale*radius
+        # index_overlap = euclid(2*half_nrm2[i+1:last_j], neigbor_sp, sp1) <= radius_2 # 2*distance_scale*radius
 
-        index_overlap = half_nrm2_sp[i+1:last_j] - np.matmul(neigbor_sp, sp1) <= radius_2 - half_nrm2_sp[i]
+        index_overlap = half_nrm2[i+1:last_j] - np.matmul(neigbor_sp, sp1) <= radius_2 - half_nrm2[i]
         
         select_stps = i+1 + np.where(index_overlap)[0]
         # calculate their neighbors ...1)

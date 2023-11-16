@@ -465,7 +465,6 @@ class CLASSIX:
         self.mergeTinyGroups = mergeTinyGroups
         self.truncate = short_log_form
         
-        self.sp_info = None
         self.clean_index_ = None
         self.connected_paths = None
         self.half_nrm2 = None
@@ -586,12 +585,16 @@ class CLASSIX:
                                                                                                     sorting=self.sorting, 
                                                                                                     tol=self.radius
                                                                                                 ) 
+            
+            self.splist_ = np.array(self.splist_)
+            self.half_nrm2 = self.half_nrm2[self.splist_[:, 0]]
+
         else:
             self.groups_, self.splist_, self.dist_nr, self.ind, sort_vals, self.data = self._aggregate(data=self.data,
                                                                                                 sorting=self.sorting, 
                                                                                                 tol=self.radius
                                                                                             ) 
-        self.splist_ = np.array(self.splist_)
+            self.splist_ = np.array(self.splist_)
         
         if self.group_merging is None:
             self.inverse_ind = np.argsort(self.ind)
@@ -733,7 +736,9 @@ class CLASSIX:
             The clusters labels of the data
         """
         
-        if self.memory: self.half_nrm2 = norm(data, axis=1, ord=2)**2 * 0.5 # precomputation
+        if self.memory: 
+            self.half_nrm2 = norm(data[splist[:, 0]], axis=1, ord=2)**2 * 0.5 # precomputation
+            
 
         if method == 'density':
             agg_labels = np.asarray(agg_labels)
