@@ -433,12 +433,14 @@ class TestClassix(unittest.TestCase):
             
             radius = 0.5
             splist = np.asarray(splist)
+            half_nrm2_sp = half_nrm2[splist[:,0]]
+            
             label_set1, connected_pairs_store1 = density_merging(data, splist, radius, sort_vals, half_nrm2)
             label_set2, connected_pairs_store2 = density_merging_cm(data, splist, radius, sort_vals, half_nrm2)
             
-            label_set3, _,_ = distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
-            label_set4, _,_ = distance_merging_cm(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
-            label_set5, _,_ = distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2)
+            label_set3, _,_ = distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2_sp)
+            label_set4, _,_ = distance_merging_cm(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2_sp)
+            label_set5, _,_ = distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2_sp)
             
             for i in range(len(label_set2)):
                 if label_set1[i] != label_set2[i]:
