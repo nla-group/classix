@@ -271,6 +271,7 @@ def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, hal
 
 
 
+
 def density_merging(data, splist, radius, sort_vals, half_nrm2):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
@@ -324,6 +325,7 @@ def density_merging(data, splist, radius, sort_vals, half_nrm2):
     splist_indices = splist[:, 0]
     sort_vals_sp = sort_vals[splist_indices]
     spdata = data[splist_indices]
+    half_nrm2_sp = half_nrm2[splist_indices]
 
     volume = np.pi**(data.shape[1]/2) * radius**data.shape[1] / gamma(data.shape[1]/2+1)
 
@@ -339,9 +341,9 @@ def density_merging(data, splist, radius, sort_vals, half_nrm2):
         # THIS PART WE OMIT THE FAST QUERY WITH EARLY STOPPING CAUSE WE DON'T THINK EARLY STOPPING IN PYTHON CODE CAN BE FASTER THAN 
         # PYTHON BROADCAST, BUT IN THE CYTHON CODE, WE IMPLEMENT FAST QUERY WITH EARLY STOPPING BY LEVERAGING THE ADVANTAGE OF SORTED 
         # AGGREGATION.
-        # index_overlap = euclid(2*half_nrm2[i+1:last_j], neigbor_sp, sp1) <= radius_2 # 2*distance_scale*radius
+        # index_overlap = euclid(2*half_nrm2_sp[i+1:last_j], neigbor_sp, sp1) <= radius_2 # 2*distance_scale*radius
 
-        index_overlap = half_nrm2[i+1:last_j] - np.matmul(neigbor_sp, sp1) <= radius_2 - half_nrm2[i]
+        index_overlap = half_nrm2_sp[i+1:last_j] - np.matmul(neigbor_sp, sp1) <= radius_2 - half_nrm2_sp[i]
         
         select_stps = i+1 + np.where(index_overlap)[0]
         # calculate their neighbors ...1)
@@ -372,7 +374,6 @@ def density_merging(data, splist, radius, sort_vals, half_nrm2):
         labels_set.append(np.where(labels == i)[0].tolist())
 
     return labels_set, connected_pairs_store 
-
 
 
 

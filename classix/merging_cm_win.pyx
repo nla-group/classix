@@ -382,6 +382,7 @@ cpdef density_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=2] splist, 
     cdef int len_sp = splist.shape[0]
     cdef np.ndarray[np.int32_t, ndim=1] splist_indices = splist[:, 0]
     cdef double[:] sort_vals_sp = sort_vals.base[splist_indices]
+    cdef double[:] half_nrm2_sp = half_nrm2.base[splist_indices]
 
     cdef double[:, :] spdata = data.base[splist_indices]
 
@@ -399,7 +400,7 @@ cpdef density_merging(double[:, :] data, np.ndarray[np.int32_t, ndim=2] splist, 
         last_j = np.searchsorted(sort_vals_sp, 2*radius + sort_vals_sp[i], side='right')
         neigbor_sp = spdata.base[i+1:last_j]
         
-        index_overlap = half_nrm2.base[i+1:last_j] - np.matmul(neigbor_sp, sp1) <= radius_2 - half_nrm2[i]
+        index_overlap = half_nrm2_sp.base[i+1:last_j] - np.matmul(neigbor_sp, sp1) <= radius_2 - half_nrm2_sp[i]
 
         select_stps = i+1 + np.where(index_overlap)[0]
 
