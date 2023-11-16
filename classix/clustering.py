@@ -737,7 +737,7 @@ class CLASSIX:
         """
 
         if method == 'density':
-            
+
             if self.memory: 
                 self.half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
 
@@ -811,7 +811,7 @@ class CLASSIX:
         else:
             if self.memory: 
                 spdata = data[splist[:, 0]]
-                self.half_nrm2 = np.einsum(spdata, spdata) * 0.5
+                self.half_nrm2 = np.einsum('ij,ij->i', spdata, spdata) * 0.5
                 # norm(data[splist[:, 0]], axis=1, ord=2)**2 * 0.5 # precomputation
             else:
                 self.half_nrm2 = self.half_nrm2[self.splist_[:, 0]]
