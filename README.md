@@ -33,7 +33,7 @@ We recommend using PIP as follows:
 
 ### ```pip install classixclustering```
 
-Note: Cython requires a C compiler to be installed on the system; getting a C compiler varies according to the system used, e.g., GNU C Compiler (gcc) for Linux, Microsoft Visual C/C++ (MSVC) for Windows. To check if your Cython is presented properly, use classix's built-in method ``cython_is_available(verbose=1)``.
+Note: Cython requires a C compiler to be installed on the system; getting a C compiler varies according to the system used, e.g., GNU C Compiler (gcc) for Linux, Microsoft Visual C/C++ (MSVC) for Windows. To check if your Cython is presented properly, use classix's built-in method ``classix.cython_is_available(verbose=1)``.
 
 ##   Quick start
 
