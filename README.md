@@ -33,6 +33,8 @@ We recommend using PIP as follows:
 
 ### ```pip install classixclustering```
 
+Note: Cython requires a C compiler to be installed on the system; getting a C compiler varies according to the system used, e.g., GNU C Compiler (gcc) for Linux, Microsoft Visual C/C++ (MSVC) for Windows. 
+
 ##   Quick start
 
 Here is an example clustering a synthetic dataset: 
