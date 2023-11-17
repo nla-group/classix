@@ -184,7 +184,7 @@ When there are many data points, the visualisations produced by the `.explain` m
 
 ### Why do I get a warning about Cython?
 
-CLASSIX used Cython to speed up some critical parts of its computation. If you get a Cython warning, it means that your current Python installation does not support Cython. CLASSIX will run just fine with Cython, but it might be significantly slower than usual. If you want to compare the speed with other clustering algorithms in scikit-learn or other packages using Cython, please also use CLASSIX with Cython for a fair comparison. To double check whether you are using the Cython installation or not, please use:
+CLASSIX used Cython to speed up some critical parts of its computation. If you get a Cython warning, it means that your current Python installation does not support Cython, or there is [no C compiler present on the system](https://cython.readthedocs.io/en/latest/src/quickstart/install.html). CLASSIX will run just fine with Cython, but it might be significantly slower than usual. If you want to compare the speed with other clustering algorithms in scikit-learn or other packages using Cython, please also use CLASSIX with Cython for a fair comparison. To double check whether you are using Cython or not, please use:
 ```Python
 import classix
 classix.cython_is_available(verbose=1)
@@ -194,6 +194,7 @@ If needed, Cython can be disabled via
 ```Python
 classix.__enable_cython__ = False
 ```
+
 ### How does CLASSIX work?
 Please refer to the CLASSIX paper referenced below. In short, CLASSIX sorts the data points along their first principal axis and then aggregates them into groups of radius `radius`. This group merging is sped up by exploiting high-level BLAS best practices and using an early stopping criterion to terminate the group search. The computed groups are then merged into clusters. In a final stage, the groups of any clusters with fewer than `minPts` points will be reallocated to larger clusters. 
 
