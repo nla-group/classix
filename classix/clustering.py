@@ -1171,7 +1171,7 @@ class CLASSIX:
                 
                 if plot:
                     from matplotlib import pyplot as plt
-                    import matplotlib.colors as colors
+
                     if self.x_pca.shape[0] > 1e5 and not showalldata:
                         print("Too many data points for plot. Randomly subsampled 1e5 points.")
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
@@ -1382,7 +1382,7 @@ class CLASSIX:
                         
                 if plot:
                     from matplotlib import pyplot as plt
-                    import matplotlib.colors as colors
+
                     if self.x_pca.shape[0] > 1e5 and not showalldata:
                         print("Too many data points for plot. Randomly subsampled 1e5 points.")
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
