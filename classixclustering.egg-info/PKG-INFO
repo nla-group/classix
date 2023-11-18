@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: classixclustering
-Version: 1.0.6
+Version: 1.0.7
 Summary: Fast and explainable clustering based on sorting
 Home-page: https://github.com/nla-group/CLASSIX.git
 Author: Xinye Chen, Stefan Güttel
@@ -17,11 +17,6 @@ Classifier: Operating System :: POSIX
 Classifier: Operating System :: Unix
 Classifier: Operating System :: MacOS
 Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.6
-Classifier: Programming Language :: Python :: 3.7
-Classifier: Programming Language :: Python :: 3.8
-Classifier: Programming Language :: Python :: 3.9
-Classifier: Programming Language :: Python :: 3.10
 Description-Content-Type: text/x-rst
 License-File: LICENSE
 
