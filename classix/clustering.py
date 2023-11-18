@@ -1876,6 +1876,7 @@ class CLASSIX:
         
         """
         from scipy.sparse import csr_matrix
+        from matplotlib import pyplot as plt
 
         if not hasattr(self, '__fit__'):
             raise NotFittedError("Please use .fit() method first.")

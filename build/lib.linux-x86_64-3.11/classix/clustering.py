@@ -1036,8 +1036,6 @@ class CLASSIX:
         
         """
         from scipy.sparse.linalg import svds
-        from matplotlib import pyplot as plt
-        import matplotlib.colors as colors
         
         # -----------------------------second method--------------------------------
         if sp_bbox is None:
@@ -1092,7 +1090,7 @@ class CLASSIX:
             
         
         if index1 is None: # analyze in the general way with a global view
-            if plot == True:
+            if plot:
                 self.explain_viz(showalldata=showalldata, alpha=alpha, cmap=cmap, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, 
                                  fontsize=sp_fontsize, bbox=sp_bbox, sp_marker=sp_marker, sp_mcolor=sp_mcolor, width=width, axis=axis, fmt=fmt)
                 
@@ -1171,8 +1169,9 @@ class CLASSIX:
 
                 cluster_label1 = self.label_change[agg_label1]
                 
-                if plot == True:
-
+                if plot:
+                    from matplotlib import pyplot as plt
+                    import matplotlib.colors as colors
                     if self.x_pca.shape[0] > 1e5 and not showalldata:
                         print("Too many data points for plot. Randomly subsampled 1e5 points.")
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
@@ -1381,7 +1380,9 @@ class CLASSIX:
                     else: 
                         connected_paths = []
                         
-                if plot == True:
+                if plot:
+                    from matplotlib import pyplot as plt
+                    import matplotlib.colors as colors
                     if self.x_pca.shape[0] > 1e5 and not showalldata:
                         print("Too many data points for plot. Randomly subsampled 1e5 points.")
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
