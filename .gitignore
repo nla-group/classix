@@ -1,1 +1,3 @@
 classix/source/*.pkl
+classix/source/*.npy
+classix/data/*.npy
