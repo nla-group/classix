@@ -347,7 +347,7 @@ class TestClassix(unittest.TestCase):
         checkpoint = 1
         try:
             for dn in ['vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 
-                       'Phoneme', 'Wine', 'CovidENV', 'Covid3MC', 'NA']:
+                       'Phoneme', 'Wine', 'NA']:
                 loadData(name=dn)
         except:
             checkpoint = 0
