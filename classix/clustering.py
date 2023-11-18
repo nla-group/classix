@@ -46,7 +46,7 @@ def cython_is_available(verbose=0):
             # !python3 setup.py build_ext --inplace
             import numpy
             
-            try:
+            try: # check if Cython packages are loaded properly
                 from .aggregation_cm import aggregate
                 from .merging_cm import density_merging, distance_merging
                 # cython with memoryviews
@@ -396,14 +396,6 @@ class CLASSIX:
         i.e., indices of abnormal groups within the clusters with fewer 
         data points than minPts points.
         
-    clean_index_ : numpy.ndarray
-        The data without outliers. Given data X,  the data without outliers 
-        can be exported by X_clean = X[classix.clean_index_,:] while the outliers can be exported by 
-        Outliers = X[~classix.clean_index_,:] 
-        
-    connected_pairs_ : list
-        List for connected group labels.
-
     clusterSizes_ : array
         The cardinality of each cluster.
 
@@ -452,30 +444,27 @@ class CLASSIX:
                  memory=True, verbose=1, short_log_form=True): 
 
 
-        self.verbose = verbose
+        self.__verbose = verbose
         self.minPts = minPts
 
         self.sorting = sorting
         self.radius = radius
         self.group_merging = group_merging
 
-        self.norm = norm # usually, we do not use this parameter
-        self.mergeScale = mergeScale # For distance measure, usually, we do not use this parameter
-        self.post_alloc = post_alloc
-        self.mergeTinyGroups = mergeTinyGroups
-        self.truncate = short_log_form
+        self.__mergeScale = mergeScale # For distance measure, usually, we do not use this parameter
+        self.__post_alloc = post_alloc
+        self.__mergeTinyGroups = mergeTinyGroups
+        self.__truncate = short_log_form
+        self.labels_ = None
         
-        self.clean_index_ = None
-        self.connected_paths = None
-        self.half_nrm2 = None
         
         self._gcIndices = np.frompyfunc(self.gc2ind, 1, 1)
                      
-        if self.verbose:
+        if self.__verbose:
             print(self)
         
-        self.index_data = None
-        self.memory = memory
+        self.__index_data = None
+        self.__memory = memory
 
         from . import __enable_cython__
         self.__enable_cython__ = __enable_cython__
@@ -511,7 +500,7 @@ class CLASSIX:
             from .merging import density_merging, distance_merging, distance_merging_mtg
             warnings.warn("This run of CLASSIX is not using Cython.")
 
-        if not self.memory:
+        if not self.__memory:
             if sorting == 'pca':
                 self._aggregate = precompute_aggregate_pca
             else:
@@ -522,7 +511,7 @@ class CLASSIX:
 
         self._density_merging = density_merging
         
-        if self.mergeTinyGroups:
+        if self.__mergeTinyGroups:
             self._distance_merging = distance_merging
         else:
             self._distance_merging = distance_merging_mtg
@@ -540,7 +529,7 @@ class CLASSIX:
             
         """
         if isinstance(data, pd.core.frame.DataFrame):
-            self.index_data = data.index
+            self.__index_data = data.index
             
         if not isinstance(data, np.ndarray):
             data = np.array(data)
@@ -580,8 +569,8 @@ class CLASSIX:
             self.data = (data - self.mu) / self.dataScale
         
         # aggregation
-        if not self.memory:
-            self.groups_, self.splist_, self.dist_nr, self.ind, sort_vals, self.data, self.half_nrm2 = self._aggregate(data=self.data,
+        if not self.__memory:
+            self.groups_, self.splist_, self.dist_nr, self.ind, sort_vals, self.data, self.__half_nrm2 = self._aggregate(data=self.data,
                                                                                                     sorting=self.sorting, 
                                                                                                     tol=self.radius
                                                                                                 ) 
@@ -615,6 +604,7 @@ class CLASSIX:
                 minPts=self.minPts
             ) 
 
+        self.__trained = True
         return self
 
 
@@ -658,7 +648,7 @@ class CLASSIX:
             The predicted clustering labels.
         """
         
-        if hasattr(self, 'labels_'):
+        if hasattr(self, '__train'):
             if not hasattr(self, 'label_change'):
                 if not hasattr(self, 'inverse_ind'):
                     self.inverse_ind = np.argsort(self.ind)
@@ -738,15 +728,15 @@ class CLASSIX:
 
         if method == 'density':
 
-            if self.memory: 
-                self.half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
+            if self.__memory: 
+                self.__half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
 
             agg_labels = np.asarray(agg_labels)
             labels = copy.deepcopy(agg_labels) 
             
             self.merge_groups, self.connected_pairs_ = self._density_merging(data, splist, 
                                                                              radius, sort_vals=sort_vals, 
-                                                                             half_nrm2=self.half_nrm2)
+                                                                             half_nrm2=self.__half_nrm2)
             maxid = max(labels) + 1
             
             # after this step, the connected pairs (groups) will be transformed into merged clusters, 
@@ -797,7 +787,7 @@ class CLASSIX:
                 unique_agln = np.unique(agln)
                 splist_clean = splist[unique_agln]
 
-                if self.post_alloc:
+                if self.__post_alloc:
                     for nsp in self.group_outliers_:
                         alloc_class = np.argmin(
                             np.linalg.norm(data[splist_clean[:, 0].astype(int)] - data[int(splist[nsp, 0])], axis=1, ord=2)
@@ -809,28 +799,28 @@ class CLASSIX:
                 
             
         else:
-            if self.memory: 
+            if self.__memory: 
                 spdata = data[splist[:, 0]]
-                self.half_nrm2 = np.einsum('ij,ij->i', spdata, spdata) * 0.5
+                self.__half_nrm2 = np.einsum('ij,ij->i', spdata, spdata) * 0.5
                 # norm(data[splist[:, 0]], axis=1, ord=2)**2 * 0.5 # precomputation
             else:
-                self.half_nrm2 = self.half_nrm2[self.splist_[:, 0]]
+                self.__half_nrm2 = self.__half_nrm2[self.splist_[:, 0]]
 
             labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merging(data=data, 
                                                                     labels=agg_labels,
                                                                     splist=splist,
                                                                     radius=radius,
                                                                     minPts=minPts,
-                                                                    scale=self.mergeScale, 
+                                                                    scale=self.__mergeScale, 
                                                                     sort_vals=sort_vals,
-                                                                    half_nrm2=self.half_nrm2
+                                                                    half_nrm2=self.__half_nrm2
                                                                 )
             
             
         self.inverse_ind = np.argsort(ind)
         labels = labels[self.inverse_ind]
         
-        if self.verbose == 1:
+        if self.__verbose == 1:
             nr_old_clust_count = len(self.old_cluster_count)
             print("""CLASSIX aggregated the {datalen} data points into {num_group} groups. """.format(datalen=len(data), num_group=splist.shape[0]))
             print("""In total, {dist:.0f} distances were computed ({avg:.1f} per data point). """.format(dist=self.dist_nr, avg=self.dist_nr/len(data)))
@@ -842,7 +832,7 @@ class CLASSIX:
             else:
                 print("The clusters have the following sizes:")
                 
-            self.pprint_format(self.old_cluster_count, truncate=self.truncate)
+            self.pprint_format(self.old_cluster_count, truncate=self.__truncate)
 
             if self.minPts > 1 and SIZE_NOISE_LABELS > 0:
                 print("As minPts is {minPts}, the number of clusters has been reduced to {r}.".format(
@@ -1065,7 +1055,7 @@ class CLASSIX:
 
 
         
-        if hasattr(self, 'labels_'):
+        if hasattr(self, '__train'):
             groups_ = np.array(self.groups_)
             groups_ = groups_[self.inverse_ind]
             if not hasattr(self, 'label_change'):
@@ -1140,9 +1130,9 @@ class CLASSIX:
             
             elif isinstance(index1, str):
                 if hasattr(self, 'index_data'):
-                    if index1 in self.index_data:
-                        index1_id = np.where(self.index_data == index1)[0][0]
-                        if len(set(self.index_data)) != len(self.index_data):
+                    if index1 in self.__index_data:
+                        index1_id = np.where(self.__index_data == index1)[0][0]
+                        if len(set(self.__index_data)) != len(self.__index_data):
                             warnings.warn("The index of data is duplicate.")
                             object1 = self.x_pca[index1_id]
                             agg_label1 = groups_[index1_id]
@@ -1316,9 +1306,9 @@ class CLASSIX:
                     
                 elif isinstance(index2, str):
                     if hasattr(self, 'index_data'):
-                        if index2 in self.index_data:
-                            index2_id = np.where(self.index_data == index2)[0][0]
-                            if len(set(self.index_data)) != len(self.index_data):
+                        if index2 in self.__index_data:
+                            index2_id = np.where(self.__index_data == index2)[0][0]
+                            if len(set(self.__index_data)) != len(self.__index_data):
                                 warnings.warn("The index of data is duplicate.")
                                 object2 = self.x_pca[index2_id]
                                 agg_label2 = groups_[index2_id]
@@ -1376,7 +1366,7 @@ class CLASSIX:
                     from scipy.sparse import csr_matrix
                     
                     distm = pairwise_distances(self.data[self.splist_[:, 0]])
-                    distm = (distm <= self.radius*self.mergeScale).astype(int)
+                    distm = (distm <= self.radius*self.__mergeScale).astype(int)
                     csr_dist_m = csr_matrix(distm)
                         
                     if cluster_label1 == cluster_label2:
@@ -1632,7 +1622,7 @@ class CLASSIX:
                         )
 
                         if connected_paths_vis is None:
-                            print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.mergeScale))
+                            print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.__mergeScale))
                             print('This is because at least one of the groups was reassigned due to the minPts condition.')
                         else:
                             print("""\nThe two groups are connected via groups\n %(connected)s.""" % {
@@ -1640,23 +1630,23 @@ class CLASSIX:
                             )
 
                             
-                            if self.index_data is not None and show_connected_label:
+                            if self.__index_data is not None and show_connected_label:
                                 show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
 
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
                                 
                                 if isinstance(index1, int):
-                                    table_index1 = self.index_data[index1]
+                                    table_index1 = self.__index_data[index1]
                                 else:
                                     table_index1 = index1
                                     
                                 if isinstance(index2, int):
-                                    table_index2 = self.index_data[index2]
+                                    table_index2 = self.__index_data[index2]
                                 else:
                                     table_index2 = index2
                                     
-                                show_connected_df["Label"] = [table_index1] + self.index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [table_index2] 
+                                show_connected_df["Label"] = [table_index1] + self.__index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [table_index2] 
                                 
                             else:
                                 show_connected_df = pd.DataFrame(columns=["Index", "Group"])
@@ -1769,7 +1759,7 @@ class CLASSIX:
         """
         from scipy.sparse import csr_matrix
         
-        if hasattr(self, 'labels_'):
+        if hasattr(self, '__train'):
             groups_ = np.array(self.groups_)
             groups_ = groups_[self.inverse_ind]
         else:
@@ -1797,7 +1787,7 @@ class CLASSIX:
                 
         else:
             distm = pairwise_distances(self.data[self.splist_[:, 0]])
-            distm = (distm <= self.radius*self.mergeScale).astype(int)
+            distm = (distm <= self.radius*self.__mergeScale).astype(int)
             csr_dist_m = csr_matrix(distm)
             connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
             connected_paths.reverse()
@@ -1888,7 +1878,7 @@ class CLASSIX:
         from scipy.sparse import csr_matrix
         from matplotlib import pyplot as plt
 
-        if not hasattr(self, 'splist_'):
+        if not hasattr(self, '__train'):
             raise NotFittedError("Please use .fit() method first.")
             
         distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(scale,2))
@@ -1925,17 +1915,16 @@ class CLASSIX:
         Normalize the data by the fitted model.
         """
 
-        if hasattr(self, 'labels_'):
+        if hasattr(self, '__train'):
             return (data - self.mu) / self.dataScale 
         else:
             raise NotFittedError("Please use .fit() method first.")
         
-
-
-
+    
+    
     @property
     def groupCenters_(self):
-        if hasattr(self, 'splist_'):
+        if hasattr(self, '__train'):
             return self._gcIndices(np.arange(self.splist_.shape[0]))
         else:
             raise NotFittedError("Please use .fit() method first.")
@@ -1944,7 +1933,7 @@ class CLASSIX:
     
     @property
     def clusterSizes_(self):
-        if hasattr(self, 'splist_'):
+        if hasattr(self, '__train'):
             counter = collections.Counter(self.labels_)
             return np.array(list(counter.values()))[np.argsort(list(counter.keys()))]
         else:
@@ -1965,7 +1954,7 @@ class CLASSIX:
     def load_group_centers(self):
         """Load group centers."""
         
-        if not hasattr(self, 'groups_'):
+        if not hasattr(self, '__train'):
             raise NotFittedError("Please use .fit() method first.")
             
         if not hasattr(self, 'grp_centers'):
@@ -1979,7 +1968,7 @@ class CLASSIX:
     def load_cluster_centers(self):
         """Load cluster centers."""
             
-        if not hasattr(self, 'labels_'):
+        if not hasattr(self, '__train'):
             raise NotFittedError("Please use .fit() method first.")
             
         if not hasattr(self, 'centers'):
