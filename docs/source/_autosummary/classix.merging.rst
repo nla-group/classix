@@ -16,8 +16,10 @@
       cal_inter_density
       cal_inter_volume
       check_if_overlap
-      fast_agglomerate
-      fast_query
+      density_merging
+      distance_merging
+      distance_merging_mtg
+      euclid
       findParent
       merge
    

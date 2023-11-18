@@ -1,4 +1,4 @@
-classix.aggregation
+﻿classix.aggregation
 ===================
 
 .. automodule:: classix.aggregation
@@ -14,6 +14,8 @@ classix.aggregation
    .. autosummary::
    
       aggregate
+      precompute_aggregate
+      precompute_aggregate_pca
    
    
 

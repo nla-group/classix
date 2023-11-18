@@ -364,7 +364,7 @@ As above, we view the whole picture for data simply by
 
 To speed up the visualization, the default setting for CLASSIX is to show less than 1e5 points, if the number of data points surpasses the value, CLASSIX will randomly select 1e5 data points for the plot. If you want to show all data in the plot, set ``showalldata=True``, which is shown as above. 
 You can also specify other parameters to personalize the visualization to make it easier to analyze. For example, you can enlarge the fontsize of starting points labels by 
-setting ``sp_fontsize`` larger or change the shape by tuning appropriate value for ``figsize``. For more details about parameter settings, we refer to our API Reference. So, we try:
+setting ``sp_fontsize`` larger or change the shape by tuning appropriate value for ``figsize``. For more details about parameter settings, we refer to our API Reference `classix.CLASSIX.explain <https://classix.readthedocs.io/en/latest/_autosummary/classix.CLASSIX.explain.html#classix.CLASSIX.explain>`_. So, we try:
 
 .. code:: python
 

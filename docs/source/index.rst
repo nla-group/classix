@@ -24,6 +24,7 @@ Guide
    
    quickstart
    clustering_tutorial
+   matlab
    comparison
    outlier_detection
    

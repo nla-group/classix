@@ -1,4 +1,4 @@
-classix.clustering
+﻿classix.clustering
 ==================
 
 .. automodule:: classix.clustering
@@ -14,11 +14,12 @@ classix.clustering
    .. autosummary::
    
       calculate_cluster_centers
-      find_shortest_path
+      cython_is_available
+      euclid
+      find_shortest_dist_path
       get_data
-      load_data
-      novel_normalization
-      pairs_to_graph
+      loadData
+      normalization
       pairwise_distances
       return_csr_matrix_indices
       visualize_connections
@@ -36,6 +37,12 @@ classix.clustering
    
 
    
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      NotFittedError
    
    
 
