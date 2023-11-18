@@ -463,7 +463,6 @@ class CLASSIX:
         if self.__verbose:
             print(self)
         
-        self.__index_data = None
         self.__memory = memory
 
         from . import __enable_cython__
