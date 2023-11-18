@@ -1128,7 +1128,7 @@ class CLASSIX:
                 agg_label1 = groups_[index1] # get the group index for object1
             
             elif isinstance(index1, str):
-                if hasattr(self, '__fit__'):
+                if hasattr(self, '__index_data'):
                     if index1 in self.__index_data:
                         index1_id = np.where(self.__index_data == index1)[0][0]
                         if len(set(self.__index_data)) != len(self.__index_data):
@@ -1140,9 +1140,9 @@ class CLASSIX:
                             agg_label1 = groups_[index1_id]
                             
                     else:
-                        raise ValueError("Please enter a legal value for index1.")
+                        raise ValueError("Please enter a valid value for index1.")
                 else:
-                    raise ValueError("Please use .fit() method first.")
+                    raise ValueError("Please enter a legal value for index1.")
                     
             elif isinstance(index1, list) or isinstance(index1, np.ndarray):
                 index1_id = -1
