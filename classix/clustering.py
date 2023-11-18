@@ -1128,7 +1128,7 @@ class CLASSIX:
                 agg_label1 = groups_[index1] # get the group index for object1
             
             elif isinstance(index1, str):
-                if hasattr(self, 'index_data'):
+                if hasattr(self, '__fit__'):
                     if index1 in self.__index_data:
                         index1_id = np.where(self.__index_data == index1)[0][0]
                         if len(set(self.__index_data)) != len(self.__index_data):
