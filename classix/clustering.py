@@ -528,7 +528,7 @@ class CLASSIX:
             
         """
         if isinstance(data, pd.core.frame.DataFrame):
-            self.__index_data = data.index
+            self._index_data = data.index
             
         if not isinstance(data, np.ndarray):
             data = np.array(data)
@@ -1128,10 +1128,10 @@ class CLASSIX:
                 agg_label1 = groups_[index1] # get the group index for object1
             
             elif isinstance(index1, str):
-                if hasattr(self, '__index_data'):
-                    if index1 in self.__index_data:
-                        index1_id = np.where(self.__index_data == index1)[0][0]
-                        if len(set(self.__index_data)) != len(self.__index_data):
+                if hasattr(self, '_index_data'):
+                    if index1 in self._index_data:
+                        index1_id = np.where(self._index_data == index1)[0][0]
+                        if len(set(self._index_data)) != len(self._index_data):
                             warnings.warn("The index of data is duplicate.")
                             object1 = self.x_pca[index1_id]
                             agg_label1 = groups_[index1_id]
@@ -1304,10 +1304,10 @@ class CLASSIX:
                     agg_label2 = groups_[index2] # get the group index for object2
                     
                 elif isinstance(index2, str):
-                    if hasattr(self, 'index_data'):
-                        if index2 in self.__index_data:
-                            index2_id = np.where(self.__index_data == index2)[0][0]
-                            if len(set(self.__index_data)) != len(self.__index_data):
+                    if hasattr(self, '_index_data'):
+                        if index2 in self._index_data:
+                            index2_id = np.where(self._index_data == index2)[0][0]
+                            if len(set(self._index_data)) != len(self._index_data):
                                 warnings.warn("The index of data is duplicate.")
                                 object2 = self.x_pca[index2_id]
                                 agg_label2 = groups_[index2_id]
@@ -1315,9 +1315,9 @@ class CLASSIX:
                                 object2 = self.x_pca[index2_id]
                                 agg_label2 = groups_[index2_id]
                         else:
-                            raise ValueError("Please enter a legal value for index2.")
+                            raise ValueError("Please enter a valid value for index2.")
                     else:
-                        raise ValueError("Please use .fit() method first.")
+                        raise ValueError("Please enter a legal value for index2.")
 
                 
                 elif isinstance(index2, list) or isinstance(index2, np.ndarray):
@@ -1636,16 +1636,16 @@ class CLASSIX:
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
                                 
                                 if isinstance(index1, int):
-                                    table_index1 = self.__index_data[index1]
+                                    table_index1 = self._index_data[index1]
                                 else:
                                     table_index1 = index1
                                     
                                 if isinstance(index2, int):
-                                    table_index2 = self.__index_data[index2]
+                                    table_index2 = self._index_data[index2]
                                 else:
                                     table_index2 = index2
                                     
-                                show_connected_df["Label"] = [table_index1] + self.__index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [table_index2] 
+                                show_connected_df["Label"] = [table_index1] + self._index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [table_index2] 
                                 
                             else:
                                 show_connected_df = pd.DataFrame(columns=["Index", "Group"])
