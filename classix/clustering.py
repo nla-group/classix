@@ -1091,8 +1091,6 @@ class CLASSIX:
         
         if index1 is None: # analyze in the general way with a global view
             if plot:
-                from matplotlib import pyplot as plt
-                import matplotlib.colors as colors
                 self.explain_viz(showalldata=showalldata, alpha=alpha, cmap=cmap, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, 
                                  fontsize=sp_fontsize, bbox=sp_bbox, sp_marker=sp_marker, sp_mcolor=sp_mcolor, width=width, axis=axis, fmt=fmt)
                 
