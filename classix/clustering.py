@@ -445,7 +445,7 @@ class CLASSIX:
 
 
         self.__verbose = verbose
-        self.minPts = minPts
+        self.minPts = int(minPts)
 
         self.sorting = sorting
         self.radius = radius
@@ -603,7 +603,7 @@ class CLASSIX:
                 minPts=self.minPts
             ) 
 
-        self.__trained = True
+        self.__fit__ = True
         return self
 
 
@@ -647,7 +647,7 @@ class CLASSIX:
             The predicted clustering labels.
         """
         
-        if hasattr(self, '__train'):
+        if hasattr(self, '__fit__'):
             if not hasattr(self, 'label_change'):
                 if not hasattr(self, 'inverse_ind'):
                     self.inverse_ind = np.argsort(self.ind)
@@ -1054,7 +1054,7 @@ class CLASSIX:
 
 
         
-        if hasattr(self, '__train'):
+        if hasattr(self, '__fit__'):
             groups_ = np.array(self.groups_)
             groups_ = groups_[self.inverse_ind]
             if not hasattr(self, 'label_change'):
@@ -1629,7 +1629,7 @@ class CLASSIX:
                             )
 
                             
-                            if self.__index_data is not None and show_connected_label:
+                            if  hasattr(self, '__index_data') and show_connected_label:
                                 show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
 
@@ -1758,7 +1758,7 @@ class CLASSIX:
         """
         from scipy.sparse import csr_matrix
         
-        if hasattr(self, '__train'):
+        if hasattr(self, '__fit__'):
             groups_ = np.array(self.groups_)
             groups_ = groups_[self.inverse_ind]
         else:
@@ -1877,7 +1877,7 @@ class CLASSIX:
         from scipy.sparse import csr_matrix
         from matplotlib import pyplot as plt
 
-        if not hasattr(self, '__train'):
+        if not hasattr(self, '__fit__'):
             raise NotFittedError("Please use .fit() method first.")
             
         distm, n_components, labels = visualize_connections(self.data, self.splist_, radius=self.radius, scale=round(scale,2))
@@ -1914,7 +1914,7 @@ class CLASSIX:
         Normalize the data by the fitted model.
         """
 
-        if hasattr(self, '__train'):
+        if hasattr(self, '__fit__'):
             return (data - self.mu) / self.dataScale 
         else:
             raise NotFittedError("Please use .fit() method first.")
@@ -1923,7 +1923,7 @@ class CLASSIX:
     
     @property
     def groupCenters_(self):
-        if hasattr(self, '__train'):
+        if hasattr(self, '__fit__'):
             return self._gcIndices(np.arange(self.splist_.shape[0]))
         else:
             raise NotFittedError("Please use .fit() method first.")
@@ -1932,7 +1932,7 @@ class CLASSIX:
     
     @property
     def clusterSizes_(self):
-        if hasattr(self, '__train'):
+        if hasattr(self, '__fit__'):
             counter = collections.Counter(self.labels_)
             return np.array(list(counter.values()))[np.argsort(list(counter.keys()))]
         else:
@@ -1953,7 +1953,7 @@ class CLASSIX:
     def load_group_centers(self):
         """Load group centers."""
         
-        if not hasattr(self, '__train'):
+        if not hasattr(self, '__fit__'):
             raise NotFittedError("Please use .fit() method first.")
             
         if not hasattr(self, 'grp_centers'):
@@ -1967,7 +1967,7 @@ class CLASSIX:
     def load_cluster_centers(self):
         """Load cluster centers."""
             
-        if not hasattr(self, '__train'):
+        if not hasattr(self, '__fit__'):
             raise NotFittedError("Please use .fit() method first.")
             
         if not hasattr(self, 'centers'):
