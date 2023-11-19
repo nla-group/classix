@@ -28,10 +28,14 @@ import warnings
 
 import os
 import copy
+import numbers
 import collections
 import numpy as np
 import pandas as pd
 from numpy.linalg import norm
+
+
+
 
 
 def cython_is_available(verbose=0):
@@ -607,7 +611,7 @@ class CLASSIX:
         return self
 
 
-        
+
     def fit_transform(self, data):
         """ 
         Cluster the data and return the associated cluster labels. 
@@ -1120,10 +1124,10 @@ class CLASSIX:
                           ".explain(index1) or .explain(index1,index2) with data indices.")
             
         else: # index is not None, explain(index1)
-            if isinstance(index1, int):
-                index1_id = int(index1)
-                object1 = self.x_pca[index1] # data has been normalized
-                agg_label1 = groups_[index1] # get the group index for object1
+            if isinstance(index1, numbers.Integral) or isinstance(index1, float):
+                index1_id, index1 = int(index1), int(index1)
+                object1 = self.x_pca[index1_id] # data has been normalized
+                agg_label1 = groups_[index1_id] # get the group index for object1
             
             elif isinstance(index1, str):
                 if hasattr(self, '_index_data'):
@@ -1297,10 +1301,10 @@ class CLASSIX:
 
             # explain two objects relationship
             else: 
-                if isinstance(index2, int):
-                    index2_id = int(index2)
-                    object2 = self.x_pca[index2] # data has been normalized
-                    agg_label2 = groups_[index2] # get the group index for object2
+                if isinstance(index2, numbers.Integral) or isinstance(index2, float):
+                    index2_id, index2 = int(index2), int(index2)
+                    object2 = self.x_pca[index2_id] # data has been normalized
+                    agg_label2 = groups_[index2_id] # get the group index for object2
                     
                 elif isinstance(index2, str):
                     if hasattr(self, '_index_data'):
@@ -2013,7 +2017,8 @@ class CLASSIX:
 
         return clabels
 
-    
+
+
 
     def pprint_format(self, items, truncate=True):
         """Format item value for clusters. """
