@@ -729,10 +729,7 @@ class CLASSIX:
 
         Returns
         -------
-        centers : numpy.ndarray
-            The return centers of clusters
-        
-        clabels : numpy.ndarray 
+        labels  : numpy.ndarray 
             The clusters labels of the data
         """
 
