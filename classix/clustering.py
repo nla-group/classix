@@ -719,13 +719,6 @@ class CLASSIX:
             The threshold, in the range of [0, infity] to determine the noise degree.
             When assign it 0, algorithm won't check noises.
 
-        algorithm : str, default='bf'
-            Algorithm to merge connected groups.
- 
-            - 'bf': Use bruteforce routines to speed up the merging of connected groups.
-
-            - 'set': Use disjoint set structure to merge connected groups.
-
 
         Returns
         -------
@@ -1059,7 +1052,6 @@ class CLASSIX:
             dp_bbox['pad'] = dp_pad
 
 
-        
         if hasattr(self, '__fit__'):
             groups_ = np.array(self.groups_)
             groups_ = groups_[self.inverse_ind]
