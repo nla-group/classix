@@ -539,37 +539,37 @@ class CLASSIX:
             data = data.astype('float64')
             
         if self.sorting == "norm-mean":
-            self.mu = data.mean(axis=0)
-            self.data = data - self.mu
-            self.dataScale = self.data.std()
-            if self.dataScale == 0: # prevent zero-division
-                self.dataScale = 1
-            self.data = self.data / self.dataScale
+            self.mu_ = data.mean(axis=0)
+            self.data = data - self.mu_
+            self.dataScale_ = self.data.std()
+            if self.dataScale_ == 0: # prevent zero-division
+                self.dataScale_ = 1
+            self.data = self.data / self.dataScale_
         
         elif self.sorting == "pca":
-            self.mu = data.mean(axis=0)
-            self.data = data - self.mu # mean center
+            self.mu_ = data.mean(axis=0)
+            self.data = data - self.mu_ # mean center
             rds = norm(self.data, axis=1) # distance of each data point from 0
-            self.dataScale = np.median(rds) # 50% of data points are within that radius
-            if self.dataScale == 0: # prevent zero-division
-                self.dataScale = 1
-            self.data = self.data / self.dataScale # now 50% of data are in unit ball 
+            self.dataScale_ = np.median(rds) # 50% of data points are within that radius
+            if self.dataScale_ == 0: # prevent zero-division
+                self.dataScale_ = 1
+            self.data = self.data / self.dataScale_ # now 50% of data are in unit ball 
             
         elif self.sorting == "norm-orthant":
-            self.mu = data.min(axis=0)
-            self.data = data - self.mu
-            self.dataScale = self.data.std()
-            if self.dataScale == 0: # prevent zero-division
-                self.dataScale = 1
-            self.data = self.data / self.dataScale
+            self.mu_ = data.min(axis=0)
+            self.data = data - self.mu_
+            self.dataScale_ = self.data.std()
+            if self.dataScale_ == 0: # prevent zero-division
+                self.dataScale_ = 1
+            self.data = self.data / self.dataScale_
             
         else:
-            self.mu, self.dataScale = 0, 1 # no normalization
-            self.data = (data - self.mu) / self.dataScale
+            self.mu_, self.dataScale_ = 0, 1 # no normalization
+            self.data = (data - self.mu_) / self.dataScale_
         
         # aggregation
         if not self.__memory:
-            self.groups_, self.splist_, self.dist_nr, self.ind, sort_vals, self.data, self.__half_nrm2 = self._aggregate(data=self.data,
+            self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, self.data, self.__half_nrm2 = self._aggregate(data=self.data,
                                                                                                     sorting=self.sorting, 
                                                                                                     tol=self.radius
                                                                                                 ) 
@@ -577,7 +577,7 @@ class CLASSIX:
             
 
         else:
-            self.groups_, self.splist_, self.dist_nr, self.ind, sort_vals, self.data = self._aggregate(data=self.data,
+            self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, self.data = self._aggregate(data=self.data,
                                                                                                 sorting=self.sorting, 
                                                                                                 tol=self.radius
                                                                                             ) 
@@ -822,7 +822,7 @@ class CLASSIX:
         if self.__verbose == 1:
             nr_old_clust_count = len(self.old_cluster_count)
             print("""CLASSIX aggregated the {datalen} data points into {num_group} groups. """.format(datalen=len(data), num_group=splist.shape[0]))
-            print("""In total, {dist:.0f} distances were computed ({avg:.1f} per data point). """.format(dist=self.dist_nr, avg=self.dist_nr/len(data)))
+            print("""In total, {dist:.0f} distances were computed ({avg:.1f} per data point). """.format(dist=self.nrDistComp_, avg=self.nrDistComp_/len(data)))
             print("""The {num_group} groups were merged into {c_size} clusters.""".format(
                 num_group=splist.shape[0], c_size=nr_old_clust_count))
             
@@ -1099,8 +1099,8 @@ class CLASSIX:
             
             print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features.\n".format(length=data_size, dim=feat_dim) + 
                 "The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}.\n".format(tol=self.radius, minPts=self.minPts) +
-                "As the provided data was auto-mergeScaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.\n".format(scl=self.dataScale, tol=self.radius, tolscl=self.dataScale*self.radius) + 
-                "In total, {dist:.0f} distances were computed ({avg:.1f} per data point).\n".format(dist=self.dist_nr, avg=self.dist_nr/data_size) + 
+                "As the provided data was auto-mergeScaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.\n".format(scl=self.dataScale_, tol=self.radius, tolscl=self.dataScale_*self.radius) + 
+                "In total, {dist:.0f} distances were computed ({avg:.1f} per data point).\n".format(dist=self.nrDistComp_, avg=self.nrDistComp_/data_size) + 
                 "This resulted in {groups:.0f} groups, each with a unique group center.\n".format(groups=self.splist_.shape[0]) + 
                 "These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. ".format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_)))
                  )
@@ -1121,7 +1121,7 @@ class CLASSIX:
             
         else: # index is not None, explain(index1)
             if isinstance(index1, int):
-                index1_id = index1
+                index1_id = int(index1)
                 object1 = self.x_pca[index1] # data has been normalized
                 agg_label1 = groups_[index1] # get the group index for object1
             
@@ -1145,7 +1145,7 @@ class CLASSIX:
             elif isinstance(index1, list) or isinstance(index1, np.ndarray):
                 index1_id = -1
                 index1 = np.array(index1)
-                object1 = (index1 - self.mu) / self.dataScale # allow for out-sample data
+                object1 = (index1 - self.mu_) / self.dataScale_ # allow for out-sample data
                 
                 if data.shape[1] > 2:
                     object1 = np.matmul(object1, self._V[np.argsort(self._s)].T)
@@ -1298,7 +1298,7 @@ class CLASSIX:
             # explain two objects relationship
             else: 
                 if isinstance(index2, int):
-                    index2_id = index2
+                    index2_id = int(index2)
                     object2 = self.x_pca[index2] # data has been normalized
                     agg_label2 = groups_[index2] # get the group index for object2
                     
@@ -1322,7 +1322,7 @@ class CLASSIX:
                 elif isinstance(index2, list) or isinstance(index2, np.ndarray):
                     index2_id = -1
                     index2 = np.array(index2)
-                    object2 = (index2 - self.mu) / self.dataScale # allow for out-sample data
+                    object2 = (index2 - self.mu_) / self.dataScale_ # allow for out-sample data
                     
                     if data.shape[1] > 2:
                         object2 = np.matmul(object2, self._V[np.argsort(self._s)].T)
@@ -1916,7 +1916,7 @@ class CLASSIX:
         """
 
         if hasattr(self, '__fit__'):
-            return (data - self.mu) / self.dataScale 
+            return (data - self.mu_) / self.dataScale_ 
         else:
             raise NotFittedError("Please use .fit() method first.")
         
