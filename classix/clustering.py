@@ -405,6 +405,12 @@ class CLASSIX:
 
     groupCenters_ : array
         The indices for starting point corresponding to original data order.
+    
+    nrDistComp_ : float
+        The number of distance computations.
+    
+    dataScale_ : float
+        The value of data scaling.
 
     
     Methods
@@ -502,6 +508,7 @@ class CLASSIX:
             from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
             from .merging import density_merging, distance_merging, distance_merging_mtg
             warnings.warn("This run of CLASSIX is not using Cython.")
+
 
         if not self.__memory:
             if sorting == 'pca':
