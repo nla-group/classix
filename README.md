@@ -34,8 +34,6 @@ We recommend using PIP as follows:
 
 ### ```pip install classixclustering```
 
-Note: Cython requires a C compiler to be installed on the system; getting a C compiler varies according to the system used, e.g., GNU C Compiler (gcc) for Linux, Microsoft Visual C/C++ (MSVC) for Windows. To check if your Cython is presented properly, use classix's built-in method ``classix.cython_is_available(verbose=1)``.
-
 ##   Quick start
 
 Here is an example clustering a synthetic dataset: 
@@ -187,7 +185,7 @@ When there are many data points, the visualisations produced by the `.explain` m
 
 ### Why do I get a warning about Cython?
 
-CLASSIX used Cython to speed up some critical parts of its computation. If you get a Cython warning, it means that your current Python installation does not support Cython, or there is [no C compiler present on the system](https://cython.readthedocs.io/en/latest/src/quickstart/install.html). CLASSIX will run just fine with Cython, but it might be significantly slower than usual. If you want to compare the speed with other clustering algorithms in scikit-learn or other packages using Cython, please also use CLASSIX with Cython for a fair comparison. To double check whether you are using Cython or not, please use:
+CLASSIX used Cython to speed up some parts of its computation. If you get a Cython warning, it means that your current Python installation does not support Cython, or there is [no C compiler present on the system](https://cython.readthedocs.io/en/latest/src/quickstart/install.html). Getting a C compiler varies according to the system used, e.g., GNU C Compiler (gcc) for Linux, Microsoft Visual C/C++ (MSVC) for Windows. CLASSIX will run just fine with Cython, but it might be slower than usual (sometimes up to a factor of 40). To double check whether you are using Cython or not, please use:
 ```Python
 import classix
 classix.cython_is_available(verbose=1)
