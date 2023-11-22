@@ -1099,7 +1099,7 @@ class CLASSIX:
             
             print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features.\n".format(length=data_size, dim=feat_dim) + 
                 "The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}.\n".format(tol=self.radius, minPts=self.minPts) +
-                "As the provided data was auto-mergeScaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.\n".format(scl=self.dataScale_, tol=self.radius, tolscl=self.dataScale_*self.radius) + 
+                "As the provided data was auto-scaled by a factor of 1/{scl:.2f},\npoints within a radius R={tol:.2f}*{scl:.2f}={tolscl:.2f} were grouped together.\n".format(scl=self.dataScale_, tol=self.radius, tolscl=self.dataScale_*self.radius) + 
                 "In total, {dist:.0f} distances were computed ({avg:.1f} per data point).\n".format(dist=self.nrDistComp_, avg=self.nrDistComp_/data_size) + 
                 "This resulted in {groups:.0f} groups, each with a unique group center.\n".format(groups=self.splist_.shape[0]) + 
                 "These {groups:.0f} groups were subsequently merged into {num_clusters:.0f} clusters. ".format(groups=self.splist_.shape[0], num_clusters=len(np.unique(self.labels_)))
@@ -1130,7 +1130,7 @@ class CLASSIX:
                     if index1 in self._index_data:
                         index1_id = np.where(self._index_data == index1)[0][0]
                         if len(set(self._index_data)) != len(self._index_data):
-                            warnings.warn("The index of data is duplicate.")
+                            warnings.warn("The data index contains duplicates.") # SG: Can this even happen with dataframes?
                             object1 = self.x_pca[index1_id]
                             agg_label1 = groups_[index1_id]
                         else:
@@ -1138,9 +1138,9 @@ class CLASSIX:
                             agg_label1 = groups_[index1_id]
                             
                     else:
-                        raise ValueError("Please enter a valid value for index1.")
+                        raise ValueError("Please use a valid value for index1.")
                 else:
-                    raise ValueError("Please enter a legal value for index1.")
+                    raise ValueError("Please use a valid value for index1.")
                     
             elif isinstance(index1, list) or isinstance(index1, np.ndarray):
                 index1_id = -1
@@ -1154,7 +1154,7 @@ class CLASSIX:
 
                     
             else:
-                raise ValueError("Please enter a legal value for index1.")
+                raise ValueError("Please use a valid value for index1.")
                 
             
             # explain one object
@@ -1275,7 +1275,7 @@ class CLASSIX:
                             else:
                                 fm = 'img/sample' + '.' + fmt
                         
-                        print("image successfully save as", fm)
+                        print("Image successfully saved as", fm)
                     
                     plt.show()
                     
@@ -1307,16 +1307,16 @@ class CLASSIX:
                         if index2 in self._index_data:
                             index2_id = np.where(self._index_data == index2)[0][0]
                             if len(set(self._index_data)) != len(self._index_data):
-                                warnings.warn("The index of data is duplicate.")
+                                warnings.warn("The data index contains duplicates.") # sg: can this even happen with dataframes?
                                 object2 = self.x_pca[index2_id]
                                 agg_label2 = groups_[index2_id]
                             else:
                                 object2 = self.x_pca[index2_id]
                                 agg_label2 = groups_[index2_id]
                         else:
-                            raise ValueError("Please enter a valid value for index2.")
+                            raise ValueError("Please use a valid value for index2.")
                     else:
-                        raise ValueError("Please enter a legal value for index2.")
+                        raise ValueError("Please use a valid value for index2.")
 
                 
                 elif isinstance(index2, list) or isinstance(index2, np.ndarray):
@@ -1330,7 +1330,7 @@ class CLASSIX:
                     agg_label2 = np.argmin(np.linalg.norm(self.s_pca - object2, axis=1, ord=2)) # get the group index for object2
                 
                 else:
-                    raise ValueError("Please enter a legal value for index2.")
+                    raise ValueError("Please use a valid value for index2.")
 
                 if showsplist:
                     
