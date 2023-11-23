@@ -1061,15 +1061,17 @@ class CLASSIX:
             raise NotFittedError("Please use .fit() method first.")
             
         data = self.data[self.inverse_ind]
-        
+        data_size = data.shape[0]
+        feat_dim = data.shape[1]
+
         if not hasattr(self, 'self.sp_to_c_info'): #  ensure call PCA and form groups information table only once
             
-            if data.shape[1] > 2:
+            if feat_dim > 2:
                 _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
                 self.x_pca = np.matmul(data, self._V[(-self._s).argsort()].T)
                 self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
                 
-            elif data.shape[1] == 2:
+            elif feat_dim == 2:
                 self.x_pca = data.copy()
                 self.s_pca = self.data[self.splist_[:, 0]] 
 
@@ -1087,15 +1089,14 @@ class CLASSIX:
         
         # pd.options.display.max_colwidth = colwidth
         dash_line = "--------"*5 
-            
+
         
         if index1 is None: # analyze in the general way with a global view
             if plot:
                 self.explain_viz(showalldata=showalldata, alpha=alpha, cmap=cmap, figsize=figsize, showallgroups=showallgroups, figstyle=figstyle, bcolor=bcolor, savefig=savefig, 
                                  fontsize=sp_fontsize, bbox=sp_bbox, sp_marker=sp_marker, sp_mcolor=sp_mcolor, width=width, axis=axis, fmt=fmt)
                 
-            data_size = data.shape[0]
-            feat_dim = data.shape[1]
+
             
             print("CLASSIX clustered {length:.0f} data points with {dim:.0f} features.\n".format(length=data_size, dim=feat_dim) + 
                 "The radius parameter was set to {tol:.2f} and minPts was set to {minPts:.0f}.\n".format(tol=self.radius, minPts=self.minPts) +
@@ -1147,7 +1148,7 @@ class CLASSIX:
                 index1 = np.array(index1)
                 object1 = (index1 - self.mu_) / self.dataScale_ # allow for out-sample data
                 
-                if data.shape[1] > 2:
+                if feat_dim > 2:
                     object1 = np.matmul(object1, self._V[np.argsort(self._s)].T)
                     
                 agg_label1 = np.argmin(np.linalg.norm(self.s_pca - object1, axis=1, ord=2)) # get the group index for object1
@@ -1178,7 +1179,7 @@ class CLASSIX:
                     else:
                         selectInd = np.arange(self.x_pca.shape[0])
                         
-                    if data.shape[1] > 2:
+                    if feat_dim > 2:
                         print("With data having more than two features, the group circles in\nthe plot may appear bigger than they are.")
 
                     plt.style.use(style=figstyle)
@@ -1195,7 +1196,7 @@ class CLASSIX:
                     ax.scatter(s_pca[:, 0], s_pca[:, 1], marker=sp_marker, label='group centers in cluster #{0}'.format(cluster_label1), 
                                s=sp_size, linewidth=0.9*width, c=sp_mcolor, alpha=0.4)
                     
-                    if show_obj_grp_circle:
+                    if feat_dim <= 2 and show_obj_grp_circle:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False, 
                                                 color=sp1_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
                         
@@ -1212,7 +1213,7 @@ class CLASSIX:
                         ax.scatter(object1[0], object1[1], marker="*", s=obj_msize, label='data point {} '.format(index1))
 
                     for i in range(s_pca.shape[0]):
-                        if data.shape[1] <= 2 and show_all_grp_circle:
+                        if feat_dim <= 2 and show_all_grp_circle:
                             ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False, color=color,
                                                      alpha=0.5, lw=cline_width*1.5, clip_on=False))
                         
@@ -1240,7 +1241,7 @@ class CLASSIX:
                     
                     if axis:
                         ax.axis('on')
-                        if data.shape[1] > 1:
+                        if feat_dim > 1:
                             ax.set_xlabel("1st principal component")
                             ax.set_ylabel("2nd principal component")
                         else:
@@ -1324,7 +1325,7 @@ class CLASSIX:
                     index2 = np.array(index2)
                     object2 = (index2 - self.mu_) / self.dataScale_ # allow for out-sample data
                     
-                    if data.shape[1] > 2:
+                    if feat_dim > 2:
                         object2 = np.matmul(object2, self._V[np.argsort(self._s)].T)
                     
                     agg_label2 = np.argmin(np.linalg.norm(self.s_pca - object2, axis=1, ord=2)) # get the group index for object2
@@ -1389,7 +1390,7 @@ class CLASSIX:
                     else:
                         selectInd = np.arange(self.x_pca.shape[0])
                         
-                    if data.shape[1] > 2:
+                    if feat_dim > 2:
                         print("With data having more than two features, the group circles in\nthe plot may appear bigger than they are.")
 
                     plt.style.use(style=figstyle)
@@ -1404,7 +1405,7 @@ class CLASSIX:
                     ax.scatter(s_pca[:,0], s_pca[:,1], label='group centers', marker=sp_marker, s=sp_size, c=sp_mcolor, linewidth=0.9*width, alpha=0.4)
 
                     
-                    if show_obj_grp_circle:
+                    if feat_dim <= 2 and show_obj_grp_circle:
                         ax.add_patch(plt.Circle((self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1]), self.radius, fill=False,
                                         color=sp1_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
                         
@@ -1449,7 +1450,7 @@ class CLASSIX:
                             )
 
                     for i in range(s_pca.shape[0]):
-                        if data.shape[1] <= 2 and show_all_grp_circle:
+                        if feat_dim <= 2 and show_all_grp_circle:
                                 ax.add_patch(plt.Circle((s_pca[i, 0], s_pca[i, 1]), self.radius, fill=False,
                                                     color=color, alpha=0.5, lw=cline_width*1.5, clip_on=False)
                                                     )
@@ -1479,12 +1480,11 @@ class CLASSIX:
                             ax.scatter(self.s_pca[i,0], self.s_pca[i,1], marker=sp_cmarker, s=sp_csize, c=sp_ccolor, 
                                        linewidths=sp_clinewidths)
 
-                        if data.shape[1] <= 2:
-                            if show_connected_grp_circle:
-                                ax.add_patch(plt.Circle((self.s_pca[i, 0], self.s_pca[i, 1]), self.radius, fill=False,
-                                                color=connect_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
-                                    
-                    
+                        if feat_dim <= 2 and show_connected_grp_circle:
+                            ax.add_patch(plt.Circle((self.s_pca[i, 0], self.s_pca[i, 1]), self.radius, fill=False,
+                                            color=connect_color, alpha=0.5, lw=cline_width*1.5, clip_on=False))
+                                
+                
                     ax.scatter(self.s_pca[agg_label1, 0], self.s_pca[agg_label1, 1], 
                             marker='.', s=sp_csize*0.3, c=sp1_color, linewidths=sp_clinewidths, 
                             label='group center {0}'.format(agg_label1)
@@ -1572,7 +1572,7 @@ class CLASSIX:
 
                     if axis:
                         ax.axis('on')
-                        if data.shape[1] > 1:
+                        if feat_dim > 1:
                             ax.set_xlabel("1st principal component")
                             ax.set_ylabel("2nd principal component")
                         else:
