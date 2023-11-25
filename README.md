@@ -133,7 +133,7 @@ The data point Carl is in group 1, which has been merged into cluster 1.
 The data point Bert is in group 0, which has been merged into cluster 0.
 There is no path of overlapping groups between these clusters.
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=600 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/NoneTom_Bert.png width=800 />
 
 ## Frequently Asked Questions
 
