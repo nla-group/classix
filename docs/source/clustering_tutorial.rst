@@ -270,15 +270,6 @@ Example to show two objects in the same clusters:
 If you want to show the paths connected the two points, setting the optional parameter ``add_arrow`` to ``True``.
 Here we also add ``figsize`` to resize the figure. More controlled parameters for fancy arrow plot can be referred to detailed documentation of `classix.CLASSIX.explain <https://classix.readthedocs.io/en/latest/_autosummary/classix.CLASSIX.explain.html#classix.CLASSIX.explain>`_. 
 
-Additionally, if one want to index more than 2 objects, use numbrt parameters ``index{number}``, for example, indexing 3 objects information, use:
-
-.. code:: python
-    
-    clx.explain(index1=773, index2=292, index3=2, figsize=(10, 10))
-
-.. image:: images/None773_292_m.png
-
-
 
 .. admonition:: Note
 
