@@ -18,7 +18,7 @@
 <!---[![PyPI pyversions](https://img.shields.io/pypi/pyversions/ClassixClustering.svg)](https://pypi.python.org/pypi/ClassixClustering/)-->
 
 
-CLASSIX is a fast, memory-efficient, and explainable clustering algorithm. Here are a few highlights:
+__CLASSIX__ is a fast, memory-efficient, and explainable clustering algorithm. Here are a few highlights:
 
 - Ability to cluster low and high-dimensional data of arbitrary shape efficiently
 - Ability to detect and deal with outliers in the data
@@ -26,11 +26,11 @@ CLASSIX is a fast, memory-efficient, and explainable clustering algorithm. Here 
 - Full reproducibility of all tests in the accompanying paper
 - Support of Cython compilation
 
-CLASSIX is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. 
+__CLASSIX__ is a contrived acronym of *CLustering by Aggregation with Sorting-based Indexing* and the letter *X* for *explainability*. 
 
 ## Install
 
-The installment of \texttt{CLASSIX} is accomplished by Conda or the Python Package Index, 
+The installment of __CLASSIX__ is accomplished by Conda or the Python Package Index, 
 
 conda-forge | PyPI
 :---:|:---:
