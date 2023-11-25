@@ -30,9 +30,12 @@ CLASSIX is a contrived acronym of *CLustering by Aggregation with Sorting-based 
 
 ## Install
 
-We recommend using PIP as follows: 
+The installment of \texttt{CLASSIX} is accomplished by Conda or the Python Package Index, 
 
-### ```pip install classixclustering```
+conda-forge | PyPI
+:---:|:---:
+[![conda-forge version](https://anaconda.org/conda-forge/classixclustering/badges/version.svg)](https://anaconda.org/conda-forge/classixclustering) | [![PyPI version](https://badge.fury.io/py/classixclustering.svg)](https://pypi.org/project/classixclustering/)
+`conda install -c conda-forge classixclustering` | `pip install classixclustering`
 
 ##   Quick start
 
