@@ -39,15 +39,13 @@ We recommend using PIP as follows:
 Here is an example clustering a synthetic dataset: 
 
 ```Python
-from sklearn import datasets
 from classix import CLASSIX
 
-# Generate synthetic data
-X, y = datasets.make_blobs(n_samples=1000, centers=10, n_features=2, cluster_std=1, random_state=42)
+data, labels = classix.loadData('Covid3MC')
 
 # Call CLASSIX
-clx = CLASSIX(radius=0.1, minPts=99, verbose=0)
-clx.fit(X)
+clx = classix.CLASSIX(radius=0.2, minPts=500, verbose=0);
+clx.fit(data)
 print(clx.labels_)
 ```
 
@@ -56,45 +54,49 @@ print(clx.labels_)
 CLASSIX is an *explainable* clustering method. To get an overview of the computed clusters, type:
 
 ```Python
-clx.explain(plot=True)
+clx.explain()
 ```
 Output:
 ```
-CLASSIX clustered 1000 data points with 2 features. 
-The radius parameter was set to 0.10 and minPts was set to 99. 
-As the provided data was auto-scaled by a factor of 1/8.12,
-points within a radius R=0.10*8.12=0.81 were grouped together. 
-In total, 7003 distances were computed (7.0 per data point). 
-This resulted in 163 groups, each with a unique group center. 
-These 163 groups were subsequently merged into 7 clusters. 
-For a visualisation of the clusters, use .explain(plot=True). 
-In order to explain the clustering of individual data points, 
-use .explain(ind1) or .explain(ind1, ind2) with data indices.
+CLASSIX clustered 5726839 data points with 3 features.
+The radius parameter was set to 0.20 and minPts was set to 500.
+As the provided data was auto-mergeScaled by a factor of 1/0.33,
+points within a radius R=0.20*0.33=0.07 were grouped together.
+In total, 80596471 distances were computed (14.1 per data point).
+This resulted in 301 groups, each with a unique group center.
+These 301 groups were subsequently merged into 25 clusters. 
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/explain_viz.png width=600 />
 
 We can ask CLASSIX why two data points ended up in the same cluster, or not: 
 
 ```Python
-clx.explain(773, 792, plot=True)
+clx.explain('hCoV-19/Costa_Rica/HNN-0400/2021', 'hCoV-19/Denmark/DCGC-269073/2021', plot=True)
 ```
 Output:
 ```
-The data point 773 is in group 37 and the data point 792 is in group 50, both of which were merged into cluster #1. 
+Data point hCoV-19/Costa_Rica/HNN-0400/2021 is in group 191.
+Data point hCoV-19/Denmark/DCGC-269073/2021 is in group 275.
+Both groups were merged into cluster #15. 
 
-The two groups are connected via groups 37 <-> 49 <-> 41 <-> 45 <-> 38 <-> 50.
+The two groups are connected via groups
+ 191 <-> 210 <-> 239 <-> 230 <-> 258 <-> 272 <-> 279 <-> 275.
 
-  Index  Group
-   773     37
-   882     37
-   726     49
-   438     41
-   772     45
-   117     38
-   207     50
-   792     50 
+Here is a list of connected data points with
+their global data indices and group numbers:
+
+   Index  Group
+    160    191
+3635328    191
+4236125    210
+1375897    239
+2339407    230
+ 124617    258
+4068000    272
+5062976    279
+1648495    275
+1648495    275 
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/None773_792.png width=600 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/sample.png width=600 />
 
 CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the data into groups of nearby data points, followed by a merging phase of groups into clusters. The ``radius`` parameter controls the size of the groups and ``minPts`` controls the minimal cluster size. CLASSIX explains that there is a path from data point 773 to data point 792 via the centers of the computed groups (37, 49, etc). 
 
