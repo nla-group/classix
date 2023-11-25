@@ -96,7 +96,7 @@ their global data indices and group numbers:
 1648495    275
 1648495    275 
 ```
-<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/sample.png width=600 />
+<img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/sample.png width=800 />
 
 CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the data into groups of nearby data points, followed by a merging phase of groups into clusters. The ``radius`` parameter controls the size of the groups and ``minPts`` controls the minimal cluster size. CLASSIX explains that there is a path from data point 773 to data point 792 via the centers of the computed groups (37, 49, etc). 
 
