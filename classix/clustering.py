@@ -670,7 +670,7 @@ class CLASSIX:
         labels = list()
         data = self.normalization(np.asarray(data))
         indices = self.splist_[:,0].astype(int)
-        splist = data[indices]
+        splist = self.data[indices]
         num_of_points = data.shape[0]
         
         if not memory:
