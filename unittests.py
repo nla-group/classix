@@ -266,6 +266,7 @@ class TestClassix(unittest.TestCase):
             clx.fit_transform(X)
             clx.load_group_centers()
             clx.load_cluster_centers()
+            clx.calculate_group_centers(X, clx.labels)
             clx.gcIndices([1, 2, 3, 4])
             
             clx.predict(X)
