@@ -1614,7 +1614,7 @@ class CLASSIX:
                             )
 
                             
-                            if  hasattr(self, '__index_data') and show_connected_label:
+                            if  hasattr(self, '_index_data') and show_connected_label:
                                 show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
 
