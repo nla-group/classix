@@ -301,7 +301,9 @@ class TestClassix(unittest.TestCase):
             clx.fit_transform(X)
             print(clx.clusterSizes_)
             print(clx.groupCenters_)
-            clx.explain(index1='Carl', index2='Bert', plot=True, showallgroups=True, sp_fontsize=12)        
+            clx.explain(index1='Carl', index2='Bert', plot=True, showallgroups=True, sp_fontsize=12)  
+            clx.explain(index1='Carl', index2='Bert', plot=True, show_connected_label=True, showallgroups=True, sp_fontsize=12)  
+            
         except:
             checkpoint = 0
         self.assertEqual(checkpoint, 1)
