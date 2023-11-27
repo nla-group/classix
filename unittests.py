@@ -285,7 +285,7 @@ class TestClassix(unittest.TestCase):
             clx.explain(index1=np.array([6, 6]), index2=np.array([6, 6]), plot=True, add_arrow=True, directed_arrow=1)
             clx = CLASSIX(radius=0.5, group_merging='distance', minPts=4999, mergeTinyGroups=False)
             clx.fit(X)
-            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=Truee, fmt='jpg')
+            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True, fmt='jpg')
             
         except:
             checkpoint = 0
