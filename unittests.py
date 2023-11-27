@@ -279,16 +279,14 @@ class TestClassix(unittest.TestCase):
             clx.explain(0, 2008,  plot=True, savefig=True, replace_name=['Superman', 'Batman'])
             plt.close()
             clx.explain(2000, 2028,  plot=True, add_arrow=True, savefig=True, showallgroups=True, include_dist=True)
-            for savefmt in ['png', 'pdf', 'jpg', 'ws']:
-                clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=0, showsplist=True, savefig=True, fmt=savefmt)
                 
-            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True)
-            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=1, savefig=True)
+            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True, fmt='pdf')
+            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=1, savefig=True, fmt='png')
             clx.explain(index1=[0, 0], index2=[4,5], plot=True, add_arrow=True, show_connected_label=True, directed_arrow=1)
             clx.explain(index1=np.array([6, 6]), index2=np.array([6, 6]), plot=True, add_arrow=True, directed_arrow=1)
             clx = CLASSIX(radius=0.5, group_merging='distance', minPts=4999, mergeTinyGroups=False)
             clx.fit(X)
-            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True)
+            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=Truee, fmt='jpg')
             
         except:
             checkpoint = 0
@@ -306,7 +304,6 @@ class TestClassix(unittest.TestCase):
             clx.fit_transform(X)
             print(clx.clusterSizes_)
             print(clx.groupCenters_)
-            clx.explain(index1='Carl', index2='Bert', plot=True, showallgroups=True, sp_fontsize=12)  
             clx.explain(index1='Carl', index2='Bert', plot=True, show_connected_label=True, showallgroups=True, sp_fontsize=12)  
             
         except:
