@@ -271,13 +271,12 @@ class TestClassix(unittest.TestCase):
             clx.predict(X)
             clx.predict(X[:1000])
 
-            plt.close()
             clx.explain(plot=True, showsplist=True, figsize=(10,10),  savefig=True)
             clx.explain(0,  plot=True, savefig=True, showsplist=True)
             clx.form_starting_point_clusters_table(aggregate=True)
             clx.explain(3, 2000,  plot=True, savefig=False)
             clx.explain(0, 2008,  plot=True, savefig=True, replace_name=['Superman', 'Batman'])
-            plt.close()
+
             clx.explain(2000, 2028,  plot=True, add_arrow=True, savefig=True, showallgroups=True, include_dist=True)
                 
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True, fmt='pdf')
