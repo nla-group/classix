@@ -1973,20 +1973,6 @@ class CLASSIX:
     
 
 
-    def reassign_labels(self, labels):
-        """Renumber the labels to 0, 1, 2, 3, ..."""
-        
-        sorted_dict = sorted(self.old_cluster_count.items(), key=lambda x: x[1], reverse=True)
-
-        clabels = copy.deepcopy(labels)
-        for i in range(len(sorted_dict)):
-            clabels[labels == sorted_dict[i][0]]  = i
-
-        return clabels
-
-
-
-
     def pprint_format(self, items, truncate=True):
         """Format item value for clusters. """
         
