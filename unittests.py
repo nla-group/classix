@@ -269,8 +269,7 @@ class TestClassix(unittest.TestCase):
             clx.gcIndices([1, 2, 3, 4])
             
             clx.predict(X)
-            clx.predict(X, memory=True)
-            clx.predict(X[:1000], memory=False)
+            clx.predict(X[:1000])
             clx.explain(plot=True, showsplist=True, figsize=(10,10),  savefig=True)
             clx.explain(0,  plot=True, savefig=True, showsplist=True)
             clx.form_starting_point_clusters_table(aggregate=True)
