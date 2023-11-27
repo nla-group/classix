@@ -276,7 +276,9 @@ class TestClassix(unittest.TestCase):
             clx.explain(3, 2000,  plot=True, savefig=False)
             clx.explain(0, 2008,  plot=True, savefig=True, replace_name=['Superman', 'Batman'])
             clx.explain(2000, 2028,  plot=True, add_arrow=True, savefig=True, showallgroups=True, include_dist=True)
-            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=0, showsplist=True, savefig=True)
+            for savefmt in ['png', 'pdf', 'jpg', 'ws']:
+                clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=0, showsplist=True, savefig=True, fmt=savefmt)
+                
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=1, savefig=True)
             clx.explain(index1=[0, 0], index2=[4,5], plot=True, add_arrow=True, show_connected_label=True, directed_arrow=1)
