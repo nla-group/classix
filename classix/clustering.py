@@ -33,8 +33,7 @@ import collections
 import numpy as np
 import pandas as pd
 from numpy.linalg import norm
-
-
+from scipy.spatial import distance
 
 
 
@@ -639,18 +638,12 @@ class CLASSIX:
         
         
         
-    def predict(self, data, memory=False):
+    def predict(self, data):
         """
         Allocate the data to their nearest clusters.
         
         - data : numpy.ndarray
             The ndarray-like input of shape (n_samples,)
-
-        - memory : bool, default=False
-        
-            - True: default, use precomputation is triggered to speedup the query
-
-            - False: a memory efficient way to perform query 
 
         Returns
         -------
@@ -671,18 +664,9 @@ class CLASSIX:
         data = self.normalization(np.asarray(data))
         indices = self.splist_[:,0].astype(int)
         splist = self.data[indices]
-        num_of_points = data.shape[0]
         
-        if not memory:
-            xxt = np.einsum('ij,ij->i', splist, splist)
-            for i in range(num_of_points):
-                splabel = np.argmin(euclid(xxt, splist, data[i]))
-                labels.append(self.label_change[splabel])
-
-        else:
-            for i in range(num_of_points):
-                splabel = np.argmin(np.linalg.norm(splist - data[i], axis=1, ord=2))
-                labels.append(self.label_change[splabel])
+        splabels = np.argmin(distance.cdist(splist, data), axis=0)
+        labels = [self.label_change[i] for i in splabels]
 
         return labels
     
@@ -1978,20 +1962,7 @@ class CLASSIX:
             return self.centers
         
         
-    def calculate_group_centers(self, data, labels):
-        """Compute data center for each label according to label sequence."""
-        
-        centers = list() 
-        for c in set(labels):
-            indc = [i for i in range(data.shape[0]) if labels[i] == c]
-            indc = (labels==c)
-            center = [-1, c] + np.mean(data[indc,:], axis=0).tolist()
-            centers.append( center )
-            
-        return centers
 
-    
-    
     def outlier_filter(self, min_samples=None, min_samples_rate=0.1): # percent
         """Filter outliers in terms of ``min_samples`` or ``min_samples_rate``. """
         
@@ -2133,11 +2104,8 @@ class CLASSIX:
 
 def pairwise_distances(X):
     """Calculate the Euclidean distance matrix."""
-    distm = np.zeros((X.shape[0], X.shape[0]))
-    for i in range(X.shape[0]):
-        for j in range(i, X.shape[0]):
-            distm[i, j] = distm[j, i] = norm(X[i,:]-X[j,:], ord=2)
-    return distm
+    
+    return distance.squareform(distance.pdist(X))
 
 
 
