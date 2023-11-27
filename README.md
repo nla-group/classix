@@ -144,20 +144,11 @@ We recommend first running CLASSIX with a relatively large `radius` parameter, s
 One can access the size of the clusters via `clx.clusterSizes_`. If there are unwanted "noise" clusters containing just a small number of data points, increase the `minPts` parameter to remove them. If, for example, `minPts=14`, all clusters with fewer than 14 data points will be reassigned to larger clusters. Here is an example that demonstrates the effect of `minPts`:
 
 ```Python
-from sklearn import datasets
-from classix import CLASSIX
 # generate synthetic data
 X, y = datasets.make_blobs(n_samples=1000, centers=2, n_features=2, random_state=0)
 # run CLASSIX
 clx = CLASSIX(sorting='pca', radius=0.15, group_merging='density', verbose=1, minPts=14, post_alloc=False)
 clx.fit(X)
-# draw figure
-plt.figure(figsize=(8,8))
-plt.rcParams['axes.facecolor'] = 'white'
-plt.scatter(X[:,0], X[:,1], c=clx.labels_)
-plt.xticks([])
-plt.yticks([])
-plt.show()
 ```
 
 Output:
