@@ -29,7 +29,7 @@ __CLASSIX__ is a contrived acronym of *CLustering by Aggregation with Sorting-ba
 
 ## Install
 
-The installment of __CLASSIX__ is accomplished by Conda or the Python Package Index, 
+The installment of __CLASSIX__ is accomplished by Conda or the Python Package Index (recommended), 
 
 conda-forge | PyPI
 :---:|:---:
