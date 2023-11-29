@@ -72,7 +72,7 @@ These 301 groups were subsequently merged into 25 clusters.
 We can ask CLASSIX why two data points ended up in the same cluster, or not: 
 
 ```Python
-clx.explain('hCoV-19/Costa_Rica/HNN-0400/2021', 'hCoV-19/Denmark/DCGC-269073/2021', plot=True)
+clx.explain('hCoV-19/Costa_Rica/HNN-0400/2021', 'hCoV-19/Denmark/DCGC-269073/2021', plot=True) # one can also provide native integer indices
 ```
 Output:
 ```
@@ -100,8 +100,7 @@ their global data indices and group numbers:
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/sample.png width=800 />
 
-CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the data into groups of nearby data points, followed by a merging phase of groups into clusters. The ``radius`` parameter controls the size of the groups and ``minPts`` controls the minimal cluster size. CLASSIX explains that there is a path from data point 773 to data point 792 via the centers of the computed groups (37, 49, etc). 
-
+CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the data into groups of nearby data points, followed by a merging phase of groups into clusters. The ``radius`` parameter controls the size of the groups and ``minPts`` controls the minimal cluster size. CLASSIX explains that there is a path from data point 'hCoV-19/Costa_Rica/HNN-0400/2021' to data point 'hCoV-19/Denmark/DCGC-269073/2021' via the centers of the computed groups ( 191, 210, etc). 
 
 
 #### Data frames
