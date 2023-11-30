@@ -48,8 +48,10 @@ data, labels = classix.loadData('Covid3MC')
 # Call CLASSIX
 clx = classix.CLASSIX(radius=0.2, minPts=500, verbose=0);
 clx.fit(data)
-print(clx.labels_)
+print(clx.labels_) # clustering labels is loaded with clx.labels_
 ```
+
+You can also predict out-of-sample data using ``predict()`` method, e.g., clx.predict(data.iloc[:1000]) 
 
 ## The explain method
 
