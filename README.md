@@ -51,7 +51,7 @@ clx.fit(data)
 print(clx.labels_) # clustering labels is loaded with clx.labels_
 ```
 
-You can also predict out-of-sample data using ``predict()`` method, e.g., clx.predict(data.iloc[:1000]) 
+You can also predict out-of-sample data using ``predict()`` method after model is fitted, e.g., clx.predict(data.iloc[:1000]) 
 
 ## The explain method
 
