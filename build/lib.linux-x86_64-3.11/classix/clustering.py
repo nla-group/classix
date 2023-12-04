@@ -5,24 +5,7 @@
 # MIT License
 #
 # Copyright (c) 2023 Stefan Güttel, Xinye Chen
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+
 
 import warnings
 
@@ -1620,7 +1603,7 @@ class CLASSIX:
                                 consecutive_distances = [distance.euclidean(data[index1_id], data[show_connected_df["Index"].iloc[1]])] + [distm[connected_paths[i], 
                                                                             connected_paths[i+1]] for i in range(len(connected_paths)-1)] + [distance.euclidean(
                                                                                 data[show_connected_df["Index"].iloc[-2]], data[index2_id])]
-                                consecutive_distances = ["{0:5.2f}".format(i) for i in consecutive_distances]
+                                consecutive_distances = ["{0:5.2f}".format(i*self.dataScale_) for i in consecutive_distances]
                                 show_connected_df.loc[1:, "Distance"] = consecutive_distances
                                 show_connected_df.loc[0, "Distance"] = '--'
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
@@ -1643,7 +1626,7 @@ class CLASSIX:
                                 consecutive_distances = [distance.euclidean(data[index1_id], data[show_connected_df["Index"].iloc[1]])] + [distm[connected_paths[i], 
                                                                             connected_paths[i+1]] for i in range(len(connected_paths)-1)] + [distance.euclidean(
                                                                                 data[show_connected_df["Index"].iloc[-2]], data[index2_id])]
-                                consecutive_distances = ["{0:5.2f}".format(i) for i in consecutive_distances]
+                                consecutive_distances = ["{0:5.2f}".format(i*self.dataScale_) for i in consecutive_distances]
                                 show_connected_df.loc[1:, "Distance"] = consecutive_distances
                                 show_connected_df.loc[0, "Distance"] = '--'
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]

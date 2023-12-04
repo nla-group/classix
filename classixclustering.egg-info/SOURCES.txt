@@ -1,0 +1,16 @@
+LICENSE
+README.rst
+setup.py
+classix/__init__.py
+classix/aggregation.py
+classix/aggregation_c.pyx
+classix/aggregation_cm.pyx
+classix/clustering.py
+classix/merging.py
+classix/merging_cm.pyx
+classix/merging_cm_win.pyx
+classixclustering.egg-info/PKG-INFO
+classixclustering.egg-info/SOURCES.txt
+classixclustering.egg-info/dependency_links.txt
+classixclustering.egg-info/requires.txt
+classixclustering.egg-info/top_level.txt
