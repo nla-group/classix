@@ -46,12 +46,12 @@ from classix import CLASSIX
 data, labels = classix.loadData('Covid3MC')
 
 # Call CLASSIX
-clx = classix.CLASSIX(radius=0.2, minPts=500, verbose=0);
+clx = classix.CLASSIX(radius=0.2, minPts=500, verbose=0)
 clx.fit(data)
-print(clx.labels_) # clustering labels is loaded with clx.labels_
+print(clx.labels_) # clustering labels 
 ```
 
-You can also cluster out-of-sample data using ``predict()`` method after the model is fitted, e.g., clx.predict(data.iloc[:1000]) 
+You can also cluster out-of-sample data using ``predict()`` after the model is fitted, e.g., clx.predict(data.iloc[:1000]) 
 
 ## The explain method
 
@@ -99,10 +99,10 @@ their global data indices and group numbers:
  167935     0.24    200            hCoV-19/Spain/CT-HUB00588/2021
     100     0.13    200        hCoV-19/USA/WY-WYPHL-20146677/2020 
 
-The distance between consecutive data points is at most R= 3.68. 
-Here, R= 0.20*12.27* 1.50, where 0.20 is the chosen radius parameter, 
+The distance between consecutive data points is at most R=3.68. 
+Here, R=0.2*12.27*1.5, where 0.2 is the chosen radius parameter, 
 dataScale_=12.27 is a data scaling factor determined by CLASSIX, 
-and mergeScale_= 1.50 (the default value).
+and mergeScale_=1.5 (the default value).
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/sample.png width=800 />
 
