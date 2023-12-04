@@ -460,7 +460,7 @@ class CLASSIX:
         self.radius = radius
         self.group_merging = group_merging
 
-        self.__mergeScale = mergeScale # For distance measure, usually, we do not use this parameter
+        self.mergeScale_ = mergeScale # For distance measure, usually, we do not use this parameter
         self.__post_alloc = post_alloc
         self.__mergeTinyGroups = mergeTinyGroups
         self.__truncate = short_log_form
@@ -795,7 +795,7 @@ class CLASSIX:
                                                                     splist=splist,
                                                                     radius=radius,
                                                                     minPts=minPts,
-                                                                    scale=self.__mergeScale, 
+                                                                    scale=self.mergeScale_, 
                                                                     sort_vals=sort_vals,
                                                                     half_nrm2=self.__half_nrm2
                                                                 )
@@ -1349,7 +1349,7 @@ class CLASSIX:
                     from scipy.sparse import csr_matrix
                     
                     distm = pairwise_distances(self.data[self.splist_[:, 0]])
-                    distmf = (distm <= self.radius*self.__mergeScale).astype(int)
+                    distmf = (distm <= self.radius*self.mergeScale_).astype(int)
                     csr_dist_m = csr_matrix(distmf)
                         
                     if cluster_label1 == cluster_label2:
@@ -1606,7 +1606,7 @@ class CLASSIX:
                         )
 
                         if connected_paths_vis is None:
-                            print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.__mergeScale))
+                            print('No path from group{0} to group{1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.mergeScale_))
                             print('This is because at least one of the groups was reassigned due to the minPts condition.')
                         else:
                             print("""\nThe two groups are connected via groups\n %(connected)s.""" % {
@@ -1615,9 +1615,14 @@ class CLASSIX:
 
                             
                             if  hasattr(self, '_index_data') and show_connected_label:
-                                show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
+                                show_connected_df = pd.DataFrame(columns=["Index", "Distance", "Group", "Label"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
-
+                                consecutive_distances = [distance.euclidean(data[index1_id], data[show_connected_df["Index"].iloc[1]])] + [distm[connected_paths[i], 
+                                                                            connected_paths[i+1]] for i in range(len(connected_paths)-1)] + [distance.euclidean(
+                                                                                data[show_connected_df["Index"].iloc[-2]], data[index2_id])]
+                                consecutive_distances = ["{0:5.2f}".format(i) for i in consecutive_distances]
+                                show_connected_df.loc[1:, "Distance"] = consecutive_distances
+                                show_connected_df.loc[0, "Distance"] = '--'
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
                                 
                                 if isinstance(index1, int):
@@ -1635,14 +1640,23 @@ class CLASSIX:
                             else:
                                 show_connected_df = pd.DataFrame(columns=["Index", "Distance", "Group"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
-                                show_connected_df.loc[1:, "Distance"] = [distance.euclidean(data[index1_id], data[show_connected_df["Index"].iloc[1]])] + [distm[connected_paths[i], 
+                                consecutive_distances = [distance.euclidean(data[index1_id], data[show_connected_df["Index"].iloc[1]])] + [distm[connected_paths[i], 
                                                                             connected_paths[i+1]] for i in range(len(connected_paths)-1)] + [distance.euclidean(
                                                                                 data[show_connected_df["Index"].iloc[-2]], data[index2_id])]
-                                
+                                consecutive_distances = ["{0:5.2f}".format(i) for i in consecutive_distances]
+                                show_connected_df.loc[1:, "Distance"] = consecutive_distances
                                 show_connected_df.loc[0, "Distance"] = '--'
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
 
                             print('\nHere is a list of connected data points with\ntheir global data indices and group numbers:\n\n', show_connected_df.to_string(index=False), '\n')
+
+                            print("""The distance between consecutive data points is at most R={0:5.2f}. """.format(self.radius*self.dataScale_*self.mergeScale_, width=0))
+                            print("""Here, R={0:5.2f}*{1:5.2f}*{2:5.2f}, where{3:5.2f} is the chosen radius parameter, """.format(self.radius, self.dataScale_, self.mergeScale_, self.radius,  align='<', width=0))
+                            print("""dataScale_={0:5.2f} is a data scaling factor determined by CLASSIX, """.format(self.dataScale_, width=0))
+                            if self.mergeScale_ == 1.5:
+                                print("""and mergeScale_={0:5.2f} (the default value).""".format(self.mergeScale_))
+                            else:
+                                print("""and mergeScale_={0:5.2f}.""".format(self.mergeScale_))
 
                             if not plot:
                                 print("Use .explain(..., plot=True) for a visual representation.")
@@ -1692,7 +1706,8 @@ class CLASSIX:
                         marker=sp_marker, linewidth=0.9*width, c=sp_mcolor)
 
         plt.axis('equal')
-        plt.title("""{num_clusters:.0f} clusters (radius={tol:.2f}, minPts={minPts:.0f})""".format(num_clusters=len(np.unique(self.labels_)),tol=self.radius, minPts=self.minPts))
+        plt.title("""{num_clusters:.0f} clusters (radius={tol:.2f}, minPts={minPts:.0f})""".format(
+                                             num_clusters=len(np.unique(self.labels_)),tol=self.radius, minPts=self.minPts))
 
         if axis:
             plt.axis('on')
@@ -1776,7 +1791,7 @@ class CLASSIX:
                 
         else:
             distm = pairwise_distances(self.data[self.splist_[:, 0]])
-            distm = (distm <= self.radius*self.__mergeScale).astype(int)
+            distm = (distm <= self.radius*self.mergeScale_).astype(int)
             csr_dist_m = csr_matrix(distm)
             connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
             connected_paths.reverse()

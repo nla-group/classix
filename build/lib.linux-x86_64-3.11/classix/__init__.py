@@ -1,5 +1,5 @@
 
-__version__ = '1.1.4'                  
+__version__ = '1.1.7'                  
 __enable_cython__ = True 
 
 from .clustering import CLASSIX

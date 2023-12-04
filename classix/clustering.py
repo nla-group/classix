@@ -1615,9 +1615,14 @@ class CLASSIX:
 
                             
                             if  hasattr(self, '_index_data') and show_connected_label:
-                                show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
+                                show_connected_df = pd.DataFrame(columns=["Index", "Distance", "Group", "Label"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
-
+                                consecutive_distances = [distance.euclidean(data[index1_id], data[show_connected_df["Index"].iloc[1]])] + [distm[connected_paths[i], 
+                                                                            connected_paths[i+1]] for i in range(len(connected_paths)-1)] + [distance.euclidean(
+                                                                                data[show_connected_df["Index"].iloc[-2]], data[index2_id])]
+                                consecutive_distances = ["{0:5.2f}".format(i) for i in consecutive_distances]
+                                show_connected_df.loc[1:, "Distance"] = consecutive_distances
+                                show_connected_df.loc[0, "Distance"] = '--'
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
                                 
                                 if isinstance(index1, int):
@@ -1648,7 +1653,11 @@ class CLASSIX:
                             print("""The distance between consecutive data points is at most R={0:5.2f}. """.format(self.radius*self.dataScale_*self.mergeScale_, width=0))
                             print("""Here, R={0:5.2f}*{1:5.2f}*{2:5.2f}, where{3:5.2f} is the chosen radius parameter, """.format(self.radius, self.dataScale_, self.mergeScale_, self.radius,  align='<', width=0))
                             print("""dataScale_={0:5.2f} is a data scaling factor determined by CLASSIX, """.format(self.dataScale_, width=0))
-                            print("""and mergeScale_={0:5.2f} (the default value).""".format(self.mergeScale_))
+                            if self.mergeScale_ == 1.5:
+                                print("""and mergeScale_={0:5.2f} (the default value).""".format(self.mergeScale_))
+                            else:
+                                print("""and mergeScale_={0:5.2f}.""".format(self.mergeScale_))
+
                             if not plot:
                                 print("Use .explain(..., plot=True) for a visual representation.")
 
