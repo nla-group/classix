@@ -90,14 +90,14 @@ their global data indices and group numbers:
 
    Index Distance  Group                                     Label
     600       --    256                  hCoV-19/Norway/6348/2021
- 186838     0.17    256   hCoV-19/Ireland/LD-NVRL-89IRL62956/2021
-5261957     0.28    257 hCoV-19/Northern_Ireland/NIRE-003afb/2021
-5086569     0.20    248        hCoV-19/Ukraine/Kyiv-PHC-0002/2021
-4600143     0.23    242            hCoV-19/Belgium/rega-2620/2021
-1599046     0.20    225      hCoV-19/Germany/NW-RKI-I-088626/2021
- 273188     0.21    217             hCoV-19/USA/CA-ALSR-8586/2020
- 167935     0.24    200            hCoV-19/Spain/CT-HUB00588/2021
-    100     0.13    200        hCoV-19/USA/WY-WYPHL-20146677/2020 
+ 186838     2.13    256   hCoV-19/Ireland/LD-NVRL-89IRL62956/2021
+5261957     3.47    257 hCoV-19/Northern_Ireland/NIRE-003afb/2021
+5086569     2.49    248        hCoV-19/Ukraine/Kyiv-PHC-0002/2021
+4600143     2.86    242            hCoV-19/Belgium/rega-2620/2021
+1599046     2.46    225      hCoV-19/Germany/NW-RKI-I-088626/2021
+ 273188     2.63    217             hCoV-19/USA/CA-ALSR-8586/2020
+ 167935     2.91    200            hCoV-19/Spain/CT-HUB00588/2021
+    100     1.56    200        hCoV-19/USA/WY-WYPHL-20146677/2020 
 
 The distance between consecutive data points is at most R= 3.68. 
 Here, R= 0.20*12.27* 1.50, where 0.20 is the chosen radius parameter, 
