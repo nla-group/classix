@@ -1589,7 +1589,7 @@ class CLASSIX:
                         )
 
                         if connected_paths_vis is None:
-                            print('No path from group{0} to group{1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.mergeScale_))
+                            print('No path from group {0} to group {1} with step size <=1.5*R={2:3.2f}.'.format(agg_label1, agg_label2, self.radius*self.mergeScale_))
                             print('This is because at least one of the groups was reassigned due to the minPts condition.')
                         else:
                             print("""\nThe two groups are connected via groups\n %(connected)s.""" % {
@@ -1633,13 +1633,13 @@ class CLASSIX:
 
                             print('\nHere is a list of connected data points with\ntheir global data indices and group numbers:\n\n', show_connected_df.to_string(index=False), '\n')
 
-                            print("""The distance between consecutive data points is at most R={0:5.2f}. """.format(self.radius*self.dataScale_*self.mergeScale_, width=0))
-                            print("""Here, R={0:5.2f}*{1:5.2f}*{2:5.2f}, where{3:5.2f} is the chosen radius parameter, """.format(self.radius, self.dataScale_, self.mergeScale_, self.radius,  align='<', width=0))
-                            print("""dataScale_={0:5.2f} is a data scaling factor determined by CLASSIX, """.format(self.dataScale_, width=0))
+                            print("""The distance between consecutive data points is at most R={0:0.3n}. """.format(self.radius*self.dataScale_*self.mergeScale_, width=0))
+                            print("""Here, R={0:0.3n}*{1:0.3n}*{2:0.3n}, where {3:0.3n} is the chosen radius parameter, """.format(self.radius, self.dataScale_, self.mergeScale_, self.radius,  align='<', width=0))
+                            print("""dataScale_={0:0.3n} is a data scaling factor determined by CLASSIX, """.format(self.dataScale_, width=0))
                             if self.mergeScale_ == 1.5:
-                                print("""and mergeScale_={0:5.2f} (the default value).""".format(self.mergeScale_))
+                                print("""and mergeScale_={0:0.3n} (the default value).""".format(self.mergeScale_))
                             else:
-                                print("""and mergeScale_={0:5.2f}.""".format(self.mergeScale_))
+                                print("""and mergeScale_={0:0.3n}.""".format(self.mergeScale_))
 
                             if not plot:
                                 print("Use .explain(..., plot=True) for a visual representation.")
