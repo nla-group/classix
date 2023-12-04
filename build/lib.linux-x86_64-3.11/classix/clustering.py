@@ -33,8 +33,7 @@ import collections
 import numpy as np
 import pandas as pd
 from numpy.linalg import norm
-
-
+from scipy.spatial import distance
 
 
 
@@ -442,7 +441,7 @@ class CLASSIX:
     getPath(index1, index2, include_dist=False):
         Return the indices of connected data points between index1 data and index2 data.
         
-    normalization(data):
+    preprocessing(data):
         Normalize the data according to the fitted model.
 
     References
@@ -575,7 +574,7 @@ class CLASSIX:
             self.data = self.data / self.dataScale_
             
         else:
-            self.mu_, self.dataScale_ = 0, 1 # no normalization
+            self.mu_, self.dataScale_ = 0, 1 # no preprocessing
             self.data = (data - self.mu_) / self.dataScale_
         
         # aggregation
@@ -639,18 +638,12 @@ class CLASSIX:
         
         
         
-    def predict(self, data, memory=False):
+    def predict(self, data):
         """
         Allocate the data to their nearest clusters.
         
         - data : numpy.ndarray
             The ndarray-like input of shape (n_samples,)
-
-        - memory : bool, default=False
-        
-            - True: default, use precomputation is triggered to speedup the query
-
-            - False: a memory efficient way to perform query 
 
         Returns
         -------
@@ -668,21 +661,12 @@ class CLASSIX:
             raise NotFittedError("Please use .fit() method first.")
             
         labels = list()
-        data = self.normalization(np.asarray(data))
+        data = self.preprocessing(np.asarray(data))
         indices = self.splist_[:,0].astype(int)
-        splist = data[indices]
-        num_of_points = data.shape[0]
+        splist = self.data[indices]
         
-        if not memory:
-            xxt = np.einsum('ij,ij->i', splist, splist)
-            for i in range(num_of_points):
-                splabel = np.argmin(euclid(xxt, splist, data[i]))
-                labels.append(self.label_change[splabel])
-
-        else:
-            for i in range(num_of_points):
-                splabel = np.argmin(np.linalg.norm(splist - data[i], axis=1, ord=2))
-                labels.append(self.label_change[splabel])
+        splabels = np.argmin(distance.cdist(splist, data), axis=0)
+        labels = [self.label_change[i] for i in splabels]
 
         return labels
     
@@ -1365,8 +1349,8 @@ class CLASSIX:
                     from scipy.sparse import csr_matrix
                     
                     distm = pairwise_distances(self.data[self.splist_[:, 0]])
-                    distm = (distm <= self.radius*self.__mergeScale).astype(int)
-                    csr_dist_m = csr_matrix(distm)
+                    distmf = (distm <= self.radius*self.__mergeScale).astype(int)
+                    csr_dist_m = csr_matrix(distmf)
                         
                     if cluster_label1 == cluster_label2:
                         connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
@@ -1630,7 +1614,7 @@ class CLASSIX:
                             )
 
                             
-                            if  hasattr(self, '__index_data') and show_connected_label:
+                            if  hasattr(self, '_index_data') and show_connected_label:
                                 show_connected_df = pd.DataFrame(columns=["Index", "Group", "Label"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
 
@@ -1649,8 +1633,13 @@ class CLASSIX:
                                 show_connected_df["Label"] = [table_index1] + self._index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [table_index2] 
                                 
                             else:
-                                show_connected_df = pd.DataFrame(columns=["Index", "Group"])
+                                show_connected_df = pd.DataFrame(columns=["Index", "Distance", "Group"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
+                                show_connected_df.loc[1:, "Distance"] = [distance.euclidean(data[index1_id], data[show_connected_df["Index"].iloc[1]])] + [distm[connected_paths[i], 
+                                                                            connected_paths[i+1]] for i in range(len(connected_paths)-1)] + [distance.euclidean(
+                                                                                data[show_connected_df["Index"].iloc[-2]], data[index2_id])]
+                                
+                                show_connected_df.loc[0, "Distance"] = '--'
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
 
                             print('\nHere is a list of connected data points with\ntheir global data indices and group numbers:\n\n', show_connected_df.to_string(index=False), '\n')
@@ -1910,7 +1899,7 @@ class CLASSIX:
         
 
 
-    def normalization(self, data):
+    def preprocessing(self, data):
         """
         Normalize the data by the fitted model.
         """
@@ -1978,20 +1967,7 @@ class CLASSIX:
             return self.centers
         
         
-    def calculate_group_centers(self, data, labels):
-        """Compute data center for each label according to label sequence."""
-        
-        centers = list() 
-        for c in set(labels):
-            indc = [i for i in range(data.shape[0]) if labels[i] == c]
-            indc = (labels==c)
-            center = [-1, c] + np.mean(data[indc,:], axis=0).tolist()
-            centers.append( center )
-            
-        return centers
 
-    
-    
     def outlier_filter(self, min_samples=None, min_samples_rate=0.1): # percent
         """Filter outliers in terms of ``min_samples`` or ``min_samples_rate``. """
         
@@ -2000,20 +1976,6 @@ class CLASSIX:
             
         return [i[0] for i in self.old_cluster_count.items() if i[1] < min_samples]
     
-
-
-    def reassign_labels(self, labels):
-        """Renumber the labels to 0, 1, 2, 3, ..."""
-        
-        sorted_dict = sorted(self.old_cluster_count.items(), key=lambda x: x[1], reverse=True)
-
-        clabels = copy.deepcopy(labels)
-        for i in range(len(sorted_dict)):
-            clabels[labels == sorted_dict[i][0]]  = i
-
-        return clabels
-
-
 
 
     def pprint_format(self, items, truncate=True):
@@ -2133,11 +2095,8 @@ class CLASSIX:
 
 def pairwise_distances(X):
     """Calculate the Euclidean distance matrix."""
-    distm = np.zeros((X.shape[0], X.shape[0]))
-    for i in range(X.shape[0]):
-        for j in range(i, X.shape[0]):
-            distm[i, j] = distm[j, i] = norm(X[i,:]-X[j,:], ord=2)
-    return distm
+    
+    return distance.squareform(distance.pdist(X))
 
 
 
@@ -2154,7 +2113,7 @@ def visualize_connections(data, splist, radius=0.5, scale=1.5):
     
     
     
-def normalization(data, base):
+def preprocessing(data, base):
     """Initial data preparation of CLASSIX."""
     if base == "norm-mean":
         _mu = data.mean(axis=0)
@@ -2176,7 +2135,7 @@ def normalization(data, base):
         ndata = ndata / dataScale
 
     else:
-        _mu, dataScale = 0, 1 # no normalization
+        _mu, dataScale = 0, 1 # no preprocessing
         ndata = (data - _mu) / dataScale
     return ndata, (_mu, dataScale)
 

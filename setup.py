@@ -10,7 +10,7 @@ except ImportError as e:
     warnings.warn(e.args[0])
     from setuptools.command.build_ext import build_ext
     
-_version="1.1.4"
+_version="1.1.5"
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
