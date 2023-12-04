@@ -441,7 +441,7 @@ class CLASSIX:
     getPath(index1, index2, include_dist=False):
         Return the indices of connected data points between index1 data and index2 data.
         
-    normalization(data):
+    preprocessing(data):
         Normalize the data according to the fitted model.
 
     References
@@ -574,7 +574,7 @@ class CLASSIX:
             self.data = self.data / self.dataScale_
             
         else:
-            self.mu_, self.dataScale_ = 0, 1 # no normalization
+            self.mu_, self.dataScale_ = 0, 1 # no preprocessing
             self.data = (data - self.mu_) / self.dataScale_
         
         # aggregation
@@ -661,7 +661,7 @@ class CLASSIX:
             raise NotFittedError("Please use .fit() method first.")
             
         labels = list()
-        data = self.normalization(np.asarray(data))
+        data = self.preprocessing(np.asarray(data))
         indices = self.splist_[:,0].astype(int)
         splist = self.data[indices]
         
@@ -1349,8 +1349,8 @@ class CLASSIX:
                     from scipy.sparse import csr_matrix
                     
                     distm = pairwise_distances(self.data[self.splist_[:, 0]])
-                    distm = (distm <= self.radius*self.__mergeScale).astype(int)
-                    csr_dist_m = csr_matrix(distm)
+                    distmf = (distm <= self.radius*self.__mergeScale).astype(int)
+                    csr_dist_m = csr_matrix(distmf)
                         
                     if cluster_label1 == cluster_label2:
                         connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
@@ -1633,8 +1633,13 @@ class CLASSIX:
                                 show_connected_df["Label"] = [table_index1] + self._index_data[self.gcIndices(connected_paths).astype(int)].tolist() + [table_index2] 
                                 
                             else:
-                                show_connected_df = pd.DataFrame(columns=["Index", "Group"])
+                                show_connected_df = pd.DataFrame(columns=["Index", "Distance", "Group"])
                                 show_connected_df["Index"] = np.insert(self.gcIndices(connected_paths), [0, len(connected_paths)], [index1_id, index2_id])
+                                show_connected_df.loc[1:, "Distance"] = [distance.euclidean(data[index1_id], data[show_connected_df["Index"].iloc[1]])] + [distm[connected_paths[i], 
+                                                                            connected_paths[i+1]] for i in range(len(connected_paths)-1)] + [distance.euclidean(
+                                                                                data[show_connected_df["Index"].iloc[-2]], data[index2_id])]
+                                
+                                show_connected_df.loc[0, "Distance"] = '--'
                                 show_connected_df["Group"] = [agg_label1] + connected_paths + [agg_label2]
 
                             print('\nHere is a list of connected data points with\ntheir global data indices and group numbers:\n\n', show_connected_df.to_string(index=False), '\n')
@@ -1894,7 +1899,7 @@ class CLASSIX:
         
 
 
-    def normalization(self, data):
+    def preprocessing(self, data):
         """
         Normalize the data by the fitted model.
         """
@@ -2108,7 +2113,7 @@ def visualize_connections(data, splist, radius=0.5, scale=1.5):
     
     
     
-def normalization(data, base):
+def preprocessing(data, base):
     """Initial data preparation of CLASSIX."""
     if base == "norm-mean":
         _mu = data.mean(axis=0)
@@ -2130,7 +2135,7 @@ def normalization(data, base):
         ndata = ndata / dataScale
 
     else:
-        _mu, dataScale = 0, 1 # no normalization
+        _mu, dataScale = 0, 1 # no preprocessing
         ndata = (data - _mu) / dataScale
     return ndata, (_mu, dataScale)
 

@@ -28,7 +28,7 @@ import pandas as pd
 import sklearn.datasets as data
 from classix import CLASSIX, loadData, cython_is_available
 from classix.clustering import calculate_cluster_centers
-from classix import normalization
+from classix import preprocessing
 from classix import aggregation, aggregation_c, aggregation_cm
 from classix.merging import distance_merging_mtg, distance_merging, density_merging
 import platform
@@ -78,13 +78,13 @@ class TestClassix(unittest.TestCase):
             assert(adjusted_rand_score(clx2.labels_, checkpoint) == 1)
             
             
-    def test_normalization(self):
+    def test_preprocessing(self):
         checkpoint = 1
         X, _ = data.make_blobs(n_samples=200, centers=3, n_features=2, random_state=42)
         try:
-            normalization(X, "norm-mean")
-            normalization(X, "pca")
-            normalization(X, "norm-orthant")
+            preprocessing(X, "norm-mean")
+            preprocessing(X, "pca")
+            preprocessing(X, "norm-orthant")
         except:
             checkpoint = 0
         
