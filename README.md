@@ -29,16 +29,16 @@ __CLASSIX__ is a contrived acronym of *CLustering by Aggregation with Sorting-ba
 
 ## Install
 
-The installment of __CLASSIX__ is accomplished by Conda or the Python Package Index (recommended), 
+__CLASSIX__ can be installed via PIP (recommended) or Conda:
 
-conda-forge | PyPI
+PyPI | conda-forge 
 :---:|:---:
-[![conda-forge version](https://anaconda.org/conda-forge/classixclustering/badges/version.svg)](https://anaconda.org/conda-forge/classixclustering) | [![PyPI version](https://badge.fury.io/py/classixclustering.svg)](https://pypi.org/project/classixclustering/)
-`conda install -c conda-forge classixclustering` | `pip install classixclustering`
+[![PyPI version](https://badge.fury.io/py/classixclustering.svg)](https://pypi.org/project/classixclustering/) | [![conda-forge version](https://anaconda.org/conda-forge/classixclustering/badges/version.svg)](https://anaconda.org/conda-forge/classixclustering) 
+`pip install classixclustering` | `conda install -c conda-forge classixclustering` 
 
 ##   Quick start
 
-Here is an example clustering a synthetic dataset: 
+Here is an example of CLASSIX clustering a synthetic dataset: 
 
 ```Python
 from classix import CLASSIX
@@ -51,7 +51,7 @@ clx.fit(data)
 print(clx.labels_) # clustering labels is loaded with clx.labels_
 ```
 
-You can also predict out-of-sample data using ``predict()`` method after model is fitted, e.g., clx.predict(data.iloc[:1000]) 
+You can also cluster out-of-sample data using ``predict()`` method after the model is fitted, e.g., clx.predict(data.iloc[:1000]) 
 
 ## The explain method
 
