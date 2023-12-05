@@ -12,7 +12,7 @@
 [![Download Status](https://static.pepy.tech/badge/classixclustering)](https://pypi.org/project/classixclustering/)
 [![Download Status](https://img.shields.io/pypi/dm/classixclustering.svg?label=PyPI%20downloads)](https://pypi.org/project/classixclustering/)
 [![Documentation Status](https://readthedocs.org/projects/classix/badge/?version=stable)](https://classix.readthedocs.io/en/latest/?badge=stable)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10214313.svg)](https://doi.org/10.5281/zenodo.10214313)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10257432.svg)](https://doi.org/10.5281/zenodo.10257432)
 
 <!---[![PyPI pyversions](https://img.shields.io/pypi/pyversions/ClassixClustering.svg)](https://pypi.python.org/pypi/ClassixClustering/)-->
 
