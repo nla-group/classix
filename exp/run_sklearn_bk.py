@@ -26,6 +26,7 @@ def rn_sklearn_benchmark():
     # of the algorithms, but not too big to avoid too long running times
     # ============
     n_samples = 1500
+    np.random.seed(0)
     noisy_circles = datasets.make_circles(n_samples=n_samples, factor=.5,
                                           noise=.05)
     noisy_moons = datasets.make_moons(n_samples=n_samples, noise=.05)
