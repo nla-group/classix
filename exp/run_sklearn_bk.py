@@ -273,9 +273,9 @@ def rn_sklearn_benchmark():
                     unit_time = unit_time + t1 - t0
 
                     if name == 'CLASSIX\n(distance)':
-                        classix_dist_nr1 = classix_dist_nr1 + algorithm_clone.dist_nr
+                        classix_dist_nr1 = classix_dist_nr1 + algorithm_clone.nrDistComp_
                     if name == 'CLASSIX\n(density)':
-                        classix_dist_nr2 = classix_dist_nr2 + algorithm_clone.dist_nr
+                        classix_dist_nr2 = classix_dist_nr2 + algorithm_clone.nrDistComp_
                 
                 if i_dataset == 5:
                     y = np.ones(len(y_pred))
