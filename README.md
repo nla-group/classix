@@ -41,7 +41,7 @@ PyPI | conda-forge
 Here is an example of CLASSIX clustering a synthetic dataset: 
 
 ```Python
-from classix import CLASSIX
+import classix
 
 data, labels = classix.loadData('Covid3MC')
 
