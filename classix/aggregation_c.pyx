@@ -4,7 +4,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2023 Stefan Güttel, Xinye Chen
+# Copyright (c) 2023 Stefan Guettel, Xinye Chen
 
 
 #!python
@@ -12,8 +12,7 @@
 #cython: profile=True
 #cython: linetrace=True
 
-# Cython implementation for aggregation
-
+# Cython implementation of CLASSIX's aggregation phase
 
 cimport cython
 import numpy as np
@@ -80,10 +79,9 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, str sortin
     cdef np.ndarray[np.float64_t, ndim=1] clustc
     cdef np.ndarray[np.int64_t, ndim=1] ind
     cdef Py_ssize_t i, j
-    
+
+    cdef double[:] ips
     cdef double half_r2 = tol**2 * 0.5
-    
-    
     cdef double rhs
 
     if fdim > 1:
@@ -94,7 +92,6 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, str sortin
         else:
             U1, s1, _ = svds(data, k=1, return_singular_vectors=True)
             sort_vals = U1[:,0]*s1[0]
-
     else:
         sort_vals = data[:,0]
         
@@ -104,7 +101,6 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, str sortin
     data = data[ind]
     sort_vals = sort_vals[ind] 
     cdef np.ndarray[np.float64_t, ndim=1] half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
-
 
     for i in range(len_ind): 
         if labels[i] >= 0:
@@ -131,8 +127,6 @@ cpdef precompute_aggregate_pca(np.ndarray[np.float64_t, ndim=2] data, str sortin
         lab += 1
 
     return labels, splist, nr_dist, ind, sort_vals, data, half_nrm2
-
-
 
 
 cpdef precompute_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", double tol=0.5):
