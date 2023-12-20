@@ -19,7 +19,6 @@ from numpy.linalg import norm
 from scipy.spatial import distance
 
 
-
 def cython_is_available(verbose=0):
     """Check if CLASSIX is using Cython."""
     
@@ -61,14 +60,15 @@ def cython_is_available(verbose=0):
         return False
     
     
-    
 def loadData(name='vdu_signals'):
     """Load built-in sample data.
     
     Parameters
     ----------
-    name: str, {'vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 'Phoneme', 'Wine'}, default='vdu_signals'
-        The supported built-in datasets.
+    name: str, {'vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 
+                'Banknote', 'Seeds', 'Phoneme', 'Wine', 'Covid3MC', 'CovidENV'}, 
+                default='vdu_signals'
+        Identifier of the built-in dataset.
 
     Returns
     -------
@@ -161,13 +161,13 @@ def loadData(name='vdu_signals'):
     if name not in ['vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 
                     'Banknote', 'Seeds', 'Phoneme', 'Wine', 'CovidENV', 'Covid3MC']:
         
-        warnings.warn("Currently not support this data.")
+        warnings.warn("Invalid dataset identifier.")
 
 
         
 
 def get_data(current_dir='', name='vdu_signals'):
-    """Download the built-in sample data."""
+    """Download the built-in sample data from the web."""
     import requests
     
     if name == 'vdu_signals':
@@ -314,16 +314,15 @@ class CLASSIX:
     group_merging : str, {'density', 'distance', None}, default='distance'
         The method for the merging of groups. 
         
-        - 'density': two groups are merged if the density of data points in their intersection 
-           is at least as high the smaller density of both groups. This option uses the disjoint 
-           set structure to speedup merging.
-        
         - 'distance': two groups are merged if the distance of their group centers is at 
-           most mergeScale*radius (the parameter above). This option uses the disjoint 
-           set structure to speedup merging.
+           most mergeScale*radius (the parameter above). 
+
+        - 'density': two groups are merged if the density of data points in their intersection 
+           is at least as high the smaller density of both groups. This option uses a disjoint 
+           set structure for the merging.
         
-        For more details, we refer to [1].
-        If group_merging is set to None, the method will return the labels formed by aggregation as cluster labels.
+        If group_merging is set to None, the method will return the labels formed by aggregation 
+        as the cluster labels.
 
     
     minPts : int, default=1
@@ -333,14 +332,15 @@ class CLASSIX:
 
     
     norm : boolean, default=True
-        If normalize the data associated with the sorting, default as True. 
+        Whether to normalize the data associated with the sorting, default as True. 
         
     mergeScale : float
-        Design for distance-clustering, when distance between the two group centers 
-        associated with two distinct groups smaller than mergeScale*radius, then the two groups merge.
+        Used with distance-clustering; when distance between the two group centers 
+        associated with two distinct groups smaller than mergeScale*radius, 
+        then the two groups merge.
 
     post_alloc : boolean, default=True
-        If allocate the outliers to the closest groups, hence the corresponding clusters. 
+        Whether to allocate outliers to the closest groups, hence the corresponding clusters. 
         If False, all outliers will be labeled as -1.
 
     mergeTinyGroups : boolean, default=True
@@ -353,8 +353,8 @@ class CLASSIX:
         
         - 'set': Use disjoint set structure to merge connected groups.
 
-    memory : boolean, default=True
-        If Cython memoryviews is disable, a fast algorithm with less efficient memory 
+    memory : boolean, default=False
+        If Cython memoryviews is disabled, a fast algorithm with less efficient memory 
           consumption is triggered since precomputation for aggregation is used. 
         Setting it True will use a memory efficient computing.  
         If Cython memoryviews is effective, this parameter can be ignored. 
@@ -429,12 +429,12 @@ class CLASSIX:
 
     References
     ----------
-    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
+    [1] X. Chen and S. Güttel. Fast and explainable clustering based on sorting, 
+        https://arxiv.org/abs/2202.01456, 2022.
     """
         
-    def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", norm=True, mergeScale=1.5, post_alloc=True, mergeTinyGroups=True,
-                 memory=False, verbose=1, short_log_form=True): 
-
+    def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", norm=True, mergeScale=1.5, 
+                 post_alloc=True, mergeTinyGroups=True, memory=False, verbose=1, short_log_form=True): 
 
         self.__verbose = verbose
         self.minPts = int(minPts)
@@ -448,7 +448,6 @@ class CLASSIX:
         self.__mergeTinyGroups = mergeTinyGroups
         self.__truncate = short_log_form
         self.labels_ = None
-        
         
         self._gcIndices = np.frompyfunc(self.gc2ind, 1, 1)
                      
@@ -517,8 +516,7 @@ class CLASSIX:
         ----------
         data : numpy.ndarray
             The ndarray-like input of shape (n_samples,)
-        
-            
+
         """
         if isinstance(data, pd.core.frame.DataFrame):
             self._index_data = data.index
@@ -618,7 +616,6 @@ class CLASSIX:
         """
         
         return self.fit(data).labels_
-        
         
         
     def predict(self, data):
