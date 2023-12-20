@@ -38,7 +38,7 @@ PyPI | conda-forge
 
 ##   Quick start
 
-Here is an example of CLASSIX clustering a synthetic dataset: 
+Here is an example of clustering one of the demo dataset provided with CLASSIX: 
 
 ```Python
 import classix
