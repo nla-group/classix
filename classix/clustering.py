@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 from numpy.linalg import norm
 from scipy.spatial import distance
-
+from time import time
 
 def cython_is_available(verbose=0):
     """Check if CLASSIX is using Cython."""
@@ -525,10 +525,11 @@ class CLASSIX:
             data = np.array(data)
             if len(data.shape) == 1:
                 data = data.reshape(-1,1)
-                
+
+        self.t1_prepare = time()        
         if data.dtype !=  'float64':
             data = data.astype('float64')
-            
+        
         if self.sorting == "norm-mean":
             self.mu_ = data.mean(axis=0)
             self.data = data - self.mu_
@@ -558,6 +559,9 @@ class CLASSIX:
             self.mu_, self.dataScale_ = 0, 1 # no preprocessing
             self.data = (data - self.mu_) / self.dataScale_
         
+        self.t1_prepare = time() - self.t1_prepare
+
+        self.t2_aggregate = time()
         # aggregation
         if not self.__memory:
             self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, self.data, self.__half_nrm2 = self._aggregate(data=self.data,
@@ -574,7 +578,9 @@ class CLASSIX:
                                                                                             ) 
         
         self.splist_ = np.array(self.splist_)
-        
+        self.t2_aggregate = time() - self.t2_aggregate
+
+        self.t3_merge = time()
         if self.group_merging is None:
             self.inverse_ind = np.argsort(self.ind)
             self.labels_ = copy.deepcopy(self.groups_[self.inverse_ind]) 
@@ -594,6 +600,8 @@ class CLASSIX:
                 minPts=self.minPts
             ) 
 
+        self.t3_merge = time() - self.t3_merge
+        
         self.__fit__ = True
         return self
 
@@ -722,6 +730,7 @@ class CLASSIX:
             
             self.old_cluster_count = collections.Counter(labels)
             
+            self.t4_minPts = time()
             if minPts >= 1:
                 potential_noise_labels = self.outlier_filter(min_samples=minPts) # calculate the min_samples directly
                 SIZE_NOISE_LABELS = len(potential_noise_labels) 
@@ -733,34 +742,31 @@ class CLASSIX:
                     for i in np.unique(potential_noise_labels):
                         labels[labels == i] = maxid # marked as noises, 
                                                     # the label number is not included in any of existing labels (maxid).
-            else:
-                potential_noise_labels = list()
-                SIZE_NOISE_LABELS = 0
+                            
+                if SIZE_NOISE_LABELS > 0:
+                    self.clean_index_ = labels != maxid
+                    agln = agg_labels[self.clean_index_]
+                    label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
+                    # allocate the outliers to the corresponding closest cluster.
+                    
+                    self.group_outliers_ = np.unique(agg_labels[~self.clean_index_]) # abnormal groups
+                    unique_agln = np.unique(agln)
+                    splist_clean = splist[unique_agln]
+
+                    if self.__post_alloc:
+                        for nsp in self.group_outliers_:
+                            alloc_class = np.argmin(
+                                np.linalg.norm(data[splist_clean[:, 0].astype(int)] - data[int(splist[nsp, 0])], axis=1, ord=2)
+                                )
+                            
+                            labels[agg_labels == nsp] = label_change[unique_agln[alloc_class]]
+                    else:
+                        labels[np.isin(agg_labels, self.group_outliers_)] = -1
 
             # remove noise cluster, avoid connecting two separate to a single cluster
             # the label with the maxid is label marked noises
-            
-            if SIZE_NOISE_LABELS > 0:
-                
-                self.clean_index_ = labels != maxid
-                agln = agg_labels[self.clean_index_]
-                label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
-                # allocate the outliers to the corresponding closest cluster.
-                
-                self.group_outliers_ = np.unique(agg_labels[~self.clean_index_]) # abnormal groups
-                unique_agln = np.unique(agln)
-                splist_clean = splist[unique_agln]
 
-                if self.__post_alloc:
-                    for nsp in self.group_outliers_:
-                        alloc_class = np.argmin(
-                            np.linalg.norm(data[splist_clean[:, 0].astype(int)] - data[int(splist[nsp, 0])], axis=1, ord=2)
-                            )
-                        
-                        labels[agg_labels == nsp] = label_change[unique_agln[alloc_class]]
-                else:
-                    labels[np.isin(agg_labels, self.group_outliers_)] = -1
-                
+            self.t4_minPts = time() - self.t4_minPts
             
         else:
             if self.__memory: 
@@ -1001,7 +1007,7 @@ class CLASSIX:
         
         """
         from scipy.sparse.linalg import svds
-        
+        self.t5_finalize = time()
         # -----------------------------second method--------------------------------
         if sp_bbox is None:
             sp_bbox = dict()
@@ -1652,6 +1658,8 @@ class CLASSIX:
                         print("""There is no path of overlapping groups between these clusters.""")
 
                 self.connected_paths = connected_paths
+
+        self.t5_finalize = self.t5_finalize - time()
         return 
     
 
@@ -1722,7 +1730,28 @@ class CLASSIX:
         return
     
         
-    
+
+    def timing(self):
+        """
+        This method will print five timing information regarding classix clustering:
+            (1) t1_prepare: The initial data preparation, which mainly comprises data scaling and the computation of the first two principal axes.
+            (2) t2_aggregate: This phase aggregates all data points into groups determined by the radius parameter of CLASSIX.
+            (3) t3_merge: The computed groups will be merged into clusters when their group centers (starting points) are sufficiently close.
+            (4) t4_minPts: Clusters with fewer than minPts points will be dissolved into their groups, and each of the groups will then be reassigned to a large enough cluster.
+            (5) t5_finalize: Any cleanup activities.
+        """
+        if hasattr(self, '__fit__'):
+            print("t1_prepare:", self.t1_prepare)
+            print("t2_aggregate:", self.t2_aggregate)
+            print("t3_merge:", self.t3_merge)
+            print("t3_merge time:", self.t3_merge)
+            if hasattr(self, 't5_finalize'):
+                print("t5_finalize time:", self.t5_finalize)
+        else:
+            raise NotFittedError("Please use .fit() method first.")
+
+
+
     def getPath(self, index1, index2, include_dist=False):
         """
         Get the indices of connected data points between index1 data and index2 data.
