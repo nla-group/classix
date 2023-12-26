@@ -162,6 +162,8 @@ class TestClassix(unittest.TestCase):
 
                 clx = CLASSIX(sorting=None, group_merging='distance', memory=True, mergeTinyGroups=False)
                 clx.fit_transform(X)
+
+                clx.timing()
             except:
                 checkpoint = 0
                 break
@@ -269,7 +271,7 @@ class TestClassix(unittest.TestCase):
             clx = CLASSIX(radius=0.5, group_merging='distance', minPts=4999, mergeTinyGroups=False)
             clx.fit(X)
             clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True, fmt='jpg')
-            
+            clx.timing()
         except:
             checkpoint = 0
 
