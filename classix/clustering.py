@@ -353,11 +353,6 @@ class CLASSIX:
         
         - 'set': Use disjoint set structure to merge connected groups.
 
-    memory : boolean, default=False
-        If Cython memoryviews is disabled, a fast algorithm with less efficient memory 
-          consumption is triggered since precomputation for aggregation is used. 
-        Setting it True will use a memory efficient computing.  
-        If Cython memoryviews is effective, this parameter can be ignored. 
     
     verbose : boolean or int, default=1
         Whether to print the logs or not.
@@ -434,7 +429,7 @@ class CLASSIX:
     """
         
     def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", norm=True, mergeScale=1.5, 
-                 post_alloc=True, mergeTinyGroups=True, memory=False, verbose=1, short_log_form=True): 
+                 post_alloc=True, mergeTinyGroups=True, verbose=1, short_log_form=True): 
 
         self.__verbose = verbose
         self.minPts = int(minPts)
@@ -454,7 +449,6 @@ class CLASSIX:
         if self.__verbose:
             print(self)
         
-        self.__memory = memory
 
         from . import __enable_cython__
         self.__enable_cython__ = __enable_cython__
@@ -491,14 +485,11 @@ class CLASSIX:
             warnings.warn("This run of CLASSIX is not using Cython.")
 
 
-        if not self.__memory:
-            if sorting == 'pca':
-                self._aggregate = precompute_aggregate_pca
-            else:
-                self._aggregate = precompute_aggregate
-            
+        if sorting == 'pca':
+            self._aggregate = precompute_aggregate_pca
         else:
-            self._aggregate = aggregate
+            self._aggregate = precompute_aggregate
+            
 
         self._density_merging = density_merging
         
@@ -563,20 +554,14 @@ class CLASSIX:
 
         self.t2_aggregate = time()
         # aggregation
-        if not self.__memory:
-            self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, self.data, self.__half_nrm2 = self._aggregate(data=self.data,
-                                                                                                    sorting=self.sorting, 
-                                                                                                    tol=self.radius
-                                                                                                ) 
-            
-            
-
-        else:
-            self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, self.data = self._aggregate(data=self.data,
-                                                                                                sorting=self.sorting, 
-                                                                                                tol=self.radius
-                                                                                            ) 
         
+        self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, self.data, self.__half_nrm2 = self._aggregate(
+                                                                                data=self.data,
+                                                                                sorting=self.sorting, 
+                                                                                tol=self.radius
+                                                                            ) 
+            
+            
         self.splist_ = np.array(self.splist_)
         self.t2_aggregate = time() - self.t2_aggregate
 
@@ -700,9 +685,6 @@ class CLASSIX:
 
         if method == 'density':
 
-            if self.__memory: 
-                self.__half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
-
             agg_labels = np.asarray(agg_labels)
             labels = copy.deepcopy(agg_labels) 
             
@@ -769,12 +751,7 @@ class CLASSIX:
             self.t4_minPts = time() - self.t4_minPts
             
         else:
-            if self.__memory: 
-                spdata = data[splist[:, 0]]
-                self.__half_nrm2 = np.einsum('ij,ij->i', spdata, spdata) * 0.5
-                # norm(data[splist[:, 0]], axis=1, ord=2)**2 * 0.5 # precomputation
-            else:
-                self.__half_nrm2 = self.__half_nrm2[self.splist_[:, 0]]
+            self.__half_nrm2 = self.__half_nrm2[self.splist_[:, 0]]
 
             labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merging(data=data, 
                                                                     labels=agg_labels,
