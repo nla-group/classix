@@ -43,10 +43,7 @@ class TestClassix(unittest.TestCase):
         vdu_signals = loadData('vdu_signals')
 
         for tol in np.arange(0.8, 1, 0.1):
-            clx1 = CLASSIX(radius=tol, group_merging='distance', verbose=0, memory=True)
-            clx1.fit_transform(vdu_signals)
-
-            clx2 = CLASSIX(radius=tol, group_merging='distance', verbose=0, memory=False)
+            clx2 = CLASSIX(radius=tol, group_merging='distance', verbose=0)
             clx2.fit_transform(vdu_signals)
 
             if adjusted_rand_score(clx1.labels_, clx2.labels_) != 1:
@@ -78,10 +75,8 @@ class TestClassix(unittest.TestCase):
         vdu_signals = loadData('vdu_signals')
 
         for tol in np.arange(0.8, 1, 0.1):
-            clx1 = CLASSIX(radius=tol, group_merging='density', verbose=0, memory=True)
-            clx1.fit_transform(vdu_signals)
 
-            clx2 = CLASSIX(radius=tol, group_merging='density', verbose=0, memory=False)
+            clx2 = CLASSIX(radius=tol, group_merging='density', verbose=0)
             clx2.fit_transform(vdu_signals)
 
             if adjusted_rand_score(clx1.labels_, clx2.labels_) != 1:
@@ -114,13 +109,13 @@ class TestClassix(unittest.TestCase):
                 clx = CLASSIX(sorting='pca', group_merging='distance')
                 clx.fit_transform(X)
                 
-                clx = CLASSIX(sorting='norm-mean', group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting='norm-mean', group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
 
-                clx = CLASSIX(sorting='norm-orthant', group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting='norm-orthant', group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
                 
-                clx = CLASSIX(sorting=None, group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting=None, group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
             except:
                 checkpoint = 0
@@ -148,19 +143,16 @@ class TestClassix(unittest.TestCase):
                 clx = CLASSIX(sorting='pca', group_merging='distance', minPts=150)
                 clx.fit_transform(X)
 
-                clx = CLASSIX(sorting='pca', group_merging='distance', memory=False)
-                clx.fit_transform(X)
-
-                clx = CLASSIX(sorting='pca', group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting='pca', group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
                 
-                clx = CLASSIX(sorting='norm-mean', group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting='norm-mean', group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
 
-                clx = CLASSIX(sorting='norm-orthant', group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting='norm-orthant', group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
 
-                clx = CLASSIX(sorting=None, group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting=None, group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
 
                 clx.timing()
