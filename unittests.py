@@ -43,19 +43,12 @@ class TestClassix(unittest.TestCase):
         vdu_signals = loadData('vdu_signals')
 
         for tol in np.arange(0.8, 1, 0.1):
-            clx2 = CLASSIX(radius=tol, group_merging='distance', verbose=0)
-            clx2.fit_transform(vdu_signals)
-
-            if adjusted_rand_score(clx1.labels_, clx2.labels_) != 1:
-                raise ValueError("Inconsistent results.")
-            # version 0.2.7
-            # np.save('classix/data/checkpoint_distance_' + str(np.round(tol,2)) + '.npy', clx.labels_) 
-            
+            clx = CLASSIX(radius=tol, group_merging='distance', verbose=0)
+            clx.fit_transform(vdu_signals)
             # test new version
             checkpoint = np.load('classix/data/checkpoint_distance_' + str(np.round(tol,2)) + '.npy')
             
-            assert(adjusted_rand_score(clx1.labels_, checkpoint) == 1)
-            assert(adjusted_rand_score(clx2.labels_, checkpoint) == 1)
+            assert(adjusted_rand_score(clx.labels_, checkpoint) == 1)
             
             
     def test_preprocessing(self):
@@ -76,19 +69,16 @@ class TestClassix(unittest.TestCase):
 
         for tol in np.arange(0.8, 1, 0.1):
 
-            clx2 = CLASSIX(radius=tol, group_merging='density', verbose=0)
-            clx2.fit_transform(vdu_signals)
+            clx = CLASSIX(radius=tol, group_merging='density', verbose=0)
+            clx.fit_transform(vdu_signals)
 
-            if adjusted_rand_score(clx1.labels_, clx2.labels_) != 1:
-                raise ValueError("Inconsistent results.")
             # version 0.2.7
             # np.save('classix/data/checkpoint_density_' + str(np.round(tol,2)) + '.npy', clx.labels_) 
             
             # test new version
             checkpoint = np.load('classix/data/checkpoint_density_' + str(np.round(tol,2)) + '.npy')
   
-            assert(adjusted_rand_score(clx1.labels_, checkpoint) == 1)
-            assert(adjusted_rand_score(clx2.labels_, checkpoint) == 1)
+            assert(adjusted_rand_score(clx.labels_, checkpoint) == 1)
 
     
     def test_non_cython_version(self):
