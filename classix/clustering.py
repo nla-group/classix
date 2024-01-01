@@ -457,11 +457,10 @@ class CLASSIX:
         if self.__enable_cython__:
             try:
                 try:
-                    from .aggregation_cm import aggregate
-                    from .aggregation_cm import aggregate as precompute_aggregate, precompute_aggregate_pca
+                    from .aggregation_cm import precompute_aggregate, precompute_aggregate_pca
                     
                 except ModuleNotFoundError:
-                    from .aggregation_c import aggregate, precompute_aggregate, precompute_aggregate_pca 
+                    from .aggregation_c import precompute_aggregate, precompute_aggregate_pca 
                 
                 self.__enable_aggregation_cython__ = True
 
@@ -474,13 +473,13 @@ class CLASSIX:
 
             except (ModuleNotFoundError, ValueError):
                 if not self.__enable_aggregation_cython__:
-                    from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
+                    from .aggregation import precompute_aggregate, precompute_aggregate_pca
                 
                 from .merging import density_merging, distance_merging, distance_merging_mtg
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
-            from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
+            from .aggregation import precompute_aggregate, precompute_aggregate_pca
             from .merging import density_merging, distance_merging, distance_merging_mtg
             warnings.warn("This run of CLASSIX is not using Cython.")
 
