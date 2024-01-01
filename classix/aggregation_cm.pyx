@@ -88,6 +88,7 @@ cpdef precompute_aggregate_pca(double[:,:] data, str sorting='pca', double tol=0
     sort_vals = sort_vals.base[ind] 
     cdef double half_r2 = tol**2 * 0.5
     cdef double[:] half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
+    cdef double[:] ips
     
     for i in range(len_ind): 
         if labels[i] >= 0:
