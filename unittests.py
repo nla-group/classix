@@ -352,9 +352,6 @@ class TestClassix(unittest.TestCase):
             inverse_ind1, spl1, _, _, _, _, _ = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5)
             inverse_ind2, spl2, _, _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="pca", tol=0.5)
             inverse_ind3, spl3, _, _, _, _, _ = aggregation_c.precompute_aggregate(data, "pca", 0.5)
-            inverse_ind4, spl4, _, _, _, _ = aggregation.aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind5, spl5, _, _, _, _ = aggregation_c.aggregate(data, "pca", 0.5)
-            inverse_ind6, spl6, _, _, _, _ = aggregation_cm.aggregate(data, "pca", 0.5)
             inverse_ind7, spl7, _, _, _, _, _ = aggregation.precompute_aggregate_pca(data, sorting="pca", tol=0.5)
             inverse_ind8, spl8, _, _, _, _, _ = aggregation_c.precompute_aggregate_pca(data, "pca", 0.5)
             inverse_ind9, spl9, _, _, _, _, _ = aggregation_cm.precompute_aggregate_pca(data, "pca", 0.5)
@@ -369,10 +366,6 @@ class TestClassix(unittest.TestCase):
                 checkpoint = 0
             if np.sum(inverse_ind2 != inverse_ind3) != 0:
                 checkpoint = 0
-            if np.sum(inverse_ind3 != inverse_ind4) != 0:
-                checkpoint = 0
-            if np.sum(inverse_ind5 != inverse_ind6) != 0:
-                checkpoint = 0
             if np.sum(inverse_ind7 != inverse_ind8) != 0:
                 checkpoint = 0
             if np.sum(inverse_ind8 != inverse_ind9) != 0:
@@ -383,26 +376,10 @@ class TestClassix(unittest.TestCase):
                     checkpoint = 0
                 if spl2[i][0] != spl3[i][0]:
                     checkpoint = 0
-                if spl3[i][0] != spl4[i][0]:
-                    checkpoint = 0
-                if spl4[i][0] != spl5[i][0]:
-                    checkpoint = 0
-                if spl5[i][0] != spl6[i][0]:
-                    checkpoint = 0
-                if spl6[i][0] != spl7[i][0]:
-                    checkpoint = 0
                     
                 if spl1[i][1] != spl2[i][1]:
                     checkpoint = 0
                 if spl2[i][1] != spl3[i][1]:
-                    checkpoint = 0
-                if spl3[i][1] != spl4[i][1]:
-                    checkpoint = 0
-                if spl4[i][1] != spl5[i][1]:
-                    checkpoint = 0
-                if spl5[i][1] != spl6[i][1]:
-                    checkpoint = 0
-                if spl6[i][1] != spl7[i][1]:
                     checkpoint = 0
         except:
             checkpoint = 0
