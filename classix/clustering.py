@@ -32,7 +32,7 @@ def cython_is_available(verbose=0):
             import numpy
             
             try: # check if Cython packages are loaded properly
-                from .aggregation_cm import aggregate
+                from .aggregation_cm import precompute_aggregate, precompute_aggregate_pca
                 from .merging_cm import density_merging, distance_merging
                 # cython with memoryviews
                 # Typed memoryviews allow efficient access to memory buffers, such as those underlying NumPy arrays, without incurring any Python overhead. 
