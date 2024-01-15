@@ -43,22 +43,12 @@ class TestClassix(unittest.TestCase):
         vdu_signals = loadData('vdu_signals')
 
         for tol in np.arange(0.8, 1, 0.1):
-            clx1 = CLASSIX(radius=tol, group_merging='distance', verbose=0, memory=True)
-            clx1.fit_transform(vdu_signals)
-
-            clx2 = CLASSIX(radius=tol, group_merging='distance', verbose=0, memory=False)
-            clx2.fit_transform(vdu_signals)
-
-            if adjusted_rand_score(clx1.labels_, clx2.labels_) != 1:
-                raise ValueError("Inconsistent results.")
-            # version 0.2.7
-            # np.save('classix/data/checkpoint_distance_' + str(np.round(tol,2)) + '.npy', clx.labels_) 
-            
+            clx = CLASSIX(radius=tol, group_merging='distance', verbose=0)
+            clx.fit_transform(vdu_signals)
             # test new version
             checkpoint = np.load('classix/data/checkpoint_distance_' + str(np.round(tol,2)) + '.npy')
             
-            assert(adjusted_rand_score(clx1.labels_, checkpoint) == 1)
-            assert(adjusted_rand_score(clx2.labels_, checkpoint) == 1)
+            assert(adjusted_rand_score(clx.labels_, checkpoint) == 1)
             
             
     def test_preprocessing(self):
@@ -78,22 +68,17 @@ class TestClassix(unittest.TestCase):
         vdu_signals = loadData('vdu_signals')
 
         for tol in np.arange(0.8, 1, 0.1):
-            clx1 = CLASSIX(radius=tol, group_merging='density', verbose=0, memory=True)
-            clx1.fit_transform(vdu_signals)
 
-            clx2 = CLASSIX(radius=tol, group_merging='density', verbose=0, memory=False)
-            clx2.fit_transform(vdu_signals)
+            clx = CLASSIX(radius=tol, group_merging='density', verbose=0)
+            clx.fit_transform(vdu_signals)
 
-            if adjusted_rand_score(clx1.labels_, clx2.labels_) != 1:
-                raise ValueError("Inconsistent results.")
             # version 0.2.7
             # np.save('classix/data/checkpoint_density_' + str(np.round(tol,2)) + '.npy', clx.labels_) 
             
             # test new version
             checkpoint = np.load('classix/data/checkpoint_density_' + str(np.round(tol,2)) + '.npy')
   
-            assert(adjusted_rand_score(clx1.labels_, checkpoint) == 1)
-            assert(adjusted_rand_score(clx2.labels_, checkpoint) == 1)
+            assert(adjusted_rand_score(clx.labels_, checkpoint) == 1)
 
     
     def test_non_cython_version(self):
@@ -114,13 +99,13 @@ class TestClassix(unittest.TestCase):
                 clx = CLASSIX(sorting='pca', group_merging='distance')
                 clx.fit_transform(X)
                 
-                clx = CLASSIX(sorting='norm-mean', group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting='norm-mean', group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
 
-                clx = CLASSIX(sorting='norm-orthant', group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting='norm-orthant', group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
                 
-                clx = CLASSIX(sorting=None, group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting=None, group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
             except:
                 checkpoint = 0
@@ -148,19 +133,16 @@ class TestClassix(unittest.TestCase):
                 clx = CLASSIX(sorting='pca', group_merging='distance', minPts=150)
                 clx.fit_transform(X)
 
-                clx = CLASSIX(sorting='pca', group_merging='distance', memory=False)
-                clx.fit_transform(X)
-
-                clx = CLASSIX(sorting='pca', group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting='pca', group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
                 
-                clx = CLASSIX(sorting='norm-mean', group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting='norm-mean', group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
 
-                clx = CLASSIX(sorting='norm-orthant', group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting='norm-orthant', group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
 
-                clx = CLASSIX(sorting=None, group_merging='distance', memory=True, mergeTinyGroups=False)
+                clx = CLASSIX(sorting=None, group_merging='distance', mergeTinyGroups=False)
                 clx.fit_transform(X)
 
                 clx.timing()
@@ -367,29 +349,22 @@ class TestClassix(unittest.TestCase):
         try:
             data = np.random.randn(10000, 2)
             
-            inverse_ind1, spl1, _, _, _, _, _ = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind2, spl2, _, _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind3, spl3, _, _, _, _, _ = aggregation_c.precompute_aggregate(data, "pca", 0.5)
-            inverse_ind4, spl4, _, _, _, _ = aggregation.aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind5, spl5, _, _, _, _ = aggregation_c.aggregate(data, "pca", 0.5)
-            inverse_ind6, spl6, _, _, _, _ = aggregation_cm.aggregate(data, "pca", 0.5)
-            inverse_ind7, spl7, _, _, _, _, _ = aggregation.precompute_aggregate_pca(data, sorting="pca", tol=0.5)
-            inverse_ind8, spl8, _, _, _, _, _ = aggregation_c.precompute_aggregate_pca(data, "pca", 0.5)
-            inverse_ind9, spl9, _, _, _, _, _ = aggregation_cm.precompute_aggregate_pca(data, "pca", 0.5)
+            inverse_ind1, spl1, _, _, _, _, _ = aggregation.general_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind2, spl2, _, _, _, _, _ = aggregation_cm.general_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind3, spl3, _, _, _, _, _ = aggregation_c.general_aggregate(data, "pca", 0.5)
+            inverse_ind7, spl7, _, _, _, _, _ = aggregation.pca_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind8, spl8, _, _, _, _, _ = aggregation_c.pca_aggregate(data, "pca", 0.5)
+            inverse_ind9, spl9, _, _, _, _, _ = aggregation_cm.pca_aggregate(data, "pca", 0.5)
             
-            _, _, _, _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="norm-mean", tol=0.5)
-            _, _, _, _, _, _, _ = aggregation_c.precompute_aggregate(data, "norm-mean", 0.5)
+            _, _, _, _, _, _, _ = aggregation_cm.general_aggregate(data, sorting="norm-mean", tol=0.5)
+            _, _, _, _, _, _, _ = aggregation_c.general_aggregate(data, "norm-mean", 0.5)
             
-            _, _, _, _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="NA", tol=0.5)
-            _, _, _, _, _, _, _ = aggregation_c.precompute_aggregate(data, "NA", 0.5)
+            _, _, _, _, _, _, _ = aggregation_cm.general_aggregate(data, sorting="NA", tol=0.5)
+            _, _, _, _, _, _, _ = aggregation_c.general_aggregate(data, "NA", 0.5)
             
             if np.sum(inverse_ind1 != inverse_ind2) != 0:
                 checkpoint = 0
             if np.sum(inverse_ind2 != inverse_ind3) != 0:
-                checkpoint = 0
-            if np.sum(inverse_ind3 != inverse_ind4) != 0:
-                checkpoint = 0
-            if np.sum(inverse_ind5 != inverse_ind6) != 0:
                 checkpoint = 0
             if np.sum(inverse_ind7 != inverse_ind8) != 0:
                 checkpoint = 0
@@ -401,26 +376,10 @@ class TestClassix(unittest.TestCase):
                     checkpoint = 0
                 if spl2[i][0] != spl3[i][0]:
                     checkpoint = 0
-                if spl3[i][0] != spl4[i][0]:
-                    checkpoint = 0
-                if spl4[i][0] != spl5[i][0]:
-                    checkpoint = 0
-                if spl5[i][0] != spl6[i][0]:
-                    checkpoint = 0
-                if spl6[i][0] != spl7[i][0]:
-                    checkpoint = 0
                     
                 if spl1[i][1] != spl2[i][1]:
                     checkpoint = 0
                 if spl2[i][1] != spl3[i][1]:
-                    checkpoint = 0
-                if spl3[i][1] != spl4[i][1]:
-                    checkpoint = 0
-                if spl4[i][1] != spl5[i][1]:
-                    checkpoint = 0
-                if spl5[i][1] != spl6[i][1]:
-                    checkpoint = 0
-                if spl6[i][1] != spl7[i][1]:
                     checkpoint = 0
         except:
             checkpoint = 0
@@ -435,7 +394,7 @@ class TestClassix(unittest.TestCase):
         data = np.random.randn(10000, 2)
         checkpoint = 1
         try:    
-            labels, splist, nr_dist, ind, sort_vals, data, half_nrm2 = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5) #
+            labels, splist, nr_dist, ind, sort_vals, data, half_nrm2 = aggregation.general_aggregate(data, sorting="pca", tol=0.5) #
             splist = np.asarray(splist)
             
             radius = 0.5
