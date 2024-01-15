@@ -32,13 +32,13 @@ def cython_is_available(verbose=0):
             import numpy
             
             try: # check if Cython packages are loaded properly
-                from .aggregation_cm import general_aggregate, pca_aggregate
-                from .merging_cm import density_merging, distance_merging
+                from .aggregate_cm import general_aggregate, pca_aggregate
+                from .merge_cm import density_merge, distance_merge
                 # cython with memoryviews
                 # Typed memoryviews allow efficient access to memory buffers, such as those underlying NumPy arrays, without incurring any Python overhead. 
             
             except ModuleNotFoundError:
-                from .aggregation_c import general_aggregate, pca_aggregate
+                from .aggregate_c import general_aggregate, pca_aggregate
                 
                 __cython_type__ =  "trivial"
 
@@ -452,35 +452,35 @@ class CLASSIX:
 
         from . import __enable_cython__
         self.__enable_cython__ = __enable_cython__
-        self.__enable_aggregation_cython__ = False
+        self.__enable_aggregate_cython__ = False
         
         if self.__enable_cython__:
             try:
                 try:
-                    from .aggregation_cm import general_aggregate, pca_aggregate
+                    from .aggregate_cm import general_aggregate, pca_aggregate
                     
                 except ModuleNotFoundError:
-                    from .aggregation_c import general_aggregate, pca_aggregate
+                    from .aggregate_c import general_aggregate, pca_aggregate
                 
-                self.__enable_aggregation_cython__ = True
+                self.__enable_aggregate_cython__ = True
 
                 import platform
                 
                 if platform.system() == 'Windows':
-                    from .merging_cm_win import density_merging, distance_merging, distance_merging_mtg
+                    from .merge_cm_win import density_merge, distance_merge, distance_merge_mtg
                 else:
-                    from .merging_cm import density_merging, distance_merging, distance_merging_mtg
+                    from .merge_cm import density_merge, distance_merge, distance_merge_mtg
 
             except (ModuleNotFoundError, ValueError):
-                if not self.__enable_aggregation_cython__:
-                    from .aggregation import general_aggregate, pca_aggregate
+                if not self.__enable_aggregate_cython__:
+                    from .aggregate import general_aggregate, pca_aggregate
                 
-                from .merging import density_merging, distance_merging, distance_merging_mtg
+                from .merge import density_merge, distance_merge, distance_merge_mtg
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
-            from .aggregation import general_aggregate, pca_aggregate
-            from .merging import density_merging, distance_merging, distance_merging_mtg
+            from .aggregate import general_aggregate, pca_aggregate
+            from .merge import density_merge, distance_merge, distance_merge_mtg
             warnings.warn("This run of CLASSIX is not using Cython.")
 
 
@@ -490,12 +490,12 @@ class CLASSIX:
             self._aggregate = general_aggregate
             
 
-        self._density_merging = density_merging
+        self._density_merge = density_merge
         
         if self.__mergeTinyGroups:
-            self._distance_merging = distance_merging
+            self._distance_merge = distance_merge
         else:
-            self._distance_merging = distance_merging_mtg
+            self._distance_merge = distance_merge_mtg
 
             
     def fit(self, data):
@@ -687,7 +687,7 @@ class CLASSIX:
             agg_labels = np.asarray(agg_labels)
             labels = copy.deepcopy(agg_labels) 
             
-            self.merge_groups, self.connected_pairs_ = self._density_merging(data, splist, 
+            self.merge_groups, self.connected_pairs_ = self._density_merge(data, splist, 
                                                                              radius, sort_vals=sort_vals, 
                                                                              half_nrm2=self.__half_nrm2)
             maxid = max(labels) + 1
@@ -752,7 +752,7 @@ class CLASSIX:
         else:
             self.__half_nrm2 = self.__half_nrm2[self.splist_[:, 0]]
 
-            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merging(data=data, 
+            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merge(data=data, 
                                                                     labels=agg_labels,
                                                                     splist=splist,
                                                                     radius=radius,

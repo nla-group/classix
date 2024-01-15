@@ -13,15 +13,15 @@ from classix import CLASSIX, loadData, cython_is_available
 from classix.clustering import calculate_cluster_centers
 from classix import preprocessing
 from classix import aggregation, aggregation_c, aggregation_cm
-from classix.merging import distance_merging_mtg, distance_merging, density_merging
+from classix.merge import distance_merge_mtg, distance_merge, density_merge
 import platform
 
 if platform.system() == 'Windows':
-    from classix.merging_cm_win import distance_merging as distance_merging_cm
-    from classix.merging_cm_win import density_merging as density_merging_cm
+    from classix.merge_cm_win import distance_merge as distance_merge_cm
+    from classix.merge_cm_win import density_merge as density_merge_cm
 else:
-    from classix.merging_cm import distance_merging as distance_merging_cm
-    from classix.merging_cm import density_merging as density_merging_cm
+    from classix.merge_cm import distance_merge as distance_merge_cm
+    from classix.merge_cm import density_merge as density_merge_cm
 
 from sklearn.metrics.cluster import adjusted_rand_score
 
@@ -401,12 +401,12 @@ class TestClassix(unittest.TestCase):
             splist = np.asarray(splist)
             half_nrm2_sp = half_nrm2[splist[:,0]]
             
-            label_set1, connected_pairs_store1 = density_merging(data, splist, radius, sort_vals, half_nrm2)
-            label_set2, connected_pairs_store2 = density_merging_cm(data, splist, radius, sort_vals, half_nrm2)
+            label_set1, connected_pairs_store1 = density_merge(data, splist, radius, sort_vals, half_nrm2)
+            label_set2, connected_pairs_store2 = density_merge_cm(data, splist, radius, sort_vals, half_nrm2)
             
-            label_set3, _,_ = distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2_sp)
-            label_set4, _,_ = distance_merging_cm(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2_sp)
-            label_set5, _,_ = distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2_sp)
+            label_set3, _,_ = distance_merge(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2_sp)
+            label_set4, _,_ = distance_merge_cm(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2_sp)
+            label_set5, _,_ = distance_merge_mtg(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2_sp)
             
             for i in range(len(label_set2)):
                 if label_set1[i] != label_set2[i]:
