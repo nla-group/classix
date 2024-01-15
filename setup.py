@@ -65,17 +65,17 @@ setup_args = {'name':"classixclustering",
         'license':'MIT License'
 }
 
-aggregation_c = Extension('classix.aggregation_c',
-                        sources=['classix/aggregation_c.pyx'])
+aggregation_c = Extension('classix.aggregate_c',
+                        sources=['classix/aggregate_c.pyx'])
 
-aggregation_cm = Extension('classix.aggregation_cm',
-                        sources=['classix/aggregation_cm.pyx'])
+aggregation_cm = Extension('classix.aggregate_cm',
+                        sources=['classix/aggregate_cm.pyx'])
 
-merging_cm = Extension('classix.merging_cm',
-                        sources=['classix/merging_cm.pyx'])
+merging_cm = Extension('classix.merge_cm',
+                        sources=['classix/merge_cm.pyx'])
 
-merging_cm_win = Extension('classix.merging_cm_win',
-                        sources=['classix/merging_cm_win.pyx'])
+merging_cm_win = Extension('classix.merge_cm_win',
+                        sources=['classix/merge_cm_win.pyx'])
 
 try:
     # from Cython.Build import cythonize
