@@ -349,18 +349,18 @@ class TestClassix(unittest.TestCase):
         try:
             data = np.random.randn(10000, 2)
             
-            inverse_ind1, spl1, _, _, _, _, _ = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind2, spl2, _, _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="pca", tol=0.5)
-            inverse_ind3, spl3, _, _, _, _, _ = aggregation_c.precompute_aggregate(data, "pca", 0.5)
-            inverse_ind7, spl7, _, _, _, _, _ = aggregation.precompute_aggregate_pca(data, sorting="pca", tol=0.5)
-            inverse_ind8, spl8, _, _, _, _, _ = aggregation_c.precompute_aggregate_pca(data, "pca", 0.5)
-            inverse_ind9, spl9, _, _, _, _, _ = aggregation_cm.precompute_aggregate_pca(data, "pca", 0.5)
+            inverse_ind1, spl1, _, _, _, _, _ = aggregation.general_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind2, spl2, _, _, _, _, _ = aggregation_cm.general_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind3, spl3, _, _, _, _, _ = aggregation_c.general_aggregate(data, "pca", 0.5)
+            inverse_ind7, spl7, _, _, _, _, _ = aggregation.pca_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind8, spl8, _, _, _, _, _ = aggregation_c.pca_aggregate(data, "pca", 0.5)
+            inverse_ind9, spl9, _, _, _, _, _ = aggregation_cm.pca_aggregate(data, "pca", 0.5)
             
-            _, _, _, _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="norm-mean", tol=0.5)
-            _, _, _, _, _, _, _ = aggregation_c.precompute_aggregate(data, "norm-mean", 0.5)
+            _, _, _, _, _, _, _ = aggregation_cm.general_aggregate(data, sorting="norm-mean", tol=0.5)
+            _, _, _, _, _, _, _ = aggregation_c.general_aggregate(data, "norm-mean", 0.5)
             
-            _, _, _, _, _, _, _ = aggregation_cm.precompute_aggregate(data, sorting="NA", tol=0.5)
-            _, _, _, _, _, _, _ = aggregation_c.precompute_aggregate(data, "NA", 0.5)
+            _, _, _, _, _, _, _ = aggregation_cm.general_aggregate(data, sorting="NA", tol=0.5)
+            _, _, _, _, _, _, _ = aggregation_c.general_aggregate(data, "NA", 0.5)
             
             if np.sum(inverse_ind1 != inverse_ind2) != 0:
                 checkpoint = 0
@@ -394,7 +394,7 @@ class TestClassix(unittest.TestCase):
         data = np.random.randn(10000, 2)
         checkpoint = 1
         try:    
-            labels, splist, nr_dist, ind, sort_vals, data, half_nrm2 = aggregation.precompute_aggregate(data, sorting="pca", tol=0.5) #
+            labels, splist, nr_dist, ind, sort_vals, data, half_nrm2 = aggregation.general_aggregate(data, sorting="pca", tol=0.5) #
             splist = np.asarray(splist)
             
             radius = 0.5
