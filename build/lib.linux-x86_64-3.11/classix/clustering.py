@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 from numpy.linalg import norm
 from scipy.spatial import distance
-
+from time import time
 
 def cython_is_available(verbose=0):
     """Check if CLASSIX is using Cython."""
@@ -32,13 +32,13 @@ def cython_is_available(verbose=0):
             import numpy
             
             try: # check if Cython packages are loaded properly
-                from .aggregation_cm import aggregate
-                from .merging_cm import density_merging, distance_merging
+                from .aggregate_cm import general_aggregate, pca_aggregate
+                from .merge_cm import density_merge, distance_merge
                 # cython with memoryviews
                 # Typed memoryviews allow efficient access to memory buffers, such as those underlying NumPy arrays, without incurring any Python overhead. 
             
             except ModuleNotFoundError:
-                from .aggregation_c import aggregate, precompute_aggregate, precompute_aggregate_pca
+                from .aggregate_c import general_aggregate, pca_aggregate
                 
                 __cython_type__ =  "trivial"
 
@@ -353,11 +353,6 @@ class CLASSIX:
         
         - 'set': Use disjoint set structure to merge connected groups.
 
-    memory : boolean, default=False
-        If Cython memoryviews is disabled, a fast algorithm with less efficient memory 
-          consumption is triggered since precomputation for aggregation is used. 
-        Setting it True will use a memory efficient computing.  
-        If Cython memoryviews is effective, this parameter can be ignored. 
     
     verbose : boolean or int, default=1
         Whether to print the logs or not.
@@ -434,7 +429,7 @@ class CLASSIX:
     """
         
     def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", norm=True, mergeScale=1.5, 
-                 post_alloc=True, mergeTinyGroups=True, memory=False, verbose=1, short_log_form=True): 
+                 post_alloc=True, mergeTinyGroups=True, verbose=1, short_log_form=True): 
 
         self.__verbose = verbose
         self.minPts = int(minPts)
@@ -454,58 +449,53 @@ class CLASSIX:
         if self.__verbose:
             print(self)
         
-        self.__memory = memory
 
         from . import __enable_cython__
         self.__enable_cython__ = __enable_cython__
-        self.__enable_aggregation_cython__ = False
+        self.__enable_aggregate_cython__ = False
         
         if self.__enable_cython__:
             try:
                 try:
-                    from .aggregation_cm import aggregate
-                    from .aggregation_cm import aggregate as precompute_aggregate, precompute_aggregate_pca
+                    from .aggregate_cm import general_aggregate, pca_aggregate
                     
                 except ModuleNotFoundError:
-                    from .aggregation_c import aggregate, precompute_aggregate, precompute_aggregate_pca 
+                    from .aggregate_c import general_aggregate, pca_aggregate
                 
-                self.__enable_aggregation_cython__ = True
+                self.__enable_aggregate_cython__ = True
 
                 import platform
                 
                 if platform.system() == 'Windows':
-                    from .merging_cm_win import density_merging, distance_merging, distance_merging_mtg
+                    from .merge_cm_win import density_merge, distance_merge, distance_merge_mtg
                 else:
-                    from .merging_cm import density_merging, distance_merging, distance_merging_mtg
+                    from .merge_cm import density_merge, distance_merge, distance_merge_mtg
 
             except (ModuleNotFoundError, ValueError):
-                if not self.__enable_aggregation_cython__:
-                    from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
+                if not self.__enable_aggregate_cython__:
+                    from .aggregate import general_aggregate, pca_aggregate
                 
-                from .merging import density_merging, distance_merging, distance_merging_mtg
+                from .merge import density_merge, distance_merge, distance_merge_mtg
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
-            from .aggregation import aggregate, precompute_aggregate, precompute_aggregate_pca
-            from .merging import density_merging, distance_merging, distance_merging_mtg
+            from .aggregate import general_aggregate, pca_aggregate
+            from .merge import density_merge, distance_merge, distance_merge_mtg
             warnings.warn("This run of CLASSIX is not using Cython.")
 
 
-        if not self.__memory:
-            if sorting == 'pca':
-                self._aggregate = precompute_aggregate_pca
-            else:
-                self._aggregate = precompute_aggregate
-            
+        if sorting == 'pca':
+            self._aggregate = pca_aggregate
         else:
-            self._aggregate = aggregate
+            self._aggregate = general_aggregate
+            
 
-        self._density_merging = density_merging
+        self._density_merge = density_merge
         
         if self.__mergeTinyGroups:
-            self._distance_merging = distance_merging
+            self._distance_merge = distance_merge
         else:
-            self._distance_merging = distance_merging_mtg
+            self._distance_merge = distance_merge_mtg
 
             
     def fit(self, data):
@@ -525,10 +515,11 @@ class CLASSIX:
             data = np.array(data)
             if len(data.shape) == 1:
                 data = data.reshape(-1,1)
-                
+
+        self.t1_prepare = time()        
         if data.dtype !=  'float64':
             data = data.astype('float64')
-            
+        
         if self.sorting == "norm-mean":
             self.mu_ = data.mean(axis=0)
             self.data = data - self.mu_
@@ -558,23 +549,22 @@ class CLASSIX:
             self.mu_, self.dataScale_ = 0, 1 # no preprocessing
             self.data = (data - self.mu_) / self.dataScale_
         
-        # aggregation
-        if not self.__memory:
-            self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, self.data, self.__half_nrm2 = self._aggregate(data=self.data,
-                                                                                                    sorting=self.sorting, 
-                                                                                                    tol=self.radius
-                                                                                                ) 
-            
-            
+        self.t1_prepare = time() - self.t1_prepare
 
-        else:
-            self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, self.data = self._aggregate(data=self.data,
-                                                                                                sorting=self.sorting, 
-                                                                                                tol=self.radius
-                                                                                            ) 
+        self.t2_aggregate = time()
+        # aggregation
         
+        self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, self.data, self.__half_nrm2 = self._aggregate(
+                                                                                data=self.data,
+                                                                                sorting=self.sorting, 
+                                                                                tol=self.radius
+                                                                            ) 
+            
+            
         self.splist_ = np.array(self.splist_)
-        
+        self.t2_aggregate = time() - self.t2_aggregate
+
+        self.t3_merge = time()
         if self.group_merging is None:
             self.inverse_ind = np.argsort(self.ind)
             self.labels_ = copy.deepcopy(self.groups_[self.inverse_ind]) 
@@ -594,6 +584,8 @@ class CLASSIX:
                 minPts=self.minPts
             ) 
 
+        self.t3_merge = time() - self.t3_merge
+        
         self.__fit__ = True
         return self
 
@@ -692,13 +684,10 @@ class CLASSIX:
 
         if method == 'density':
 
-            if self.__memory: 
-                self.__half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
-
             agg_labels = np.asarray(agg_labels)
             labels = copy.deepcopy(agg_labels) 
             
-            self.merge_groups, self.connected_pairs_ = self._density_merging(data, splist, 
+            self.merge_groups, self.connected_pairs_ = self._density_merge(data, splist, 
                                                                              radius, sort_vals=sort_vals, 
                                                                              half_nrm2=self.__half_nrm2)
             maxid = max(labels) + 1
@@ -722,6 +711,7 @@ class CLASSIX:
             
             self.old_cluster_count = collections.Counter(labels)
             
+            self.t4_minPts = time()
             if minPts >= 1:
                 potential_noise_labels = self.outlier_filter(min_samples=minPts) # calculate the min_samples directly
                 SIZE_NOISE_LABELS = len(potential_noise_labels) 
@@ -733,44 +723,36 @@ class CLASSIX:
                     for i in np.unique(potential_noise_labels):
                         labels[labels == i] = maxid # marked as noises, 
                                                     # the label number is not included in any of existing labels (maxid).
-            else:
-                potential_noise_labels = list()
-                SIZE_NOISE_LABELS = 0
+                            
+                if SIZE_NOISE_LABELS > 0:
+                    self.clean_index_ = labels != maxid
+                    agln = agg_labels[self.clean_index_]
+                    label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
+                    # allocate the outliers to the corresponding closest cluster.
+                    
+                    self.group_outliers_ = np.unique(agg_labels[~self.clean_index_]) # abnormal groups
+                    unique_agln = np.unique(agln)
+                    splist_clean = splist[unique_agln]
+
+                    if self.__post_alloc:
+                        for nsp in self.group_outliers_:
+                            alloc_class = np.argmin(
+                                np.linalg.norm(data[splist_clean[:, 0].astype(int)] - data[int(splist[nsp, 0])], axis=1, ord=2)
+                                )
+                            
+                            labels[agg_labels == nsp] = label_change[unique_agln[alloc_class]]
+                    else:
+                        labels[np.isin(agg_labels, self.group_outliers_)] = -1
 
             # remove noise cluster, avoid connecting two separate to a single cluster
             # the label with the maxid is label marked noises
-            
-            if SIZE_NOISE_LABELS > 0:
-                
-                self.clean_index_ = labels != maxid
-                agln = agg_labels[self.clean_index_]
-                label_change = dict(zip(agln, labels[self.clean_index_])) # how object change group to cluster.
-                # allocate the outliers to the corresponding closest cluster.
-                
-                self.group_outliers_ = np.unique(agg_labels[~self.clean_index_]) # abnormal groups
-                unique_agln = np.unique(agln)
-                splist_clean = splist[unique_agln]
 
-                if self.__post_alloc:
-                    for nsp in self.group_outliers_:
-                        alloc_class = np.argmin(
-                            np.linalg.norm(data[splist_clean[:, 0].astype(int)] - data[int(splist[nsp, 0])], axis=1, ord=2)
-                            )
-                        
-                        labels[agg_labels == nsp] = label_change[unique_agln[alloc_class]]
-                else:
-                    labels[np.isin(agg_labels, self.group_outliers_)] = -1
-                
+            self.t4_minPts = time() - self.t4_minPts
             
         else:
-            if self.__memory: 
-                spdata = data[splist[:, 0]]
-                self.__half_nrm2 = np.einsum('ij,ij->i', spdata, spdata) * 0.5
-                # norm(data[splist[:, 0]], axis=1, ord=2)**2 * 0.5 # precomputation
-            else:
-                self.__half_nrm2 = self.__half_nrm2[self.splist_[:, 0]]
+            self.__half_nrm2 = self.__half_nrm2[self.splist_[:, 0]]
 
-            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merging(data=data, 
+            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merge(data=data, 
                                                                     labels=agg_labels,
                                                                     splist=splist,
                                                                     radius=radius,
@@ -1001,7 +983,7 @@ class CLASSIX:
         
         """
         from scipy.sparse.linalg import svds
-        
+        self.t5_finalize = time()
         # -----------------------------second method--------------------------------
         if sp_bbox is None:
             sp_bbox = dict()
@@ -1652,6 +1634,8 @@ class CLASSIX:
                         print("""There is no path of overlapping groups between these clusters.""")
 
                 self.connected_paths = connected_paths
+
+        self.t5_finalize = self.t5_finalize - time()
         return 
     
 
@@ -1722,7 +1706,28 @@ class CLASSIX:
         return
     
         
-    
+
+    def timing(self):
+        """
+        This method will print five timing information regarding classix clustering:
+            (1) t1_prepare: The initial data preparation, which mainly comprises data scaling and the computation of the first two principal axes.
+            (2) t2_aggregate: This phase aggregates all data points into groups determined by the radius parameter of CLASSIX.
+            (3) t3_merge: The computed groups will be merged into clusters when their group centers (starting points) are sufficiently close.
+            (4) t4_minPts: Clusters with fewer than minPts points will be dissolved into their groups, and each of the groups will then be reassigned to a large enough cluster.
+            (5) t5_finalize: Any cleanup activities.
+        """
+        if hasattr(self, '__fit__'):
+            print("t1_prepare:", self.t1_prepare)
+            print("t2_aggregate:", self.t2_aggregate)
+            print("t3_merge:", self.t3_merge)
+            print("t3_merge time:", self.t3_merge)
+            if hasattr(self, 't5_finalize'):
+                print("t5_finalize time:", self.t5_finalize)
+        else:
+            raise NotFittedError("Please use .fit() method first.")
+
+
+
     def getPath(self, index1, index2, include_dist=False):
         """
         Get the indices of connected data points between index1 data and index2 data.

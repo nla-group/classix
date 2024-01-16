@@ -13,7 +13,7 @@ import numpy as np
 from scipy.special import betainc, gamma
 
 
-def distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2):
+def distance_merge_mtg(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2):
     """
     Implement CLASSIX's merging without merging tiny groups
     
@@ -140,7 +140,7 @@ def distance_merging_mtg(data, labels, splist, radius, minPts, scale, sort_vals,
 
 
 
-def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2):
+def distance_merge(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2):
     """
     Implement CLASSIX's merging with early stopping and BLAS routines
     
@@ -264,7 +264,7 @@ def distance_merging(data, labels, splist, radius, minPts, scale, sort_vals, hal
 
 
 
-def density_merging(data, splist, radius, sort_vals, half_nrm2):
+def density_merge(data, splist, radius, sort_vals, half_nrm2):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
     
