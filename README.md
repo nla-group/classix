@@ -220,16 +220,16 @@ Any form of contribution is welcome. We particularly welcome the contribution of
 
 ## Citation 
 ```bibtex
-@techreport{CG22b,
+@article{CG24,
   title   = {Fast and explainable clustering based on sorting},
   author  = {Chen, Xinye and G\"{u}ttel, Stefan},
-  year    = {2022},
-  number  = {arXiv:2202.01456},
-  pages   = {25},
-  institution = {The University of Manchester},
-  address = {UK},
-  type    = {arXiv EPrint},
-  url     = {https://arxiv.org/abs/2202.01456}
+  year    = {2024},
+  volume  = {},
+  number  = {},
+  pages   = {},
+  journal = {To appear in Pattern Recognition},
+  url     = {https://arxiv.org/abs/2202.01456},
+  webpdf  = {https://arxiv.org/abs/2202.01456}
 }
 ```
 
