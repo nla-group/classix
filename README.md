@@ -228,8 +228,7 @@ Any form of contribution is welcome. We particularly welcome the contribution of
   number  = {},
   pages   = {},
   journal = {To appear in Pattern Recognition},
-  url     = {https://arxiv.org/abs/2202.01456},
-  webpdf  = {https://arxiv.org/abs/2202.01456}
+  url     = {https://arxiv.org/abs/2202.01456}
 }
 ```
 
