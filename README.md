@@ -221,14 +221,13 @@ Any form of contribution is welcome. We particularly welcome the contribution of
 ## Citation 
 ```bibtex
 @article{CG24,
-  title   = {Fast and explainable clustering based on sorting},
-  author  = {Chen, Xinye and G\"{u}ttel, Stefan},
-  year    = {2024},
-  volume  = {},
-  number  = {},
-  pages   = {},
-  journal = {Pattern Recognition},
-  url     = {https://doi.org/10.1016/j.patcog.2024.110298}
+title = {Fast and explainable clustering based on sorting},
+author = {Xinye Chen and Stefan Güttel},
+journal = {Pattern Recognition},
+volume = {150},
+pages = {110298},
+year = {2024},
+doi = {https://doi.org/10.1016/j.patcog.2024.110298}
 }
 ```
 
