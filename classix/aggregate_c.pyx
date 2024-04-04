@@ -4,7 +4,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2023 Stefan Guettel, Xinye Chen
+# Copyright (c) 2024 Stefan Guettel, Xinye Chen
 
 
 #!python
@@ -25,7 +25,9 @@ np.import_array()
 @cython.wraparound(False)
 @cython.binding(True)
 
-cpdef pca_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting='pca', double tol=0.5):
+cpdef pca_aggregate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.float64_t, ndim=1] sort_vals, 
+                    np.ndarray[np.float64_t, ndim=1] half_nrm2, int len_ind, 
+                    str sorting='pca', double tol=0.5):
     """Aggregate the data with PCA using precomputation
 
     Parameters
@@ -68,14 +70,11 @@ cpdef pca_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting='pca', do
     
     cdef int num_group
     cdef Py_ssize_t fdim = data.shape[1] # feature dimension
-    cdef Py_ssize_t len_ind = data.shape[0] # size of data
-    cdef np.ndarray[np.float64_t, ndim=2] U1
 
     cdef int nr_dist = 0 
     cdef int lab = 0 
     cdef list labels = [-1]*len_ind
     cdef list splist = list() 
-    cdef np.ndarray[np.float64_t, ndim=1] sort_vals
     cdef np.ndarray[np.float64_t, ndim=1] clustc
     cdef np.ndarray[np.int64_t, ndim=1] ind
     cdef Py_ssize_t i, j
@@ -84,23 +83,9 @@ cpdef pca_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting='pca', do
     cdef double half_r2 = tol**2 * 0.5
     cdef double rhs
 
-    if fdim > 1:
-        if fdim <= 3: # memory inefficient
-            gemm = get_blas_funcs("gemm", [data.T, data])
-            _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
-            sort_vals = data@U1.reshape(-1)
-        else:
-            U1, s1, _ = svds(data, k=1, return_singular_vectors=True)
-            sort_vals = U1[:,0]*s1[0]
-    else:
-        sort_vals = data[:,0]
-        
-    sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
-
     ind = np.argsort(sort_vals)
     data = data[ind]
     sort_vals = sort_vals[ind] 
-    cdef np.ndarray[np.float64_t, ndim=1] half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
 
     for i in range(len_ind): 
         if labels[i] >= 0:
@@ -126,10 +111,12 @@ cpdef pca_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting='pca', do
         splist.append((i, num_group))
         lab += 1
 
-    return labels, splist, nr_dist, ind, sort_vals, data, half_nrm2
+    return labels, splist, nr_dist, ind, sort_vals, data
 
 
-cpdef general_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", double tol=0.5):
+cpdef general_aggregate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.float64_t, ndim=1] sort_vals, 
+                    np.ndarray[np.float64_t, ndim=1] half_nrm2, int len_ind, 
+                    str sorting='pca', double tol=0.5):
     """Aggregate the data using precomputation
 
     Parameters
@@ -172,50 +159,23 @@ cpdef general_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca"
     
     cdef int num_group
     cdef Py_ssize_t fdim = data.shape[1] # feature dimension
-    cdef Py_ssize_t len_ind = data.shape[0] # size of data
-    cdef np.ndarray[np.float64_t, ndim=2] U1
     cdef int nr_dist = 0 
     cdef int lab = 0 
     cdef double dist
     cdef list labels = [-1]*len_ind
     cdef list splist = list() 
-    cdef np.ndarray[np.float64_t, ndim=1] sort_vals
     cdef np.ndarray[np.float64_t, ndim=1] clustc
     cdef np.ndarray[np.int64_t, ndim=1] ind
     cdef Py_ssize_t i, j, coord
     
     cdef double half_r2 = tol**2 * 0.5
-    cdef np.ndarray[np.float64_t, ndim=1] half_nrm2
     
     cdef np.ndarray[np.float64_t, ndim=1] dataj
     cdef double rhs
 
-    if sorting == "norm-mean" or sorting == "norm-orthant": 
-        sort_vals = np.linalg.norm(data, ord=2, axis=1)
-
-    elif sorting == "pca":
-        if fdim > 1:
-            if fdim <= 3: # memory inefficient
-                gemm = get_blas_funcs("gemm", [data.T, data])
-                _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
-                sort_vals = data@U1.reshape(-1)
-            else:
-                U1, s1, _ = svds(data, k=1, return_singular_vectors=True)
-                sort_vals = U1[:,0]*s1[0]
-
-        else:
-            sort_vals = data[:,0]
-            
-        sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
-        
-
-    else: # no sorting
-        sort_vals = np.zeros(len_ind)
-        
     ind = np.argsort(sort_vals)
     data = data[ind]
     sort_vals = sort_vals[ind] 
-    half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
     
     for i in range(len_ind):
         if labels[i] >= 0:
@@ -251,5 +211,7 @@ cpdef general_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca"
 
         lab += 1
 
-    return labels, splist, nr_dist, ind, sort_vals, data, half_nrm2
+    return labels, splist, nr_dist, ind, sort_vals, data
+
+
 
