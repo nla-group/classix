@@ -4,7 +4,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2023 Stefan Güttel, Xinye Chen
+# Copyright (c) 2024 Stefan Güttel, Xinye Chen
 
 # Cython implementation for aggregation
 
@@ -19,7 +19,7 @@ np.import_array()
 @cython.wraparound(False)
 @cython.binding(True)
 
-cpdef pca_aggregate(double[:,:] data, str sorting='pca', double tol=0.5):
+cpdef pca_aggregate(double[:,:] data, double[:] sort_vals, double[:] half_nrm2, int len_ind, str sorting='pca', double tol=0.5):
     """Aggregate the data with PCA using precomputation
 
     Parameters
@@ -58,11 +58,9 @@ cpdef pca_aggregate(double[:,:] data, str sorting='pca', double tol=0.5):
         
     """
 
-    cdef Py_ssize_t len_ind, fdim, last_j
+    cdef Py_ssize_t fdim, last_j
     len_ind, fdim = data.base.shape
 
-    cdef double[:] sort_vals
-    cdef double[:, :] U1, _
     cdef long long[:] ind
     cdef unsigned int lab=0, nr_dist=0, num_group
     cdef double[:] clustc 
@@ -74,20 +72,11 @@ cpdef pca_aggregate(double[:,:] data, str sorting='pca', double tol=0.5):
     
     cdef double rhs
 
-    if fdim > 1:
-        U1, s1, _ = svds(np.asarray(data), k=1, return_singular_vectors=True)
-        sort_vals = U1[:,0]*s1[0]
-    else:
-        sort_vals = data[:,0]
-        
-    sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
-        
     ind = np.argsort(sort_vals)
     
     data = data.base[ind]
     sort_vals = sort_vals.base[ind] 
     cdef double half_r2 = tol**2 * 0.5
-    cdef double[:] half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
     cdef double[:] ips
     
     for i in range(len_ind): 
@@ -115,12 +104,12 @@ cpdef pca_aggregate(double[:,:] data, str sorting='pca', double tol=0.5):
         splist.append((i, num_group))
         lab += 1
 
-    return labels, splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data), np.asarray(half_nrm2)
+    return labels, splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data)
 
 
 
 
-cpdef general_aggregate(double[:,:] data, str sorting, double tol=0.5):
+cpdef general_aggregate(double[:,:] data, double[:] sort_vals, double[:] half_nrm2, int len_ind, str sorting='pca', double tol=0.5):
     """Aggregate the data using precomputation
 
     Parameters
@@ -163,9 +152,6 @@ cpdef general_aggregate(double[:,:] data, str sorting, double tol=0.5):
     """
 
     cdef Py_ssize_t fdim = data.shape[1] # feature dimension
-    cdef Py_ssize_t len_ind = data.shape[0] # size of data
-    cdef double[:] sort_vals
-    cdef double[:, :] U1, _  # = np.empty((len_ind, ), dtype=float)
     cdef long long[:] ind # = np.empty((len_ind, ), dtype=int)
     cdef unsigned int lab=0, nr_dist=0, num_group
     cdef double[:] clustc # starting point coordinates
@@ -173,32 +159,14 @@ cpdef general_aggregate(double[:,:] data, str sorting, double tol=0.5):
     cdef list labels = [-1]*len_ind
     cdef list splist = list() # list of starting points
     cdef Py_ssize_t i, j, coord
-    cdef double[:] half_nrm2
     cdef double half_r2 = tol**2 * 0.5
     cdef double[:] dataj
     cdef double rhs
 
-
-    if sorting == "norm-mean" or sorting == "norm-orthant":
-        sort_vals = np.linalg.norm(data, ord=2, axis=1)
-    
-    elif sorting == "pca":
-        if fdim > 1:
-            U1, s1, _ = svds(np.asarray(data), k=1, return_singular_vectors=True)
-            sort_vals = U1[:,0]*s1[0]
-        else:
-            sort_vals = data[:,0]
-            
-        sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
-    
-    else: # no sorting
-        sort_vals = np.zeros(len_ind)
-        
     ind = np.argsort(sort_vals)
     data = data.base[ind]
     sort_vals = sort_vals.base[ind] 
 
-    half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
 
     for i in range(len_ind): 
         if labels[i] >= 0:
@@ -235,6 +203,7 @@ cpdef general_aggregate(double[:,:] data, str sorting, double tol=0.5):
 
         lab += 1
   
-    return labels, splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data), np.asarray(half_nrm2)
+    return labels, splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data)
+
 
 
