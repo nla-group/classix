@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2023 Stefan Güttel, Xinye Chen
+# Copyright (c) 2024 Stefan Güttel, Xinye Chen
 #
 
 
@@ -348,28 +348,19 @@ class TestClassix(unittest.TestCase):
         checkpoint = 1
         try:
             data = np.random.randn(10000, 2)
-            sort_vals = np.zeros(len_ind) 
-            half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5 # precomputation
-            len_ind = data.shape[0]
-
-            inverse_ind1, spl1, _ = aggregate.general_aggregate(data, sort_vals=sort_vals, half_nrm2=half_nrm2, 
-                                                                len_ind=len_ind, sorting="pca", tol=0.5)
-            inverse_ind2, spl2, _ = aggregate_cm.general_aggregate(data, sort_vals=sort_vals, half_nrm2=half_nrm2, 
-                                                                len_ind=len_ind, sorting="pca", tol=0.5)
-            inverse_ind3, spl3, _ = aggregate_c.general_aggregate(data, sort_vals=sort_vals, half_nrm2=half_nrm2, 
-                                                                len_ind=len_ind, sorting="pca", tol=0.5)
-            inverse_ind7, spl7, _ = aggregate.pca_aggregate(data, sort_vals=sort_vals, half_nrm2=half_nrm2, 
-                                                                len_ind=len_ind, sorting="pca", tol=0.5)
-            inverse_ind8, spl8, _ = aggregate_c.pca_aggregate(data, sort_vals=sort_vals, half_nrm2=half_nrm2, 
-                                                                len_ind=len_ind, sorting="pca", tol=0.5)
-            inverse_ind9, spl9, _ = aggregate_cm.pca_aggregate(data, sort_vals=sort_vals, half_nrm2=half_nrm2, 
-                                                                len_ind=len_ind, sorting="pca", tol=0.5)
             
-            _, _, _ = aggregate_cm.general_aggregate(data, sorting="norm-mean", tol=0.5)
-            _, _, _ = aggregate_c.general_aggregate(data, "norm-mean", 0.5)
+            inverse_ind1, spl1, _, _, _, _, _ = aggregate.general_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind2, spl2, _, _, _, _, _ = aggregate_cm.general_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind3, spl3, _, _, _, _, _ = aggregate_c.general_aggregate(data, "pca", 0.5)
+            inverse_ind7, spl7, _, _, _, _, _ = aggregate.pca_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind8, spl8, _, _, _, _, _ = aggregate_c.pca_aggregate(data, "pca", 0.5)
+            inverse_ind9, spl9, _, _, _, _, _ = aggregate_cm.pca_aggregate(data, "pca", 0.5)
             
-            _, _, _ = aggregate_cm.general_aggregate(data, sorting="NA", tol=0.5)
-            _, _, _ = aggregate_c.general_aggregate(data, "NA", 0.5)
+            _, _, _, _, _, _, _ = aggregate_cm.general_aggregate(data, sorting="norm-mean", tol=0.5)
+            _, _, _, _, _, _, _ = aggregate_c.general_aggregate(data, "norm-mean", 0.5)
+            
+            _, _, _, _, _, _, _ = aggregate_cm.general_aggregate(data, sorting="NA", tol=0.5)
+            _, _, _, _, _, _, _ = aggregate_c.general_aggregate(data, "NA", 0.5)
             
             if np.sum(inverse_ind1 != inverse_ind2) != 0:
                 checkpoint = 0
