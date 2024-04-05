@@ -4,7 +4,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2024 Stefan Güttel, Xinye Chen
+# Copyright (c) 2023 Stefan Güttel, Xinye Chen
 
 
 import warnings
@@ -457,10 +457,10 @@ class CLASSIX:
         if self.__enable_cython__:
             try:
                 try:
-                    from .aggregate_cm import general_aggregate, pca_aggregate
+                    from .aggregate_cm import general_aggregate, pca_aggregate, lm_aggregate
                     
                 except ModuleNotFoundError:
-                    from .aggregate_c import general_aggregate, pca_aggregate
+                    from .aggregate_c import general_aggregate, pca_aggregate, lm_aggregate
                 
                 self.__enable_aggregate_cython__ = True
 
@@ -473,20 +473,24 @@ class CLASSIX:
 
             except (ModuleNotFoundError, ValueError):
                 if not self.__enable_aggregate_cython__:
-                    from .aggregate import general_aggregate, pca_aggregate
+                    from .aggregate import general_aggregate, pca_aggregate, lm_aggregate
                 
                 from .merge import density_merge, distance_merge, distance_merge_mtg
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
-            from .aggregate import general_aggregate, pca_aggregate
+            from .aggregate import general_aggregate, pca_aggregate, lm_aggregate
             from .merge import density_merge, distance_merge, distance_merge_mtg
             warnings.warn("This run of CLASSIX is not using Cython.")
 
-        if sorting == 'pca':
-            self._aggregate = pca_aggregate
+        
+        if platform.system() == 'Windows':
+            if sorting == 'pca':
+                self._aggregate = pca_aggregate
+            else:
+                self._aggregate = general_aggregate
         else:
-            self._aggregate = general_aggregate
+            self._aggregate = lm_aggregate
 
         self._density_merge = density_merge
         
@@ -506,9 +510,6 @@ class CLASSIX:
             The ndarray-like input of shape (n_samples,)
 
         """
-        from scipy.sparse.linalg import svds
-        from scipy.linalg import get_blas_funcs, eigh
-        
         if isinstance(data, pd.core.frame.DataFrame):
             self._index_data = data.index
             
@@ -516,11 +517,7 @@ class CLASSIX:
             data = np.array(data)
             if len(data.shape) == 1:
                 data = data.reshape(-1,1)
-        
-        ## compute sorting values
-        len_ind = data.shape[0]
-        fdim = data.shape[1]
-        
+
         self.t1_prepare = time()        
         if data.dtype !=  'float64':
             data = data.astype('float64')
@@ -532,8 +529,7 @@ class CLASSIX:
             if self.dataScale_ == 0: # prevent zero-division
                 self.dataScale_ = 1
             self.data = self.data / self.dataScale_
-            sort_vals = np.linalg.norm(data, ord=2, axis=1)
-            
+        
         elif self.sorting == "pca":
             self.mu_ = data.mean(axis=0)
             self.data = data - self.mu_ # mean center
@@ -543,22 +539,6 @@ class CLASSIX:
                 self.dataScale_ = 1
             self.data = self.data / self.dataScale_ # now 50% of data are in unit ball 
             
-            # change to svd 
-            if fdim > 1:
-                if fdim <= 3: # memory inefficient
-                    gemm = get_blas_funcs("gemm", [data.T, data])
-                    _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
-                    sort_vals = data@U1.reshape(-1)
-                else:
-                    U1, s1, _ = svds(data, k=1, return_singular_vectors=True)
-                    sort_vals = U1[:,0]*s1[0]
-
-            else:
-                sort_vals = data[:,0]
-
-            sort_vals = sort_vals*np.sign(-sort_vals[0]) 
-            # flip to enforce deterministic output
-            
         elif self.sorting == "norm-orthant":
             self.mu_ = data.min(axis=0)
             self.data = data - self.mu_
@@ -566,31 +546,23 @@ class CLASSIX:
             if self.dataScale_ == 0: # prevent zero-division
                 self.dataScale_ = 1
             self.data = self.data / self.dataScale_
-            sort_vals = np.linalg.norm(data, ord=2, axis=1)
+            
         else:
             self.mu_, self.dataScale_ = 0, 1 # no preprocessing
             self.data = (data - self.mu_) / self.dataScale_
-            sort_vals = np.zeros(len_ind) 
-            
+        
         self.t1_prepare = time() - self.t1_prepare
         self.t2_aggregate = time()
-        
         # aggregation
-        self.ind = np.argsort(sort_vals)
-        self.data = data[self.ind]
-        sort_vals = sort_vals[self.ind]
-
-        self.__half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5 # precomputation
-
-        ## aggregation
-        self.groups_, self.splist_, self.nrDistComp_ = self._aggregate(data=self.data,
-                                                                       sort_vals=sort_vals,
-                                                                       half_nrm2=self.__half_nrm2,
-                                                                       len_ind=len_ind,
-                                                                       sorting=self.sorting, 
-                                                                       tol=self.radius
-                                                                    ) 
+        
+        self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, self.data, self.__half_nrm2 = self._aggregate(
+                                                                                data=self.data,
+                                                                                sorting=self.sorting, 
+                                                                                tol=self.radius
+                                                                            ) 
             
+        if self.__half_nrm2 is None:
+            self.__half_nrm2 = np.einsum('ij,ij->i', self.data, self.data) * 0.5
             
         self.splist_ = np.array(self.splist_)
         self.t2_aggregate = time() - self.t2_aggregate
@@ -609,8 +581,7 @@ class CLASSIX:
                 data=self.data,
                 agg_labels=self.groups_, 
                 splist=self.splist_,  
-                ind=self.ind, 
-                sort_vals=sort_vals, 
+                ind=self.ind, sort_vals=sort_vals, 
                 radius=self.radius, 
                 method=self.group_merging, 
                 minPts=self.minPts
