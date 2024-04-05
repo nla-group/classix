@@ -577,8 +577,8 @@ class CLASSIX:
         
         # aggregation
         self.ind = np.argsort(sort_vals)
-        self.data = data[ind]
-        sort_vals = sort_vals[ind]
+        self.data = data[self.ind]
+        sort_vals = sort_vals[self.ind]
 
         self.__half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5 # precomputation
 
@@ -586,7 +586,7 @@ class CLASSIX:
         self.groups_, self.splist_, self.nrDistComp_ = self._aggregate(data=self.data,
                                                                        sort_vals=sort_vals,
                                                                        half_nrm2=self.__half_nrm2,
-                                                                       len_ind=self.len_ind,
+                                                                       len_ind=len_ind,
                                                                        sorting=self.sorting, 
                                                                        tol=self.radius
                                                                     ) 
