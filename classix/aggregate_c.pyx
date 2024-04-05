@@ -17,8 +17,6 @@
 cimport cython
 import numpy as np
 cimport numpy as np 
-from scipy.sparse.linalg import svds
-from scipy.linalg import get_blas_funcs, eigh
 np.import_array()
 
 @cython.boundscheck(False)
@@ -33,7 +31,16 @@ cpdef pca_aggregate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.float64
     Parameters
     ----------
     data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
+        The sorted input that is array-like of shape (n_samples,).
+
+    sort_vals  : numpy.ndarray
+            Sorting values.
+
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
+
+    len_ind : int
+        Number of data points, i.e., n_samples.
 
     sorting : str
         The sorting method for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
@@ -53,18 +60,6 @@ cpdef pca_aggregate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.float64
     
     nr_dist (int) :
         The number of pairwise distance calculations.
-
-    ind (numpy.ndarray):
-        Array storing Sorting indices.
-
-    sort_vals (numpy.ndarray):
-        Sorting values.
-    
-    data (numpy.ndarray):
-        Sorted data.
-    
-    half_nrm2 (numpy.ndarray):
-        Precomputed values for distance computation.
 
     """
     
@@ -111,7 +106,7 @@ cpdef pca_aggregate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.float64
         splist.append((i, num_group))
         lab += 1
 
-    return labels, splist, nr_dist, ind, sort_vals, data
+    return labels, splist, nr_dist
 
 
 cpdef general_aggregate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.float64_t, ndim=1] sort_vals, 
@@ -122,7 +117,16 @@ cpdef general_aggregate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.flo
     Parameters
     ----------
     data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
+        The sorted input that is array-like of shape (n_samples,).
+
+    sort_vals  : numpy.ndarray
+            Sorting values.
+
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
+
+    len_ind : int
+        Number of data points, i.e., n_samples.
 
     sorting : str
         The sorting method for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
@@ -142,18 +146,6 @@ cpdef general_aggregate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.flo
     
     nr_dist (int) :
         The number of pairwise distance calculations.
-
-    ind (numpy.ndarray):
-        Array storing Sorting indices.
-
-    sort_vals (numpy.ndarray):
-        Sorting values.
-    
-    data (numpy.ndarray):
-        Sorted data.
-    
-    half_nrm2 (numpy.ndarray):
-        Precomputed values for distance computation.
         
     """
     
@@ -211,7 +203,7 @@ cpdef general_aggregate(np.ndarray[np.float64_t, ndim=2] data, np.ndarray[np.flo
 
         lab += 1
 
-    return labels, splist, nr_dist, ind, sort_vals, data
+    return labels, splist, nr_dist
 
 
 

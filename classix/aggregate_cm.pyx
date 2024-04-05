@@ -12,7 +12,6 @@
 cimport cython
 import numpy as np
 cimport numpy as np 
-from scipy.sparse.linalg import svds
 np.import_array()
 
 @cython.boundscheck(False)
@@ -22,17 +21,29 @@ np.import_array()
 cpdef pca_aggregate(double[:,:] data, double[:] sort_vals, double[:] half_nrm2, int len_ind, str sorting='pca', double tol=0.5):
     """Aggregate the data with PCA using precomputation
 
+
     Parameters
     ----------
     data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
-    
+        The sorted input that is array-like of shape (n_samples,).
+
+    sort_vals  : numpy.ndarray
+            Sorting values.
+
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
+
+    len_ind : int
+        Number of data points, i.e., n_samples.
+
+    sorting : str
+        The sorting method for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
+
     tol : float
-        The tolerance to control the aggregation, if the distance between the starting point 
-        and the object is less than or equal than the tolerance,
-        the object should allocated to the group which starting point belongs to.  
-    
-    
+        The tolerance to control the aggregation. if the distance between the starting point 
+        of a group and another data point is less than or equal to the tolerance,
+        the point is allocated to that group.  
+
     Returns
     -------
     labels (list) : 
@@ -43,18 +54,6 @@ cpdef pca_aggregate(double[:,:] data, double[:] sort_vals, double[:] half_nrm2, 
     
     nr_dist (int) :
         The number of pairwise distance calculations.
-
-    ind (numpy.ndarray):
-        Array storing Sorting indices.
-
-    sort_vals (numpy.ndarray):
-        Sorting values.
-    
-    data (numpy.ndarray):
-        Sorted data.
-    
-    half_nrm2 (numpy.ndarray):
-        Precomputed values for distance computation.
         
     """
 
@@ -104,7 +103,7 @@ cpdef pca_aggregate(double[:,:] data, double[:] sort_vals, double[:] half_nrm2, 
         splist.append((i, num_group))
         lab += 1
 
-    return labels, splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data)
+    return labels, splist, nr_dist
 
 
 
@@ -112,20 +111,29 @@ cpdef pca_aggregate(double[:,:] data, double[:] sort_vals, double[:] half_nrm2, 
 cpdef general_aggregate(double[:,:] data, double[:] sort_vals, double[:] half_nrm2, int len_ind, str sorting='pca', double tol=0.5):
     """Aggregate the data using precomputation
 
+
     Parameters
     ----------
     data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
-    
+        The sorted input that is array-like of shape (n_samples,).
+
+    sort_vals  : numpy.ndarray
+            Sorting values.
+
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
+
+    len_ind : int
+        Number of data points, i.e., n_samples.
+
     sorting : str
-        The sorting way referred for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
-    
+        The sorting method for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
+
     tol : float
-        The tolerance to control the aggregation, if the distance between the starting point 
-        and the object is less than or equal than the tolerance,
-        the object should allocated to the group which starting point belongs to.  
-    
-    
+        The tolerance to control the aggregation. if the distance between the starting point 
+        of a group and another data point is less than or equal to the tolerance,
+        the point is allocated to that group.  
+
     Returns
     -------
     labels (list) : 
@@ -136,18 +144,6 @@ cpdef general_aggregate(double[:,:] data, double[:] sort_vals, double[:] half_nr
     
     nr_dist (int) :
         The number of pairwise distance calculations.
-
-    ind (numpy.ndarray):
-        Array storing Sorting indices.
-
-    sort_vals (numpy.ndarray):
-        Sorting values.
-    
-    data (numpy.ndarray):
-        Sorted data.
-    
-    half_nrm2 (numpy.ndarray):
-        Precomputed values for distance computation.
         
     """
 
@@ -203,7 +199,7 @@ cpdef general_aggregate(double[:,:] data, double[:] sort_vals, double[:] half_nr
 
         lab += 1
   
-    return labels, splist, nr_dist, np.asarray(ind), np.asarray(sort_vals), np.asarray(data)
+    return labels, splist, nr_dist
 
 
 

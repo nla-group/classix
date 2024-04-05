@@ -11,24 +11,35 @@
 
 
 import numpy as np
-from scipy.sparse.linalg import svds
-from scipy.linalg import get_blas_funcs, eigh
+
 
 
 def pca_aggregate(data, sort_vals, half_nrm2, len_ind, sorting="pca", tol=0.5):
     """Aggregate the data with PCA using precomputation
 
+ 
     Parameters
     ----------
     data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
-    
+        The sorted input that is array-like of shape (n_samples,).
+
+    sort_vals  : numpy.ndarray
+            Sorting values.
+
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
+
+    len_ind : int
+        Number of data points, i.e., n_samples.
+
+    sorting : str
+        The sorting method for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
+
     tol : float
-        The tolerance to control the aggregation, if the distance between the starting point 
-        and the object is less than or equal than the tolerance,
-        the object should allocated to the group which starting point belongs to.  
-    
-    
+        The tolerance to control the aggregation. if the distance between the starting point 
+        of a group and another data point is less than or equal to the tolerance,
+        the point is allocated to that group.  
+
     Returns
     -------
     labels (list) : 
@@ -39,18 +50,6 @@ def pca_aggregate(data, sort_vals, half_nrm2, len_ind, sorting="pca", tol=0.5):
     
     nr_dist (int) :
         The number of pairwise distance calculations.
-
-    ind (numpy.ndarray):
-        Array storing Sorting indices.
-
-    sort_vals (numpy.ndarray):
-        Sorting values.
-    
-    data (numpy.ndarray):
-        Sorted data.
-    
-    half_nrm2 (numpy.ndarray):
-        Precomputed values for distance computation.
 
     """
  
@@ -85,7 +84,7 @@ def pca_aggregate(data, sort_vals, half_nrm2, len_ind, sorting="pca", tol=0.5):
         splist.append((i, num_group))
         lab += 1
 
-    return labels, splist, nr_dist, ind, sort_vals, data
+    return labels, splist, nr_dist
 
 
 
@@ -95,17 +94,25 @@ def general_aggregate(data, sort_vals, half_nrm2, len_ind, sorting="pca", tol=0.
     Parameters
     ----------
     data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
-    
+        The sorted input that is array-like of shape (n_samples,).
+
+    sort_vals  : numpy.ndarray
+            Sorting values.
+
+    half_nrm2 : numpy.ndarray
+        Precomputed values for distance computation.
+
+    len_ind : int
+        Number of data points, i.e., n_samples.
+
     sorting : str
-        The sorting way referred for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
-    
+        The sorting method for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
+
     tol : float
-        The tolerance to control the aggregation, if the distance between the starting point 
-        and the object is less than or equal than the tolerance,
-        the object should allocated to the group which starting point belongs to.  
-    
-    
+        The tolerance to control the aggregation. if the distance between the starting point 
+        of a group and another data point is less than or equal to the tolerance,
+        the point is allocated to that group.  
+
     Returns
     -------
     labels (list) : 
@@ -116,18 +123,6 @@ def general_aggregate(data, sort_vals, half_nrm2, len_ind, sorting="pca", tol=0.
     
     nr_dist (int) :
         The number of pairwise distance calculations.
-
-    ind (numpy.ndarray):
-        Array storing Sorting indices.
-
-    sort_vals (numpy.ndarray):
-        Sorting values.
-    
-    data (numpy.ndarray):
-        Sorted data.
-    
-    half_nrm2 (numpy.ndarray):
-        Precomputed values for distance computation.
 
     """
 
@@ -165,7 +160,7 @@ def general_aggregate(data, sort_vals, half_nrm2, len_ind, sorting="pca", tol=0.
         splist.append((i, num_group))  
         lab += 1
 
-    return labels, splist, nr_dist, ind, sort_vals, data
+    return labels, splist, nr_dist
 
 
 

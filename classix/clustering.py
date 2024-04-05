@@ -506,6 +506,9 @@ class CLASSIX:
             The ndarray-like input of shape (n_samples,)
 
         """
+        from scipy.sparse.linalg import svds
+        from scipy.linalg import get_blas_funcs, eigh
+        
         if isinstance(data, pd.core.frame.DataFrame):
             self._index_data = data.index
             
@@ -573,21 +576,20 @@ class CLASSIX:
         self.t2_aggregate = time()
         
         # aggregation
-        ind = np.argsort(sort_vals)
-        data = data[ind]
+        self.ind = np.argsort(sort_vals)
+        self.data = data[ind]
         sort_vals = sort_vals[ind]
 
         self.__half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5 # precomputation
 
         ## aggregation
-        self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, self.data = self._aggregate(
-                                                                                data=self.data,
-                                                                                sort_vals=sort_vals,
-                                                                                half_nrm2=self.__half_nrm2,
-                                                                                len_ind=len_ind,
-                                                                                sorting=self.sorting, 
-                                                                                tol=self.radius
-                                                                            ) 
+        self.groups_, self.splist_, self.nrDistComp_ = self._aggregate(data=self.data,
+                                                                       sort_vals=sort_vals,
+                                                                       half_nrm2=self.__half_nrm2,
+                                                                       len_ind=self.len_ind,
+                                                                       sorting=self.sorting, 
+                                                                       tol=self.radius
+                                                                    ) 
             
             
         self.splist_ = np.array(self.splist_)
@@ -607,7 +609,8 @@ class CLASSIX:
                 data=self.data,
                 agg_labels=self.groups_, 
                 splist=self.splist_,  
-                ind=self.ind, sort_vals=sort_vals, 
+                ind=self.ind, 
+                sort_vals=sort_vals, 
                 radius=self.radius, 
                 method=self.group_merging, 
                 minPts=self.minPts

@@ -4,7 +4,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2023 Stefan Güttel, Xinye Chen
+# Copyright (c) 2024 Stefan Güttel, Xinye Chen
 
 # Cython implementation for group merging
 
