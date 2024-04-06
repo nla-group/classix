@@ -4,7 +4,7 @@
 #
 # MIT License
 #
-# Copyright (c) 2023 Stefan Güttel, Xinye Chen
+# Copyright (c) 2024 Stefan Güttel, Xinye Chen
 
 
 import warnings
@@ -453,6 +453,7 @@ class CLASSIX:
         from . import __enable_cython__
         self.__enable_cython__ = __enable_cython__
         self.__enable_aggregate_cython__ = False
+        import platform
         
         if self.__enable_cython__:
             try:
@@ -464,7 +465,7 @@ class CLASSIX:
                 
                 self.__enable_aggregate_cython__ = True
 
-                import platform
+                
                 
                 if platform.system() == 'Windows':
                     from .merge_cm_win import density_merge, distance_merge, distance_merge_mtg
