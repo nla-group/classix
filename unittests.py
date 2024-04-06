@@ -361,6 +361,18 @@ class TestClassix(unittest.TestCase):
             
             _, _, _, _, _, _, _ = aggregate_cm.general_aggregate(data, sorting="NA", tol=0.5)
             _, _, _, _, _, _, _ = aggregate_c.general_aggregate(data, "NA", 0.5)
+
+            inverse_ind1, spl1, _, _, _, _, _ = aggregate.lm_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind2, spl2, _, _, _, _, _ = aggregate_cm.lm_aggregate(data, sorting="pca", tol=0.5)
+            inverse_ind3, spl3, _, _, _, _, _ = aggregate_c.lm_aggregate(data, "pca", 0.5)
+            
+            _, _, _, _, _, _, _ = aggregate.lm_aggregate(data, sorting="norm-mean", tol=0.5)
+            _, _, _, _, _, _, _ = aggregate_cm.lm_aggregate(data, sorting="norm-mean", tol=0.5)
+            _, _, _, _, _, _, _ = aggregate_c.lm_aggregate(data, "norm-mean", 0.5)
+            
+            _, _, _, _, _, _, _ = aggregate.lm_aggregate(data, sorting="NA", tol=0.5)
+            _, _, _, _, _, _, _ = aggregate_cm.lm_aggregate(data, sorting="NA", tol=0.5)
+            _, _, _, _, _, _, _ = aggregate_c.lm_aggregate(data, "NA", 0.5)
             
             if np.sum(inverse_ind1 != inverse_ind2) != 0:
                 checkpoint = 0
