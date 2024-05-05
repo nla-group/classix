@@ -8,8 +8,7 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import DBSCAN
 from classix import CLASSIX
 from quickshift.QuickshiftPP import *
-from classix.aggregation_cm import aggregate
-from classix.clustering import calculate_cluster_centers, novel_normalization
+from classix.clustering import calculate_cluster_centers
 
 imagePaths1 = [
     'data/COCO2017/000000002473.jpg',
@@ -196,6 +195,8 @@ def rn_img_real_comp(imagePaths, params, sample_size=10):
     }
     
     return clustering_results, clustering_labels, clustering_times, classix_distances
+
+
 
 
 def img_plot(imagePaths, clustering_results, clustering_labels, clustering_times, classix_distances, fontsize = 55, maxlen=6, savefile=None):
