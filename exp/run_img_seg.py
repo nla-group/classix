@@ -150,7 +150,8 @@ def rn_img_real_comp(imagePaths, params, sample_size=10):
         classix_time = time.time() - classix_time
         classix_distances.append(dist/(len(vectorized)*sample_size))
         # print("CLASSIX time:", classix_time/sample_size)
-        classix_centers = np.uint8(classix.load_cluster_centers())
+        classix_centers = calculate_cluster_centers(vectorized, classix.labels_)
+        classix_centers = np.uint8(classix_centers)
         classix_res = classix_centers[classix.labels_]
         classix_image = classix_res.reshape((img.shape))
         
@@ -195,6 +196,43 @@ def rn_img_real_comp(imagePaths, params, sample_size=10):
     }
     
     return clustering_results, clustering_labels, clustering_times, classix_distances
+
+def img_plot(imagePaths, clustering_results, clustering_labels, clustering_times, 
+             classix_distances, fontsize = 55, maxlen=6, savefile=None):
+    plot_num = 1
+    plt.figure(figsize=(10*len(clustering_results), 9*len(imagePaths)))
+    for i_dataset in range(len(imagePaths)):  
+        if i_dataset >= maxlen:
+            break
+        for name in clustering_results:
+            plt.subplot(len(imagePaths), len(clustering_results), plot_num)
+            plt.imshow(clustering_results[name][i_dataset])
+
+            if name != 'Origin':
+                plt.title(name+' (%i clusters)' % len(set(clustering_labels[name][i_dataset])),fontsize=int(1.27*fontsize));
+
+            plt.axis('off');
+
+            if name != 'Origin':
+                plt.text(.99, .02, ('%.2fs' % np.round(clustering_times[name][i_dataset], 2)),
+                         transform=plt.gca().transAxes, size=1.5*fontsize,
+                         horizontalalignment='right', bbox=dict(facecolor='white', alpha=0.5)
+                        );
+                
+            if name == "CLASSIX":
+                plt.text(.01, .02, ('%.2f' % np.round(classix_distances[i_dataset], 2)),
+                         transform=plt.gca().transAxes, size=1.5*fontsize,
+                         horizontalalignment='left', bbox=dict(facecolor='white', alpha=0.5)
+                        );
+
+            plot_num = plot_num + 1
+            
+            plt.subplots_adjust(bottom=0.01, left=0.01, right=0.99, top=0.99, wspace=0.00001, hspace=0.00001)
+    plt.tight_layout()
+    plt.savefig('temp/img_' + str(savefile) + '.pdf', bbox_inches='tight')
+    # plt.show()
+    
+    
 
 
 
