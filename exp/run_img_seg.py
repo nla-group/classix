@@ -7,7 +7,7 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import matplotlib.pyplot as plt
 from sklearn.cluster import DBSCAN
 from classix import CLASSIX
-from quickshift.QuickshiftPP import *
+from quickshift.QuickshiftPP import * # Use the fixed one: https://github.com/chenxinye/quickshift/tree/master
 from classix.clustering import calculate_cluster_centers
 
 imagePaths1 = [
@@ -144,9 +144,9 @@ def rn_img_real_comp(imagePaths, params, sample_size=10):
                               minPts=minPts[i]+1, 
                               verbose=0, 
                               group_merging='distance', 
-                              scale=1.05).fit(vectorized)
+                              mergeScale=1.05).fit(vectorized)
             
-            dist = dist + classix.dist_nr
+            dist = dist + classix.nrDistComp_
         classix_time = time.time() - classix_time
         classix_distances.append(dist/(len(vectorized)*sample_size))
         # print("CLASSIX time:", classix_time/sample_size)
@@ -195,6 +195,7 @@ def rn_img_real_comp(imagePaths, params, sample_size=10):
     }
     
     return clustering_results, clustering_labels, clustering_times, classix_distances
+
 
 
 
