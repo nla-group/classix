@@ -13,6 +13,8 @@
 [![Download Status](https://img.shields.io/pypi/dm/classixclustering.svg?label=PyPI%20downloads)](https://pypi.org/project/classixclustering/)
 [![Documentation Status](https://readthedocs.org/projects/classix/badge/?version=stable)](https://classix.readthedocs.io/en/latest/?badge=stable)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10257432.svg)](https://doi.org/10.5281/zenodo.10257432)
+ ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white) 
+ ![SciPy](https://img.shields.io/badge/SciPy-%230C55A5.svg?style=for-the-badge&logo=scipy&logoColor=%white)
 
 <!---[![PyPI pyversions](https://img.shields.io/pypi/pyversions/ClassixClustering.svg)](https://pypi.python.org/pypi/ClassixClustering/)-->
 
@@ -35,6 +37,7 @@ PyPI | conda-forge
 :---:|:---:
 [![PyPI version](https://badge.fury.io/py/classixclustering.svg)](https://pypi.org/project/classixclustering/) | [![conda-forge version](https://anaconda.org/conda-forge/classixclustering/badges/version.svg)](https://anaconda.org/conda-forge/classixclustering) 
 `pip install classixclustering` | `conda install -c conda-forge classixclustering` 
+
 
 ##   Quick start
 
