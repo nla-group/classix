@@ -15,12 +15,13 @@ copyright = '2022, Stefan Güttel, Xinye Chen'
 author = 'Stefan Güttel, Xinye Chen'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.3'
+release = '0.0.4'
 
 
 # -- General configuration ---------------------------------------------------
 
 extensions = [
+    "sphinx.ext.napoleon",
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosummary',
     'sphinx.ext.autodoc',
@@ -58,3 +59,5 @@ html_theme_options = {
     'logo_only': False,
     'navigation_depth': 5,
 }
+
+strip_signature_backslash = True

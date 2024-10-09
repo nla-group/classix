@@ -1,0 +1,258 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get Started with CLASSIX &mdash; CLASSIX 0.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=53e15035" />
+      <link rel="stylesheet" type="text/css" href="_static/css/_.css?v=83e1d0fc" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Clustering Tutorial" href="clustering_tutorial.html" />
+    <link rel="prev" title="Welcome to CLASSIX’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            CLASSIX
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Get Started with CLASSIX</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation-guide">Installation guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick start</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="clustering_tutorial.html">Clustering Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matlab.html">MATLAB’s users</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Performance Comparison</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outlier_detection.html">Outlier Detection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgement.html">Acknowledgement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CLASSIX</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Get Started with CLASSIX</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/quickstart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="get-started-with-classix">
+<h1>Get Started with CLASSIX<a class="headerlink" href="#get-started-with-classix" title="Link to this heading"></a></h1>
+<p>Clustering is a widely-used unsupervised learning technique to find patterns and structures in data. The applications of clustering are wide-ranging,  including areas like finance, traffic, civil engineering, and bioinformatics.  Clustering algorithms aim to group the data points into distinct clusters such that points within a cluster share similar characteristics on the basis of spatial properties, while points in two distinct clusters are less similar.  It might be easy for a human to perceive the clusters with a small sample in a small (1 or 2) dimensional space, however, in practice, the real world data with increasing dimensions and size of the data usually make a human out of reach. Considering data provided with labels are considerably rare and expensive, reliable and easy-to-tune explainable clustering methods are highly desirable.</p>
+<p>We introduce a novel clustering method called CLASSIX. The appealing characteristics of CLASSIX include fast speed, scalable clustering and explainable descriptions and visualization of clusters. It consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points,  followed by the merging of groups into clusters. The algorithm is controlled by two scalar parameters, namely a distance parameter for the aggregation and another parameter controlling the minimal cluster size. Extensive experiments are conducted to give a comprehensive evaluation of the clustering performance on  synthetic and real-world datasets, with various cluster shapes and low to high feature dimensionality. Our experiments demonstrate that CLASSIX competes with state-of-the-art clustering algorithms. The algorithm has linear space complexity and achieves near linear time complexity on a wide range of problems. Its inherent simplicity allows for the generation of intuitive explanations of the computed clusters.
+This documentation will provide you with a beginner-friendly tutorial, and show you how to get a quick start!</p>
+<section id="installation-guide">
+<h2>Installation guide<a class="headerlink" href="#installation-guide" title="Link to this heading"></a></h2>
+<p>To ensure most users can install it on their local machine, we try to keep the installing requirements for CLASSIX as low as possible. CLASSIX has the following dependencies for its clustering functionality:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>cython (recommend &gt;=0.27)</p></li>
+<li><p>numpy&gt;=1.7.2 (recommend &gt;=1.20)</p></li>
+<li><p>scipy</p></li>
+<li><p>requests</p></li>
+</ul>
+</div></blockquote>
+<p>and requires the following packages for data visualization:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>matplotlib</p></li>
+<li><p>pandas</p></li>
+</ul>
+</div></blockquote>
+<p><strong>If you want to compare the speed with other clustering algorithms in scikit-learn or other packages combined with Cython, please use CLASSIX of Cython installation for a fair comparison.</strong></p>
+<ol class="upperroman simple">
+<li><p><strong>pip</strong></p></li>
+</ol>
+<p>To install the current release via PIP use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">classixclustering</span>
+</pre></div>
+</div>
+<p>To check the installation, simply run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">show</span> <span class="n">classixclustering</span>
+</pre></div>
+</div>
+<p>If you want to uninstall it, you can use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">uninstall</span> <span class="n">classixclustering</span>
+</pre></div>
+</div>
+<ol class="upperroman simple" start="2">
+<li><p><strong>conda</strong></p></li>
+</ol>
+<p>For conda users, to install this package with conda run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">classixclustering</span>
+</pre></div>
+</div>
+<p>To check the installation, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="nb">list</span> <span class="n">classixclustering</span>
+</pre></div>
+</div>
+<p>and uninstall it with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">uninstall</span> <span class="n">classixclustering</span>
+</pre></div>
+</div>
+<p>Installing <cite>classixclustering</cite> from the <cite>conda-forge</cite> channel can also be achieved by adding <cite>conda-forge</cite> to your channels with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="n">add</span> <span class="n">channels</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+<span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="nb">set</span> <span class="n">channel_priority</span> <span class="n">strict</span>
+</pre></div>
+</div>
+<p>Once the <cite>conda-forge</cite> channel has been enabled, <cite>classixclustering</cite> can be installed with <cite>conda</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">classixclustering</span>
+</pre></div>
+</div>
+<p>or with <cite>mamba</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">install</span> <span class="n">classixclustering</span>
+</pre></div>
+</div>
+<p>It is possible to list all of the versions of <cite>classixclustering</cite> available on your platform with <cite>conda</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">search</span> <span class="n">classixclustering</span> <span class="o">--</span><span class="n">channel</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+</pre></div>
+</div>
+<p>or with <cite>mamba</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">search</span> <span class="n">classixclustering</span> <span class="o">--</span><span class="n">channel</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+</pre></div>
+</div>
+<p>Alternatively, <cite>mamba repoquery</cite> may provide more information:</p>
+<pre class="literal-block"># Search all versions available on your platform:
+mamba repoquery search classixclustering --channel conda-forge
+
+# List packages depending on <cite>classixclustering</cite>:
+mamba repoquery whoneeds classixclustering --channel conda-forge
+
+# List dependencies of <cite>classixclustering</cite>:
+mamba repoquery depends classixclustering --channel conda-forge</pre>
+<ol class="upperroman simple" start="3">
+<li><p><strong>download</strong></p></li>
+</ol>
+<p>Download this repository via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">nla</span><span class="o">-</span><span class="n">group</span><span class="o">/</span><span class="n">classix</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>If you have any installing issues, please be free to submit your questions in the <a class="reference external" href="https://github.com/nla-group/classix/issues">issues</a>.</p>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>You can check if you Cython is installed properly:</p>
+<p><code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">classix;</span> <span class="pre">classix.cython_is_available()</span></code></p>
+<p>If you want to disable Cython, or compare the runtime between Cython and Python, you can simply set by</p>
+<p><code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">classix;</span> <span class="pre">classix.__enable_cython__</span> <span class="pre">=</span> <span class="pre">False</span></code></p>
+<p>And then your following CLASSIX implementation will disable Cython compiling. If you can Cython back, just set <code class="docutils literal notranslate"><span class="pre">classix.__enable_cython__</span> <span class="pre">=</span> <span class="pre">True</span></code>.</p>
+</div>
+</section>
+<section id="quick-start">
+<h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
+<p>CLASSIX follows a similar API design as scikit-learn library. So if you are familiar with scikit-learn, you can quickly master the CLASSIX library to do a wonderful clustering.
+We demonstrate a toy application of CLASSIX’s clustering on simple data.</p>
+<p>After importing the required python libraries, we generate isotropic Gaussian blobs with 2 clusters using sklearn.datasets tool.
+The sample is exhibited with 2 clusters of 1000 2-dimensional data. Then, we employ CLASSIX with the simple setting:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_blobs</span>
+<span class="kn">from</span> <span class="nn">classix</span> <span class="kn">import</span> <span class="n">CLASSIX</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_blobs</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">clx</span> <span class="o">=</span> <span class="n">CLASSIX</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">minPts</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+<span class="n">clx</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-remember admonition">
+<p class="admonition-title">Remember</p>
+<p>By default, CLASSIX will use <code class="docutils literal notranslate"><span class="pre">sorting=pca</span></code> sorting and apply <code class="docutils literal notranslate"><span class="pre">group_merging=&quot;distance&quot;</span></code>, i.e., distance-based merging.</p>
+</div>
+<p>After that, to get the clustering result, we just need to load <code class="docutils literal notranslate"><span class="pre">clx.labels_</span></code>. Also you can return the cluster labels directly by <code class="docutils literal notranslate"><span class="pre">labels</span> <span class="pre">=</span> <span class="pre">clx.fit_transform(X)</span></code>.
+Now we plot the clustering result:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">clx</span><span class="o">.</span><span class="n">labels_</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The result is as belows:</p>
+<img alt="_images/demo1.png" src="_images/demo1.png" />
+<p>That is a basic setting tutorial of CLASSIX, which applied to most cases. If you want to learn more, please go through other sections of the documentation.</p>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>CLASSIX allows to load starting points and cluster centers information by using the method <code class="docutils literal notranslate"><span class="pre">clx.load_cluster_centers()</span></code> and <code class="docutils literal notranslate"><span class="pre">clx.load_splist_indices()</span></code> where clx is the object of CLASSIX
+class. More usages are shown in <a class="reference external" href="https://github.com/nla-group/classix/blob/master/unittests.py">unittests.py</a></p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to CLASSIX’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="clustering_tutorial.html" class="btn btn-neutral float-right" title="Clustering Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Stefan Güttel, Xinye Chen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

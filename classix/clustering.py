@@ -68,6 +68,7 @@ def loadData(name='vdu_signals'):
     name: str, {'vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 
                 'Banknote', 'Seeds', 'Phoneme', 'Wine', 'Covid3MC', 'CovidENV'}, 
                 default='vdu_signals'
+        
         Identifier of the built-in dataset.
 
     Returns
