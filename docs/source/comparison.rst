@@ -180,7 +180,7 @@ We now compare the algorithms on synthetic Gaussian blobs with increasing number
     import pandas as pd
     import seaborn as sns
     from numpy.linalg import norm
-    from classix.aggregation_test import aggregate
+    from classix.bin.aggregation_test import aggregate
     from classix import CLASSIX
     from quickshift.QuickshiftPP import *
     from sklearn import metrics
@@ -498,7 +498,7 @@ We show how to run test for cluster size of 5 and 20 with increasing data size, 
     import pandas as pd
     import seaborn as sns
     from numpy.linalg import norm
-    from classix.aggregation_test import aggregate
+    from classix.bin.aggregation_test import aggregate
     from classix import CLASSIX
     from quickshift.QuickshiftPP import *
     from sklearn import metrics
@@ -773,7 +773,7 @@ This test shows the averaging result with varying cluster size, researchers of i
     import pandas as pd
     import seaborn as sns
     from numpy.linalg import norm
-    from classix.aggregation_test import aggregate
+    from classix.bin.aggregation_test import aggregate
     from classix import CLASSIX
     from quickshift.QuickshiftPP import *
     from sklearn import metrics

@@ -6,7 +6,6 @@
 # -- Project information -----------------------------------------------------
 import sys
 import os
-import sphinx_rtd_theme
 
 
 sys.path.insert(0, os.path.abspath('../..'))
@@ -26,8 +25,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
-    'sphinx_rtd_theme',
+    'sphinx.ext.viewcode'
 ]
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -55,7 +53,7 @@ pygments_style = 'lovelace'
 html_static_path = ['_static']
 html_style = 'css/_.css'
 html_theme = "sphinx_rtd_theme" # html_theme = 'alabaster'
-html_logo = "classix_logo.png"
+# html_logo = "classix_logo.png"
 html_theme_options = {
     'logo_only': False,
     'navigation_depth': 5,

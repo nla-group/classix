@@ -14,7 +14,6 @@
    .. autosummary::
    
       ~CLASSIX.__init__
-      ~CLASSIX.calculate_group_centers
       ~CLASSIX.explain
       ~CLASSIX.explain_viz
       ~CLASSIX.fit
@@ -26,11 +25,11 @@
       ~CLASSIX.load_cluster_centers
       ~CLASSIX.load_group_centers
       ~CLASSIX.merging
-      ~CLASSIX.normalization
       ~CLASSIX.outlier_filter
       ~CLASSIX.pprint_format
       ~CLASSIX.predict
-      ~CLASSIX.reassign_labels
+      ~CLASSIX.preprocessing
+      ~CLASSIX.timing
       ~CLASSIX.visualize_linkage
    
    
