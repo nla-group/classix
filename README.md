@@ -34,8 +34,9 @@ __CLASSIX__ is a contrived acronym of *CLustering by Aggregation with Sorting-ba
 __CLASSIX__ can be installed via PIP (recommended) or Conda:
 
 | PyPI | conda-forge |
-|:--- |:---:|
+|:---: |:---:|
 |[![PyPI version](https://badge.fury.io/py/classixclustering.svg)](https://pypi.org/project/classixclustering/) | [![conda-forge version](https://anaconda.org/conda-forge/classixclustering/badges/version.svg)](https://anaconda.org/conda-forge/classixclustering) 
+|:--- |:---:|
 | NumPy<=1.26.4: `pip install classixclustering` <br/> NumPy>2: `pip install classixclustering --no-cache-dir `| `conda install -c conda-forge classixclustering` |
 
 
