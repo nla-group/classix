@@ -39,7 +39,7 @@ __CLASSIX__ can be installed via PIP (recommended) or Conda:
 | NumPy<=1.26.4: `pip install classixclustering` <br/> NumPy>2: `pip install classixclustering --no-cache-dir `| `conda install -c conda-forge classixclustering` |
 
 
-We recommend use the installation with `pip install classixclustering --no-cache-dir ` as default.
+We recommend the installation with `pip install classixclustering --no-cache-dir `.
 
 <br/>
 
