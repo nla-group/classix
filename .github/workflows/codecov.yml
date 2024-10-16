@@ -23,7 +23,7 @@ jobs:
         pip install pytest-cov
         pip install build
         python3 -m build
-        ppython setup.py build_ext --inplace
+        python setup.py build_ext --inplace
         pytest unittests.py --cov=classix
         coverage xml
     - name: Upload coverage to Codecov
