@@ -159,15 +159,14 @@ If you have any installing issues, please be free to submit your questions in th
    
    And then your following CLASSIX implementation will disable Cython compiling. If you can Cython back, just set ``classix.__enable_cython__ = True``. 
 
+   If Cython is not installed properly (e.g., not compatible NumPy version), one can instead use the following command instead to install ``classix``:
    
-If Cython is not installed properly (e.g., not compatible NumPy version), one can instead use the following command instead to install ``classix``:
-
-.. parsed-literal::
+   .. parsed-literal::
+      
+      pip install classixclustering --no-cache-dir 
    
-   pip install classixclustering --no-cache-dir 
-
-Quick start
-------------------------------
+   Quick start
+   ------------------------------
 
 
 CLASSIX follows a similar API design as scikit-learn library. So if you are familiar with scikit-learn, you can quickly master the CLASSIX library to do a wonderful clustering. 
