@@ -24,6 +24,8 @@ and requires the following packages for data visualization:
 **If you want to compare the speed with other clustering algorithms in scikit-learn or other packages combined with Cython, please use CLASSIX of Cython installation for a fair comparison.**
 
 
+
+
 I. **pip**
 
 To install the current release via PIP use:
@@ -31,6 +33,22 @@ To install the current release via PIP use:
 .. parsed-literal::
     
     pip install classixclustering
+
+Creation of virtual environments is needed for some users, for example, 
+
+.. parsed-literal::
+
+   python3 -m venv ~/.virtualenv/<user-defined name>
+   source ~/.virtualenv/<user-defined name>/bin/activate
+
+And then perform the pip installing ``pip install classixclustering``. 
+
+The following installing command is needed some Cython failure situation:
+
+.. parsed-literal::
+   
+   pip install classixclustering --no-cache-dir 
+
 
 To check the installation, simply run:
 
@@ -116,6 +134,9 @@ Alternatively, `mamba repoquery` may provide more information:
 
 
 
+
+
+
 III. **download**
 
 Download this repository via:
@@ -139,8 +160,11 @@ If you have any installing issues, please be free to submit your questions in th
    And then your following CLASSIX implementation will disable Cython compiling. If you can Cython back, just set ``classix.__enable_cython__ = True``. 
 
    
+If Cython is not installed properly (e.g., not compatible NumPy version), one can instead use the following command instead to install ``classix``:
 
-
+.. parsed-literal::
+   
+   pip install classixclustering --no-cache-dir 
 
 Quick start
 ------------------------------
