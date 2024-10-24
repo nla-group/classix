@@ -43,7 +43,6 @@ setup_args = {'name':"classixclustering",
                              "matplotlib>=3.5",
                              "requests"], # requirements()
 
-        'packages': ['classix'],
         'cmdclass': {'build_ext': CustomBuildExtCommand},
         'classifiers':["Intended Audience :: Science/Research",
                 "Intended Audience :: Developers",
