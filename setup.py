@@ -10,7 +10,19 @@ except ImportError as e:
     warnings.warn(e.args[0])
     from setuptools.command.build_ext import build_ext
     
-_version="1.2.7"
+
+__package__ = 'classixclustering'
+__version__ = get_version(__package__+'/__init__.py')
+
+
+def get_version(fname):
+    with open(fname) as f:
+        for line in f:
+            if line.startswith("__version__ = '"):
+                return line.split("'")[1]
+    raise RuntimeError('Error in parsing version string.')
+
+
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
@@ -33,7 +45,7 @@ class CustomBuildExtCommand(build_ext):
         build_ext.run(self)
         
         
-setup_args = {'name':"classixclustering",
+setup_args = {'name':__package__,
         'packages':["classix"],
         'version':_version,
         'install_requires':["cython>=0.27",
