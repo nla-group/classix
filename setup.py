@@ -25,7 +25,7 @@ def get_version(fname):
 logging.basicConfig()
 log = logging.getLogger(__file__)
 
-__version__ = get_version(__package__+'/__init__.py')
+__version__ = get_version('classix/__init__.py')
 
 
 ext_errors = (CCompilerError, ModuleNotFoundError, DistutilsExecError, DistutilsPlatformError, IOError, SystemExit)
