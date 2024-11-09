@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+#
+# CLASSIX: Fast and explainable clustering based on sorting
+#
+# MIT License
+#
+# Copyright (c) 2024 Stefan Güttel, Xinye Chen
+
+
 import warnings
 import logging
 import setuptools
