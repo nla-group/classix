@@ -49,7 +49,7 @@ class CustomBuildExtCommand(build_ext):
         
 setup_args = {'name':__package__,
         'packages':["classix"],
-        'version':_version,
+        'version':__version__,
         'install_requires':["cython>=0.27",
                              "numpy>=1.17.3",
                              "scipy>=1.7.0",
