@@ -76,7 +76,7 @@ Output:
 ```
 CLASSIX clustered 5726839 data points with 3 features.
 The radius parameter was set to 0.20 and minPts was set to 500.
-As the provided data was auto-mergeScaled by a factor of 1/0.33,
+As the provided data was auto scaled by a factor of 1/0.33,
 points within a radius R=0.20*0.33=0.07 were grouped together.
 In total, 80596471 distances were computed (14.1 per data point).
 This resulted in 301 groups, each with a unique group center.
