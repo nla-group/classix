@@ -56,7 +56,7 @@ Here is an example of clustering one of the demo dataset provided with CLASSIX:
 import classix
 
 data, labels = classix.loadData('Covid3MC')
-# or only can use Gaussian blobs data for a quick try:
+# or one can use Gaussian blobs data for a quick try:
 # from sklearn.datasets import make_blobs
 # data, labels  make_blobs(n_samples=1000, centers=3, n_features=2, random_state=0)
 
