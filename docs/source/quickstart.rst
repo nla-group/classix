@@ -25,6 +25,25 @@ and requires the following packages for data visualization:
 
 
 
+** Setup virtual environment **
+
+There are two ways to setup virtual enviroment for test, the first one is:
+
+.. parsed-literal::
+
+   mkdir ~/.myenv
+   python -m venv ~/.myenv
+   source ~/.myenv/bin/activate
+
+The second one is via conda: 
+
+.. parsed-literal::
+
+   conda create -n myenv
+   conda activate myenv
+
+
+
 
 I. **pip**
 
