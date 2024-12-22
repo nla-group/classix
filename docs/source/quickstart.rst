@@ -25,9 +25,9 @@ and requires the following packages for data visualization:
 
 
 
-** Setup virtual environment **
+.. admonition:: Note
 
-There are two ways to setup virtual enviroment for test, the first one is:
+There are two ways to setup virtual enviroment for testing ``classix``, the first one is:
 
 .. parsed-literal::
 

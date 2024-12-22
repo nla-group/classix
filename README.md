@@ -222,13 +222,13 @@ Here is short video abstract on CLASSIX:
 A detailed documentation, including tutorials, is available at [![Dev](https://img.shields.io/badge/docs-latest-blue.svg)](https://classix.readthedocs.io/en/latest/). Please also check out the many demos in the `demos` subfolder. 
 
 ## Reproducibility 
-All experiments in the CLASSIX paper referenced below are reproducible by running the code in the folder of ["exp"](https://github.com/nla-group/classix/tree/master/exp).
+All experiments in the CLASSIX paper referenced below are reproducible by running the code in the folder of ["exps"](https://github.com/nla-group/classix/tree/master/exps).
 Before running, ensure the dependencies `scikit-learn` and `hdbscan` are installed and the ``Quickshift++`` code ([Quickshift++: Provably Good Initializations for Sample-Based Mean Shift](https://github.com/google/quickshift)) is compiled. After configuring all of these, run the following commands:
 ```
 cd exp
 python3 run exp_main.py
 ```
-All results will be written to the folder ["exp/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
+All results will be written to the folder ["exps/results"](https://github.com/nla-group/classix/tree/master/exp/results). Please let us know if you have any questions.
 
 ## Contribution
 Any form of contribution is welcome. We particularly welcome the contribution of new `demos` in the form of Jupyter Notebooks. Feel free to post issues and pull requests if you want to assist in documentation or code. To contribute, please fork the project and pull a request for your changes. We will strive to work through any issues and requests and get your code merged into the main branch. Contributors will be acknowledged in the release notes. 
