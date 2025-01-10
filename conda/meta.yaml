@@ -1,64 +1,44 @@
-package:
-  name: classix
-  version: 0.7.9
+{% set name = "classixclustering" %}
+{% set version = "1.2.7" %}
 
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
-  fn: classixclustering-0.7.9.tar.gz
-  url: https://files.pythonhosted.org/packages/f8/9e/c5214489eb6801c746792e38f7ea3a282e62cad3c23db310a1e13be2803a/classixclustering-0.7.9.tar.gz
-  sha256: 680b5d45d436665e2f0aec4d43218408532a0e84a4c25c341670ec7dbc3faede
-
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: c144de8750f7d8ec8b2d88150a94b3919ce69e0f0900c2346d35f86b558c8265
 
 build:
   noarch: python
-  number: 1
+  number: 0
+  script: {{ PYTHON }} -m pip install . -vv
 
 requirements:
   build:
-    - python >=3.6
-    - pip
-    - setuptools
-    - pandas
-    - numpy 
-    - requests
-    - cython
-    - scipy
-    - matplotlib
-
+    - {{ compiler('c') }}
+    - {{ stdlib("c") }}
   host:
     - python >=3.6
-    - setuptools
-    - pandas
-    - numpy 
-    - requests
+    - pip
+    - numpy
     - cython
-    - scipy
-    - matplotlib
 
   run:
     - python >=3.6
-
+    - pandas
+    - requests
+    - {{ pin_compatible('numpy') }}
+    - scipy ==1.7.0
+    - matplotlib-base
 
 test:
-  requires:
-    - pip
-    - numpy
-    - scipy
-    - requests
-    - pandas
-    - matplotlib
-  files:
-    - runtest.py
   imports:
     - classix
-    - numpy
-  commands:
-    - pip check
-
 
 about:
   home: https://github.com/nla-group/classix
-  summary: 'CLASSIX is a fast and explainable clustering algorithm based on sorting.'
+  summary: CLASSIX is a fast and explainable clustering algorithm based on sorting.
   license: MIT
   license_family: MIT
   license_file: LICENSE
@@ -66,5 +46,5 @@ about:
 
 extra:
   recipe-maintainers:
-    - chenxinye
     - guettel
+    - chenxinye
