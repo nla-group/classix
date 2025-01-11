@@ -1,6 +1,6 @@
-[![es](https://img.shields.io/badge/lang-es-yellowgreen.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
-[![ch](https://img.shields.io/badge/lang-ch-cyan.svg)](https://github.com/nla-group/classix/blob/master/README-ch.md)
-
+ [![es](https://img.shields.io/badge/lang-es-greenyellow.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
+ [![ch](https://img.shields.io/badge/lang-ch-yellowgreen.svg)](https://github.com/nla-group/classix/blob/master/README-ch.md)
+  
 
 <h1 align="center">
   CLASSIX: 快速且可解释的聚类算法
