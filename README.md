@@ -1,12 +1,10 @@
+ [![es](https://img.shields.io/badge/lang-es-greenyellow.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
+  [![ch](https://img.shields.io/badge/lang-ch-cyan.svg)](https://github.com/nla-group/classix/blob/master/README-ch.md)
+  
 <p align="center">
   CLASSIX: Fast and explainable clustering in Python
 </p>
 
-
-<h2 align="center">
-  [![es](https://img.shields.io/badge/lang-es-greenyellow.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
-  [![ch](https://img.shields.io/badge/lang-ch-cyan.svg)](https://github.com/nla-group/classix/blob/master/README-ch.md)
-</h2>
 
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
 [![!pypi](https://img.shields.io/pypi/v/classixclustering?color=red)](https://pypi.org/project/classixclustering/)
