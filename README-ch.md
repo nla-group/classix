@@ -66,7 +66,7 @@ data, labels = classix.loadData('Covid3MC')
 clx = classix.CLASSIX(radius=0.2, minPts=500, verbose=0)
 clx.fit(data)
 print(clx.labels_) # 输出聚类标签
-
+```
 此外，您可以在模型训练后通过 predict() 方法对样本外数据进行聚类，例如 clx.predict(data.iloc[:1000])。
 
 
