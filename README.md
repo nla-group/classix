@@ -1,4 +1,4 @@
- [![es](https://img.shields.io/badge/lang-es-tomato.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
+ [![es](https://img.shields.io/badge/lang-es-greenyellow.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
  [![ch](https://img.shields.io/badge/lang-ch-yellowgreen.svg)](https://github.com/nla-group/classix/blob/master/README-ch.md)
   
 <h1 align="center">
