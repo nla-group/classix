@@ -1,6 +1,7 @@
+<h1 align="center">
 [![es](https://img.shields.io/badge/lang-es-greenyellow.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
 [![ch](https://img.shields.io/badge/lang-ch-cyan.svg)](https://github.com/nla-group/classix/blob/master/README-ch.md)
-
+</h1>
 
 <h1 align="center">
   CLASSIX: Fast and explainable clustering in Python
