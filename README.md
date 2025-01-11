@@ -1,5 +1,5 @@
- [![es](https://img.shields.io/badge/lang-es-yellowgreen.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
- [![ch](https://img.shields.io/badge/lang-ch-darkblue.svg)](https://github.com/nla-group/classix/blob/master/README-ch.md)
+ [![es](https://img.shields.io/badge/lang-es-blue.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
+ [![ch](https://img.shields.io/badge/lang-ch-yellowgreen.svg)](https://github.com/nla-group/classix/blob/master/README-ch.md)
   
 <h1 align="center">
   CLASSIX: Fast and explainable clustering in Python
