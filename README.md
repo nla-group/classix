@@ -1,9 +1,9 @@
  [![es](https://img.shields.io/badge/lang-es-greenyellow.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
   [![ch](https://img.shields.io/badge/lang-ch-cyan.svg)](https://github.com/nla-group/classix/blob/master/README-ch.md)
   
-<p align="center">
+<h1 align="center">
   CLASSIX: Fast and explainable clustering in Python
-</p>
+</h1>
 
 
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
