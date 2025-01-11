@@ -1,3 +1,7 @@
+[![es](https://img.shields.io/badge/lang-es-yellow.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
+![ch](https://img.shields.io/badge/lang-ch-red.svg)](https://github.com/nla-group/classix/blob/master/README-ch.md)
+
+
 <h1 align="center">
   CLASSIX: Fast and explainable clustering in Python
 </h1>
