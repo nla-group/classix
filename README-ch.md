@@ -173,8 +173,6 @@ pytest tests/
 我们期待您的参与！请阅读 贡献指南 以了解更多信息。
 文档和支持
 
-CLASSIX 的完整文档可在 ReadTheDocs 上查看。
-
 如果您有任何疑问或建议，请通过以下方式联系我们：
 
     在 GitHub Issues 提交问题。
