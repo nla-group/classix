@@ -1,8 +1,7 @@
-
-
-<h1 align="center">
+<p align="center">
   CLASSIX: Fast and explainable clustering in Python
-</h1>
+</p>
+
 
 <h2 align="center">
   [![es](https://img.shields.io/badge/lang-es-greenyellow.svg)](https://github.com/jonatasemidio/multilanguage-readme-pattern/blob/master/README.es.md)
