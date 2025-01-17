@@ -76,7 +76,11 @@ def loadData(name='vdu_signals'):
     X, y: numpy.ndarray
         Data and ground-truth labels (if available).    
     """
-    
+
+    import logging
+    logging.basicConfig()
+    log = logging.getLogger(__file__)
+
     current_dir, current_filename = os.path.split(__file__)
     
     if not os.path.isdir(os.path.join(current_dir, 'data')):
@@ -85,6 +89,7 @@ def loadData(name='vdu_signals'):
     if name == 'vdu_signals':
         DATA_PATH = os.path.join(current_dir, 'data/vdu_signals.npy')
         if not os.path.isfile(DATA_PATH):
+            log.info('Downloading data...')
             get_data(current_dir)
         return np.load(DATA_PATH)
     
@@ -92,6 +97,7 @@ def loadData(name='vdu_signals'):
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Irirs.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Irirs.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            log.info('Downloading data...')
             get_data(current_dir, 'Iris')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
@@ -99,6 +105,7 @@ def loadData(name='vdu_signals'):
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Dermatology.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Dermatology.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            log.info('Downloading data...')
             get_data(current_dir, 'Dermatology')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
@@ -106,6 +113,7 @@ def loadData(name='vdu_signals'):
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Ecoli.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Ecoli.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            log.info('Downloading data...')
             get_data(current_dir, 'Ecoli')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
@@ -113,6 +121,7 @@ def loadData(name='vdu_signals'):
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Glass.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Glass.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            log.info('Downloading data...')
             get_data(current_dir, 'Glass')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
@@ -120,6 +129,7 @@ def loadData(name='vdu_signals'):
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Banknote.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Banknote.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            log.info('Downloading data...')
             get_data(current_dir, 'Banknote')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
@@ -127,6 +137,7 @@ def loadData(name='vdu_signals'):
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Seeds.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Seeds.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            log.info('Downloading data...')
             get_data(current_dir, 'Seeds')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
@@ -134,6 +145,7 @@ def loadData(name='vdu_signals'):
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Phoneme.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Phoneme.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            log.info('Downloading data...')
             get_data(current_dir, 'Phoneme')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
@@ -141,6 +153,7 @@ def loadData(name='vdu_signals'):
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Wine.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Wine.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            log.info('Downloading data...')
             get_data(current_dir, 'Wine')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
@@ -148,6 +161,7 @@ def loadData(name='vdu_signals'):
         DATA_PATH_X = os.path.join(current_dir, 'data/X_CovidENV.pkl')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_CovidENV.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            log.info('Downloading data...')
             get_data(current_dir, 'CovidENV')
         return pd.read_pickle(DATA_PATH_X), np.load(DATA_PATH_Y)
     
@@ -155,6 +169,7 @@ def loadData(name='vdu_signals'):
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Covid3MC.pkl')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Covid3MC.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
+            log.info('Downloading data...')
             get_data(current_dir, 'Covid3MC')
         return pd.read_pickle(DATA_PATH_X), np.load(DATA_PATH_Y)
     
