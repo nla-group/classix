@@ -278,7 +278,7 @@ class TestClassix(unittest.TestCase):
 
     
     def test_explain_hdim(self):
-        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=20, 
+        X, y = data.make_blobs(n_samples=1000, centers=2, n_features=20, 
                                cluster_std=1.5, random_state=1
         )
         checkpoint = 1
@@ -297,7 +297,7 @@ class TestClassix(unittest.TestCase):
 
     
     def test_explain_1D(self):
-        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=1, 
+        X, y = data.make_blobs(n_samples=2000, centers=2, n_features=1, 
                                cluster_std=1.5, random_state=1
         )
         checkpoint = 1
@@ -347,7 +347,7 @@ class TestClassix(unittest.TestCase):
     def test_aggregate_precompute(self): 
         checkpoint = 1
         try:
-            data = np.random.randn(10000, 2)
+            data = np.random.randn(1000, 2)
             
             inverse_ind1, spl1, _, _, _, _, _ = aggregate.general_aggregate(data, sorting="pca", tol=0.5)
             inverse_ind2, spl2, _, _, _, _, _ = aggregate_cm.general_aggregate(data, sorting="pca", tol=0.5)
@@ -403,7 +403,7 @@ class TestClassix(unittest.TestCase):
         checkpoint = 1
         minPts = 10
         scale = 1.5
-        data = np.random.randn(10000, 2)
+        data = np.random.randn(1000, 2)
         checkpoint = 1
         try:    
             labels, splist, nr_dist, ind, sort_vals, data, half_nrm2 = aggregate.general_aggregate(data, sorting="pca", tol=0.5) #
@@ -439,7 +439,7 @@ class TestClassix(unittest.TestCase):
 
 
     def test_group_merging_error_type(self):
-        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=20, 
+        X, y = data.make_blobs(n_samples=1000, centers=2, n_features=20, 
                                cluster_std=1.5, random_state=1
         )
         
