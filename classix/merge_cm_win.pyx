@@ -226,7 +226,7 @@ cpdef distance_merge(double[:, :] data, list labels,
 
     """
 
-    cdef long[:] splist_indices = splist.base[:, 0]
+    cdef long long[:] splist_indices = splist.base[:, 0]
     cdef np.ndarray[np.int32_t, ndim=1] arr_labels = np.array(labels)
     cdef double[:, :] spdata = data.base[splist_indices]
     cdef np.ndarray[np.int32_t, ndim=1] sp_cluster_labels = arr_labels[splist_indices]   
@@ -311,7 +311,7 @@ cpdef distance_merge(double[:, :] data, list labels,
 
 
 # Disjoint set union
-cpdef density_merge(double[:, :] data, np.ndarray[np.int32_t, ndim=2] splist, double radius, double[:] sort_vals, double[:] half_nrm2):
+cpdef density_merge(double[:, :] data, long long[:, :] splist, double radius, double[:] sort_vals, double[:] half_nrm2):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
     
