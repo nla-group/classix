@@ -28,7 +28,7 @@ np.import_array()
 
 
 cpdef distance_merge_mtg(double[:, :] data, list labels,
-                       np.ndarray[np.int64_t, ndim=2] splist,  double radius, int minPts, double scale, 
+                       long long[:, :] splist,  double radius, int minPts, double scale, 
                        double[:] sort_vals, double[:] half_nrm2):
 
     """
@@ -171,7 +171,7 @@ cpdef distance_merge_mtg(double[:, :] data, list labels,
 
 
 cpdef distance_merge(double[:, :] data, list labels,
-                       np.ndarray[np.int64_t, ndim=2] splist,  double radius, int minPts, double scale, 
+                       long long[:, :] splist,  double radius, int minPts, double scale, 
                        double[:] sort_vals, double[:] half_nrm2):
 
     """
