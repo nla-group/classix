@@ -84,7 +84,7 @@ cpdef distance_merge_mtg(double[:, :] data, list labels,
     """
 
     cdef long[:] splist_indices = splist[:, 0]
-    cdef np.ndarray[np.npy_bool, ndim=1, cast=True] gp_nr = splist[:, 1].base >= minPts
+    cdef np.ndarray[np.npy_bool, ndim=1, cast=True] gp_nr = splist.base[:, 1] >= minPts
     cdef np.ndarray[np.int32_t, ndim=1] arr_labels = np.array(labels)
     cdef double[:, :] spdata = data.base[splist_indices]
     cdef np.ndarray[np.int32_t, ndim=1] sp_cluster_labels = arr_labels[splist_indices]   
