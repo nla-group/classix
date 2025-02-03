@@ -299,8 +299,8 @@ class TestClassix(unittest.TestCase):
             clx.predict(X)
             clx.explain(plot=True, figsize=(10,10),  savefig=False)
             clx.explain(0,  plot=True, savefig=False)
-            clx.explain(3, 2000,  plot=True, savefig=False)
-            clx.explain(0, 2008,  plot=True, savefig=False)
+            clx.explain(3, 1000,  plot=True, savefig=False)
+            clx.explain(0, 108,  plot=True, savefig=False)
         except:
             checkpoint = 0
 
