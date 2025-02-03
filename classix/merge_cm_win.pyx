@@ -171,7 +171,7 @@ cpdef distance_merge_mtg(double[:, :] data, list labels,
 
 
 cpdef distance_merge(double[:, :] data, list labels,
-                       long long[:, :] splist,  double radius, int minPts, double scale, 
+                       long long[:, :] splist, double radius, int minPts, double scale, 
                        double[:] sort_vals, double[:] half_nrm2):
 
     """
@@ -227,7 +227,7 @@ cpdef distance_merge(double[:, :] data, list labels,
     """
 
     cdef long long[:] splist_indices = splist.base[:, 0]
-    cdef np.ndarray[np.int32_t, ndim=1] arr_labels = np.array(labels)
+    cdef np.ndarray[np.int32_t, ndim=1] arr_labels = np.int32(np.array(labels))
     cdef double[:, :] spdata = data.base[splist_indices]
     cdef np.ndarray[np.int32_t, ndim=1] sp_cluster_labels = arr_labels[splist_indices]   
     cdef double[:] sort_vals_sp = sort_vals.base[splist_indices]
