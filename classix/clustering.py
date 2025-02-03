@@ -774,7 +774,7 @@ class CLASSIX:
 
             labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merge(data=data, 
                                                                     labels=agg_labels,
-                                                                    splist=splist,
+                                                                    splist=np.int64(splist),
                                                                     radius=radius,
                                                                     minPts=minPts,
                                                                     scale=self.mergeScale_, 
