@@ -273,7 +273,7 @@ def get_data(current_dir='', name='vdu_signals'):
             handler.write(y)
                     
     elif name == 'CovidENV':
-        url_parent_x = "https://github.com/the-null/data/raw/main/X_CovidENV.pkl"
+        url_parent_x = "https://www.dropbox.com/scl/fi/tulksb60iu22q7sj9gef3/X_CovidENV.pkl?rlkey=olndlzyxz69i28srfuclsecrc&st=5ojreume&dl=1"
         url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_CovidENV.npy"
         x = requests.get(url_parent_x).content
         y = requests.get(url_parent_y).content
@@ -284,7 +284,7 @@ def get_data(current_dir='', name='vdu_signals'):
                     
 
     elif name == 'Covid3MC':
-        url_parent_x = "https://github.com/the-null/data/raw/main/X_Covid3MC.pkl"
+        url_parent_x = "https://www.dropbox.com/scl/fi/qcc60zplu7vtv2l3fee8z/X_Covid3MC.pkl?rlkey=y3y2k90itgjd98odytlf6aehy&st=edodmc5b&dl=1"
         url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Covid3MC.npy"
         x = requests.get(url_parent_x).content
         y = requests.get(url_parent_y).content
@@ -774,7 +774,7 @@ class CLASSIX:
 
             labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merge(data=data, 
                                                                     labels=agg_labels,
-                                                                    splist=splist,
+                                                                    splist=np.int64(splist),
                                                                     radius=radius,
                                                                     minPts=minPts,
                                                                     scale=self.mergeScale_, 

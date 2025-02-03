@@ -360,7 +360,7 @@ cpdef density_merge(double[:, :] data, np.ndarray[np.int32_t, ndim=2] splist, do
     cdef int last_j
     
     cdef int len_sp = splist.shape[0]
-    cdef np.ndarray[np.int32_t, ndim=1] splist_indices = splist.base[:, 0]
+    cdef np.ndarray[np.int32_t, ndim=1] splist_indices = splist[:, 0]
     cdef double[:] sort_vals_sp = sort_vals.base[splist_indices]
     cdef double[:] half_nrm2_sp = half_nrm2.base[splist_indices]
 
