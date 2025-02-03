@@ -266,7 +266,7 @@ cpdef distance_merge(double[:, :] data, list labels,
     cdef long[:] cs = np.zeros(nr_u, dtype=np.int32)
     
     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] cid
-    cdef np.ndarray[np.int32_t, ndim=1] grp_sizes = splist.base[:, 1]
+    cdef np.ndarray[np.int32_t, ndim=1] grp_sizes = np.int32(splist.base[:, 1])
 
     for i in range(nr_u):
         cid = sp_cluster_labels==ul[i]
