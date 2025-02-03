@@ -346,10 +346,6 @@ class CLASSIX:
         The data points in an abnormal cluster will be redistributed to the nearest normal cluster. 
         When set to 1, no redistribution is performed. 
 
-    
-    norm : boolean, default=True
-        Whether to normalize the data associated with the sorting, default as True. 
-        
     mergeScale : float
         Used with distance-clustering; when distance between the two group centers 
         associated with two distinct groups smaller than mergeScale*radius, 
@@ -444,7 +440,7 @@ class CLASSIX:
         https://arxiv.org/abs/2202.01456, 2022.
     """
         
-    def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", norm=True, mergeScale=1.5, 
+    def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance",  mergeScale=1.5, merge_algorithm='default', 
                  post_alloc=True, mergeTinyGroups=True, verbose=1, short_log_form=True): 
 
         self.__verbose = verbose
@@ -459,6 +455,7 @@ class CLASSIX:
         self.__mergeTinyGroups = mergeTinyGroups
         self.__truncate = short_log_form
         self.labels_ = None
+        self.merge_algorithm = merge_algorithm
         
         self._gcIndices = np.frompyfunc(self.gc2ind, 1, 1)
                      
@@ -484,20 +481,20 @@ class CLASSIX:
                 
                 
                 if platform.system() == 'Windows':
-                    from .merge_cm_win import density_merge, distance_merge, distance_merge_mtg
+                    from .merge_cm_win import density_merge, distance_merge, distance_merge_mtg, distance_merge_set
                 else:
-                    from .merge_cm import density_merge, distance_merge, distance_merge_mtg
+                    from .merge_cm import density_merge, distance_merge, distance_merge_mtg, distance_merge_set
 
             except (ModuleNotFoundError, ValueError):
                 if not self.__enable_aggregate_cython__:
                     from .aggregate import general_aggregate, pca_aggregate, lm_aggregate
                 
-                from .merge import density_merge, distance_merge, distance_merge_mtg
+                from .merge import density_merge, distance_merge, distance_merge_mtg, distance_merge_set
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
             from .aggregate import general_aggregate, pca_aggregate, lm_aggregate
-            from .merge import density_merge, distance_merge, distance_merge_mtg
+            from .merge import density_merge, distance_merge, distance_merge_mtg, distance_merge_set
             warnings.warn("This run of CLASSIX is not using Cython.")
 
         
@@ -509,7 +506,10 @@ class CLASSIX:
         else:
             self._aggregate = lm_aggregate
 
-        self._density_merge = density_merge
+        if self.merge_algorithm == "set":
+            self._density_merge = distance_merge_set
+        else:
+            self._density_merge = density_merge
         
         if self.__mergeTinyGroups:
             self._distance_merge = distance_merge
@@ -702,14 +702,17 @@ class CLASSIX:
             The clusters labels of the data
         """
 
-        if method == 'density':
+        if method == 'density' or self.merge_algorithm == 'set':
 
             agg_labels = np.asarray(agg_labels)
             labels = copy.deepcopy(agg_labels) 
             
-            self.merge_groups, self.connected_pairs_ = self._density_merge(data, splist, 
-                                                                             radius, sort_vals=sort_vals, 
-                                                                             half_nrm2=self.__half_nrm2)
+            if method == 'density':
+                self.merge_groups, self.connected_pairs_ = self._density_merge(data, splist, radius, sort_vals=sort_vals, half_nrm2=self.__half_nrm2)
+
+            else:
+                self.merge_groups, self.connected_pairs_ = self._density_merge(data, splist, radius, scale=self.mergeScale_)
+
             maxid = max(labels) + 1
             
             # after this step, the connected pairs (groups) will be transformed into merged clusters, 
@@ -730,8 +733,10 @@ class CLASSIX:
             # This method is quite effective at solving the noise arise from small tolerance (radius).
             
             self.old_cluster_count = collections.Counter(labels)
-            
+            self.merge_temp_labels = labels
+
             self.t4_minPts = time()
+
             if minPts >= 1:
                 potential_noise_labels = self.outlier_filter(min_samples=minPts) # calculate the min_samples directly
                 SIZE_NOISE_LABELS = len(potential_noise_labels) 
@@ -771,17 +776,16 @@ class CLASSIX:
             
         else:
             self.__half_nrm2 = self.__half_nrm2[self.splist_[:, 0]]
-
-            labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merge(data=data, 
-                                                                    labels=agg_labels,
-                                                                    splist=splist,
-                                                                    radius=radius,
-                                                                    minPts=minPts,
-                                                                    scale=self.mergeScale_, 
-                                                                    sort_vals=sort_vals,
-                                                                    half_nrm2=self.__half_nrm2
-                                                                )
             
+            labels, self.old_cluster_count, SIZE_NOISE_LABELS, = self._distance_merge(data=data, 
+                                                                labels=agg_labels,
+                                                                splist=splist,
+                                                                radius=radius,
+                                                                minPts=minPts,
+                                                                scale=self.mergeScale_, 
+                                                                sort_vals=sort_vals,
+                                                                half_nrm2=self.__half_nrm2
+                                                            )
             
         self.inverse_ind = np.argsort(ind)
         labels = labels[self.inverse_ind]
@@ -809,7 +813,15 @@ class CLASSIX:
 
         return labels 
     
-    
+
+
+
+
+    def minPtsChange(self, minPts, verbose=1):
+        if not hasattr(self, '__fit__'):
+            raise NotFittedError("Please use .fit() method first.")
+
+        
     
     def explain(self, index1=None, index2=None, cmap='jet', showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
                 plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5,  obj_msize=160, sp1_color='lime', sp2_color='cyan',

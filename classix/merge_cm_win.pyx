@@ -170,9 +170,8 @@ cpdef distance_merge_mtg(double[:, :] data, list labels,
 
 
 
-cpdef distance_merge(double[:, :] data, list labels,
-                       np.ndarray[np.int32_t, ndim=2] splist,  double radius, int minPts, double scale, 
-                       double[:] sort_vals, double[:] half_nrm2):
+cpdef distance_merge(double[:, :] data, list labels, np.ndarray[np.int32_t, ndim=2] splist,  double radius, int minPts, double scale, 
+                     double[:] sort_vals, double[:] half_nrm2):
 
     """
     Implement CLASSIX's merging with early stopping and BLAS routines
@@ -414,6 +413,138 @@ cpdef density_merge(double[:, :] data, np.ndarray[np.int32_t, ndim=2] splist, do
     return labels_set, connected_pairs_store 
 
 
+cpdef distance_merge_set(double[:, :] data,  double[:, :] splist,  double radius, double scale=1.5):
+    """
+    Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
+    
+    Parameters
+    ----------
+    data : numpy.ndarray
+        The input that is array-like of shape (n_samples,).
+    
+    splist : numpy.ndarray
+        List of starting points formed in the aggregation.
+
+    radius : float
+        The tolerance to control the aggregation. If the distance between the starting point 
+        of a group and another data point is less than or equal to the tolerance,
+        the point is allocated to that group. For details, we refer users to [1].
+
+    method : str, default='distance'
+        Method for group merging, Available options are:
+        
+        - 'density': two groups are merged if the density of data points in their intersection 
+           is at least as high the smaller density of both groups. This option uses the disjoint 
+           set structure to speedup merging.
+           
+        - 'distance': two groups are merged if the distance of their starting points is at 
+           most scale*radius (the parameter above). This option uses the disjoint 
+           set structure to speedup merging.
+    
+    scale : float
+        Design for distance-clustering, when distance between the two starting points 
+        associated with two distinct groups smaller than scale*radius, then the two groups merge.
+
+    Returns
+    -------
+    labels_set : list
+        Connected components of graph with groups as vertices.
+    
+    connected_pairs_store : list
+        List for connected group labels.
+
+
+    References
+    ----------
+    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
+
+    """
+    
+    # cdef list connected_pairs = list()
+    cdef list connected_pairs = [SET(i) for i in range(splist.shape[0])]
+    cdef list connected_pairs_store = list()
+    cdef double den1, den2, cid
+    cdef unsigned int i, j, internum
+    cdef int ndim = data.shape[1]
+    cdef int nsize_stp = splist.shape[0]
+    cdef np.ndarray[np.int32_t, ndim=1] splist_indices = np.int32(splist[:, 0])
+
+    cdef double[:, :] neigbor_sp
+    cdef double[:] sort_vals
+    cdef long[:] select_stps
+    cdef np.ndarray[np.npy_bool, ndim=1, cast=True] index_overlap, c1, c2
+    
+    
+    for i in range(nsize_stp):
+        sp1 = data.base[splist_indices[i]] 
+        select_stps = splist_indices[i+1:]
+        neigbor_sp = data.base[select_stps, :] 
+        
+        select_stps = np.arange(i+1, nsize_stp, dtype=int)
+        sort_vals = splist.base[i:, 1]
+        
+        # index_overlap = np.linalg.norm(neigbor_sp - sp1, ord=2, axis=-1) <= scale*radius  
+        index_overlap = fast_query(neigbor_sp, sp1, sort_vals, scale*radius)
+        select_stps = select_stps.base[index_overlap]
+        if not np.any(index_overlap):
+            continue
+
+        for j in select_stps:
+            merge(connected_pairs[i], connected_pairs[j])
+            connected_pairs_store.append((i, j))
+                
+
+    cdef SET obj = SET(0)
+    cdef list labels_set = list()
+    cdef list labels = [findParent(obj).data for obj in connected_pairs]
+    cdef int lab
+
+    for lab in np.unique(labels):
+        labels_set.append([i for i in range(len(labels)) if labels[i] == lab])
+    return labels_set, connected_pairs_store 
+
+
+
+
+cpdef distance_minpts_no_merge(double[:, :] data, list labels, np.ndarray[np.int32_t, ndim=1] sp_cluster_labels, np.ndarray[np.int32_t, ndim=1] cs,
+                       np.ndarray[np.int32_t, ndim=2] splist,  int minPts, double[:] half_nrm2):
+
+    cdef long[:] splist_indices = splist[:, 0]
+    cdef double[:, :] spdata = data.base[splist_indices]
+    cdef np.ndarray[np.int64_t, ndim=1] arr_labels = np.array(labels)
+    old_cluster_count = collections.Counter(sp_cluster_labels[arr_labels])
+    cdef long[:] ncid = np.nonzero(cs < minPts)[0]
+    cdef np.ndarray[np.int64_t, ndim=1] grp_sizes = np.int64(splist[:, 1])
+    cdef Py_ssize_t SIZE_NOISE_LABELS = ncid.size
+
+    if SIZE_NOISE_LABELS > 0:
+        copy_sp_cluster_labels = sp_cluster_labels.copy()
+
+        for i in ncid:
+            ii = np.nonzero(copy_sp_cluster_labels==i)[0]
+            
+            for iii in ii:
+                xi = spdata[iii, :]    # starting point of one tiny group
+                
+                dist = half_nrm2 - np.matmul(spdata, xi) + half_nrm2[iii]
+                merge_ind = np.argsort(dist)
+                for j in merge_ind:
+                    if cs[copy_sp_cluster_labels[j]] >= minPts:
+                        sp_cluster_labels[iii] = copy_sp_cluster_labels[j]
+                        break
+
+        ul = np.unique(sp_cluster_labels)
+        nr_u = len(ul)
+        cs = np.zeros(nr_u, dtype=int)
+
+        for i in range(nr_u):
+            cid = sp_cluster_labels==ul[i]
+            sp_cluster_labels[cid] = i
+            cs[i] = np.sum(grp_sizes[cid])
+
+    arr_labels = sp_cluster_labels[arr_labels]
+    return arr_labels, old_cluster_count, SIZE_NOISE_LABELS
+
 
 
 cpdef euclid(double[:] xxt, double[:, :] X, double[:] v):
@@ -491,3 +622,28 @@ cpdef cal_inter_volume(double[:] starting_point, double[:] spo, double radius):
     cdef double c = dist / 2
     return np.pi**(fdim/2)/gamma(fdim/2 + 1)*(radius**fdim)*betainc((fdim + 1)/2, 1/2, 1 - c**2/radius**2) + np.finfo(float).eps
 
+
+
+
+cpdef fast_query(double[:,:] data, double[:] starting_point, double[:] sort_vals, double tol):
+    """Fast query with built in early stopping strategy for merging."""
+    cdef int len_ind = data.shape[0]
+    cdef double[:] candidate
+    cdef double dist
+    cdef Py_ssize_t i, coord
+    cdef ndim = data.shape[1] # remove the first three elements that not included in the features
+    cdef np.ndarray[np.npy_bool, ndim=1, cast=True] index_query=np.full(len_ind, False, dtype=bool)
+    for i in range(len_ind):
+        candidate = data[i]
+        
+        if (sort_vals[i+1] - sort_vals[0] > tol):
+            break
+
+        dist = 0
+        for coord in range(ndim):
+            dist += (candidate[coord] - starting_point[coord])**2
+
+        if dist <= tol**2:
+            index_query[i] = True
+            
+    return index_query
