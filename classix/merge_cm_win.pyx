@@ -21,14 +21,16 @@ cimport numpy as np
 from scipy.special import betainc, gamma
 ctypedef np.uint8_t uint8
 np.import_array()
-    
+from libc.stdint cimport int32_t, int64_t
+
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.binding(True)
 
 
 cpdef distance_merge_mtg(double[:, :] data, list labels,
-                       long long[:, :] splist,  double radius, int minPts, double scale, 
+                       int64_t[:, :] splist,  double radius, int minPts, double scale, 
                        double[:] sort_vals, double[:] half_nrm2):
 
     """
@@ -92,12 +94,12 @@ cpdef distance_merge_mtg(double[:, :] data, list labels,
     cdef np.ndarray[np.float64_t, ndim=1] eucl
     cdef np.ndarray[np.int32_t, ndim=1] copy_sp_cluster_labels
     
-    cdef long long[:] inds, ii
+    cdef int64_t[:] inds, ii
     cdef long[:] spl
     cdef Py_ssize_t fdim =  splist.shape[0]
     cdef Py_ssize_t i, iii, j, ell, last_j
     cdef double[:] xi
-    cdef long long[:] merge_ind
+    cdef int64_t[:] merge_ind
     cdef int minlab
     cdef np.ndarray[np.float64_t, ndim=1] dist
     
@@ -127,7 +129,7 @@ cpdef distance_merge_mtg(double[:, :] data, list labels,
     cdef long[:] cs = np.zeros(nr_u, dtype=int)
     
     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] cid
-    cdef np.ndarray[np.int32_t, ndim=1] grp_sizes = splist[:, 1]
+    cdef np.ndarray[np.int64_t, ndim=1] grp_sizes = splist[:, 1]
 
     for i in range(nr_u):
         cid = sp_cluster_labels==ul[i]
@@ -135,7 +137,7 @@ cpdef distance_merge_mtg(double[:, :] data, list labels,
         cs[i] = np.sum(grp_sizes[cid])
 
     old_cluster_count = collections.Counter(sp_cluster_labels[arr_labels])
-    cdef long long[:] ncid = np.nonzero(cs.base < minPts)[0]
+    cdef int64_t[:] ncid = np.nonzero(cs.base < minPts)[0]
 
     cdef Py_ssize_t SIZE_NOISE_LABELS = ncid.size
 
@@ -171,7 +173,7 @@ cpdef distance_merge_mtg(double[:, :] data, list labels,
 
 
 cpdef distance_merge(double[:, :] data, list labels,
-                       long long[:, :] splist, double radius, int minPts, double scale, 
+                       int64_t[:, :] splist, double radius, int minPts, double scale, 
                        double[:] sort_vals, double[:] half_nrm2):
 
     """
@@ -226,7 +228,7 @@ cpdef distance_merge(double[:, :] data, list labels,
 
     """
 
-    cdef long long[:] splist_indices = splist.base[:, 0]
+    cdef int64_t[:] splist_indices = splist.base[:, 0]
     cdef np.ndarray[np.int32_t, ndim=1] arr_labels = np.int32(np.array(labels))
     cdef double[:, :] spdata = data.base[splist_indices]
     cdef np.ndarray[np.int32_t, ndim=1] sp_cluster_labels = arr_labels[splist_indices]   
@@ -234,12 +236,12 @@ cpdef distance_merge(double[:, :] data, list labels,
     cdef np.ndarray[np.float64_t, ndim=1] eucl
     cdef np.ndarray[np.int32_t, ndim=1] copy_sp_cluster_labels
     
-    cdef long long[:] inds, ii
+    cdef int64_t[:] inds, ii
     cdef long[:] spl
     cdef Py_ssize_t fdim =  splist.base.shape[0]
     cdef Py_ssize_t i, iii, j, ell, last_j
     cdef double[:] xi
-    cdef long long[:] merge_ind
+    cdef int64_t[:] merge_ind
     cdef int minlab
     cdef np.ndarray[np.float64_t, ndim=1] dist
     
@@ -266,7 +268,7 @@ cpdef distance_merge(double[:, :] data, list labels,
     cdef long[:] cs = np.zeros(nr_u, dtype=np.int32)
     
     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] cid
-    cdef np.ndarray[np.int32_t, ndim=1] grp_sizes = np.int32(splist.base[:, 1])
+    cdef np.ndarray[np.int64_t, ndim=1] grp_sizes = splist.base[:, 1]
 
     for i in range(nr_u):
         cid = sp_cluster_labels==ul[i]
@@ -274,7 +276,7 @@ cpdef distance_merge(double[:, :] data, list labels,
         cs[i] = np.sum(grp_sizes[cid])
 
     old_cluster_count = collections.Counter(sp_cluster_labels[arr_labels])
-    cdef long long[:] ncid = np.nonzero(cs.base < minPts)[0]
+    cdef int64_t[:] ncid = np.nonzero(cs.base < minPts)[0]
 
     cdef Py_ssize_t SIZE_NOISE_LABELS = ncid.size
 
@@ -311,7 +313,7 @@ cpdef distance_merge(double[:, :] data, list labels,
 
 
 # Disjoint set union
-cpdef density_merge(double[:, :] data, long long[:, :] splist, double radius, double[:] sort_vals, double[:] half_nrm2):
+cpdef density_merge(double[:, :] data, int64_t[:, :] splist, double radius, double[:] sort_vals, double[:] half_nrm2):
     """
     Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
     
@@ -360,14 +362,14 @@ cpdef density_merge(double[:, :] data, long long[:, :] splist, double radius, do
     cdef int last_j
     
     cdef int len_sp = splist.shape[0]
-    cdef long long[:] splist_indices = splist.base[:, 0]
+    cdef int64_t[:] splist_indices = splist.base[:, 0]
     cdef double[:] sort_vals_sp = sort_vals.base[splist_indices]
     cdef double[:] half_nrm2_sp = half_nrm2.base[splist_indices]
 
     cdef double[:, :] spdata = data.base[splist_indices]
 
     cdef double[:, :] neigbor_sp
-    cdef long long[:] select_stps
+    cdef int64_t[:] select_stps
     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] index_overlap, c1, c2
     
     volume = np.pi**(ndim/2) * radius** ndim / gamma( ndim/2+1 ) + np.finfo(float).eps
