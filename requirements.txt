@@ -4,3 +4,4 @@ scipy>=1.7.0
 pandas
 matplotlib>=3.5
 requests
+scikit-learn>=0.20
