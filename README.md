@@ -54,20 +54,25 @@ __Language__ | __Dependencies__
 
 ##   Quick start
 
-Here is an example of clustering one of the demo dataset provided with CLASSIX: 
+Here is a simple code snippet to get you started:
 
 ```Python
 import classix
-
-data, labels = classix.loadData('Covid3MC')
-# or one can use Gaussian blobs for a quick try:
-# from sklearn.datasets import make_blobs
-# data, labels = make_blobs(n_samples=1000, centers=3, n_features=2, random_state=0)
-
-# Call CLASSIX
-clx = classix.CLASSIX(radius=0.2, minPts=500, verbose=0)
+from sklearn.datasets import make_blobs
+data, labels = make_blobs(n_samples=1000, centers=5, n_features=10, random_state=0)
+clx = classix.CLASSIX(radius=0.1, minPts=10, verbose=0)
 clx.fit(data)
 print(clx.labels_) # clustering labels 
+clx.explain(plot=True)
+```
+
+And here is a slightly more practical example using a demo dataframe provided with CLASSIX: 
+
+```Python
+import classix
+data, labels = classix.loadData('Covid3MC')
+clx = classix.CLASSIX(radius=0.2, minPts=500, verbose=0)
+clx.fit(data)
 ```
 
 You can also cluster out-of-sample data using ``predict()`` after the model is fitted, e.g., clx.predict(data.iloc[:1000]) 
@@ -93,7 +98,7 @@ These 301 groups were subsequently merged into 25 clusters.
 We can ask CLASSIX why two data points ended up in the same cluster, or not: 
 
 ```Python
-clx.explain('hCoV-19/Norway/6348/2021','hCoV-19/USA/WY-WYPHL-20146677/2020', plot=True) # one can also provide native integer indices
+clx.explain('hCoV-19/Norway/6348/2021', 'hCoV-19/USA/WY-WYPHL-20146677/2020', plot=True) 
 ```
 Output:
 ```
@@ -125,7 +130,7 @@ and mergeScale_=1.5 (the default value).
 ```
 <img src=https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/sample.png width=800 />
 
-CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the data into groups of nearby data points, followed by a merging phase of groups into clusters. The ``radius`` parameter controls the size of the groups and ``minPts`` controls the minimal cluster size. CLASSIX explains that there is a path from data point 'hCoV-19/Costa_Rica/HNN-0400/2021' to data point 'hCoV-19/Denmark/DCGC-269073/2021' via the centers of the computed groups ( 191, 210, etc). 
+CLASSIX clustering consists of two phases, namely a greedy aggregation phase of the data into groups of nearby data points, followed by a merging phase of groups into clusters. The ``radius`` parameter controls the size of the groups and ``minPts`` controls the minimal cluster size. CLASSIX explains that there is a path from data point `hCoV-19/Costa_Rica/HNN-0400/2021` to data point `hCoV-19/Denmark/DCGC-269073/2021` via the centers of the computed groups (256, 248, etc.). 
 
 
 #### Data frames
