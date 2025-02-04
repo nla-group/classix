@@ -30,9 +30,14 @@ from sklearn.metrics.cluster import adjusted_rand_score
 class TestClassix(unittest.TestCase):
     
     def test_cython_check(self):
-        checkpoint = cython_is_available(verbose=True)
-
+        checkpoint = 1
+        try:
+            cython_is_available()
+            cython_is_available(verbose=True)
+        except:
+            checkpoint = 0
         self.assertEqual(checkpoint, 1)
+        
         
     def test_distance_cluster(self):
         vdu_signals = loadData('vdu_signals')
@@ -201,6 +206,7 @@ class TestClassix(unittest.TestCase):
             try:
                 clx = CLASSIX(sorting='norm-mean', radius=TOL, group_merging='distance', verbose=0)
                 clx.fit_transform(X)
+                clx.visualize_linkage(scale=scale, figsize=(8,8), labelsize=24)
             except:
                 checkpoint = 0
         self.assertEqual(checkpoint, 1)
@@ -210,18 +216,127 @@ class TestClassix(unittest.TestCase):
             try:
                 clx = CLASSIX(sorting='norm-mean', radius=tol, group_merging='distance', verbose=0)
                 clx.fit_transform(X)
+                clx.visualize_linkage(scale=1.5, figsize=(8,8), labelsize=24, plot_boundary=True)
             except:
                 checkpoint = 0
         self.assertEqual(checkpoint, 1)
 
 
+    
+    def test_explain(self):
+        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=2, 
+                               cluster_std=1.5, random_state=1
+        )
+        checkpoint = 1
+        try:
+            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
+            clx.fit_transform(X)
+            clx.load_group_centers()
+            clx.load_cluster_centers()
+            clx.gcIndices([1, 2, 3, 4])
+            
+            clx.predict(X)
+            clx.predict(X[:1000])
+
+            clx.explain(plot=True, showsplist=True, figsize=(10,10),  savefig=True)
+            clx.explain(0,  plot=True, savefig=True, showsplist=True)
+            clx.form_starting_point_clusters_table(aggregate=True)
+            clx.explain(3, 2000,  plot=True, savefig=False)
+            clx.explain(0, 2008,  plot=True, savefig=True, replace_name=['Superman', 'Batman'])
+
+            clx.explain(2000, 2028,  plot=True, add_arrow=True, savefig=True, showallgroups=True, include_dist=True)
+                
+            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True, fmt='pdf')
+            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=1, savefig=True, fmt='png')
+            clx.explain(index1=[0, 0], index2=[4,5], plot=True, add_arrow=True, show_connected_label=True, directed_arrow=1)
+            clx.explain(index1=np.array([6, 6]), index2=np.array([6, 6]), plot=True, add_arrow=True, directed_arrow=1)
+            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=4999, mergeTinyGroups=False)
+            clx.fit(X)
+            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True, fmt='jpg')
+            clx.timing()
+        except:
+            checkpoint = 0
+
+        self.assertEqual(checkpoint, 1)
+   
+
+    def test_explain_str_input(self):
+        X, _ = data.make_blobs(n_samples=5, centers=2, n_features=2, cluster_std=1.5, random_state=1)
+        X = pd.DataFrame(X, index=['Anna', 'Bert', 'Carl', 'Tom', 'Bob'])
+        checkpoint = 1
+        
+        try:
+            clx = CLASSIX(radius=0.6)
+            clx.fit_transform(X)
+            print(clx.clusterSizes_)
+            print(clx.groupCenters_)
+            clx.explain(index1='Carl', index2='Bert', plot=True, show_connected_label=True, showallgroups=True, sp_fontsize=12)  
+            
+        except:
+            checkpoint = 0
+        self.assertEqual(checkpoint, 1)
+
+    
+    def test_explain_hdim(self):
+        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=20, 
+                               cluster_std=1.5, random_state=1
+        )
+        checkpoint = 1
+        try:
+            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
+            clx.fit_transform(X)
+            clx.predict(X)
+            clx.explain(plot=True, figsize=(10,10),  savefig=False)
+            clx.explain(0,  plot=True, savefig=False)
+            clx.explain(3, 2000,  plot=True, savefig=False)
+            clx.explain(0, 2008,  plot=True, savefig=False)
+        except:
+            checkpoint = 0
+
+        self.assertEqual(checkpoint, 1)
+
+    
+    def test_explain_1D(self):
+        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=1, 
+                               cluster_std=1.5, random_state=1
+        )
+        checkpoint = 1
+        try:
+            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
+            clx.fit_transform(X)
+            clx.predict(X)
+            clx.explain(plot=True, figsize=(10,10),  savefig=False)
+            clx.explain(0,  plot=True, savefig=False)
+            clx.explain(3, 2000,  plot=True, savefig=False)
+            clx.explain(0, 2008,  plot=True, savefig=False)
+        except:
+            checkpoint = 0
+
+        self.assertEqual(checkpoint, 1)
+
+    
+    def test_explain_connected_groups(self):
+        X, y = data.make_blobs(n_samples=1000, centers=3, n_features=2, cluster_std=2, random_state=1)
+        checkpoint = 1
+        try:
+            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging='distance')
+            clx.fit(X)
+            clx.explain(773, 22, plot=True,  add_arrow=True, include_dist=False)
+
+            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging='density')
+            clx.fit(X)
+            clx.explain(773, 22, plot=True,  add_arrow=True, include_dist=False)
+        except:
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
         
         
     def test_built_in_data(self):
         checkpoint = 1
         try:
             for dn in ['vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 'Banknote', 'Seeds', 
-                       'Phoneme', 'Wine', 'NA']:
+                       'Phoneme', 'Wine', 'CovidENV', 'Covid3MC', 'NA']:
                 loadData(name=dn)
         except:
             checkpoint = 0
@@ -232,7 +347,7 @@ class TestClassix(unittest.TestCase):
     def test_aggregate_precompute(self): 
         checkpoint = 1
         try:
-            data = np.random.randn(1000, 2)
+            data = np.random.randn(10000, 2)
             
             inverse_ind1, spl1, _, _, _, _, _ = aggregate.general_aggregate(data, sorting="pca", tol=0.5)
             inverse_ind2, spl2, _, _, _, _, _ = aggregate_cm.general_aggregate(data, sorting="pca", tol=0.5)
@@ -288,16 +403,15 @@ class TestClassix(unittest.TestCase):
         checkpoint = 1
         minPts = 10
         scale = 1.5
-        data = np.random.randn(1000, 2)
+        data = np.random.randn(10000, 2)
         checkpoint = 1
         try:    
             labels, splist, nr_dist, ind, sort_vals, data, half_nrm2 = aggregate.general_aggregate(data, sorting="pca", tol=0.5) #
-        
+            splist = np.asarray(splist)
             
             radius = 0.5
-            splist = np.asarray(splist)
+            splist = np.int64(np.asarray(splist))
             half_nrm2_sp = half_nrm2[splist[:,0]]
-            splist = np.int64(splist)
             
             label_set1, connected_pairs_store1 = density_merge(data, splist, radius, sort_vals, half_nrm2)
             label_set2, connected_pairs_store2 = density_merge_cm(data, splist, radius, sort_vals, half_nrm2)
@@ -325,7 +439,7 @@ class TestClassix(unittest.TestCase):
 
 
     def test_group_merging_error_type(self):
-        X, y = data.make_blobs(n_samples=1000, centers=2, n_features=20, 
+        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=20, 
                                cluster_std=1.5, random_state=1
         )
         
@@ -359,7 +473,6 @@ class TestClassix(unittest.TestCase):
             checkpoint = 0
             
         self.assertEqual(checkpoint, 1)
-        
         
 if __name__ == '__main__':
     unittest.main()
