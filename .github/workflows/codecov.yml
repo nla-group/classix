@@ -21,8 +21,6 @@ jobs:
         pip install -r requirements.txt
         pip install -U scikit-learn
         pip install pytest-cov
-        pip install build
-        python3 -m build
         pip install setuptools 
         python setup.py build_ext --inplace
         pytest unittests.py --cov=classix
