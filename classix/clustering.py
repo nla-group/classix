@@ -89,88 +89,99 @@ def loadData(name='vdu_signals'):
     if name == 'vdu_signals':
         DATA_PATH = os.path.join(current_dir, 'data/vdu_signals.npy')
         if not os.path.isfile(DATA_PATH):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir)
+            print('Done.')
         return np.load(DATA_PATH)
     
     if name == 'Iris':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Irirs.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Irirs.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Iris')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Dermatology':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Dermatology.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Dermatology.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Dermatology')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Ecoli':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Ecoli.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Ecoli.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Ecoli')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Glass':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Glass.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Glass.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Glass')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Banknote':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Banknote.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Banknote.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Banknote')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Seeds':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Seeds.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Seeds.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Seeds')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Phoneme':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Phoneme.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Phoneme.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Phoneme')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Wine':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Wine.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Wine.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Wine')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'CovidENV':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_CovidENV.pkl')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_CovidENV.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'CovidENV')
+            print('Done.')
         return pd.read_pickle(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Covid3MC':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Covid3MC.pkl')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Covid3MC.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Covid3MC')
+            print('Done.')
         return pd.read_pickle(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     
