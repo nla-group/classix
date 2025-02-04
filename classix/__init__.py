@@ -1,7 +1,7 @@
 
 __version__ = '1.2.8'                  
 __enable_cython__ = True 
-
+__debug_token__ = "asdasdaskj1.2.8"
 from .clustering import CLASSIX
 from .clustering import loadData
 from .clustering import cython_is_available
