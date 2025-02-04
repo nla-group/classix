@@ -707,7 +707,7 @@ class CLASSIX:
             agg_labels = np.asarray(agg_labels)
             labels = copy.deepcopy(agg_labels) 
             
-            self.merge_groups, self.connected_pairs_ = self._density_merge(data, np.int64(splist), 
+            self.merge_groups, self.connected_pairs_ = self._density_merge(data, np.int64(splist, 
                                                                              radius, sort_vals=sort_vals, 
                                                                              half_nrm2=self.__half_nrm2)
             maxid = max(labels) + 1
