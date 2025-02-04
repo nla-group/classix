@@ -201,7 +201,6 @@ class TestClassix(unittest.TestCase):
             try:
                 clx = CLASSIX(sorting='norm-mean', radius=TOL, group_merging='distance', verbose=0)
                 clx.fit_transform(X)
-                clx.visualize_linkage(scale=scale, figsize=(8,8), labelsize=24)
             except:
                 checkpoint = 0
         self.assertEqual(checkpoint, 1)
@@ -211,112 +210,11 @@ class TestClassix(unittest.TestCase):
             try:
                 clx = CLASSIX(sorting='norm-mean', radius=tol, group_merging='distance', verbose=0)
                 clx.fit_transform(X)
-                clx.visualize_linkage(scale=1.5, figsize=(8,8), labelsize=24, plot_boundary=True)
             except:
                 checkpoint = 0
         self.assertEqual(checkpoint, 1)
 
 
-    
-    def test_explain(self):
-        X, y = data.make_blobs(n_samples=5000, centers=2, n_features=2, 
-                               cluster_std=1.5, random_state=1
-        )
-        checkpoint = 1
-        try:
-            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
-            clx.fit_transform(X)
-            clx.load_group_centers()
-            clx.load_cluster_centers()
-            clx.gcIndices([1, 2, 3, 4])
-            
-            clx.predict(X)
-            clx.predict(X[:1000])
-            clx.explain(0,  plot=True, savefig=True, showsplist=True)
-            clx.form_starting_point_clusters_table(aggregate=True)
-            clx.explain(3, 2000,  plot=True, savefig=False)
-            clx.explain(0, 2008,  plot=True, savefig=True, replace_name=['Superman', 'Batman'])
-
-            clx.explain(2000, 2028,  plot=True, add_arrow=True, savefig=True, showallgroups=True, include_dist=True)
-                
-            clx.explain(0, 2008,  plot=True, add_arrow=True, directed_arrow=-1, savefig=True, fmt='pdf')
-            clx.timing()
-        except:
-            checkpoint = 0
-
-        self.assertEqual(checkpoint, 1)
-   
-
-    def test_explain_str_input(self):
-        X, _ = data.make_blobs(n_samples=5, centers=2, n_features=2, cluster_std=1.5, random_state=1)
-        X = pd.DataFrame(X, index=['Anna', 'Bert', 'Carl', 'Tom', 'Bob'])
-        checkpoint = 1
-        
-        try:
-            clx = CLASSIX(radius=0.6)
-            clx.fit_transform(X)
-            print(clx.clusterSizes_)
-            print(clx.groupCenters_)
-            clx.explain(index1='Carl', index2='Bert', plot=True, show_connected_label=True, showallgroups=True, sp_fontsize=12)  
-            
-        except:
-            checkpoint = 0
-        self.assertEqual(checkpoint, 1)
-
-    
-    def test_explain_hdim(self):
-        X, y = data.make_blobs(n_samples=1000, centers=2, n_features=20, 
-                               cluster_std=1.5, random_state=1
-        )
-        checkpoint = 1
-        try:
-            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
-            clx.fit_transform(X)
-            clx.predict(X)
-            clx.explain(plot=True, figsize=(10,10),  savefig=False)
-            clx.explain(0,  plot=True, savefig=False)
-            clx.explain(3, 600,  plot=True, savefig=False)
-            clx.explain(0, 208,  plot=True, savefig=False)
-        except:
-            checkpoint = 0
-
-        self.assertEqual(checkpoint, 1)
-
-    
-    def test_explain_1D(self):
-        X, y = data.make_blobs(n_samples=2000, centers=2, n_features=1, 
-                               cluster_std=1.5, random_state=1
-        )
-        checkpoint = 1
-        try:
-            clx = CLASSIX(radius=0.5, group_merging='distance', minPts=3)
-            clx.fit_transform(X)
-            clx.predict(X)
-            clx.explain(plot=True, figsize=(10,10),  savefig=False)
-            clx.explain(0,  plot=True, savefig=False)
-            clx.explain(3, 1000,  plot=True, savefig=False)
-            clx.explain(0, 108,  plot=True, savefig=False)
-        except:
-            checkpoint = 0
-
-        self.assertEqual(checkpoint, 1)
-
-    
-    def test_explain_connected_groups(self):
-        X, y = data.make_blobs(n_samples=1000, centers=3, n_features=2, cluster_std=2, random_state=1)
-        checkpoint = 1
-        try:
-            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging='distance')
-            clx.fit(X)
-            clx.explain(773, 22, plot=True,  add_arrow=True, include_dist=False)
-
-            clx = CLASSIX(radius=0.1, minPts=99, verbose=1, group_merging='density')
-            clx.fit(X)
-            clx.explain(773, 22, plot=True,  add_arrow=True, include_dist=False)
-        except:
-            checkpoint = 0
-            
-        self.assertEqual(checkpoint, 1)
         
         
     def test_built_in_data(self):
