@@ -295,7 +295,7 @@ class TestClassix(unittest.TestCase):
             splist = np.asarray(splist)
             
             radius = 0.5
-            splist = np.asarray(splist)
+            splist = np.int64(np.asarray(splist))
             half_nrm2_sp = half_nrm2[splist[:,0]]
             
             label_set1, connected_pairs_store1 = density_merge(data, splist, radius, sort_vals, half_nrm2)
