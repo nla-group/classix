@@ -1143,10 +1143,7 @@ class CLASSIX:
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
                     else:
                         selectInd = np.arange(self.x_pca.shape[0])
-                        
-                    if feat_dim > 2:
-                        print("With data having more than two features, the group circles in\nthe plot may appear bigger than they are.")
-
+                     
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
                     
@@ -1355,9 +1352,6 @@ class CLASSIX:
                     else:
                         selectInd = np.arange(self.x_pca.shape[0])
                         
-                    if feat_dim > 2:
-                        print("With data having more than two features, the group circles in\nthe plot may appear bigger than they are.")
-
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
                     ax.set_facecolor(bcolor)
