@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: classixclustering
 Version: 1.2.8
 Summary: Fast and explainable clustering based on sorting
@@ -25,6 +25,15 @@ Requires-Dist: scipy>=1.7.0
 Requires-Dist: pandas
 Requires-Dist: matplotlib>=3.5
 Requires-Dist: requests
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: summary
 
 .. image:: https://codecov.io/gh/nla-group/classix/branch/master/graph/badge.svg?token=D4MQZS67H1
     :target: https://codecov.io/gh/nla-group/classix
