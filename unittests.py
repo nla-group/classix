@@ -30,12 +30,7 @@ from sklearn.metrics.cluster import adjusted_rand_score
 class TestClassix(unittest.TestCase):
     
     def test_cython_check(self):
-        checkpoint = 1
-        try:
-            cython_is_available()
-            cython_is_available(verbose=True)
-        except:
-            checkpoint = 0
+        checkpoint = cython_is_available(verbose=True)
         self.assertEqual(checkpoint, 1)
         
         
