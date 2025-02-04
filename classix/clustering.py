@@ -346,10 +346,6 @@ class CLASSIX:
         The data points in an abnormal cluster will be redistributed to the nearest normal cluster. 
         When set to 1, no redistribution is performed. 
 
-    
-    norm : boolean, default=True
-        Whether to normalize the data associated with the sorting, default as True. 
-        
     mergeScale : float
         Used with distance-clustering; when distance between the two group centers 
         associated with two distinct groups smaller than mergeScale*radius, 
@@ -361,14 +357,6 @@ class CLASSIX:
 
     mergeTinyGroups : boolean, default=True
         If this is False, the group merging will ignore all groups with < minPts points.
-    
-    algorithm : str, default='bf'
-        Algorithm to merge connected groups.
-
-        - 'bf': Use brute force routines to speed up the merging of connected groups.
-        
-        - 'set': Use disjoint set structure to merge connected groups.
-
     
     verbose : boolean or int, default=1
         Whether to print the logs or not.
@@ -444,7 +432,7 @@ class CLASSIX:
         https://arxiv.org/abs/2202.01456, 2022.
     """
         
-    def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", norm=True, mergeScale=1.5, 
+    def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", mergeScale=1.5, 
                  post_alloc=True, mergeTinyGroups=True, verbose=1, short_log_form=True): 
 
         self.__verbose = verbose
