@@ -292,10 +292,12 @@ class TestClassix(unittest.TestCase):
         checkpoint = 1
         try:    
             labels, splist, nr_dist, ind, sort_vals, data, half_nrm2 = aggregate.general_aggregate(data, sorting="pca", tol=0.5) #
-           
+        
+            
             radius = 0.5
-            splist = np.int64(np.asarray(splist))
+            splist = np.asarray(splist)
             half_nrm2_sp = half_nrm2[splist[:,0]]
+            splist = np.int64(splist)
             
             label_set1, connected_pairs_store1 = density_merge(data, splist, radius, sort_vals, half_nrm2)
             label_set2, connected_pairs_store2 = density_merge_cm(data, splist, radius, sort_vals, half_nrm2)
