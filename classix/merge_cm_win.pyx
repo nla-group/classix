@@ -80,7 +80,7 @@ cpdef distance_merge_mtg(double[:, :] data, list labels,
     
     References
     ----------
-    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
+    [1] X. Chen and S. Güttel. Fast and explainable sorting based clustering, 2024.
 
     """
 
@@ -125,7 +125,7 @@ cpdef distance_merge_mtg(double[:, :] data, list labels,
     cdef long[:] ul = np.unique(sp_cluster_labels)
     cdef Py_ssize_t nr_u = len(ul)
 
-    cdef long[:] cs = np.zeros(nr_u, dtype=int)
+    cdef long long[:] cs = np.zeros(nr_u, dtype=int)
     
     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] cid
     cdef np.ndarray[np.int64_t, ndim=1] grp_sizes = splist.base[:, 1]
@@ -158,7 +158,7 @@ cpdef distance_merge_mtg(double[:, :] data, list labels,
 
         ul = np.unique(sp_cluster_labels)
         nr_u = len(ul)
-        cs = np.zeros(nr_u, dtype=int)
+        
 
         for i in range(nr_u):
             cid = sp_cluster_labels==ul[i]
@@ -264,7 +264,7 @@ cpdef distance_merge(double[:, :] data, list labels,
     cdef long[:] ul = np.unique(sp_cluster_labels)
     cdef Py_ssize_t nr_u = len(ul)
 
-    cdef long[:] cs = np.zeros(nr_u, dtype=np.int32)
+    cdef long long[:] cs = np.zeros(nr_u, dtype=int)
     
     cdef np.ndarray[np.npy_bool, ndim=1, cast=True] cid
     cdef np.ndarray[np.int64_t, ndim=1] grp_sizes = splist.base[:, 1]
@@ -297,7 +297,7 @@ cpdef distance_merge(double[:, :] data, list labels,
 
         ul = np.unique(sp_cluster_labels)
         nr_u = len(ul)
-        cs = np.zeros(nr_u, dtype=int)
+        
 
         for i in range(nr_u):
             cid = sp_cluster_labels==ul[i]
