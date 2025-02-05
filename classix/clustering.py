@@ -10,7 +10,6 @@
 import warnings
 
 import os
-import copy
 import numbers
 import collections
 import numpy as np
@@ -586,11 +585,11 @@ class CLASSIX:
         self.t3_merge = time()
         if self.group_merging is None:
             self.inverse_ind = np.argsort(self.ind)
-            self.labels_ = copy.deepcopy(self.groups_[self.inverse_ind]) 
+            self.labels_ = self.groups_[self.inverse_ind]
         
         elif self.group_merging.lower()=='none':
             self.inverse_ind = np.argsort(self.ind)
-            self.labels_ = copy.deepcopy(self.groups_[self.inverse_ind]) 
+            self.labels_ = self.groups_[self.inverse_ind]
         
         else:
             self.labels_ = self.merging(
@@ -704,7 +703,7 @@ class CLASSIX:
         if method == 'density':
 
             agg_labels = np.asarray(agg_labels)
-            labels = copy.deepcopy(agg_labels) 
+            labels = agg_labels.copy()
             
             self.merge_groups, self.connected_pairs_ = self._density_merge(data, np.int64(splist), 
                                                                              radius, sort_vals=sort_vals, 
