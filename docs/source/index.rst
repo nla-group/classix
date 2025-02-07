@@ -3,9 +3,53 @@
 Welcome to CLASSIX's documentation!
 ===================================
 
-Clustering is a widely-used unsupervised learning technique to find patterns and structures in data. Clustering algorithms group the data points into distinct clusters such that points within a cluster share similar characteristics on the basis of their distance, density, or other spatial properties, while points in two distinct clusters are less similar. Since obtaining data labels requires a huge investment of human labor and cost, clustering analysis, as a general task to be solved, has a broad range of applications in many scientific and engineering fields, e.g., time series analysis, social network analysis, market segmentation, anomaly detection, and image segmentation.  We propose a novel clustering method called CLASSIX which shares features with both distance and density-based methods.  CLASSIX is an explainable sorting-based clustering algorithm towards a fast and scalable setting. 
+Clustering: A Core Technique in Unsupervised Learning
+=====================================================
 
-In this documentation, we will illustrate the use of CLASSIX and introduce its basic applications and provide fundamental guidance for its parameter settings. Simply put, CLASSIX comprises two phases to conduct clustering, namely aggregation and merging. The aggregation performs a quick partition of data associated with starting points which are a reduced estimator of general density. After that. the aggregation phase is followed by the merging of overlapping groups into clusters using either a distance or density-based criterion. For parameter settings, CLASSIX is dominated by two parameters, namely ``radius`` and ``minPts``, and their tuning is straightforward and simple, which we will illustrate later. In brief, ``radius`` is a distance parameter that serves as a tolerance for the grouping in the aggregation phase, while ``minPts`` parameter specifies the minimum acceptable cluster size for the final picture.
+Clustering is a fundamental unsupervised learning technique used to identify patterns and structures in data. It groups data points into distinct clusters so that points within the same cluster share similar characteristics based on **distance, density, or other spatial properties**, while points in separate clusters are less similar.
+
+Since acquiring labeled data is often costly and time-consuming, clustering serves as a powerful tool for exploratory data analysis and pattern discovery across various scientific and engineering fields, including:
+
+- **Time series analysis** – Identifying trends, anomalies, and recurring patterns in sequential data.
+- **Social network analysis** – Detecting communities and influential entities within networks.
+- **Market segmentation** – Grouping customers based on behavior, demographics, or purchasing patterns.
+- **Anomaly detection** – Recognizing unusual patterns in cybersecurity, fraud detection, and medical diagnosis.
+- **Image segmentation** – Dividing images into meaningful regions for object recognition, medical imaging, and computer vision tasks.
+
+Introducing CLASSIX
+===================
+
+We introduce **CLASSIX**, a novel, explainable clustering algorithm that integrates features of both **distance-based** and **density-based** methods. Unlike many traditional clustering techniques, CLASSIX is designed for **speed, scalability, and interpretability**, making it particularly well-suited for large datasets.
+
+Key Features of CLASSIX
+-----------------------
+
+- **Sorting-based approach** – CLASSIX leverages data sorting as a core mechanism, enabling efficient clustering with minimal computational overhead.
+- **Fast and scalable** – The algorithm is optimized for large-scale data processing without sacrificing accuracy.
+- **Explainable** – The clustering process remains transparent, allowing users to understand and interpret how clusters are formed.
+
+This documentation provides a comprehensive guide on using CLASSIX, its practical applications, and best practices for parameter tuning.
+
+How CLASSIX Works
+=================
+
+CLASSIX follows a two-phase clustering process:
+
+1. **Aggregation** – A fast, initial partitioning of data based on **starting points**, which serve as reduced estimators of density.
+2. **Merging** – Overlapping groups from the aggregation phase are merged into clusters based on either a **distance-based** or **density-based** criterion.
+
+This two-step approach ensures that CLASSIX remains both computationally efficient and robust across various data distributions.
+
+Understanding CLASSIX Parameters
+================================
+
+The behavior of CLASSIX is primarily controlled by two key parameters: **radius** and **minPts**, both of which are easy to interpret and tune.
+
+- **radius**: A distance-based threshold that governs the tolerance for grouping points during the aggregation phase.
+- **minPts**: Specifies the minimum number of points required for a valid cluster in the final output, ensuring small, insignificant clusters are filtered out.
+
+These parameters provide users with **flexible control** over clustering granularity and computational efficiency. In the following sections, we will explore their effects in greater detail and provide guidance on optimal parameter selection.
+
 
 
 .. raw:: html
