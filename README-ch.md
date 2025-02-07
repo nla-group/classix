@@ -183,13 +183,13 @@ pytest unittests.py
 
 如果您在研究中使用了 CLASSIX，请引用以下论文：
 ```
-@article{classix2023,
-  title={CLASSIX: A Fast and Interpretable Clustering Algorithm},
-  author={NLA Group},
-  journal={Journal of Machine Learning Research},
-  year={2023},
-  volume={24},
-  pages={1--25},
-  doi={10.5281/zenodo.10257432}
+@article{CG24,
+title = {Fast and explainable clustering based on sorting},
+author = {Xinye Chen and Stefan Güttel},
+journal = {Pattern Recognition},
+volume = {150},
+pages = {110298},
+year = {2024},
+doi = {https://doi.org/10.1016/j.patcog.2024.110298}
 }
 ```
