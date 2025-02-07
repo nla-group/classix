@@ -73,6 +73,7 @@ import classix
 data, labels = classix.loadData('Covid3MC')
 clx = classix.CLASSIX(radius=0.2, minPts=500, verbose=0)
 clx.fit(data)
+clx.explain(plot=True)
 ```
 
 You can also cluster out-of-sample data using ``predict()`` after the model is fitted, e.g., clx.predict(data.iloc[:1000]) 
