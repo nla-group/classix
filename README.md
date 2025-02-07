@@ -76,7 +76,7 @@ clx.fit(data)
 clx.explain(plot=True)
 ```
 
-You can also cluster out-of-sample data using ``predict()`` after the model is fitted, e.g., clx.predict(data.iloc[:1000]) 
+You can also cluster out-of-sample data using ``predict()`` after the model is fitted, e.g., `clx.predict(data.iloc[:1000])` 
 
 ## The explain method
 
