@@ -53,11 +53,12 @@ These parameters provide users with **flexible control** over clustering granula
    <iframe width="720" height="420" src="https://www.youtube.com/embed/K94zgRjFEYo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
-The documentation mainly contains five chapters about user guidance and one chapter for API reference, which is organized as follows: The first chapter demonstrates a quick introduction to the installment of CLASSIX and its deployment; The second chapter compares CLASSIX with other sought-after clustering algorithms with respect to speed and accuracy on built-in data; The third chapter illustrates a vivid tutorial for density and distance merging applications; The fourth chapter illustrates the interpretable clustering result obtained from CLASSIX; The final chapter demonstrates how to use CLASSIX to find outliers in data; The API details can be found at the independent section titled as “API reference”. The documentation is still under construction, any suggestions from users are appreciated, please be free to email us for any questions on CLASSIX. 
-
-
 Guide
 -------------
+
+
+The documentation mainly contains five chapters about user guidance and one chapter for API reference, which is organized as follows: The first chapter demonstrates a quick introduction to the installment of CLASSIX and its deployment; The second chapter compares CLASSIX with other sought-after clustering algorithms with respect to speed and accuracy on built-in data; The third chapter illustrates a vivid tutorial for density and distance merging applications; The fourth chapter illustrates the interpretable clustering result obtained from CLASSIX; The final chapter demonstrates how to use CLASSIX to find outliers in data; The API details can be found at the independent section titled as “API reference”. The documentation is still under construction, any suggestions from users are appreciated, please be free to email us for any questions on CLASSIX. 
+
 
 .. toctree::
    :maxdepth: 2
