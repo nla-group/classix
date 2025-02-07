@@ -3,8 +3,6 @@
 Welcome to CLASSIX's documentation!
 ===================================
 
-Clustering: A Core Technique in Unsupervised Learning
-=====================================================
 
 Clustering is a fundamental unsupervised learning technique used to identify patterns and structures in data. It groups data points into distinct clusters so that points within the same cluster share similar characteristics based on **distance, density, or other spatial properties**, while points in separate clusters are less similar.
 
@@ -16,8 +14,6 @@ Since acquiring labeled data is often costly and time-consuming, clustering serv
 - **Anomaly detection** – Recognizing unusual patterns in cybersecurity, fraud detection, and medical diagnosis.
 - **Image segmentation** – Dividing images into meaningful regions for object recognition, medical imaging, and computer vision tasks.
 
-Introducing CLASSIX
-===================
 
 We introduce **CLASSIX**, a novel, explainable clustering algorithm that integrates features of both **distance-based** and **density-based** methods. Unlike many traditional clustering techniques, CLASSIX is designed for **speed, scalability, and interpretability**, making it particularly well-suited for large datasets.
 
@@ -31,7 +27,7 @@ Key Features of CLASSIX
 This documentation provides a comprehensive guide on using CLASSIX, its practical applications, and best practices for parameter tuning.
 
 How CLASSIX Works
-=================
+-----------------------
 
 CLASSIX follows a two-phase clustering process:
 
@@ -41,7 +37,7 @@ CLASSIX follows a two-phase clustering process:
 This two-step approach ensures that CLASSIX remains both computationally efficient and robust across various data distributions.
 
 Understanding CLASSIX Parameters
-================================
+-----------------------
 
 The behavior of CLASSIX is primarily controlled by two key parameters: **radius** and **minPts**, both of which are easy to interpret and tune.
 
