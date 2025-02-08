@@ -152,9 +152,7 @@ print(clx.labels_)
 
 ### 贡献方式
 
-欢迎社区用户贡献代码和提交问题。以下是参与方式：
-
-    克隆仓库：
+欢迎社区用户贡献代码和提交问题。以下是参与方式, 克隆仓库：
 ```
 git clone https://github.com/nla-group/classix.git
 cd classix
