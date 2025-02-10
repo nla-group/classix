@@ -10,7 +10,6 @@
 import warnings
 
 import os
-import copy
 import numbers
 import collections
 import numpy as np
@@ -89,88 +88,99 @@ def loadData(name='vdu_signals'):
     if name == 'vdu_signals':
         DATA_PATH = os.path.join(current_dir, 'data/vdu_signals.npy')
         if not os.path.isfile(DATA_PATH):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir)
+            print('Done.')
         return np.load(DATA_PATH)
     
     if name == 'Iris':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Irirs.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Irirs.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Iris')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Dermatology':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Dermatology.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Dermatology.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Dermatology')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Ecoli':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Ecoli.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Ecoli.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Ecoli')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Glass':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Glass.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Glass.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Glass')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Banknote':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Banknote.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Banknote.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Banknote')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Seeds':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Seeds.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Seeds.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Seeds')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Phoneme':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Phoneme.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Phoneme.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Phoneme')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Wine':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Wine.npy')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Wine.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Wine')
+            print('Done.')
         return np.load(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'CovidENV':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_CovidENV.pkl')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_CovidENV.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'CovidENV')
+            print('Done.')
         return pd.read_pickle(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     if name == 'Covid3MC':
         DATA_PATH_X = os.path.join(current_dir, 'data/X_Covid3MC.pkl')
         DATA_PATH_Y = os.path.join(current_dir, 'data/y_Covid3MC.npy')
         if not os.path.isfile(DATA_PATH_X) or not os.path.isfile(DATA_PATH_Y):
-            log.info('Downloading data...')
+            print('Loading data files from the web...')
             get_data(current_dir, 'Covid3MC')
+            print('Done.')
         return pd.read_pickle(DATA_PATH_X), np.load(DATA_PATH_Y)
     
     
@@ -273,7 +283,7 @@ def get_data(current_dir='', name='vdu_signals'):
             handler.write(y)
                     
     elif name == 'CovidENV':
-        url_parent_x = "https://github.com/the-null/data/raw/main/X_CovidENV.pkl"
+        url_parent_x = "https://www.dropbox.com/scl/fi/tulksb60iu22q7sj9gef3/X_CovidENV.pkl?rlkey=olndlzyxz69i28srfuclsecrc&st=5ojreume&dl=1"
         url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_CovidENV.npy"
         x = requests.get(url_parent_x).content
         y = requests.get(url_parent_y).content
@@ -284,7 +294,7 @@ def get_data(current_dir='', name='vdu_signals'):
                     
 
     elif name == 'Covid3MC':
-        url_parent_x = "https://github.com/the-null/data/raw/main/X_Covid3MC.pkl"
+        url_parent_x = "https://www.dropbox.com/scl/fi/qcc60zplu7vtv2l3fee8z/X_Covid3MC.pkl?rlkey=y3y2k90itgjd98odytlf6aehy&st=edodmc5b&dl=1"
         url_parent_y = "https://github.com/nla-group/classix/raw/master/classix/source/y_Covid3MC.npy"
         x = requests.get(url_parent_x).content
         y = requests.get(url_parent_y).content
@@ -346,10 +356,6 @@ class CLASSIX:
         The data points in an abnormal cluster will be redistributed to the nearest normal cluster. 
         When set to 1, no redistribution is performed. 
 
-    
-    norm : boolean, default=True
-        Whether to normalize the data associated with the sorting, default as True. 
-        
     mergeScale : float
         Used with distance-clustering; when distance between the two group centers 
         associated with two distinct groups smaller than mergeScale*radius, 
@@ -361,14 +367,6 @@ class CLASSIX:
 
     mergeTinyGroups : boolean, default=True
         If this is False, the group merging will ignore all groups with < minPts points.
-    
-    algorithm : str, default='bf'
-        Algorithm to merge connected groups.
-
-        - 'bf': Use brute force routines to speed up the merging of connected groups.
-        
-        - 'set': Use disjoint set structure to merge connected groups.
-
     
     verbose : boolean or int, default=1
         Whether to print the logs or not.
@@ -444,7 +442,7 @@ class CLASSIX:
         https://arxiv.org/abs/2202.01456, 2022.
     """
         
-    def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", norm=True, mergeScale=1.5, 
+    def __init__(self, sorting="pca", radius=0.5, minPts=1, group_merging="distance", mergeScale=1.5, 
                  post_alloc=True, mergeTinyGroups=True, verbose=1, short_log_form=True): 
 
         self.__verbose = verbose
@@ -587,11 +585,11 @@ class CLASSIX:
         self.t3_merge = time()
         if self.group_merging is None:
             self.inverse_ind = np.argsort(self.ind)
-            self.labels_ = copy.deepcopy(self.groups_[self.inverse_ind]) 
+            self.labels_ = self.groups_[self.inverse_ind]
         
         elif self.group_merging.lower()=='none':
             self.inverse_ind = np.argsort(self.ind)
-            self.labels_ = copy.deepcopy(self.groups_[self.inverse_ind]) 
+            self.labels_ = self.groups_[self.inverse_ind]
         
         else:
             self.labels_ = self.merging(
@@ -660,7 +658,7 @@ class CLASSIX:
         splabels = np.argmin(distance.cdist(splist, data), axis=0)
         labels = [self.label_change[i] for i in splabels]
 
-        return labels
+        return np.asarray(labels)
     
     
     
@@ -705,9 +703,9 @@ class CLASSIX:
         if method == 'density':
 
             agg_labels = np.asarray(agg_labels)
-            labels = copy.deepcopy(agg_labels) 
+            labels = agg_labels.copy()
             
-            self.merge_groups, self.connected_pairs_ = self._density_merge(data, splist, 
+            self.merge_groups, self.connected_pairs_ = self._density_merge(data, np.int64(splist), 
                                                                              radius, sort_vals=sort_vals, 
                                                                              half_nrm2=self.__half_nrm2)
             maxid = max(labels) + 1
@@ -774,7 +772,7 @@ class CLASSIX:
 
             labels, self.old_cluster_count, SIZE_NOISE_LABELS = self._distance_merge(data=data, 
                                                                     labels=agg_labels,
-                                                                    splist=splist,
+                                                                    splist=np.int64(splist),
                                                                     radius=radius,
                                                                     minPts=minPts,
                                                                     scale=self.mergeScale_, 
@@ -1144,10 +1142,7 @@ class CLASSIX:
                         selectInd = np.random.choice(self.x_pca.shape[0], 100000, replace=False)      
                     else:
                         selectInd = np.arange(self.x_pca.shape[0])
-                        
-                    if feat_dim > 2:
-                        print("With data having more than two features, the group circles in\nthe plot may appear bigger than they are.")
-
+                     
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
                     
@@ -1356,9 +1351,6 @@ class CLASSIX:
                     else:
                         selectInd = np.arange(self.x_pca.shape[0])
                         
-                    if feat_dim > 2:
-                        print("With data having more than two features, the group circles in\nthe plot may appear bigger than they are.")
-
                     plt.style.use(style=figstyle)
                     fig, ax = plt.subplots(figsize=figsize)
                     ax.set_facecolor(bcolor)
