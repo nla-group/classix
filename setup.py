@@ -64,6 +64,7 @@ setup_args = {'name':__package__,
                              "scipy>=1.7.0",
                              "pandas",
                              "matplotlib>=3.5",
+                             "scikit-learn>=0.20",
                              "requests"], # requirements()
 
         'cmdclass': {'build_ext': CustomBuildExtCommand},
