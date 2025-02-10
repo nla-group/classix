@@ -658,7 +658,7 @@ class CLASSIX:
         splabels = np.argmin(distance.cdist(splist, data), axis=0)
         labels = [self.label_change[i] for i in splabels]
 
-        return labels
+        return np.asarray(labels)
     
     
     
