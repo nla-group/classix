@@ -1,0 +1,56 @@
+# pyproject.toml
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+    "cython>=0.27",
+    "numpy>=1.17.3"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "classixclustering"
+dynamic = ["version"]
+description = "Fast and explainable clustering based on sorting"
+readme = "README.rst"
+authors = [
+    {name = "Xinye Chen", email = "xinyechenai@gmail.com"},
+    {name = "Stefan Güttel", email = "stefan.guettel@manchester.ac.uk"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Programming Language :: C",
+    "Programming Language :: Python",
+    "Topic :: Software Development",
+    "Topic :: Scientific/Engineering",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License"
+]
+dependencies = [
+    "numpy>=1.17.3",
+    "scipy>=1.7.0",
+    "pandas",
+    "matplotlib>=3.5",
+    "scikit-learn>=0.20",
+    "requests"
+]
+
+[project.urls]
+Homepage = "https://github.com/nla-group/CLASSIX"
+Repository = "https://github.com/nla-group/CLASSIX.git"
+
+[tool.setuptools]
+packages = ["classix"]
+
+[tool.setuptools.package-data]
+classix = ["*.pyx", "*.pxd"]
+
+[tool.setuptools.dynamic]
+version = {attr = "classix.__version__"}
