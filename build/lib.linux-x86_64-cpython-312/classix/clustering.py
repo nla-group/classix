@@ -585,11 +585,11 @@ class CLASSIX:
         self.t3_merge = time()
         if self.group_merging is None:
             self.inverse_ind = np.argsort(self.ind)
-            self.labels_ = self.groups_[self.inverse_ind]
+            self.labels_ = np.asarray(self.groups_)[self.inverse_ind]
         
         elif self.group_merging.lower()=='none':
             self.inverse_ind = np.argsort(self.ind)
-            self.labels_ = self.groups_[self.inverse_ind]
+            self.labels_ = np.asarray(self.groups_)[self.inverse_ind]
         
         else:
             self.labels_ = self.merging(
