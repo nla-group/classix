@@ -3,8 +3,8 @@
 requires = [
     "setuptools>=61.0",
     "wheel",
-    "cython>=0.27",
-    "numpy>=1.17.3"
+    "cython>=3.0",
+    "numpy>=1.22"
 ]
 build-backend = "setuptools.build_meta"
 
@@ -22,23 +22,23 @@ requires-python = ">=3.8"
 classifiers = [
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
-    "Programming Language :: C",
     "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Topic :: Software Development",
     "Topic :: Scientific/Engineering",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX",
     "Operating System :: Unix",
     "Operating System :: MacOS",
-    "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License"
 ]
 dependencies = [
-    "numpy>=1.17.3",
-    "scipy>=1.7.0",
+    "numpy>=1.22",
+    "scipy>=1.13",
     "pandas",
     "matplotlib>=3.5",
-    "scikit-learn>=0.20",
+    "scikit-learn>=1.0",
     "requests"
 ]
 
