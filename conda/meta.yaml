@@ -1,40 +1,45 @@
 {% set name = "classixclustering" %}
-{% set version = "1.2.7" %}
+{% set version = "1.3.1" %}
+{% set python_min = ">=3.12,<3.13" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: c144de8750f7d8ec8b2d88150a94b3919ce69e0f0900c2346d35f86b558c8265
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: d8071033dc309d79fd25e9636d3ed00d7e443dbc62fc1285d98e7579d37a7399
 
 build:
   noarch: python
   number: 0
-  script: {{ PYTHON }} -m pip install . -vv
+  script: "{{ PYTHON }} -m pip install . -vv"
 
 requirements:
   build:
     - {{ compiler('c') }}
-    - {{ stdlib("c") }}
+    - {{ stdlib('c') }}
   host:
-    - python >=3.6
+    - python {{ python_min }}
     - pip
-    - numpy
+    - numpy 2.3.*
     - cython
-
   run:
-    - python >=3.6
-    - pandas
+    - python {{ python_min }}
+    - pandas >=2.1
     - requests
-    - {{ pin_compatible('numpy') }}
-    - scipy ==1.7.0
-    - matplotlib-base
+    - numpy 2.3.*
+    - scipy >=1.11,<2.0
+    - matplotlib-base >=3.8
+    - scikit-learn >=1.2,<2.0
 
 test:
+  requires:
+    - python {{ python_min }}
   imports:
     - classix
+  commands:
+    - python -c "import classix; print('classix imported successfully')"
 
 about:
   home: https://github.com/nla-group/classix
