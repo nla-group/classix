@@ -3,8 +3,8 @@ name: Build and Publish Wheels
 on:
   push:
     tags:
-      - 'v*'
-  workflow_dispatch:
+      - 'v*'       # 只在打 tag 时触发
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   build_wheels:
@@ -16,18 +16,26 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
+      # 检出代码
       - uses: actions/checkout@v4
+
+      #  清理旧构建文件
       - name: Clean old build files
         run: |
           find . -name "*.so" -delete
           find . -name "*.c" -delete
           rm -rf build/ dist/ *.egg-info || true
 
+      # 安装 cibuildwheel（可选，这里使用 action 自带）
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.5
         env:
-          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-* cp314-*"
+          # 指定要构建的 Python 版本
+          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+        with:
+          output-dir: wheelhouse
 
+      # 4️⃣ 上传 artifacts（可选，方便下载调试）
       - uses: actions/upload-artifact@v4
         with:
           name: wheels-${{ matrix.os }}
@@ -35,14 +43,18 @@ jobs:
 
   publish:
     name: Publish to PyPI
-    needs: build_wheels
     runs-on: ubuntu-latest
+    needs: build_wheels  # 等待 build 完成
 
     steps:
+      - uses: actions/checkout@v4
+
+      # 下载所有 platform 构建的 wheels
       - uses: actions/download-artifact@v4
         with:
-          path: dist
+          path: dist  # 下载到 dist/
 
+      # 上传到 PyPI
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
