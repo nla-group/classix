@@ -17,6 +17,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Clean old build files
+        run: |
+          find . -name "*.so" -delete
+          find . -name "*.c" -delete
+          rm -rf build/ dist/ *.egg-info || true
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.5
