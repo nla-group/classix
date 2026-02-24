@@ -63,7 +63,7 @@ jobs:
       # 8. Run tests and generate coverage
       - name: Run tests and generate coverage
         run: |
-          pytest --cov=classix --cov-report=xml unittests.py
+          pytest --cov=classix --cov-report=xml test/
 
       # 9. Upload coverage to Codecov
       - name: Upload coverage to Codecov
