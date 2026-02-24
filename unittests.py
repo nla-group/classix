@@ -339,7 +339,7 @@ class TestClassix(unittest.TestCase):
         """
         import sys, os
         sys.path.insert(0, os.path.dirname(__file__))
-        from tanimoto_blobs import generate_data
+        from tests.tanimoto_blobs import generate_data
         X, _, _ = generate_data(num_clusters=3, pops=[5, 10, 15], d=20, n=100, flip_prob=0.1, seed=42)
         checkpoint = 1
         try:
@@ -525,3 +525,4 @@ class TestClassix(unittest.TestCase):
         
 if __name__ == '__main__':
     unittest.main()
+
