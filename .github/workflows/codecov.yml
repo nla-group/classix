@@ -3,7 +3,7 @@ name: Workflow for Codecov (with Cython coverage)
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
 
 jobs:
