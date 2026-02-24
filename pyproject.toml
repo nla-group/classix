@@ -17,7 +17,7 @@ authors = [
     {name = "Xinye Chen", email = "xinyechenai@gmail.com"},
     {name = "Stefan Güttel", email = "stefan.guettel@manchester.ac.uk"}
 ]
-license = {text = "MIT"}
+license = "MIT"
 requires-python = ">=3.8"
 classifiers = [
     "Intended Audience :: Science/Research",
@@ -30,8 +30,7 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX",
     "Operating System :: Unix",
-    "Operating System :: MacOS",
-    "License :: OSI Approved :: MIT License"
+    "Operating System :: MacOS"
 ]
 dependencies = [
     "numpy>=1.22",
