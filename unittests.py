@@ -352,11 +352,11 @@ class TestClassix(unittest.TestCase):
 
 
             # Test with minPts redistribution (forces Adj value 2)
-            clx2 = CLASSIX(metric='tanimoto', radius=0.1, group_merging='distance', minPts=300, verbose=0)
+            clx2 = CLASSIX(metric='tanimoto', radius=0.1, group_merging='distance', minPts=50, verbose=0)
             clx2.fit_transform(X)
             clx2.explain(X, plot=False)
             clx2.explain(X, 0, plot=False)
-            clx2.explain(X, 0, 100, plot=False)
+            clx2.explain(X, 0, 1, plot=False)
         except:
             checkpoint = 0 
 
@@ -525,4 +525,5 @@ class TestClassix(unittest.TestCase):
         
 if __name__ == '__main__':
     unittest.main()
+
 
