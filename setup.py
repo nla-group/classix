@@ -31,7 +31,12 @@ pyx_extensions = [
 ]
 
 c_extensions = [
-    Extension("spmv", ["classix/spmv.c"], extra_compile_args=c_args),
+    Extension(
+    "spmv",
+    ["classix/spmv.cpp"],
+    language="c++",
+    extra_compile_args=c_args,
+),
 ]
 
 setup(
@@ -42,3 +47,4 @@ setup(
     ) + c_extensions,
     cmdclass={"build_ext": CustomBuildExt},
 )
+
