@@ -49,7 +49,7 @@ Repository = "https://github.com/nla-group/CLASSIX.git"
 packages = ["classix"]
 
 [tool.setuptools.package-data]
-classix = ["*.pyx", "*.pxd"]
+classix = ["*.pyx", "*.pxd", "*.c"]
 
 [tool.setuptools.dynamic]
 version = {attr = "classix.__version__"}
