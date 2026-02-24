@@ -11,30 +11,31 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
+      # 1. Checkout code
       - uses: actions/checkout@v4
 
+      # 2. Setup Python
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
+      # 3. Install dependencies
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-cov coverage setuptools cython
+          pip install --upgrade pip setuptools cython pytest pytest-cov coverage -r requirements.txt
 
-      # Linux & macOS
+      # 4. Clean old build files (Linux/macOS)
       - name: Clean old build files (Linux/macOS)
         if: runner.os != 'Windows'
         run: |
           find . -name "*.so" -delete
           find . -name "*.c" -delete
           rm -rf build/ dist/ *.egg-info
-      
-      # Windows
+
+      # 5. Clean old build files (Windows)
       - name: Clean old build files (Windows)
         if: runner.os == 'Windows'
         shell: powershell
@@ -43,21 +44,28 @@ jobs:
           Get-ChildItem -Recurse -Filter '*.so' | Remove-Item -Force -ErrorAction SilentlyContinue
           Get-ChildItem -Recurse -Filter '*.c' | Remove-Item -Force -ErrorAction SilentlyContinue
 
+      # 6. Build Cython extensions with linetrace
       - name: Build Cython extensions
+        shell: bash
         run: |
-          # 开启 Cython linetrace
-          export CFLAGS="-O0 -DCYTHON_TRACE=1"
-          python setup.py build_ext --inplace
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            powershell -Command "$env:CFLAGS='-O0 -DCYTHON_TRACE=1'; python setup.py build_ext --inplace"
+          else
+            export CFLAGS="-O0 -DCYTHON_TRACE=1"
+            python setup.py build_ext --inplace
+          fi
 
+      # 7. Install package
       - name: Install package
         run: |
           pip install -e .
 
+      # 8. Run tests and generate coverage
       - name: Run tests and generate coverage
         run: |
-          python -m coverage run --source=classix -m pytest unittests.py
-          python -m coverage xml -o coverage.xml
+          pytest --cov=classix --cov-report=xml unittests.py
 
+      # 9. Upload coverage to Codecov
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
