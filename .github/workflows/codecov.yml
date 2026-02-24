@@ -26,18 +26,22 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov coverage setuptools cython
 
-      - name: Clean old build files
-        shell: bash
+      # Linux & macOS
+      - name: Clean old build files (Linux/macOS)
+        if: runner.os != 'Windows'
         run: |
-          if [[ "$RUNNER_OS" == "Linux" || "$RUNNER_OS" == "macOS" ]]; then
-            find . -name "*.so" -delete
-            find . -name "*.c" -delete
-            rm -rf build/ dist/ *.egg-info
-          elif [[ "$RUNNER_OS" == "Windows" ]]; then
-            powershell -Command "Remove-Item -Recurse -Force build,dist,*.egg-info -ErrorAction SilentlyContinue"
-            powershell -Command "Get-ChildItem -Recurse -Filter '*.so' | Remove-Item -Force -ErrorAction SilentlyContinue"
-            powershell -Command "Get-ChildItem -Recurse -Filter '*.c' | Remove-Item -Force -ErrorAction SilentlyContinue"
-          fi
+          find . -name "*.so" -delete
+          find . -name "*.c" -delete
+          rm -rf build/ dist/ *.egg-info
+      
+      # Windows
+      - name: Clean old build files (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Remove-Item -Recurse -Force build,dist,*.egg-info -ErrorAction SilentlyContinue
+          Get-ChildItem -Recurse -Filter '*.so' | Remove-Item -Force -ErrorAction SilentlyContinue
+          Get-ChildItem -Recurse -Filter '*.c' | Remove-Item -Force -ErrorAction SilentlyContinue
 
       - name: Build Cython extensions
         run: |
