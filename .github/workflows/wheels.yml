@@ -21,11 +21,18 @@ jobs:
 
       #  清理旧构建文件
       - name: Clean old build files
+        shell: bash
         run: |
-          find . -name "*.so" -delete
-          find . -name "*.c" -delete
-          rm -rf build/ dist/ *.egg-info || true
-
+          if [[ "$RUNNER_OS" == "Linux" || "$RUNNER_OS" == "macOS" ]]; then
+            find . -name "*.so" -delete
+            find . -name "*.c" -delete
+            rm -rf build/ dist/ *.egg-info
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
+            powershell -Command "Remove-Item -Recurse -Force build,dist,*.egg-info -ErrorAction SilentlyContinue"
+            powershell -Command "Get-ChildItem -Recurse -Filter '*.so' | Remove-Item -Force -ErrorAction SilentlyContinue"
+            powershell -Command "Get-ChildItem -Recurse -Filter '*.c' | Remove-Item -Force -ErrorAction SilentlyContinue"
+          fi
+          
       # 安装 cibuildwheel（可选，这里使用 action 自带）
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.5
