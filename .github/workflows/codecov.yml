@@ -29,7 +29,6 @@ jobs:
       - name: Clean build
         run: |
           python setup.py clean --all
-          rm -rf build *.so *.pyd *.c
 
       - name: Build Cython extensions
         run: |
