@@ -249,6 +249,80 @@ class CLASSIX_T:
         self.group_centers = self.splist
         return self
 
+    def explain(self, ind1=None, ind2=None):
+        if ind1 is None and ind2 is None:
+            # If there are no specific points to explain, print the general information
+            print(f"The data was clustered into {len(self.group_labels)} groups. These were further merged into {len(np.unique(self.group_labels))} clusters.")
+
+        if ind1 is not None and ind2 is None:
+            # If only one index is provided, print the cluster information for that index
+            print(f"The data point at index {ind1} was assigned to cluster {self.labels[ind1]}")
+
+        if ind1 is not None and ind2 is not None:
+            # If two indices are provided, print the cluster information
+            if self.labels[ind1] == self.labels[ind2]:
+                # If the two data points belong to the same cluster, check if they are in the same group
+                print(f"The data points at indices {ind1} and {ind2} belong to the same cluster.")
+                agg_label_1 = self.aggregation_labels[ind1]
+                agg_label_2 = self.aggregation_labels[ind2]
+                if agg_label_1 == agg_label_2:
+                    # If the two data points are in the same group, print the information
+                    print(f"The data points at indices {ind1} and {ind2} are in the same group {agg_label_1}.")
+                    return None
+
+                else:
+                    # If the two data points are in different groups, find the shortest connection path between the two groups
+                    print(f"The data points at indices {ind1} and {ind2} are in different groups.")
+                    connected_path = self.bfs_shortest_path(self.Adj, agg_label_1, agg_label_2)
+                    if connected_path is not None:
+                        # If a connection path is found, print the path
+                        print(f'The connections between {ind1} and {ind2} are via this path: {connected_path[0]} ', end="")
+                        for k in range(len(connected_path)-1):
+                            if self.Adj[connected_path[k]-1, connected_path[k+1]-1] == 2:
+                                print(f'(minPts) -> {connected_path[k+1]}', end="")
+                            else:
+                                print(f' -> {connected_path[k+1]}', end="")
+
+                        return connected_path
+                    
+                    else:
+                        # If no connection path is found, print that there is no connection, there must be something wrong with the code
+                        print(f"No connection path found between {ind1} and {ind2}, although they belong to different groups in the same cluster. Please check the program for bugs!")
+                        return None
+
+            else:
+                print(f"The data points at indices {ind1} and {ind2} belong to different clusters.")
+
+
+    def bfs_shortest_path(self, adj_matrix, start, goal):
+        # Convert start and goal from 1-based to 0-based indices
+        start -= 1
+        goal -= 1
+        
+        # Initialize the queue with the start node and a path containing only the start node
+        queue = deque([(start, [start])])
+        
+        # Keep track of visited nodes to avoid cycles
+        visited = set()
+        
+        while queue:
+            # Dequeue a node and the path that led to it
+            current_node, path = queue.popleft()
+            
+            # If the current node is the goal, return the path
+            if current_node == goal:
+                return [node + 1 for node in path]  # Convert back to 1-based indices
+            
+            # Mark the current node as visited
+            visited.add(current_node)
+            
+            # Enqueue all unvisited neighbors
+            for neighbor, connected in enumerate(adj_matrix[current_node]):
+                if connected and neighbor not in visited:
+                    queue.append((neighbor, path + [neighbor]))
+
+        return None
+
 
     def bfs_shortest_path(self, adj_matrix, start, goal):
         start -= 1

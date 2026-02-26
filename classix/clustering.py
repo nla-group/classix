@@ -588,6 +588,7 @@ class CLASSIX:
             mext = np.median(sort_vals) or 1.0
             data /= mext
             dataScale_ = mext  # 可以視為 scale
+            self.dataScale_ = mext
             sort_vals /= mext
             
         elif self.metric == 'tanimoto':
@@ -702,6 +703,7 @@ class CLASSIX:
                 labels_sorted = group2cluster[self.groups_]
 
                 self.labels_ = labels_sorted[np.argsort(self.ind)]
+                self.inverse_ind = np.argsort(self.ind)
                 self.Adj = merge_result['Adj']
                 
                 if self.__verbose:
@@ -732,6 +734,7 @@ class CLASSIX:
                 labels_sorted = group2cluster[self.groups_]
 
                 self.labels_ = labels_sorted[np.argsort(self.ind)]
+                self.inverse_ind = np.argsort(self.ind)
                 self.Adj = merge_result['Adj']
                 if self.__verbose:
                     print(f"Tanimoto merging completed: {len(np.unique(self.labels_))} clusters")
@@ -1234,7 +1237,8 @@ class CLASSIX:
             if feat_dim > 2:
                 _U, self._s, self._V = svds(data, k=2, return_singular_vectors=True)
                 self.x_pca = np.matmul(data, self._V[(-self._s).argsort()].T)
-                self.s_pca = self.x_pca[self.ind[self.splist_[:, 0]]]
+                sp_indices = self.splist_[:, 0] if self.splist_.ndim == 2 else self.splist_
+                self.s_pca = self.x_pca[self.ind[sp_indices.astype(int)]]
                 
             elif feat_dim == 2:
                 self.x_pca = data.copy()
@@ -1524,24 +1528,49 @@ class CLASSIX:
                 if agg_label1 == agg_label2: # when ind1 & ind2 are in the same group
                     connected_paths = [agg_label1]
                 else:
-                    from scipy.sparse import csr_matrix
-                    
-                    distm = pairwise_distances(self.sp_data_pts)
-                    distmf = (distm <= self.radius*self.mergeScale_).astype(int)
-                    csr_dist_m = csr_matrix(distmf)
+                    if self.metric in ('manhattan', 'tanimoto') and hasattr(self, 'Adj'):
+                        if self.metric == 'manhattan':
+                            from .merge_md import bfs_shortest_path
+                        else:
+                            from .merge_td import bfs_shortest_path
                         
-                    if cluster_label1 == cluster_label2:
-                        connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
+                        distm = pairwise_distances(self.sp_data_pts)
                         
-                        connected_paths.reverse()
+                        if cluster_label1 == cluster_label2:
+                            connected_paths = bfs_shortest_path(self.Adj, agg_label1, agg_label2)
+                            
+                            if connected_paths is None or len(connected_paths) < 1:
+                                connected_paths_vis = None
+                                connected_paths = []
+                            else:
+                                path_parts = [str(connected_paths[0])]
+                                for k in range(len(connected_paths) - 1):
+                                    if self.Adj[connected_paths[k], connected_paths[k+1]] == 2:
+                                        path_parts.append("(minPts) <-> " + str(connected_paths[k+1]))
+                                    else:
+                                        path_parts.append("<-> " + str(connected_paths[k+1]))
+                                connected_paths_vis = " ".join(path_parts)
+                        else:
+                            connected_paths = []
+                    else:
+                        from scipy.sparse import csr_matrix
                         
-                        if len(connected_paths)<1:
-                            connected_paths_vis = None
-                        else:    
-                            connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
-                        
-                    else: 
-                        connected_paths = []
+                        distm = pairwise_distances(self.sp_data_pts)
+                        distmf = (distm <= self.radius*self.mergeScale_).astype(int)
+                        csr_dist_m = csr_matrix(distmf)
+                            
+                        if cluster_label1 == cluster_label2:
+                            connected_paths = find_shortest_dist_path(agg_label1, csr_dist_m, agg_label2, unweighted=not include_dist)
+                            
+                            connected_paths.reverse()
+                            
+                            if len(connected_paths)<1:
+                                connected_paths_vis = None
+                            else:    
+                                connected_paths_vis = " <-> ".join([str(group) for group in connected_paths]) 
+                            
+                        else: 
+                            connected_paths = []
                         
                 if plot:
                     from matplotlib import pyplot as plt
@@ -2024,7 +2053,8 @@ class CLASSIX:
 
 
         else:
-            for i in self.splist_[:, 0]:
+            sp_indices = self.splist_[:, 0] if self.splist_.ndim == 2 else self.splist_
+            for i in sp_indices:
                 fill = ""
                 sp_item = np.around(data[int(i), :], 2).tolist()
                 if len(sp_item) <= 5:
@@ -2039,7 +2069,10 @@ class CLASSIX:
                 
         self.sp_info = pd.DataFrame(columns=cols)
         self.sp_info["Group"] = np.arange(0, self.splist_.shape[0])
-        self.sp_info["NrPts"] = self.splist_[:, 1].astype(int)
+        if self.splist_.ndim == 2:
+            self.sp_info["NrPts"] = self.splist_[:, 1].astype(int)
+        else:
+            self.sp_info["NrPts"] = np.array(self.group_sizes_).astype(int)
         self.sp_info["Cluster"] = [self.label_change[i] for i in range(self.splist_.shape[0])]
         self.sp_info["Coordinates"] = coord 
         self.sp_to_c_info = True 
@@ -2152,7 +2185,10 @@ class CLASSIX:
 
         
     def gc2ind(self, spid):
-        return self.ind[self.splist_[spid, 0]]
+        if self.splist_.ndim == 2:
+            return self.ind[self.splist_[spid, 0]]
+        else:
+            return self.ind[self.splist_[spid]]
 
 
     

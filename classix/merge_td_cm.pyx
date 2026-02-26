@@ -68,7 +68,6 @@ def merge_tanimoto(
             1 = connected by Tanimoto distance <= mergeScale * radius
             2 = connection created during small-cluster redistribution
     """
-    # Ensure contiguous arrays with correct dtypes for maximum performance
     spdata = np.ascontiguousarray(spdata, dtype=np.float64)
     group_sizes = np.asarray(group_sizes, dtype=np.int64)
     sort_vals_sp = np.ascontiguousarray(sort_vals_sp, dtype=np.float64)
@@ -77,28 +76,22 @@ def merge_tanimoto(
     cdef int n_groups = spdata.shape[0]
     cdef cnp.ndarray[cnp.int64_t, ndim=1] label_sp = agg_labels_sp.copy()
 
-    # Build CSR matrix (Python object – cannot be cdef as a C type)
     spdatas = csr_matrix(spdata)
 
-    # Extract CSR components as typed, contiguous NumPy arrays (matching original code)
     cdef cnp.ndarray[cnp.float64_t, ndim=1] spdatas_data = spdatas.data.astype(np.float64)
     cdef cnp.ndarray[cnp.int32_t, ndim=1] spdatas_indices = spdatas.indices.astype(np.int32)
     cdef cnp.ndarray[cnp.int32_t, ndim=1] spdatas_indptr = spdatas.indptr.astype(np.int32)
 
-    # Adjacency matrix
     cdef cnp.ndarray[cnp.int8_t, ndim=2] Adj = np.zeros((n_groups, n_groups), dtype=np.int8)
 
-    # Pre-allocate reusable large arrays (size n_groups) to avoid repeated allocation
     cdef cnp.ndarray[cnp.float64_t, ndim=1] ips = np.zeros(n_groups, dtype=np.float64)
     cdef cnp.ndarray[cnp.float64_t, ndim=1] denom = np.empty(n_groups, dtype=np.float64)
     cdef cnp.ndarray[cnp.float64_t, ndim=1] tanimoto_dist = np.empty(n_groups, dtype=np.float64)
 
-    # Views/slices for windowed computations in the main loop
     cdef cnp.ndarray[cnp.float64_t, ndim=1] ips_slice
     cdef cnp.ndarray[cnp.float64_t, ndim=1] denom_slice
     cdef cnp.ndarray[cnp.float64_t, ndim=1] tanimoto_slice
 
-    # Temporary index arrays
     cdef cnp.ndarray[cnp.int64_t, ndim=1] rel_inds
     cdef cnp.ndarray[cnp.int64_t, ndim=1] inds
     cdef cnp.ndarray[cnp.int64_t, ndim=1] connected_labels
@@ -107,7 +100,6 @@ def merge_tanimoto(
     cdef double search_radius
     cdef long minlab
 
-    # Main merging phase: build graph and perform on-the-fly union-find merging
     for i in range(n_groups):
         if not mergeTinyGroups and group_sizes[i] < minPts:
             continue
@@ -153,23 +145,19 @@ def merge_tanimoto(
                         for cl in connected_labels:
                             label_sp[label_sp == cl] = minlab
 
-    # Compute cluster sizes after main merging phase
     cdef cnp.ndarray[cnp.int64_t, ndim=1] unique_labels = np.unique(label_sp)
     cdef dict cluster_sizes = {}
     cdef long lbl
     for lbl in unique_labels:
         cluster_sizes[lbl] = np.sum(group_sizes[label_sp == lbl])
 
-    # Identify small clusters
     small_clusters = [lbl for lbl in unique_labels if cluster_sizes[lbl] < minPts]
 
-    # Redistribution variables (declared here to avoid scoped cdef issues)
     cdef cnp.ndarray[cnp.int64_t, ndim=1] label_sp_fixed
     cdef cnp.ndarray[cnp.int64_t, ndim=1] group_ids
     cdef cnp.ndarray[cnp.int64_t, ndim=1] sorted_indices
     cdef long cluster_id, gid, target_gid, target_cluster
 
-    # Redistribution phase for tiny clusters
     if small_clusters:
         label_sp_fixed = label_sp.copy()
 
@@ -196,7 +184,6 @@ def merge_tanimoto(
                         Adj[target_gid, gid] = 2
                         break
 
-    # Final consecutive renumbering - vectorized
     cdef cnp.ndarray[cnp.int64_t, ndim=1] final_ul = np.unique(label_sp)
     cdef cnp.ndarray[cnp.int64_t, ndim=1] group_cluster_labels = np.searchsorted(final_ul, label_sp)
 

@@ -97,7 +97,6 @@ def merge_manhattan(
 
     """
     
-    # Prepare Data Views
     cdef FLOAT64_t[:, :] spdata_mv = np.asarray(spdata, dtype=np.float64)
     cdef INT64_t[:] group_sizes_mv = np.asarray(group_sizes, dtype=np.int64)
     cdef FLOAT64_t[:] sort_vals_mv = np.asarray(sort_vals_sp, dtype=np.float64)
@@ -106,7 +105,6 @@ def merge_manhattan(
     cdef Py_ssize_t n_groups = spdata_mv.shape[0]
     cdef Py_ssize_t n_features = spdata_mv.shape[1]
     
-    # Output structures
     cdef INT8_t[:, :] Adj = np.zeros((n_groups, n_groups), dtype=np.int8)
     cdef INT32_t[:] parent = np.arange(n_groups, dtype=np.int32)
     
@@ -114,14 +112,12 @@ def merge_manhattan(
     cdef double search_radius, dist, diff
     cdef Py_ssize_t i, j, k, last_j, left, right, mid
     
-    # Graph Construction & Merging (Union-Find)
     for i in range(n_groups):
         if not mergeTinyGroups and group_sizes_mv[i] < minPts:
             continue
 
         search_radius = dist_threshold + sort_vals_mv[i]
         
-        # Binary search for window end (equivalent to np.searchsorted)
         left = i + 1
         right = n_groups
         while left < right:
@@ -150,26 +146,20 @@ def merge_manhattan(
                     Adj[j, i] = 1
                     union_sets(parent, i, j)
 
-    # 3. Resolve Labels based on Union-Find and Original Input Labels
-    # We must map the UF root to the minimum original label in that component
-    # to strictly match the "assign to smallest label" logic of the original code.
     
     cdef INT64_t[:] final_labels = np.empty(n_groups, dtype=np.int64)
     cdef INT64_t[:] root_to_min_label = np.full(n_groups, 9223372036854775807, dtype=np.int64) # Max INT64
     cdef INT32_t root
     
-    # First pass: Find min label for each component root
     for i in range(n_groups):
         root = find_root(parent, i)
         if agg_labels_mv[i] < root_to_min_label[root]:
             root_to_min_label[root] = agg_labels_mv[i]
             
-    # Second pass: Assign min label to all nodes
     for i in range(n_groups):
         root = find_root(parent, i)
         final_labels[i] = root_to_min_label[root]
 
-    # Renumber labels (0, 1, 2...) and calculate cluster sizes
     cdef INT64_t[:] ul = np.unique(final_labels)
     cdef INT64_t[:] cs = np.zeros(ul.shape[0], dtype=np.int64)
     cdef INT64_t[:] label_map = np.zeros(np.max(ul) + 1, dtype=np.int64) # Map original value -> 0..K
@@ -181,8 +171,6 @@ def merge_manhattan(
         final_labels[i] = label_map[final_labels[i]]
         cs[final_labels[i]] += group_sizes_mv[i]
 
-    # Handle Small Clusters (Redistribution)
-    # Reassign points from clusters < minPts to the nearest valid cluster
     cdef INT64_t[:] label_sp_copy = final_labels.copy()
     cdef double min_dist
     cdef Py_ssize_t best_neighbor
@@ -221,8 +209,6 @@ def merge_manhattan(
                 Adj[i, best_neighbor] = 2
                 Adj[best_neighbor, i] = 2
 
-    # Final Renumbering (Ensure consecutive labels 0..N-1)
-    # The reassignment above might have emptied some clusters, creating gaps.
     cdef INT64_t[:] ul_final = np.unique(final_labels)
     cdef INT64_t[:] final_map = np.full(np.max(ul_final) + 1, -1, dtype=np.int64)
     

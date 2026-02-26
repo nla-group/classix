@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.so
+*.egg-info/
+linkage_*.pdf
+*.svg
+*.pdf

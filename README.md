@@ -92,11 +92,11 @@ Output:
 ```
 CLASSIX clustered 5726839 data points with 3 features.
 The radius parameter was set to 0.20 and minPts was set to 500.
-As the provided data was auto scaled by a factor of 1/0.33,
-points within a radius R=0.20*0.33=0.07 were grouped together.
-In total, 80596471 distances were computed (14.1 per data point).
-This resulted in 301 groups, each with a unique group center.
-These 301 groups were subsequently merged into 25 clusters. 
+As the provided data was auto-scaled by a factor of 1/12.27,
+points within a radius R=0.20*12.27=2.45 were grouped together.
+In total, 71926291 distances were computed (12.6 per data point).
+This resulted in 274 groups, each with a unique group center.
+These 274 groups were subsequently merged into 25 clusters. 
 ```
 
 We can ask CLASSIX why two data points ended up in the same cluster, or not: 
@@ -282,6 +282,7 @@ This project is licensed under the terms of the [MIT license](https://github.com
     <img alt="CLASSIX" src="https://raw.githubusercontent.com/nla-group/classix/master/docs/source/images/nla_logo.jpg" width="240" />
   </a>
 </p>
+
 
 
 

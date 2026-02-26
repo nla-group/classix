@@ -1,4 +1,5 @@
 import numpy as np
+from collections import deque
 
 def merge_manhattan(
     spdata,              
@@ -127,3 +128,37 @@ def merge_manhattan(
         'group_cluster_labels': label_sp, 
         'Adj': Adj,
     }
+
+
+def bfs_shortest_path(adj_matrix, start, goal):
+    """Find shortest path between two nodes using BFS on an adjacency matrix.
+    
+    Parameters
+    ----------
+    adj_matrix : ndarray of shape (n, n)
+        Adjacency matrix where nonzero entries indicate connections.
+        Value 2 indicates a connection created during minPts redistribution.
+    
+    start : int
+        Start node index (0-based).
+    
+    goal : int
+        Goal node index (0-based).
+    
+    Returns
+    -------
+    list or None
+        List of node indices forming the shortest path, or None if no path exists.
+    """
+    queue = deque([(start, [start])])
+    visited = {start}
+    
+    while queue:
+        current_node, path = queue.popleft()
+        if current_node == goal:
+            return path
+        for neighbor, connected in enumerate(adj_matrix[current_node]):
+            if connected and neighbor not in visited:
+                visited.add(neighbor)
+                queue.append((neighbor, path + [neighbor]))
+    return None

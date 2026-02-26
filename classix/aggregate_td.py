@@ -1,5 +1,4 @@
 import numpy as np
-from tqdm import tqdm
 import scipy.sparse as sparse
 from spmv import spsubmatxvec  
 
@@ -8,12 +7,10 @@ def aggregate_tanimoto(data, radius, verbose=False):
     
     sort_vals = np.sum(data, axis=1)
     
-    # 排序
     ind = np.argsort(sort_vals, kind='stable')
     data_sorted = data[ind]
     sort_vals_sorted = sort_vals[ind]
     
-    # 轉為稀疏 CSR 格式（加速內積）
     datas = sparse.csr_matrix(data_sorted)
     
     labels = np.full(n, -1, dtype=int)
@@ -25,8 +22,7 @@ def aggregate_tanimoto(data, radius, verbose=False):
     rhs = 1 / (1 - radius) + 1
     rhsi = 1 / rhs
     
-    pbar = tqdm(range(n), desc="Aggregation", disable=not verbose)
-    for i in pbar:
+    for i in range(n):
         if labels[i] >= 0:
             continue
         
@@ -54,7 +50,6 @@ def aggregate_tanimoto(data, radius, verbose=False):
             
             nr_dist += n_rows
             
-            # Tanimoto similarity >= rhsi ⇔ distance <= radius
             denom = sort_vals_sorted[i+1:last_j] + sort_vals_sorted[i]
             vec = ips / denom
             vec_mask = vec >= rhsi
@@ -69,11 +64,11 @@ def aggregate_tanimoto(data, radius, verbose=False):
         lab += 1
     
     return {
-        'labels': labels,                     # 在 sorted space 的聚合標籤
-        'splist': np.array(splist),           # starting points 在 sorted space 的索引
+        'labels': labels,                     
+        'splist': np.array(splist),          
         'group_sizes': np.array(group_sizes),
-        'ind': ind,                           # 原始到 sorted 的排序索引
-        'sort_vals': sort_vals_sorted,        # sorted 後的 sort_vals
-        'data_sorted': data_sorted,           # sorted 後的數據
+        'ind': ind,                           
+        'sort_vals': sort_vals_sorted,       
+        'data_sorted': data_sorted,           
         'nr_dist': nr_dist
     }

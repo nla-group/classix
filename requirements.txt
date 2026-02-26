@@ -5,3 +5,6 @@ pandas
 matplotlib>=3.5
 requests
 scikit-learn>=0.20
+rdkit>=2025.9.4
+tqdm
+seaborn>=0.13.2

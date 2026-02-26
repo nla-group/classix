@@ -1,5 +1,4 @@
 import numpy as np
-from tqdm import tqdm
 
 def aggregate_manhattan(data, radius, verbose=False):
     n, _ = data.shape
@@ -15,8 +14,7 @@ def aggregate_manhattan(data, radius, verbose=False):
     lab = 0
     nr_dist = 0
     
-    pbar = tqdm(range(n), desc="Aggregation", disable=not verbose)
-    for i in pbar:
+    for i in range(n):
         if labels[i] >= 0:
             continue
         
@@ -29,7 +27,6 @@ def aggregate_manhattan(data, radius, verbose=False):
         last_j = np.searchsorted(sort_vals_sorted, search_radius, side='right')
         
         if last_j > i + 1:
-            # L1 距離（更快）
             dists = np.sum(np.abs(clustc - data_sorted[i+1:last_j]), axis=1)
             nr_dist += len(dists)
             
@@ -41,11 +38,11 @@ def aggregate_manhattan(data, radius, verbose=False):
         lab += 1
     
     return {
-        'labels': labels,                     # sorted space
+        'labels': labels,                   
         'splist': np.array(splist),
         'group_sizes': np.array(group_sizes),
         'ind': ind,
-        'sort_vals': sort_vals_sorted,         # 已 standardized
+        'sort_vals': sort_vals_sorted,         
         'data_sorted': data_sorted,
         'nr_dist': nr_dist
     }

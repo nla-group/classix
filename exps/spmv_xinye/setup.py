@@ -9,7 +9,7 @@ class build_ext_with_numpy(build_ext):
 
 spmv_module = Extension(
     'spmv',
-    sources=['spmv.c'],
+    sources=['spmv.cpp'],
     extra_compile_args=['-O3', '-march=native'],
 )
 
