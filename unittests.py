@@ -1,9 +1,3 @@
-# MIT License
-#
-# Copyright (c) 2026 Stefan Güttel, Xinye Chen
-#
-
-
 import classix
 import unittest
 import numpy as np
@@ -472,6 +466,7 @@ class TestClassix(unittest.TestCase):
         
 if __name__ == '__main__':
     unittest.main()
+
 
 
 
