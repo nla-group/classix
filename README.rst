@@ -1,6 +1,3 @@
-.. image:: https://codecov.io/gh/nla-group/classix/branch/master/graph/badge.svg?token=D4MQZS67H1
-    :target: https://codecov.io/gh/nla-group/classix
-    :alt: codecov
 .. image:: https://img.shields.io/pypi/v/ClassixClustering?color=orange
     :target: https://pypi.org/project/ClassixClustering/
     :alt: pypi
@@ -96,4 +93,5 @@ Citation
       address = {UK},
       type    = {arXiv EPrint},
       url     = {https://arxiv.org/abs/2202.01456}
+
     }
