@@ -21,8 +21,7 @@ cdef Py_ssize_t bisect_right(double[:] a, double x, Py_ssize_t lo, Py_ssize_t hi
 
 def aggregate_tanimoto(
     double[:, :] data, 
-    double radius, 
-    bint verbose=False
+    double radius
 ):
     cdef Py_ssize_t n = data.shape[0]
     
@@ -53,14 +52,8 @@ def aggregate_tanimoto(
     cdef double rhs = 1.0 / (1.0 - radius) + 1.0
     cdef double rhsi = 1.0 / rhs
     
-    # Progress bar handling
-    cdef int update_iters = 0
-    cdef int update_threshold = 1000 
     
     for i in range(n):
-        if verbose:
-            update_iters += 1
-
         if labels[i] >= 0:
             continue
         
