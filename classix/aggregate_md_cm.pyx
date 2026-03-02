@@ -10,7 +10,7 @@ from libc.math cimport fabs
 ctypedef np.float64_t DTYPE_t
 ctypedef np.int64_t ITYPE_t
 
-def aggregate_manhattan(double[:, :] data, double radius, int verbose=0):
+def aggregate_manhattan(double[:, :] data, double radius):
     """
     Cython optimized version of aggregate_manhattan.
     Inputs and Outputs match the original function exactly.
@@ -42,9 +42,6 @@ def aggregate_manhattan(double[:, :] data, double radius, int verbose=0):
     cdef int current_group_size
     
     for i in range(n):
-        if verbose and i % 100 == 0:
-            pass 
-
         if labels[i] >= 0:
             continue
             
