@@ -304,6 +304,59 @@ class TestClassix(unittest.TestCase):
         self.assertEqual(checkpoint, 1)
 
 
+    def test_explain_manhattan(self):
+        X, y = data.make_blobs(n_samples=200, centers=2, n_features=2, 
+                               cluster_std=1.5, random_state=42)
+        checkpoint = 1
+        try:
+            # Test basic Manhattan explain
+            clx = CLASSIX(radius=0.5, metric='manhattan', group_merging='distance', minPts=3, verbose=0)
+            clx.fit_transform(X)
+            clx.explain(X, plot=False)
+            clx.explain(X, 0, plot=False)
+            clx.explain(X, 0, 50, plot=False)
+            
+            # Test with minPts redistribution (forces Adj value 2)
+            clx2 = CLASSIX(radius=0.3, metric='manhattan', group_merging='distance', minPts=50, verbose=0)
+            clx2.fit_transform(X)
+            clx2.explain(X, plot=False)
+            clx2.explain(X, 0, plot=False)
+            clx2.explain(X, 0, 100, plot=False)
+        except:
+            checkpoint = 0
+        
+        self.assertEqual(checkpoint, 1)
+
+    def test_explain_tanimoto(self):
+        """
+        Need to implement and add the Tanimoto blobs to test this.
+        """
+        import sys, os
+        sys.path.insert(0, os.path.dirname(__file__))
+        from tests.tanimoto_blobs import generate_data
+        X, _, _ = generate_data(num_clusters=3, pops=[5, 10, 15], d=20, n=100, flip_prob=0.1, seed=42)
+        checkpoint = 1
+        try:
+            # Test basic Tanimoto explain
+            clx = CLASSIX(metric='tanimoto', radius=0.1, group_merging='distance', minPts=1, verbose=0)
+            clx.fit_transform(X)
+            clx.explain(X, plot=False)
+            clx.explain(X, 0, plot=False)
+            clx.explain(X, 0, 50, plot=False)
+
+
+            # Test with minPts redistribution (forces Adj value 2)
+            clx2 = CLASSIX(metric='tanimoto', radius=0.1, group_merging='distance', minPts=50, verbose=0)
+            clx2.fit_transform(X)
+            clx2.explain(X, plot=False)
+            clx2.explain(X, 0, plot=False)
+            clx2.explain(X, 0, 1, plot=False)
+        except:
+            checkpoint = 0 
+
+        self.assertEqual(checkpoint, 1)
+        
+
     
     def test_explain_connected_groups(self):
         X, y = data.make_blobs(n_samples=1000, centers=3, n_features=2, cluster_std=2, random_state=1)
@@ -466,7 +519,4 @@ class TestClassix(unittest.TestCase):
         
 if __name__ == '__main__':
     unittest.main()
-
-
-
 
