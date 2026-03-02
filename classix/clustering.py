@@ -621,7 +621,7 @@ class CLASSIX:
                 from .aggregate_td import aggregate_tanimoto
                 warnings.warn("aggregation_td module is required for tanimoto metric, roll back to Python version.")
         
-            agg_res = aggregate_tanimoto(data, self.radius, verbose=self.__verbose > 0)
+            agg_res = aggregate_tanimoto(data, self.radius)
             self.groups_ = agg_res['labels']
             self.splist_ = agg_res['splist']
             self.nrDistComp_ = agg_res['nr_dist']
@@ -642,7 +642,7 @@ class CLASSIX:
                 from .aggregate_md import aggregate_manhattan
                 warnings.warn("aggregation_md module is required for manhattan metric, roll back to Python version.")
 
-            agg_res = aggregate_manhattan(data, self.radius, verbose=self.__verbose > 0)
+            agg_res = aggregate_manhattan(data, self.radius)
             self.groups_ = agg_res['labels']
             self.splist_ = agg_res['splist']
             self.nrDistComp_ = agg_res['nr_dist']
@@ -2470,6 +2470,7 @@ def return_csr_matrix_indices(csr_mat):
 
 def euclid(xxt, X, v):
     return (xxt + np.inner(v,v).ravel() -2*X.dot(v)).astype(float)
+
 
 
 
