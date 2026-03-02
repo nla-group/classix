@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sparse
 from spmv import spsubmatxvec  
 
-def aggregate_tanimoto(data, radius, verbose=False):
+def aggregate_tanimoto(data, radius):
     n, _ = data.shape
     
     sort_vals = np.sum(data, axis=1)
