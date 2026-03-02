@@ -1,6 +1,6 @@
 import numpy as np
 
-def aggregate_manhattan(data, radius, verbose=False):
+def aggregate_manhattan(data, radius):
     n, _ = data.shape
     sort_vals = np.sum(data, axis=1)
     
