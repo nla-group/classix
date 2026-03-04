@@ -1,4 +1,4 @@
-__version__ = '1.4.8'                  
+__version__ = '1.4.9'                  
 __enable_cython__ = True 
 
 
