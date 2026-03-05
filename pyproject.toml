@@ -14,7 +14,7 @@ description = "Fast and explainable clustering based on sorting"
 readme = "README.rst"
 authors = [
     {name = "Xinye Chen", email = "xinyechenai@gmail.com"},
-    {name = "Stefan Güttel", email = "stefan.guettel@manchester.ac.uk"}
+    {name = "Stefan Güttel", email = "stefan.guettel@manchester.ac.uk"},
     {name = "Kaustubh Roy", email = "kaustubh.roy1995@gmail.com"}
 ]
 license = { text = "MIT" }
