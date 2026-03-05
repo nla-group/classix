@@ -18,7 +18,7 @@ authors = [
     {name = "Kaustubh Roy", email = "kaustubh.roy1995@gmail.com"}
 ]
 license = { text = "MIT" }
-requires-python = ">=3.8, <=3.14"
+requires-python = ">=3.8, <3.15"
 classifiers = [
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
