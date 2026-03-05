@@ -1,4 +1,4 @@
-__version__ = '1.5.0'                  
+__version__ = '1.5.1'                  
 __enable_cython__ = True 
 
 
@@ -10,6 +10,7 @@ from .clustering import preprocessing
 
 """For Matlab's users to check the CLASSIX's version."""
 version = __version__
+
 
 
 
