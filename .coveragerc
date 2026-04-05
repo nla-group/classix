@@ -1,0 +1,46 @@
+# .coveragerc
+[run]
+source = classix
+omit =
+    */tests/*
+    */test_*
+    setup.py
+    */__pycache__/*
+    */bin/*
+    */data/*
+    *.c
+    # 如果不想统计 Cython 文件，取消下面的注释
+    # *.pyx
+    # */aggregate_ed_c*
+    # */aggregate_ed_cm*
+    # */aggregate_md_cm*
+    # */aggregate_td_cm*
+    # */merge_ed_cm*
+    # */merge_md_cm*
+    # */merge_td_cm*
+    # */merge_ed_cm_win*
+branch = True
+parallel = True
+plugins = Cython.Coverage
+
+[report]
+precision = 2
+skip_empty = True
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    def __str__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstractmethod
+    @abc.abstractmethod
+    if 0:
+    if False:
+
+[html]
+directory = htmlcov
+
+[xml]
+output = coverage.xml
