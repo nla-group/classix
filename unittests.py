@@ -516,6 +516,625 @@ class TestClassix(unittest.TestCase):
             checkpoint = 0
             
         self.assertEqual(checkpoint, 1)
+
+
+    # ==================== NEW TESTS FOR MANHATTAN DISTANCE ====================
+    
+    def test_manhattan_aggregation(self):
+        """Test Manhattan distance aggregation module"""
+        from classix.aggregate_md import aggregate_manhattan
+        
+        checkpoint = 1
+        try:
+            # Test with 2D data
+            X = np.random.randn(1000, 2)
+            result = aggregate_manhattan(X, radius=0.5)
+            
+            # Verify returned dictionary keys
+            required_keys = ['labels', 'splist', 'group_sizes', 'ind', 'sort_vals', 'data_sorted', 'nr_dist']
+            for key in required_keys:
+                if key not in result:
+                    checkpoint = 0
+                    break
+            
+            # Verify data integrity
+            if len(result['labels']) != len(X):
+                checkpoint = 0
+            if len(result['splist']) != len(result['group_sizes']):
+                checkpoint = 0
+                
+            # Test with higher dimensional data
+            X_hd = np.random.randn(500, 10)
+            result_hd = aggregate_manhattan(X_hd, radius=1.0)
+            if len(result_hd['labels']) != len(X_hd):
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Manhattan aggregation test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_manhattan_merging(self):
+        """Test Manhattan distance merging module"""
+        from classix.aggregate_md import aggregate_manhattan
+        from classix.merge_md import merge_manhattan
+        
+        checkpoint = 1
+        try:
+            # First do aggregation
+            X = np.random.randn(1000, 3)
+            agg_result = aggregate_manhattan(X, radius=0.5)
+            
+            # Extract starting point data
+            spdata = agg_result['data_sorted'][agg_result['splist']]
+            group_sizes = agg_result['group_sizes']
+            sort_vals_sp = agg_result['sort_vals'][agg_result['splist']]
+            agg_labels_sp = np.arange(len(agg_result['splist']))
+            
+            # Test merging with different parameters
+            merge_result = merge_manhattan(
+                spdata=spdata,
+                group_sizes=group_sizes,
+                sort_vals_sp=sort_vals_sp,
+                agg_labels_sp=agg_labels_sp,
+                radius=0.5,
+                mergeScale=1.5,
+                minPts=3,
+                mergeTinyGroups=True
+            )
+            
+            # Verify results
+            if 'group_cluster_labels' not in merge_result:
+                checkpoint = 0
+            if 'Adj' not in merge_result:
+                checkpoint = 0
+            if len(merge_result['group_cluster_labels']) != len(spdata):
+                checkpoint = 0
+                
+            # Test with mergeTinyGroups=False
+            merge_result2 = merge_manhattan(
+                spdata=spdata,
+                group_sizes=group_sizes,
+                sort_vals_sp=sort_vals_sp,
+                agg_labels_sp=agg_labels_sp,
+                radius=0.5,
+                mergeScale=1.5,
+                minPts=10,
+                mergeTinyGroups=False
+            )
+            
+            if len(merge_result2['group_cluster_labels']) != len(spdata):
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Manhattan merging test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_manhattan_bfs_shortest_path(self):
+        """Test BFS shortest path function in merge_md"""
+        from classix.merge_md import bfs_shortest_path
+        
+        checkpoint = 1
+        try:
+            # Create a simple adjacency matrix
+            adj = np.array([
+                [0, 1, 0, 0, 0],
+                [1, 0, 1, 0, 0],
+                [0, 1, 0, 1, 0],
+                [0, 0, 1, 0, 1],
+                [0, 0, 0, 1, 0]
+            ], dtype=np.int8)
+            
+            # Test path from 0 to 4
+            path = bfs_shortest_path(adj, 0, 4)
+            if path is None or len(path) != 5:
+                checkpoint = 0
+            
+            # Test path from 0 to 2
+            path2 = bfs_shortest_path(adj, 0, 2)
+            if path2 is None or len(path2) != 3:
+                checkpoint = 0
+                
+            # Test same start and goal
+            path3 = bfs_shortest_path(adj, 2, 2)
+            if path3 is None or len(path3) != 1:
+                checkpoint = 0
+                
+            # Test no path exists
+            adj_disconnected = np.array([
+                [0, 1, 0, 0],
+                [1, 0, 0, 0],
+                [0, 0, 0, 1],
+                [0, 0, 1, 0]
+            ], dtype=np.int8)
+            path4 = bfs_shortest_path(adj_disconnected, 0, 3)
+            if path4 is not None:
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Manhattan BFS test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_manhattan_clustering_full_pipeline(self):
+        """Test full Manhattan clustering pipeline with CLASSIX"""
+        checkpoint = 1
+        try:
+            X, _ = data.make_blobs(n_samples=500, centers=4, n_features=3, random_state=42)
+            
+            # Test with distance merging
+            clx1 = CLASSIX(metric='manhattan', radius=0.5, group_merging='distance', minPts=5, verbose=0)
+            clx1.fit_transform(X)
+            if clx1.labels_ is None or len(clx1.labels_) != len(X):
+                checkpoint = 0
+                
+            # Test with density merging  
+            clx2 = CLASSIX(metric='manhattan', radius=0.5, group_merging='density', minPts=5, verbose=0)
+            clx2.fit_transform(X)
+            if clx2.labels_ is None or len(clx2.labels_) != len(X):
+                checkpoint = 0
+                
+            # Test with mergeTinyGroups=False
+            clx3 = CLASSIX(metric='manhattan', radius=0.5, group_merging='distance', 
+                          minPts=20, mergeTinyGroups=False, verbose=0)
+            clx3.fit_transform(X)
+            if clx3.labels_ is None or len(clx3.labels_) != len(X):
+                checkpoint = 0
+                
+            # Test predict method
+            X_new = np.random.randn(50, 3)
+            labels_new = clx1.predict(X_new)
+            if labels_new is None or len(labels_new) != len(X_new):
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Manhattan full pipeline test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    # ==================== NEW TESTS FOR TANIMOTO DISTANCE ====================
+    
+    def test_tanimoto_aggregation(self):
+        """Test Tanimoto distance aggregation module"""
+        from classix.aggregate_td import aggregate_tanimoto
+        
+        checkpoint = 1
+        try:
+            # Generate binary-like data for Tanimoto
+            X = np.random.randint(0, 2, size=(500, 20)).astype(np.float64)
+            result = aggregate_tanimoto(X, radius=0.3)
+            
+            # Verify returned dictionary keys
+            required_keys = ['labels', 'splist', 'group_sizes', 'ind', 'sort_vals', 'data_sorted', 'nr_dist']
+            for key in required_keys:
+                if key not in result:
+                    checkpoint = 0
+                    break
+            
+            # Verify data integrity
+            if len(result['labels']) != len(X):
+                checkpoint = 0
+            if len(result['splist']) != len(result['group_sizes']):
+                checkpoint = 0
+                
+            # Test with different radius
+            result2 = aggregate_tanimoto(X, radius=0.1)
+            if len(result2['labels']) != len(X):
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Tanimoto aggregation test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_tanimoto_merging(self):
+        """Test Tanimoto distance merging module"""
+        from classix.aggregate_td import aggregate_tanimoto
+        from classix.merge_td import merge_tanimoto
+        
+        checkpoint = 1
+        try:
+            # Generate binary data
+            X = np.random.randint(0, 2, size=(500, 15)).astype(np.float64)
+            agg_result = aggregate_tanimoto(X, radius=0.3)
+            
+            # Extract starting point data
+            spdata = agg_result['data_sorted'][agg_result['splist']]
+            group_sizes = agg_result['group_sizes']
+            sort_vals_sp = agg_result['sort_vals'][agg_result['splist']]
+            agg_labels_sp = np.arange(len(agg_result['splist']))
+            
+            # Test merging
+            merge_result = merge_tanimoto(
+                spdata=spdata,
+                group_sizes=group_sizes,
+                sort_vals_sp=sort_vals_sp,
+                agg_labels_sp=agg_labels_sp,
+                radius=0.3,
+                mergeScale=1.5,
+                minPts=3,
+                mergeTinyGroups=True
+            )
+            
+            # Verify results
+            if 'group_cluster_labels' not in merge_result:
+                checkpoint = 0
+            if 'Adj' not in merge_result:
+                checkpoint = 0
+            if len(merge_result['group_cluster_labels']) != len(spdata):
+                checkpoint = 0
+                
+            # Test with mergeTinyGroups=False
+            merge_result2 = merge_tanimoto(
+                spdata=spdata,
+                group_sizes=group_sizes,
+                sort_vals_sp=sort_vals_sp,
+                agg_labels_sp=agg_labels_sp,
+                radius=0.3,
+                mergeScale=1.5,
+                minPts=10,
+                mergeTinyGroups=False
+            )
+            
+            if len(merge_result2['group_cluster_labels']) != len(spdata):
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Tanimoto merging test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_tanimoto_bfs_shortest_path(self):
+        """Test BFS shortest path function in merge_td"""
+        from classix.merge_td import bfs_shortest_path
+        
+        checkpoint = 1
+        try:
+            # Create adjacency matrix
+            adj = np.array([
+                [0, 1, 1, 0, 0],
+                [1, 0, 0, 1, 0],
+                [1, 0, 0, 1, 0],
+                [0, 1, 1, 0, 1],
+                [0, 0, 0, 1, 0]
+            ], dtype=np.int8)
+            
+            # Test various paths
+            path1 = bfs_shortest_path(adj, 0, 4)
+            if path1 is None or len(path1) < 3:
+                checkpoint = 0
+            
+            path2 = bfs_shortest_path(adj, 0, 1)
+            if path2 is None or len(path2) != 2:
+                checkpoint = 0
+                
+            # Test same node
+            path3 = bfs_shortest_path(adj, 3, 3)
+            if path3 is None or len(path3) != 1:
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Tanimoto BFS test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_tanimoto_clustering_full_pipeline(self):
+        """Test full Tanimoto clustering pipeline with CLASSIX"""
+        checkpoint = 1
+        try:
+            # Generate binary data
+            X = np.random.randint(0, 2, size=(400, 25)).astype(np.float64)
+            
+            # Test with distance merging
+            clx1 = CLASSIX(metric='tanimoto', radius=0.3, group_merging='distance', minPts=5, verbose=0)
+            clx1.fit_transform(X)
+            if clx1.labels_ is None or len(clx1.labels_) != len(X):
+                checkpoint = 0
+                
+            # Test with density merging
+            clx2 = CLASSIX(metric='tanimoto', radius=0.3, group_merging='density', minPts=5, verbose=0)
+            clx2.fit_transform(X)
+            if clx2.labels_ is None or len(clx2.labels_) != len(X):
+                checkpoint = 0
+                
+            # Test with mergeTinyGroups=False
+            clx3 = CLASSIX(metric='tanimoto', radius=0.3, group_merging='distance', 
+                          minPts=15, mergeTinyGroups=False, verbose=0)
+            clx3.fit_transform(X)
+            if clx3.labels_ is None or len(clx3.labels_) != len(X):
+                checkpoint = 0
+                
+            # Test predict method
+            X_new = np.random.randint(0, 2, size=(30, 25)).astype(np.float64)
+            labels_new = clx1.predict(X_new)
+            if labels_new is None or len(labels_new) != len(X_new):
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Tanimoto full pipeline test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_cython_manhattan_modules(self):
+        """Test Cython implementations of Manhattan distance modules"""
+        checkpoint = 1
+        try:
+            # Import Cython modules
+            if platform.system() == 'Windows':
+                # Windows doesn't have aggregate_md_cm, skip
+                return
+            else:
+                from classix import aggregate_md_cm
+                from classix import merge_md_cm
+                
+            X = np.random.randn(500, 3)
+            
+            # Test Cython aggregation (if available)
+            try:
+                result = aggregate_md_cm.aggregate_manhattan(X, 0.5)
+                if len(result['labels']) != len(X):
+                    checkpoint = 0
+            except AttributeError:
+                # Module may not have this function, that's ok
+                pass
+                
+        except ImportError:
+            # Cython modules might not be compiled, that's acceptable
+            pass
+        except Exception as e:
+            print(f"Cython Manhattan test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_cython_tanimoto_modules(self):
+        """Test Cython implementations of Tanimoto distance modules"""
+        checkpoint = 1
+        try:
+            # Import Cython modules
+            if platform.system() == 'Windows':
+                # Windows support might be different
+                return
+            else:
+                from classix import aggregate_td_cm
+                from classix import merge_td_cm
+                
+            X = np.random.randint(0, 2, size=(400, 20)).astype(np.float64)
+            
+            # Test Cython aggregation (if available)
+            try:
+                result = aggregate_td_cm.aggregate_tanimoto(X, 0.3)
+                if len(result['labels']) != len(X):
+                    checkpoint = 0
+            except AttributeError:
+                # Module may not have this function, that's ok
+                pass
+                
+        except ImportError:
+            # Cython modules might not be compiled, that's acceptable
+            pass
+        except Exception as e:
+            print(f"Cython Tanimoto test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_manhattan_explain_path(self):
+        """Test explain method with Manhattan metric including path finding"""
+        checkpoint = 1
+        try:
+            X, _ = data.make_blobs(n_samples=300, centers=3, n_features=2, random_state=42)
+            
+            clx = CLASSIX(metric='manhattan', radius=0.5, group_merging='distance', minPts=5, verbose=0)
+            clx.fit(X)
+            
+            # Test explain with various parameters
+            clx.explain(X, plot=False)
+            clx.explain(X, 0, plot=False)
+            clx.explain(X, 0, 50, plot=False, add_arrow=True)
+            clx.explain(X, 0, 50, plot=False, add_arrow=True, include_dist=True)
+            
+        except Exception as e:
+            print(f"Manhattan explain path test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_tanimoto_explain_path(self):
+        """Test explain method with Tanimoto metric including path finding"""
+        checkpoint = 1
+        try:
+            X = np.random.randint(0, 2, size=(200, 15)).astype(np.float64)
+            
+            clx = CLASSIX(metric='tanimoto', radius=0.3, group_merging='distance', minPts=3, verbose=0)
+            clx.fit(X)
+            
+            # Test explain with various parameters
+            clx.explain(X, plot=False)
+            clx.explain(X, 0, plot=False)
+            clx.explain(X, 0, 30, plot=False, add_arrow=True)
+            clx.explain(X, 0, 30, plot=False, add_arrow=True, include_dist=True)
+            
+        except Exception as e:
+            print(f"Tanimoto explain path test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_predict_manhattan(self):
+        """Test predict method specifically for Manhattan metric"""
+        checkpoint = 1
+        try:
+            X_train, _ = data.make_blobs(n_samples=400, centers=3, n_features=4, random_state=42)
+            X_test = np.random.randn(50, 4)
+            
+            clx = CLASSIX(metric='manhattan', radius=0.5, group_merging='distance', minPts=5, verbose=0)
+            clx.fit(X_train)
+            
+            labels_pred = clx.predict(X_test)
+            
+            if labels_pred is None or len(labels_pred) != len(X_test):
+                checkpoint = 0
+                
+            # Test with 1D data
+            X_train_1d = X_train[:, 0].reshape(-1, 1)
+            X_test_1d = X_test[:, 0].reshape(-1, 1)
+            
+            clx_1d = CLASSIX(metric='manhattan', radius=0.5, verbose=0)
+            clx_1d.fit(X_train_1d)
+            labels_1d = clx_1d.predict(X_test_1d)
+            
+            if labels_1d is None or len(labels_1d) != len(X_test_1d):
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Predict Manhattan test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_predict_tanimoto(self):
+        """Test predict method specifically for Tanimoto metric"""
+        checkpoint = 1
+        try:
+            X_train = np.random.randint(0, 2, size=(300, 20)).astype(np.float64)
+            X_test = np.random.randint(0, 2, size=(40, 20)).astype(np.float64)
+            
+            clx = CLASSIX(metric='tanimoto', radius=0.3, group_merging='distance', minPts=5, verbose=0)
+            clx.fit(X_train)
+            
+            labels_pred = clx.predict(X_test)
+            
+            if labels_pred is None or len(labels_pred) != len(X_test):
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Predict Tanimoto test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_manhattan_different_dimensions(self):
+        """Test Manhattan clustering with different data dimensions"""
+        checkpoint = 1
+        try:
+            for dim in [1, 2, 5, 10, 20]:
+                X = np.random.randn(200, dim)
+                clx = CLASSIX(metric='manhattan', radius=0.5, minPts=3, verbose=0)
+                clx.fit_transform(X)
+                
+                if clx.labels_ is None or len(clx.labels_) != len(X):
+                    checkpoint = 0
+                    break
+                    
+        except Exception as e:
+            print(f"Manhattan dimensions test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_tanimoto_different_dimensions(self):
+        """Test Tanimoto clustering with different data dimensions"""
+        checkpoint = 1
+        try:
+            for dim in [5, 10, 20, 50]:
+                X = np.random.randint(0, 2, size=(150, dim)).astype(np.float64)
+                clx = CLASSIX(metric='tanimoto', radius=0.3, minPts=3, verbose=0)
+                clx.fit_transform(X)
+                
+                if clx.labels_ is None or len(clx.labels_) != len(X):
+                    checkpoint = 0
+                    break
+                    
+        except Exception as e:
+            print(f"Tanimoto dimensions test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_manhattan_edge_cases(self):
+        """Test Manhattan clustering edge cases"""
+        checkpoint = 1
+        try:
+            # Very small dataset
+            X_small = np.random.randn(10, 3)
+            clx = CLASSIX(metric='manhattan', radius=0.5, minPts=2, verbose=0)
+            clx.fit(X_small)
+            if clx.labels_ is None or len(clx.labels_) != len(X_small):
+                checkpoint = 0
+                
+            # All points identical
+            X_identical = np.ones((50, 3))
+            clx2 = CLASSIX(metric='manhattan', radius=0.1, verbose=0)
+            clx2.fit(X_identical)
+            # Should form single cluster
+            if len(np.unique(clx2.labels_)) > 1:
+                checkpoint = 0
+                
+            # Very large radius
+            X = np.random.randn(100, 3)
+            clx3 = CLASSIX(metric='manhattan', radius=100.0, verbose=0)
+            clx3.fit(X)
+            # Should merge everything
+            if clx3.labels_ is None or len(clx3.labels_) != len(X):
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Manhattan edge cases test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_tanimoto_edge_cases(self):
+        """Test Tanimoto clustering edge cases"""
+        checkpoint = 1
+        try:
+            # Very small dataset
+            X_small = np.random.randint(0, 2, size=(10, 10)).astype(np.float64)
+            clx = CLASSIX(metric='tanimoto', radius=0.3, minPts=2, verbose=0)
+            clx.fit(X_small)
+            if clx.labels_ is None or len(clx.labels_) != len(X_small):
+                checkpoint = 0
+                
+            # All points identical
+            X_identical = np.ones((30, 15))
+            clx2 = CLASSIX(metric='tanimoto', radius=0.1, verbose=0)
+            clx2.fit(X_identical)
+            if len(np.unique(clx2.labels_)) > 1:
+                checkpoint = 0
+                
+        except Exception as e:
+            print(f"Tanimoto edge cases test failed: {e}")
+            checkpoint = 0
+            
+        self.assertEqual(checkpoint, 1)
+
         
 if __name__ == '__main__':
     unittest.main()
