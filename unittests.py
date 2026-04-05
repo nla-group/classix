@@ -1,6 +1,3 @@
-"""
-Fixed tests for coverage boosting
-"""
 import classix
 import unittest
 import numpy as np
