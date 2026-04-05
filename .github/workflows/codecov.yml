@@ -46,7 +46,7 @@ jobs:
         run: python setup.py build_ext --inplace
         env:
           CFLAGS: -O0 -DCYTHON_TRACE=1
-        continue-on-error: true  # 允许没有 Cython 的情况继续
+        continue-on-error: true
 
       # 6. Install package
       - name: Install package
@@ -63,8 +63,9 @@ jobs:
       - name: Display coverage file info
         shell: bash
         run: |
-          ls -lh coverage.xml || dir coverage.xml
-          head -n 20 coverage.xml || type coverage.xml
+          ls -lh coverage.xml 2>/dev/null || dir coverage.xml
+          echo "--- First 30 lines of coverage.xml ---"
+          head -n 30 coverage.xml 2>/dev/null || powershell -Command "Get-Content coverage.xml -Head 30"
 
       # 9. Upload coverage to Codecov
       - name: Upload coverage to Codecov
@@ -73,11 +74,11 @@ jobs:
           files: ./coverage.xml
           flags: ${{ matrix.os }}-py${{ matrix.python-version }}
           name: codecov-${{ matrix.os }}-py${{ matrix.python-version }}
-          fail_ci_if_error: false  # 不让 codecov 失败阻止 CI
+          fail_ci_if_error: false
           verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      # 10. Upload coverage HTML report as artifact
+      # 10. Upload HTML coverage report as artifact
       - name: Generate HTML coverage report
         if: always()
         run: coverage html
