@@ -12,81 +12,46 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12']
-      fail-fast: false
 
     steps:
-      # 1. Checkout code
       - uses: actions/checkout@v4
 
-      # 2. Setup Python
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.12'
 
-      # 3. Install dependencies
       - name: Install dependencies
         run: |
           pip install --upgrade pip setuptools cython pytest pytest-cov coverage
           pip install -r requirements.txt
 
-      # 4. Clean old build files
       - name: Clean old build files
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
-            powershell -Command "Remove-Item -Recurse -Force build,dist,*.egg-info -ErrorAction SilentlyContinue; Get-ChildItem -Recurse -Filter '*.pyd' | Remove-Item -Force -ErrorAction SilentlyContinue"
+            powershell -Command "Remove-Item -Recurse -Force build,dist,*.egg-info -ErrorAction SilentlyContinue; Get-ChildItem -Recurse -Filter '*.pyd' | Remove-Item -Force -ErrorAction SilentlyContinue; Get-ChildItem -Recurse -Filter '*.c' | Remove-Item -Force -ErrorAction SilentlyContinue"
           else
-            find . -name "*.so" -delete 2>/dev/null || true
+            find . -name "*.so" -delete
+            find . -name "*.c" -delete
             rm -rf build/ dist/ *.egg-info
           fi
 
-      # 5. Build Cython extensions with linetrace
       - name: Build Cython extensions
         run: python setup.py build_ext --inplace
         env:
           CFLAGS: -O0 -DCYTHON_TRACE=1
-        continue-on-error: true
 
-      # 6. Install package
       - name: Install package
         run: pip install -e .
 
-      # 7. Run tests and generate coverage
       - name: Run tests and generate coverage
         run: |
-          coverage run -m pytest unittests.py -v
-          coverage xml -o coverage.xml
-          coverage report
+          pytest --cov=classix --cov-report=xml:coverage.xml unittests.py
 
-      # 8. Display coverage file info (for debugging)
-      - name: Display coverage file info
-        shell: bash
-        run: |
-          ls -lh coverage.xml 2>/dev/null || dir coverage.xml
-          echo "--- First 30 lines of coverage.xml ---"
-          head -n 30 coverage.xml 2>/dev/null || powershell -Command "Get-Content coverage.xml -Head 30"
-
-      # 9. Upload coverage to Codecov
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: ./coverage.xml
-          flags: ${{ matrix.os }}-py${{ matrix.python-version }}
-          name: codecov-${{ matrix.os }}-py${{ matrix.python-version }}
-          fail_ci_if_error: false
+          files: coverage.xml
+          fail_ci_if_error: true
           verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      # 10. Upload HTML coverage report as artifact
-      - name: Generate HTML coverage report
-        if: always()
-        run: coverage html
-
-      - name: Upload HTML coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report-${{ matrix.os }}-py${{ matrix.python-version }}
-          path: htmlcov/
-          retention-days: 30
