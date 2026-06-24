@@ -7,7 +7,7 @@
 
 
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
-[![!pypi](https://img.shields.io/pypi/v/classixclustering?color=red)](https://pypi.org/project/classixclustering/)
+[![!pypi](https://img.shields.io/pypi/v/classixclustering?color=tomato)](https://pypi.org/project/classixclustering/)
 ![Static Badge](https://img.shields.io/badge/Compiler-8A2BE2?label=Cython-Accelerated)
 [![Workflow for Codecov (with Cython coverage)](https://github.com/nla-group/classix/actions/workflows/codecov.yml/badge.svg)](https://github.com/nla-group/classix/actions/workflows/codecov.yml)
 [![License: MIT](https://anaconda.org/conda-forge/classixclustering/badges/license.svg)](https://github.com/nla-group/classix/blob/master/LICENSE)
