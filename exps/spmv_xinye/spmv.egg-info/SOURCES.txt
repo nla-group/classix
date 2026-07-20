@@ -1,6 +1,0 @@
-setup.py
-spmv.c
-spmv.egg-info/PKG-INFO
-spmv.egg-info/SOURCES.txt
-spmv.egg-info/dependency_links.txt
-spmv.egg-info/top_level.txt
