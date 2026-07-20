@@ -1,6 +1,43 @@
 import numpy as np
 
 def aggregate_manhattan(data, radius):
+    """Aggregate samples using Manhattan distance.
+
+    Parameters
+    ----------
+    data : ndarray of shape (n_samples, n_features)
+        Preprocessed input data.
+
+    radius : float
+        Maximum L1 distance from a starting point for assigning a sample to the
+        corresponding aggregation group.
+
+    Returns
+    -------
+    result : dict
+        Aggregation result with the following keys:
+
+        ``'labels'`` : ndarray of shape (n_samples,)
+            Aggregation group label for each sorted sample.
+
+        ``'splist'`` : ndarray of shape (n_groups,)
+            Sorted-data index of each group starting point.
+
+        ``'group_sizes'`` : ndarray of shape (n_groups,)
+            Number of samples assigned to each group.
+
+        ``'ind'`` : ndarray of shape (n_samples,)
+            Permutation that maps sorted rows to original rows.
+
+        ``'sort_vals'`` : ndarray of shape (n_samples,)
+            Sorted feature-sum values.
+
+        ``'data_sorted'`` : ndarray of shape (n_samples, n_features)
+            Data after sorting.
+
+        ``'nr_dist'`` : int
+            Number of Manhattan distances evaluated.
+    """
     n, _ = data.shape
     sort_vals = np.sum(data, axis=1)
     

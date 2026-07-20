@@ -3,6 +3,45 @@ import scipy.sparse as sparse
 from spmv import spsubmatxvec  
 
 def aggregate_tanimoto(data, radius):
+    """Aggregate samples using Tanimoto distance.
+
+    Parameters
+    ----------
+    data : ndarray of shape (n_samples, n_features)
+        Non-negative input data. Binary, count, or molecular fingerprint-like
+        rows are typical use cases.
+
+    radius : float
+        Maximum Tanimoto distance from a starting point for assigning a sample
+        to the corresponding aggregation group. The value should be smaller
+        than 1.
+
+    Returns
+    -------
+    result : dict
+        Aggregation result with the following keys:
+
+        ``'labels'`` : ndarray of shape (n_samples,)
+            Aggregation group label for each sorted sample.
+
+        ``'splist'`` : ndarray of shape (n_groups,)
+            Sorted-data index of each group starting point.
+
+        ``'group_sizes'`` : ndarray of shape (n_groups,)
+            Number of samples assigned to each group.
+
+        ``'ind'`` : ndarray of shape (n_samples,)
+            Permutation that maps sorted rows to original rows.
+
+        ``'sort_vals'`` : ndarray of shape (n_samples,)
+            Sorted row-sum values used for pruning candidate comparisons.
+
+        ``'data_sorted'`` : ndarray of shape (n_samples, n_features)
+            Data after sorting.
+
+        ``'nr_dist'`` : int
+            Number of Tanimoto comparisons evaluated.
+    """
     n, _ = data.shape
     
     sort_vals = np.sum(data, axis=1)

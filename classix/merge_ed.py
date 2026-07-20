@@ -14,56 +14,44 @@ from scipy.special import betainc, gamma
 
 
 def distance_merge_mtg(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2):
-    """
-    Implement CLASSIX's merging without merging tiny groups
+    """Merge Euclidean groups while preventing tiny groups from initiating edges.
     
     Parameters
     ----------
-    data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
+    data : ndarray of shape (n_samples, n_features)
+        Preprocessed and sorted training data.
     
-    labels : list
-        aggregation labels
+    labels : array-like of shape (n_samples,)
+        Aggregation group labels in sorted-data order.
 
-    splist : numpy.ndarray
-        Represent the list of starting points information formed in the aggregation. 
-        list of [ starting point index of current group, sorting values, and number of group elements ].
+    splist : ndarray of shape (n_groups, 2)
+        Starting-point index and group size for each aggregation group.
 
     radius : float
-        The tolerance to control the aggregation. If the distance between the starting point 
-        of a group and another data point is less than or equal to the tolerance,
-        the point is allocated to that group. For details, we refer users to [1].
+        Base aggregation radius.
 
-    minPts : int, default=0
-        The threshold, in the range of [0, infity] to determine the noise degree.
-        When assign it 0, algorithm won't check noises.
+    minPts : int
+        Minimum valid cluster size.
 
-    scale : float, default 1.5
-        Design for distance-clustering, when distance between the two starting points 
-        associated with two distinct groups smaller than scale*radius, then the two groups merge.
+    scale : float
+        Multiplicative factor for the merge radius.
 
-    sort_vals : numpy.ndarray
-        Sorting values.
+    sort_vals : ndarray of shape (n_samples,)
+        Sorting values in sorted-data order.
         
-    half_nrm2 : numpy.ndarray
-        Precomputed values for distance computation.
+    half_nrm2 : ndarray of shape (n_groups,)
+        Half squared norms of the group starting points.
 
     Returns
     -------
-    labels : numpy.ndarray
-        The merging labels.
+    labels : ndarray of shape (n_samples,)
+        Cluster labels in sorted-data order.
     
-    old_cluster_count : int
-        The number of clusters without outliers elimination.
+    old_cluster_count : collections.Counter
+        Cluster sizes before small-cluster reassignment.
     
     SIZE_NOISE_LABELS : int
-        The number of clusters marked as outliers.
-
-        
-    References
-    ----------
-    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
-
+        Number of clusters smaller than ``minPts`` before reassignment.
     """
     
     splist_indices = splist[:, 0]
@@ -141,56 +129,44 @@ def distance_merge_mtg(data, labels, splist, radius, minPts, scale, sort_vals, h
 
 
 def distance_merge(data, labels, splist, radius, minPts, scale, sort_vals, half_nrm2):
-    """
-    Implement CLASSIX's merging with early stopping and BLAS routines
+    """Merge Euclidean groups by distance between starting points.
     
     Parameters
     ----------
-    data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
+    data : ndarray of shape (n_samples, n_features)
+        Preprocessed and sorted training data.
     
-    labels : list
-        aggregation labels
+    labels : array-like of shape (n_samples,)
+        Aggregation group labels in sorted-data order.
 
-    splist : numpy.ndarray
-        Represent the list of starting points information formed in the aggregation. 
-        list of [ starting point index of current group, sorting values, and number of group elements ].
+    splist : ndarray of shape (n_groups, 2)
+        Starting-point index and group size for each aggregation group.
 
     radius : float
-        The tolerance to control the aggregation. If the distance between the starting point 
-        of a group and another data point is less than or equal to the tolerance,
-        the point is allocated to that group. For details, we refer users to [1].
+        Base aggregation radius.
 
     minPts : int
-        The threshold, in the range of [0, infity] to determine the noise degree.
-        When assign it 0, algorithm won't check noises.
+        Minimum valid cluster size.
 
     scale : float
-        Design for distance-clustering, when distance between the two starting points 
-        associated with two distinct groups smaller than scale*radius, then the two groups merge.
+        Multiplicative factor for the merge radius.
 
-    sort_vals : numpy.ndarray
-        Sorting values.
+    sort_vals : ndarray of shape (n_samples,)
+        Sorting values in sorted-data order.
         
-    half_nrm2 : numpy.ndarray
-        Precomputed values for distance computation.
+    half_nrm2 : ndarray of shape (n_groups,)
+        Half squared norms of the group starting points.
 
     Returns
     -------
-    labels : numpy.ndarray
-        The merging labels.
+    labels : ndarray of shape (n_samples,)
+        Cluster labels in sorted-data order.
     
-    old_cluster_count : int
-        The number of clusters without outliers elimination.
+    old_cluster_count : collections.Counter
+        Cluster sizes before small-cluster reassignment.
     
     SIZE_NOISE_LABELS : int
-        The number of clusters marked as outliers.
-
-        
-    References
-    ----------
-    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
-
+        Number of clusters smaller than ``minPts`` before reassignment.
     """
     
     splist_indices = splist[:, 0]
@@ -265,42 +241,33 @@ def distance_merge(data, labels, splist, radius, minPts, scale, sort_vals, half_
 
 
 def density_merge(data, splist, radius, sort_vals, half_nrm2):
-    """
-    Implement CLASSIX's merging with disjoint-set data structure, default choice for the merging.
+    """Merge Euclidean groups with the density-overlap criterion.
     
     Parameters
     ----------
-    data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
+    data : ndarray of shape (n_samples, n_features)
+        Preprocessed and sorted training data.
     
-    splist : numpy.ndarray
-        Represent the list of starting points information formed in the aggregation. 
-        list of [ starting point index of current group, sorting values, and number of group elements ]
+    splist : ndarray of shape (n_groups, 2)
+        Starting-point index and group size for each aggregation group.
 
     radius : float
-        The tolerance to control the aggregation. If the distance between the starting point 
-        of a group and another data point is less than or equal to the tolerance,
-        the point is allocated to that group. For details, we refer users to [1].
+        Base aggregation radius.
 
-    sort_vals : numpy.ndarray
-        Sorting values.
+    sort_vals : ndarray of shape (n_samples,)
+        Sorting values in sorted-data order.
 
-    half_nrm2 : numpy.ndarray
-        Precomputed values for distance computation.
+    half_nrm2 : ndarray of shape (n_samples,)
+        Half squared norms of sorted samples.
 
         
     Returns
     -------
-    labels_set : list
-        Connected components of graph with groups as vertices.
+    labels_set : list of list of int
+        Connected components of the group-overlap graph.
     
-    connected_pairs_store : list
-        List for connected group labels.
-
-    References
-    ----------
-    [1] X. Chen and S. Güttel. Fast and explainable sorted based clustering, 2022
-
+    connected_pairs_store : list of list of int
+        Pairwise group connections used to build explanations.
     """
     
     connected_pairs = [SET(i) for i in range(splist.shape[0])]
@@ -362,20 +329,56 @@ def density_merge(data, splist, radius, sort_vals, half_nrm2):
 
 
 def euclid(xxt, X, v):
+    """Compute squared Euclidean distances from rows of ``X`` to ``v``.
+
+    Parameters
+    ----------
+    xxt : ndarray of shape (n_samples,)
+        Precomputed squared norms for rows of ``X``.
+
+    X : ndarray of shape (n_samples, n_features)
+        Input data.
+
+    v : ndarray of shape (n_features,)
+        Reference vector.
+
+    Returns
+    -------
+    distances : ndarray of shape (n_samples,)
+        Squared Euclidean distances.
+    """
     return (xxt + np.inner(v,v).ravel() -2*X.dot(v)).astype(float)
     
 
 
 class SET:
-    """Disjoint-set data structure."""
+    """Node in the disjoint-set data structure used for group merging.
+
+    Parameters
+    ----------
+    data : int
+        Group identifier stored by this node.
+    """
     def __init__( self, data):
+        """Initialize a disjoint-set node."""
         self.data = data
         self.parent = self
 
         
         
 def findParent(s):
-    """Find parent of node."""
+    """Return the root node of a disjoint-set component.
+
+    Parameters
+    ----------
+    s : SET
+        Node whose component root is requested.
+
+    Returns
+    -------
+    parent : SET
+        Root node after path compression.
+    """
     if (s.data != s.parent.data) :
         s.parent = findParent((s.parent))
     return s.parent
@@ -383,7 +386,18 @@ def findParent(s):
 
 
 def merge(s1, s2):
-    """Merge the roots of two node."""
+    """Merge two disjoint-set components.
+
+    Parameters
+    ----------
+    s1, s2 : SET
+        Nodes whose components should be merged.
+
+    Returns
+    -------
+    None
+        The parent pointer of one component is updated in place.
+    """
     parent_of_s1 = findParent(s1)
     parent_of_s2 = findParent(s2)
 
@@ -393,14 +407,52 @@ def merge(s1, s2):
         
 
 def check_if_overlap(starting_point, spo, radius, scale = 1):
-    """Check if two groups formed by aggregation overlap
+    """Return whether two aggregation balls overlap.
+
+    Parameters
+    ----------
+    starting_point : ndarray of shape (n_features,)
+        Center of the first aggregation ball.
+
+    spo : ndarray of shape (n_features,)
+        Center of the second aggregation ball.
+
+    radius : float
+        Ball radius.
+
+    scale : float, default=1
+        Additional multiplicative scale.
+
+    Returns
+    -------
+    overlap : bool
+        ``True`` if the centers are at most ``2 * scale * radius`` apart.
     """
     return np.linalg.norm(starting_point - spo, ord=2, axis=-1) <= 2 * scale * radius
 
     
 
 def cal_inter_density(starting_point, spo, radius, num):
-    """Calculate the density of intersection (lens)
+    """Calculate sample density in the intersection of two balls.
+
+    Parameters
+    ----------
+    starting_point : ndarray of shape (n_features,)
+        Center of the first ball.
+
+    spo : ndarray of shape (n_features,)
+        Center of the second ball.
+
+    radius : float
+        Common ball radius.
+
+    num : int
+        Number of samples in the intersection.
+
+    Returns
+    -------
+    density : float
+        ``num`` divided by the intersection volume.
     """
     in_volume = cal_inter_volume(starting_point, spo, radius)
     return num / in_volume
@@ -408,12 +460,29 @@ def cal_inter_density(starting_point, spo, radius, num):
 
 
 def cal_inter_volume(starting_point, spo, radius):
-    """
-    Returns the volume of the intersection of two spheres in n-dimensional space.
-    The radius of the two spheres is r and the distance of their centers is d.
-    For d=0 the function returns the volume of full sphere.
-    Reference: https://math.stackexchange.com/questions/162250/how-to-compute-the-volume-of-intersection-between-two-hyperspheres
+    """Return the intersection volume of two equal-radius hyperspheres.
 
+    Parameters
+    ----------
+    starting_point : ndarray of shape (n_features,)
+        Center of the first hypersphere.
+
+    spo : ndarray of shape (n_features,)
+        Center of the second hypersphere.
+
+    radius : float
+        Common hypersphere radius.
+
+    Returns
+    -------
+    volume : float
+        Volume of the intersection. If the centers are farther than
+        ``2 * radius`` apart, the volume is zero.
+
+    Notes
+    -----
+    The formula follows the standard hypersphere lens-volume expression using
+    the regularized incomplete beta function.
     """
     
     dim =starting_point.shape[0]

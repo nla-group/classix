@@ -15,7 +15,7 @@ copyright = '2022, Stefan Güttel, Xinye Chen'
 author = 'Stefan Güttel, Xinye Chen'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.4'
+release = '1.5.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -28,6 +28,16 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode'
 ]
+
+autodoc_default_options = {
+    'members': True,
+    'undoc-members': True,
+    'show-inheritance': True,
+}
+autodoc_mock_imports = ['spmv']
+autosummary_generate = True
+napoleon_google_docstring = False
+napoleon_numpy_docstring = True
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 source_suffix = '.rst'

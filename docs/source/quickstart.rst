@@ -1,234 +1,129 @@
+Quick start
+===========
 
-Get Started with CLASSIX
-======================================
-Clustering is a widely-used unsupervised learning technique to find patterns and structures in data. The applications of clustering are wide-ranging,  including areas like finance, traffic, civil engineering, and bioinformatics.  Clustering algorithms aim to group the data points into distinct clusters such that points within a cluster share similar characteristics on the basis of spatial properties, while points in two distinct clusters are less similar.  It might be easy for a human to perceive the clusters with a small sample in a small (1 or 2) dimensional space, however, in practice, the real world data with increasing dimensions and size of the data usually make a human out of reach. Considering data provided with labels are considerably rare and expensive, reliable and easy-to-tune explainable clustering methods are highly desirable. 
+Installation
+------------
 
-We introduce a novel clustering method called CLASSIX. The appealing characteristics of CLASSIX include fast speed, scalable clustering and explainable descriptions and visualization of clusters. It consists of two phases, namely a greedy aggregation phase of the sorted data into groups of nearby data points,  followed by the merging of groups into clusters. The algorithm is controlled by two scalar parameters, namely a distance parameter for the aggregation and another parameter controlling the minimal cluster size. Extensive experiments are conducted to give a comprehensive evaluation of the clustering performance on  synthetic and real-world datasets, with various cluster shapes and low to high feature dimensionality. Our experiments demonstrate that CLASSIX competes with state-of-the-art clustering algorithms. The algorithm has linear space complexity and achieves near linear time complexity on a wide range of problems. Its inherent simplicity allows for the generation of intuitive explanations of the computed clusters.
-This documentation will provide you with a beginner-friendly tutorial, and show you how to get a quick start!
+CLASSIX is distributed as ``classixclustering``.
 
-Installation guide
-------------------------------
-To ensure most users can install it on their local machine, we try to keep the installing requirements for CLASSIX as low as possible. CLASSIX has the following dependencies for its clustering functionality:
+.. code-block:: bash
 
-    * cython (recommend >=0.27)
-    * numpy>=1.7.2 (recommend >=1.20)
-    * scipy
-    * requests
-    
-and requires the following packages for data visualization:
+   pip install classixclustering
 
-    * matplotlib
-    * pandas
-    
- 
-**If you want to compare the speed with other clustering algorithms in scikit-learn or other packages combined with Cython, please use CLASSIX of Cython installation for a fair comparison.**
+Conda users can install from conda-forge:
 
+.. code-block:: bash
 
+   conda install -c conda-forge classixclustering
 
-.. admonition:: Note
+The core runtime depends on NumPy, SciPy, pandas, matplotlib, scikit-learn, and
+requests. Source builds also use Cython and a C++ compiler for the optional
+accelerated extensions.
 
-There are two ways to setup virtual enviroment for testing ``classix``, the first one is:
+You can check whether the accelerated Cython modules are available with:
 
-.. parsed-literal::
+.. code-block:: python
 
-   mkdir ~/.myenv
-   python -m venv ~/.myenv
-   source ~/.myenv/bin/activate
+   import classix
 
-The second one is via conda: 
+   classix.cython_is_available(verbose=True)
 
-.. parsed-literal::
+Basic clustering
+----------------
 
-   conda create -n myenv
-   conda activate myenv
+CLASSIX follows the estimator conventions used by scikit-learn. Create an
+estimator, call ``fit`` or ``fit_transform``, and read the fitted labels from
+``labels_``.
 
+.. code-block:: python
 
+   import matplotlib.pyplot as plt
+   from sklearn.datasets import make_blobs
+   from classix import CLASSIX
 
+   X, y_true = make_blobs(
+       n_samples=1000,
+       centers=3,
+       n_features=2,
+       random_state=1,
+   )
 
-I. **pip**
+   clx = CLASSIX(radius=0.5, minPts=10, verbose=0)
+   labels = clx.fit_transform(X)
 
-To install the current release via PIP use:
+   plt.scatter(X[:, 0], X[:, 1], c=labels, s=15, cmap="tab10")
+   plt.axis("equal")
+   plt.show()
 
-.. parsed-literal::
-    
-    pip install classixclustering
+Useful fitted attributes include:
 
-Creation of virtual environments is needed for some users, for example, 
+``labels_``
+    Final cluster label for each input sample.
 
-.. parsed-literal::
+``groups_``
+    Aggregation group label for each sorted sample.
 
-   python3 -m venv ~/.virtualenv/<user-defined name>
-   source ~/.virtualenv/<user-defined name>/bin/activate
+``splist_``
+    Internal starting-point information for the aggregation groups.
 
-And then perform the pip installing ``pip install classixclustering``. 
+``groupCenters_``
+    Original input indices of the aggregation group starting points.
 
-The following installing command is needed some Cython failure situation:
+``clusterSizes_``
+    Number of samples in each final cluster.
 
-.. parsed-literal::
-   
-   pip install classixclustering --no-cache-dir 
+Choosing the metric
+-------------------
 
+The default ``metric='euclidean'`` works well for standard numerical feature
+data. CLASSIX also supports Manhattan and Tanimoto distances.
 
-To check the installation, simply run:
+.. code-block:: python
 
-.. parsed-literal::
-    
-    python -m pip show classixclustering
-    
-If you want to uninstall it, you can use:
+   clx_l1 = CLASSIX(metric="manhattan", radius=0.4, minPts=5, verbose=0)
+   labels_l1 = clx_l1.fit_transform(X)
 
-.. parsed-literal::
+For non-negative binary or count data, use Tanimoto distance:
 
-    pip uninstall classixclustering
-    
-II. **conda**
+.. code-block:: python
 
-For conda users, to install this package with conda run:
+   clx_tanimoto = CLASSIX(metric="tanimoto", radius=0.25, minPts=5, verbose=0)
+   labels_tanimoto = clx_tanimoto.fit_transform(binary_or_count_matrix)
 
-.. parsed-literal::
+Explaining results
+------------------
 
-    conda install -c conda-forge classixclustering
-    
-To check the installation, run:
+CLASSIX can explain the global clustering, a single sample, or the relationship
+between two samples. Explanations are printed by default and can also be plotted.
 
-.. parsed-literal::
-    
-    conda list classixclustering 
+.. code-block:: python
 
-and uninstall it with 
+   clx = CLASSIX(radius=0.5, minPts=10, verbose=0).fit(X)
 
-.. parsed-literal::
+   # Global summary
+   clx.explain(X)
 
-    conda uninstall classixclustering
-   
-   
+   # Explain one sample
+   clx.explain(X, index1=42)
 
-Installing `classixclustering` from the `conda-forge` channel can also be achieved by adding `conda-forge` to your channels with:
+   # Explain whether two samples are connected through aggregation groups
+   clx.explain(X, index1=42, index2=100, plot=True)
 
-.. parsed-literal::
+Cluster centers and built-in data
+---------------------------------
 
-   conda config --add channels conda-forge
-   conda config --set channel_priority strict
+The helper functions exported from ``classix`` cover common exploratory tasks:
 
-Once the `conda-forge` channel has been enabled, `classixclustering` can be installed with `conda`:
+.. code-block:: python
 
-.. parsed-literal::
+   from classix import loadData
 
-   conda install classixclustering
+   X_vdu = loadData("vdu_signals")
 
+   clx = CLASSIX(radius=1.0, verbose=0).fit(X_vdu)
+   cluster_centers = clx.load_cluster_centers(X_vdu)
+   group_centers = clx.load_group_centers(X_vdu)
 
-or with `mamba`:
-
-.. parsed-literal::
-
-   mamba install classixclustering
-
-
-It is possible to list all of the versions of `classixclustering` available on your platform with `conda`:
-
-.. parsed-literal::
-
-   conda search classixclustering --channel conda-forge
-
-
-or with `mamba`:
-
-.. parsed-literal::
-
-   mamba search classixclustering --channel conda-forge
-
-
-Alternatively, `mamba repoquery` may provide more information:
-
-.. parsed-literal::
-
-   # Search all versions available on your platform:
-   mamba repoquery search classixclustering --channel conda-forge
-
-   # List packages depending on `classixclustering`:
-   mamba repoquery whoneeds classixclustering --channel conda-forge
-
-   # List dependencies of `classixclustering`:
-   mamba repoquery depends classixclustering --channel conda-forge
-
-
-
-
-
-
-III. **download**
-
-Download this repository via:
-
-.. parsed-literal::
-    
-    git clone https://github.com/nla-group/classix.git
-
-If you have any installing issues, please be free to submit your questions in the `issues <https://github.com/nla-group/classix/issues>`_.
-
-.. admonition:: Note
-
-   You can check if you Cython is installed properly:
-   
-   ``import classix; classix.cython_is_available()``
-
-   If you want to disable Cython, or compare the runtime between Cython and Python, you can simply set by 
-  
-   ``import classix; classix.__enable_cython__ = False``
-   
-   And then your following CLASSIX implementation will disable Cython compiling. If you can Cython back, just set ``classix.__enable_cython__ = True``. 
-
-   If Cython is not installed properly (e.g., not compatible NumPy version), one can instead use the following command instead to install ``classix``:
-   
-   .. parsed-literal::
-      
-      pip install classixclustering --no-cache-dir 
-   
-   Quick start
-   ------------------------------
-
-
-CLASSIX follows a similar API design as scikit-learn library. So if you are familiar with scikit-learn, you can quickly master the CLASSIX library to do a wonderful clustering. 
-We demonstrate a toy application of CLASSIX's clustering on simple data. 
-
-After importing the required python libraries, we generate isotropic Gaussian blobs with 2 clusters using sklearn.datasets tool. 
-The sample is exhibited with 2 clusters of 1000 2-dimensional data. Then, we employ CLASSIX with the simple setting:
-
-
-.. code:: python
-
-    from sklearn.datasets import make_blobs
-    from classix import CLASSIX
-
-    X, y = make_blobs(n_samples=1000, centers=2, n_features=2, random_state=1)    
-    clx = CLASSIX(radius=0.5, minPts=13)
-    clx.fit(X)
-
-
-.. admonition:: Remember
-    
-    By default, CLASSIX will use ``sorting=pca`` sorting and apply ``group_merging="distance"``, i.e., distance-based merging. 
-
-
-After that, to get the clustering result, we just need to load ``clx.labels_``. Also you can return the cluster labels directly by ``labels = clx.fit_transform(X)``.
-Now we plot the clustering result:
-
-.. code:: python
-
-    import matplotlib.pyplot as plt
-    plt.figure(figsize=(10,10))
-    plt.scatter(X[:,0], X[:,1], c=clx.labels_)
-    plt.show()
-
-The result is as belows:
-
-.. image:: images/demo1.png
-
-That is a basic setting tutorial of CLASSIX, which applied to most cases. If you want to learn more, please go through other sections of the documentation.
-
-
-.. admonition:: Note
-
-   CLASSIX allows to load starting points and cluster centers information by using the method ``clx.load_cluster_centers()`` and ``clx.load_splist_indices()`` where clx is the object of CLASSIX 
-   class. More usages are shown in `unittests.py <https://github.com/nla-group/classix/blob/master/unittests.py>`_
-
+The available named datasets include ``'vdu_signals'``, ``'Iris'``,
+``'Dermatology'``, ``'Ecoli'``, ``'Glass'``, ``'Banknote'``, ``'Seeds'``,
+``'Phoneme'``, ``'Wine'``, ``'CovidENV'``, and ``'Covid3MC'``.

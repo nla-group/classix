@@ -20,7 +20,19 @@ import scipy.sparse as sparse
 from time import time
 
 def cython_is_available(verbose=0):
-    """Check if CLASSIX is using Cython."""
+    """Return whether the optimized Cython implementation is available.
+
+    Parameters
+    ----------
+    verbose : int or bool, default=0
+        If non-zero, print which implementation variant is being used.
+
+    Returns
+    -------
+    available : bool
+        ``True`` when the package is configured to use Cython and the compiled
+        extension modules can be imported, otherwise ``False``.
+    """
     
     __cython_type__ = "memoryview"
     
@@ -61,20 +73,30 @@ def cython_is_available(verbose=0):
     
     
 def loadData(name='vdu_signals'):
-    """Load built-in sample data.
+    """Load a built-in CLASSIX sample dataset.
     
     Parameters
     ----------
-    name: str, {'vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', 
-                'Banknote', 'Seeds', 'Phoneme', 'Wine', 'Covid3MC', 'CovidENV'}, 
-                default='vdu_signals'
-        
-        Identifier of the built-in dataset.
+    name : {'vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', \
+'Banknote', 'Seeds', 'Phoneme', 'Wine', 'Covid3MC', 'CovidENV'}, \
+default='vdu_signals'
+        Dataset identifier.
 
     Returns
     -------
-    X, y: numpy.ndarray
-        Data and ground-truth labels (if available).    
+    data : ndarray of shape (n_samples, n_features)
+        Returned when ``name='vdu_signals'``.
+
+    X : ndarray or pandas.DataFrame of shape (n_samples, n_features)
+        Feature matrix for labeled datasets.
+
+    y : ndarray of shape (n_samples,)
+        Ground-truth labels for labeled datasets.
+
+    Notes
+    -----
+    Missing data files are downloaded automatically and cached in the package's
+    ``data`` directory.
     """
 
     import logging
@@ -191,7 +213,24 @@ def loadData(name='vdu_signals'):
 
 
 def get_data(current_dir='', name='vdu_signals'):
-    """Download the built-in sample data from the web."""
+    """Download one of the built-in sample datasets.
+
+    Parameters
+    ----------
+    current_dir : str, default=''
+        Directory containing the ``data`` subdirectory where downloaded files
+        are written.
+
+    name : {'vdu_signals', 'Iris', 'Dermatology', 'Ecoli', 'Glass', \
+'Banknote', 'Seeds', 'Phoneme', 'Wine', 'CovidENV', 'Covid3MC'}, \
+default='vdu_signals'
+        Name of the dataset to download.
+
+    Notes
+    -----
+    This helper is called by :func:`loadData` when a bundled dataset is not
+    present locally. It writes files to disk and does not return a value.
+    """
     import requests
     
     if name == 'vdu_signals':
@@ -304,159 +343,110 @@ def get_data(current_dir='', name='vdu_signals'):
                 
                 
 class NotFittedError(ValueError, AttributeError):
-    """Exception class to raise if estimator is used before fitting.
-    """
+    """Exception raised when a CLASSIX estimator is used before fitting."""
         
         
 
 class CLASSIX:
-    """CLASSIX: Fast and explainable clustering based on sorting.
-    
-    The main parameters are``radius``.
+    """Fast and explainable clustering based on sorting.
 
-    
+    CLASSIX is a scikit-learn-like clustering estimator. It first sorts and
+    aggregates nearby samples into small groups represented by starting points,
+    then optionally merges those groups into final clusters. The implementation
+    emphasizes speed, low memory use, and post-hoc explanations of why samples
+    belong to the same or different clusters.
+
     Parameters
     ----------
     metric : str, {'euclidean', 'manhattan', 'tanimoto'}, default='euclidean'
-        Distance metric used for the entire clustering process (aggregation and merging).
-        
-        - 'euclidean': Standard Euclidean (L2) distance. Supports all sorting options 
-          ('pca', 'norm-mean', 'norm-orthant', None) and corresponding preprocessing 
-          (mean centering, PCA-based scaling, or orthant shift).
-        
-        - 'manhattan': Manhattan (L1) distance. Automatically uses sum-based sorting 
-          (sorting='sum') with shift to the non-negative orthant and median-sum scaling. 
-          Other sorting options are ignored.
-        
-        - 'tanimoto': Tanimoto distance (1 - Tanimoto similarity), suitable for binary 
-          or count data. No sorting or additional preprocessing is applied (data should 
-          be non-negative). Sorting parameter is ignored.
+        Distance metric used during aggregation and merging.
+
+        ``'euclidean'`` uses the Euclidean distance and supports ``'pca'``,
+        ``'norm-mean'``, ``'norm-orthant'``, and ``None`` sorting. ``'manhattan'``
+        uses the L1 distance and automatically switches to sum-based sorting.
+        ``'tanimoto'`` uses Tanimoto distance, which is intended for non-negative
+        binary, count, or fingerprint-like data.
 
     sorting : str, {'pca', 'norm-mean', 'norm-orthant', 'sum', None}, default='pca'
-        Sorting method used for the aggregation phase (only fully effective with 
-        metric='euclidean').
-        
-        - 'pca': sort data points by their first principal component.
-        
-        - 'norm-mean': shift data to zero mean and sort by L2-norm.
-        
-        - 'norm-orthant': shift data to positive orthant and sort by L2-norm.
-        
-        - 'sum': sort by the sum of feature values (automatically used for 'manhattan').
-        
-        - None: aggregate the raw data without sorting.
+        Sorting method used before aggregation. ``'pca'`` sorts by the first
+        principal component, ``'norm-mean'`` mean-centers the data and sorts by
+        Euclidean norm, ``'norm-orthant'`` shifts the data to the non-negative
+        orthant and sorts by Euclidean norm, ``'sum'`` sorts by the sum of
+        feature values, and ``None`` disables sorting.
 
     radius : float, default=0.5
-        Tolerance controlling aggregation. An object is allocated to a group if its 
-        distance to the group center (starting point) is ≤ radius. The exact distance 
-        measure depends on the chosen ``metric``.
+        Aggregation radius. A sample is assigned to the current starting point's
+        group when its distance to that starting point is at most ``radius`` in
+        the preprocessed feature space.
 
     group_merging : str, {'density', 'distance', None}, default='distance'
-        Method for merging aggregation groups into final clusters.
-        
-        - 'distance': merge groups if the distance between their centers is at most 
-          ``mergeScale * radius`` (distance metric follows ``metric``).
-        
-        - 'density': merge based on intersection density (currently only supported 
-          for 'euclidean').
-        
-        - None: skip merging; return aggregation groups as clusters.
+        Strategy used to merge aggregation groups. ``'distance'`` merges groups
+        whose starting points are within ``mergeScale * radius``. ``'density'``
+        merges Euclidean groups using an intersection-density criterion. ``None``
+        or ``'none'`` skips merging and returns aggregation groups as clusters.
 
     minPts : int, default=1
-        Minimum cluster size. Clusters with fewer than minPts points are dissolved, 
-        and their points are reassigned to the nearest valid cluster. Set to 1 to 
-        disable reassignment.
+        Minimum valid cluster size. Clusters smaller than ``minPts`` are
+        dissolved and their groups are reassigned to the nearest valid cluster
+        when possible. Set to 1 to disable this filtering.
 
     mergeScale : float, default=1.5
-        Scaling factor for distance-based merging. Groups are merged if their center 
-        distance ≤ mergeScale * radius (only used when group_merging='distance').
+        Multiplicative factor for distance-based merging.
 
     post_alloc : bool, default=True
-        If True, outliers (points not assigned during aggregation) are allocated to 
-        the nearest cluster. If False, they are labeled as -1.
+        If ``True``, groups filtered by ``minPts`` are assigned to the nearest
+        valid cluster. If ``False``, those samples receive label ``-1`` where the
+        selected merging implementation supports explicit outlier labels.
 
     mergeTinyGroups : bool, default=True
-        If False, groups smaller than minPts are ignored during distance-based merging.
+        If ``False``, groups smaller than ``minPts`` do not initiate
+        distance-based merge connections.
 
     verbose : bool or int, default=1
-        Controls logging output. Set to 0 for silent mode.
+        Controls progress output. Set to 0 for silent mode.
 
     short_log_form : bool, default=True
-        If True, truncate long cluster size lists in logs (show only the 20 largest).
+        If ``True``, truncate long cluster-size lists in progress output.
 
 
     Attributes
     ----------
     groups_ : numpy.ndarray
-        Aggregation group labels (in sorted order).
+        Aggregation group labels in sorted-data order.
 
     splist_ : numpy.ndarray
-        Indices of group starting points (centers) in the sorted data.
+        Starting-point information for aggregation groups. For Euclidean
+        clustering this stores sorted-data indices and group sizes; for
+        Manhattan and Tanimoto clustering this stores sorted-data indices.
 
     labels_ : numpy.ndarray
-        Final cluster labels for the data (in original order).
+        Final cluster labels in the original input order.
 
     group_outliers_ : numpy.ndarray
         Indices of small aggregation groups dissolved during minPts processing.
-
-    clusterSizes_ : array
-        Sizes of the final clusters (sorted by label).
-
-    groupCenters_ : array
-        Original-data indices of group starting points.
 
     nrDistComp_ : int
         Number of distance computations performed.
 
     dataScale_ : float
-        Scaling factor applied during preprocessing (metric-dependent).
+        Scaling factor applied during preprocessing.
 
-
-    Methods
-    -------
-    fit(data)
-        Fit the model to data and store clustering results.
-
-    fit_transform(data)
-        Fit and return cluster labels.
-
-    predict(data)
-        Assign new data points to existing clusters using nearest group center.
-
-    gcIndices(ids)
-        Convert group IDs to original data indices of starting points.
-
-    explain(index1=None, index2=None, plot=False)
-        Provide human-readable explanation of clustering or why two points are connected.
-
-    load_group_centers()
-        Compute and return aggregation group centers.
-
-    load_cluster_centers()
-        Compute and return final cluster centers.
-
-    getPath(index1, index2, include_dist=False)
-        Return connecting path of indices between two points in the same cluster.
-
-    preprocessing(data)
-        Apply the fitted model's preprocessing to new data.
-
-        
     References
     ----------
-    [1] X. Chen and S. Güttel. Fast and explainable clustering based on sorting, 
-        https://arxiv.org/abs/2202.01456, 2022.
+    Chen, X. and Guettel, S. (2022). Fast and explainable clustering based on
+    sorting. https://arxiv.org/abs/2202.01456
     """
         
     def __init__(self, sorting="pca", metric='euclidean', radius=0.5, minPts=1, group_merging="distance", mergeScale=1.5, 
                  post_alloc=True, mergeTinyGroups=True, verbose=1, short_log_form=True): 
+        """Initialize the CLASSIX clustering estimator."""
         
         self.metric = metric.lower()
         if self.metric not in ['euclidean', 'manhattan', 'tanimoto']:
             raise ValueError("Only 'euclidean', 'manhattan', and 'tanimoto' are supported now.")
         
         if self.metric == 'manhattan' and sorting not in ['sum', 'popcount', None]:
-            sorting = 'sum'  # Manhattan 常用 sum 排序
+            sorting = 'sum'  # Manhattan clustering uses sum-based sorting.
         self.__verbose = verbose
         self.minPts = int(minPts)
 
@@ -528,13 +518,18 @@ class CLASSIX:
 
             
     def fit(self, data):
-        """ 
-        Cluster the data and return the associated cluster labels. 
+        """Fit CLASSIX to data.
         
         Parameters
         ----------
-        data : numpy.ndarray
-            The ndarray-like input of shape (n_samples,)
+        data : array-like of shape (n_samples, n_features) or (n_samples,)
+            Training data. One-dimensional input is reshaped to
+            ``(n_samples, 1)``.
+
+        Returns
+        -------
+        self : CLASSIX
+            Fitted estimator.
 
         """
         if isinstance(data, pd.core.frame.DataFrame):
@@ -581,7 +576,8 @@ class CLASSIX:
                 data = (data - self.mu_) / self.dataScale_
 
         elif self.metric == 'manhattan':
-            # Manhattan 專屬預處理（移到正象限 + sum 標準化）
+            # Manhattan-specific preprocessing: shift to the non-negative
+            # orthant and normalize by the median feature sum.
             self.mu_ = data.min(0)
             data = data - self.mu_
             sort_vals = np.sum(data, axis=1)
@@ -592,8 +588,9 @@ class CLASSIX:
             sort_vals /= mext
             
         elif self.metric == 'tanimoto':
-            # Tanimoto 無需任何預處理（數據應非負）
-            self.mu_ = np.zeros(data.shape[1])  # 佔位
+            # Tanimoto data should already be non-negative; keep placeholders
+            # so downstream preprocessing-related attributes are available.
+            self.mu_ = np.zeros(data.shape[1])
             self.dataScale_ = 1.0
 
         self.t1_prepare = time() - self.t1_prepare
@@ -611,7 +608,7 @@ class CLASSIX:
                 self.__half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5
 
         elif self.metric == 'tanimoto':
-            # Tanimoto 聚合
+            # Tanimoto aggregation.
             try:
                 if self.__enable_cython__:
                     from .aggregate_td_cm import aggregate_tanimoto
@@ -631,7 +628,7 @@ class CLASSIX:
             self.group_sizes_ = agg_res['group_sizes']
 
         elif self.metric == 'manhattan':
-            # Manhattan 聚合
+            # Manhattan aggregation.
             try:
                 if self.__enable_cython__:
                     from .aggregate_md_cm import aggregate_manhattan
@@ -649,7 +646,7 @@ class CLASSIX:
             self.ind = agg_res['ind']
             sort_vals = agg_res['sort_vals']
             data = agg_res['data_sorted']          # this is sorted 
-            self.group_sizes_ = agg_res['group_sizes']  # new property for manhattan
+            self.group_sizes_ = agg_res['group_sizes']
             
 
         self.splist_ = np.array(self.splist_)
@@ -749,18 +746,17 @@ class CLASSIX:
 
 
     def fit_transform(self, data):
-        """ 
-        Cluster the data and return the associated cluster labels. 
+        """Fit CLASSIX and return cluster labels.
         
         Parameters
         ----------
-        data : numpy.ndarray
-            The ndarray-like input of shape (n_samples,)
+        data : array-like of shape (n_samples, n_features) or (n_samples,)
+            Training data.
         
         Returns
         -------
-        labels : numpy.ndarray
-            Index of the cluster each sample belongs to.
+        labels : ndarray of shape (n_samples,)
+            Cluster label assigned to each sample.
             
         """
         
@@ -769,18 +765,26 @@ class CLASSIX:
     
         
     def predict(self, data): # This method only consistent when the clustering is well-separated / correctly clustered
-        """
-        Allocate new data points to their nearest clusters.
+        """Predict cluster labels for new samples.
+
+        New samples are assigned to the cluster of the nearest fitted group
+        starting point. This nearest-representative rule is most reliable when
+        the fitted clusters are well separated.
         
         Parameters
         ----------
-        data : numpy.ndarray
-            The ndarray-like input of shape (n_samples, n_features)
+        data : array-like of shape (n_samples, n_features) or (n_features,)
+            Samples to assign.
     
         Returns
         -------
-        labels : numpy.ndarray
-            The predicted clustering labels.
+        labels : ndarray of shape (n_samples,)
+            Predicted cluster labels.
+
+        Raises
+        ------
+        NotFittedError
+            If the estimator has not been fitted.
         """
         if not hasattr(self, '__fit__'):
             raise NotFittedError("Please use .fit() method first.")
@@ -862,41 +866,39 @@ class CLASSIX:
     
     
     def merging(self, data, agg_labels, splist, ind, sort_vals, radius=0.5, method="distance", minPts=1):
-        """
-        Merge groups after aggregation. 
+        """Merge aggregation groups into final clusters.
 
         Parameters
         ----------
-        data : numpy.ndarray
-            The input that is array-like of shape (n_samples,).
+        data : ndarray of shape (n_samples, n_features)
+            Preprocessed and sorted training data.
         
-        agg_labels: list
-            Groups labels of aggregation.
+        agg_labels : array-like of shape (n_samples,)
+            Aggregation group label for each sorted sample.
         
-        splist: numpy.ndarray
-            List formed in the aggregation storing group centers.
+        splist : ndarray
+            Starting-point information produced by aggregation.
         
-        ind : numpy.ndarray
-            Sort values.
+        ind : ndarray of shape (n_samples,)
+            Indices mapping sorted data back to the original input order.
+
+        sort_vals : ndarray of shape (n_samples,)
+            Sorting values associated with the sorted data.
 
         radius : float, default=0.5
-            Tolerance to control the aggregation hence the whole clustering process. For aggregation, 
-            if the distance between a starting point and an object is less than or equal to the tolerance, 
-            the object will be allocated to the group which the starting point belongs to. 
+            Aggregation radius used as the base radius for merging.
         
-        method : str
-            The method for groups merging, 
-            default='distance', other options: 'density', 'mst-distance', and 'scc-distance'.
+        method : {'distance', 'density'}, default='distance'
+            Group merging strategy.
 
-        minPts : int, default=0
-            The threshold, in the range of [0, infity] to determine the noise degree.
-            When assign it 0, algorithm won't check noises.
+        minPts : int, default=1
+            Minimum valid cluster size.
 
 
         Returns
         -------
-        labels  : numpy.ndarray 
-            The clusters labels of the data
+        labels : ndarray of shape (n_samples,)
+            Cluster labels in the original input order.
         """
 
         if method == 'density':
@@ -1016,72 +1018,58 @@ class CLASSIX:
                 arrow_linestyle="--", arrow_fc="darkslategrey", arrow_ec="k", arrow_linewidth=1, arrow_shrinkA=2, arrow_shrinkB=2, directed_arrow=0, 
                 axis='off', include_dist=False, show_connected_label=True, figname=None, fmt="pdf"):
         
-        """
-        'self.explain(object/index) # prints an explanation for why a point object1 is in its cluster (or an outlier)
-        'self.explain(object1/index1, object2/index2) # prints an explanation why object1 and object2 are either in the same or distinct clusters
+        """Print and optionally plot an explanation of the clustering.
 
-        
-        Here we unify the terminology:
-            [-] data points
-            [-] groups (made up of data points, formed by aggregation)
-            [-] clusters (made up of groups)
+        Called without indices, this method summarizes the fitted clustering.
+        Called with ``index1``, it explains which aggregation group and cluster
+        contain that sample. Called with both ``index1`` and ``index2``, it
+        explains whether the two samples are in the same cluster and, when
+        available, prints a path of connected groups.
         
         
         Parameters
         ----------
-        data : numpy.ndarray
-            Original data used for clustering.
+        data : array-like of shape (n_samples, n_features)
+            Original data used to fit the estimator.
 
-        index1 : int or numpy.ndarray, optional
-            Input object1 [with index 'index1'] for explanation.
+        index1 : int, str, array-like of shape (n_features,), optional
+            First sample to explain. Integers refer to row positions, strings
+            refer to pandas index labels when the fitted data was a DataFrame,
+            and array-like values are interpreted as out-of-sample points.
         
-        index2 : int or numpy.ndarray, optional
-            Input object2 [with index 'index2'] for explanation, and compare objects [with indices 'index1' and 'index2'].
+        index2 : int, str, array-like of shape (n_features,), optional
+            Second sample to compare with ``index1``.
         
         cmap : str, default='Set3'
-            Colormaps for scatter plot. 
+            Matplotlib colormap used for scatter plots.
         
-        showalldata : boolean, default=False
-            Whether or not to show all data points in global view when too many data points for plot.
+        showalldata : bool, default=False
+            If ``False``, plots with more than 100,000 samples are subsampled.
 
-        showallgroups : boolean, default=False
-            Whether or not to show the start points marker.
+        showallgroups : bool, default=False
+            Whether to show all group starting-point markers and labels.
 
-        showsplist : boolean, default=False
-            Whether or not to show the group centers information, which include the number of data points (NumPts), 
-            corresponding clusters, and associated coordinates. This only applies to both index1 and index2 are "NULL".
-            Default as True. 
+        showsplist : bool, default=False
+            Whether to print a table of selected or all group starting points.
         
         max_colwidth : int, optional
-            Max width to truncate each column in characters. By default, no limit.
+            Maximum printed column width for pandas tables.
             
         replace_name : str or list, optional
-            Replace the index with name. 
-            * For example: as for indices 1 and 1300 we have 
-            
-            ``classix.explain(1, 1300, plot=False, figstyle="seaborn") # or classix.explain(obj1, obj4)``
-            
-            The data point 1 is in group 9 and the data point 1300 is in group 8, both of which were merged into cluster #0. 
-            The two groups are connected via groups 9 -> 2 -> 8.
-            * if we specify the replace name, then the output will be
-            
-            ``classix.explain(1, 1300, replace_name=["Peter Meyer", "Anna Fields"], figstyle="seaborn")``
-            
-            The data point Peter Meyer is in group 9 and the data point Anna Fields is in group 8, both of which were merged into cluster #0. 
-            The two groups are connected via groups 9 -> 2 -> 8.
+            Display name or names used in printed explanations instead of the
+            raw sample indices.
 
-        plot : boolean, default=False
-            Determine if visulize the explanation. 
+        plot : bool, default=False
+            Whether to draw a visualization.
         
         figsize : tuple, default=(9, 6)
-            Determine the size of explain figure. 
+            Matplotlib figure size.
 
         figstyle : str, default="default"
-            Determine the style of visualization.
-            see reference: https://matplotlib.org/stable/gallery/style_sheets/style_sheets_reference.html
+            Matplotlib style sheet name.
         
-        savefig : boolean, default=False
-            Determine if save figure, the figure will be saved in the folder named "img".
+        savefig : bool, default=False
+            Whether to save the generated figure in an ``img`` directory.
         
         bcolor : str, default="#f5f9f9"
             Color for figure background.
@@ -1186,20 +1174,31 @@ class CLASSIX:
         shrinkA, shrinkB : float, default=2
             Shrinking factor of the tail and head of the arrow respectively.
 
-        axis : boolean, default=True
-            Whether or not add x,y axes to plot.
+        axis : bool, default=True
+            Whether to show plot axes.
         
-        include_dist : boolean, default=False
-            Whether or not to include distance information to compute the shortest path between objects. 
+        include_dist : bool, default=False
+            Whether to include weighted distance information when computing
+            shortest paths between groups.
             
-        show_connected_label : boolean, default=True
-            Whether or not to show the named labels of the connected data points, where the named labels are given by pandas dataframe index.
+        show_connected_label : bool, default=True
+            Whether to include pandas index labels for connected path samples.
             
         figname : str, optional
             Set the figure name for the image to be saved.
             
-        fmt : str
-            Specify the format of the image to be saved, default as 'pdf', other choice: png.
+        fmt : str, default='pdf'
+            File format used when ``savefig=True``.
+
+        Returns
+        -------
+        None
+            The explanation is printed and, optionally, plotted.
+
+        Raises
+        ------
+        NotFittedError
+            If the estimator has not been fitted.
         
         """
         from scipy.sparse.linalg import svds
@@ -1884,7 +1883,60 @@ class CLASSIX:
 
     def explain_viz(self, showalldata=False, alpha=0.5, cmap='Set3', figsize=(10, 7), showallgroups=False, figstyle="default", bcolor="white", width=0.5, sp_marker="+", sp_mcolor="k", 
                     savefig=False, fontsize=None, bbox=None, axis="off", fmt="pdf"):
-        """Visualize the starting point and data points"""
+        """Visualize fitted samples and group starting points.
+
+        Parameters
+        ----------
+        showalldata : bool, default=False
+            If ``False``, plots with more than 100,000 samples are subsampled.
+
+        alpha : float, default=0.5
+            Marker transparency for data points.
+
+        cmap : str, default='Set3'
+            Matplotlib colormap for cluster labels.
+
+        figsize : tuple of int, default=(10, 7)
+            Matplotlib figure size.
+
+        showallgroups : bool, default=False
+            Whether to draw and label all group starting points.
+
+        figstyle : str, default='default'
+            Matplotlib style sheet name.
+
+        bcolor : str, default='white'
+            Axes background color.
+
+        width : float, default=0.5
+            Marker linewidth scaling factor.
+
+        sp_marker : str, default='+'
+            Marker used for starting points.
+
+        sp_mcolor : str, default='k'
+            Starting-point marker color.
+
+        savefig : bool, default=False
+            Whether to save the figure in the ``img`` directory.
+
+        fontsize : int, optional
+            Font size for group labels.
+
+        bbox : dict, optional
+            Matplotlib text bounding-box properties.
+
+        axis : bool or {'on', 'off'}, default='off'
+            Whether to show plot axes.
+
+        fmt : str, default='pdf'
+            File format used when ``savefig=True``.
+
+        Returns
+        -------
+        None
+            The visualization is shown and optionally written to disk.
+        """
         
         from matplotlib import pyplot as plt
 
@@ -1950,13 +2002,20 @@ class CLASSIX:
         
 
     def timing(self):
-        """
-        This method will print five timing information regarding classix clustering:
-            (1) t1_prepare: The initial data preparation, which mainly comprises data scaling and the computation of the first two principal axes.
-            (2) t2_aggregate: This phase aggregates all data points into groups determined by the radius parameter of CLASSIX.
-            (3) t3_merge: The computed groups will be merged into clusters when their group centers (starting points) are sufficiently close.
-            (4) t4_minPts: Clusters with fewer than minPts points will be dissolved into their groups, and each of the groups will then be reassigned to a large enough cluster.
-            (5) t5_finalize: Any cleanup activities.
+        """Print timing information for the fitted clustering run.
+
+        The reported phases include preprocessing, aggregation, merging, and
+        optional explanation finalization.
+
+        Returns
+        -------
+        None
+            Timing values are printed to standard output.
+
+        Raises
+        ------
+        NotFittedError
+            If the estimator has not been fitted.
         """
         if hasattr(self, '__fit__'):
             print("t1_prepare:", self.t1_prepare)
@@ -1971,21 +2030,24 @@ class CLASSIX:
 
 
     def getPath(self, index1, index2, include_dist=False):
-        """
-        Get the indices of connected data points between index1 data and index2 data.
+        """Return a representative path between two samples.
         
         Parameters
         ----------
         index1 : int
-            Index for data point.
+            Row index of the first sample.
         
         index2 : int
-            Index for data point.
+            Row index of the second sample.
+
+        include_dist : bool, default=False
+            Whether to use weighted distances when computing the shortest path.
             
         Returns
         -------
-        connected_points : numpy.ndarray
-            connected data points.
+        connected_points : ndarray of shape (n_path_points,)
+            Original input indices of samples along the connected path. If no
+            path exists, an empty array is returned.
             
         """
         from scipy.sparse import csr_matrix
@@ -2032,7 +2094,23 @@ class CLASSIX:
         
         
     def form_starting_point_clusters_table(self, data, aggregate=False):
-        """form the columns details for group centers and clusters information"""
+        """Build the table used to explain starting points and clusters.
+
+        Parameters
+        ----------
+        data : ndarray of shape (n_samples, n_features)
+            Data in sorted order.
+
+        aggregate : bool, default=False
+            If ``True``, coordinates are taken from the low-dimensional
+            visualization coordinates. Otherwise, original sorted coordinates are
+            shown.
+
+        Returns
+        -------
+        None
+            The resulting table is stored as ``sp_info``.
+        """
         
         # won't change the original order of self.splist_
         cols = ["Group", "NrPts"]
@@ -2082,35 +2160,44 @@ class CLASSIX:
     
     def visualize_linkage(self, data, scale=1.5, figsize=(10,7), labelsize=24, markersize=320, plot_boundary=False, bound_color='red', path='.', fmt='pdf'):
         
-        """Visualize the linkage in the distance clustering.
+        """Visualize the distance-merging graph between starting points.
         
         
         Parameters
         ----------
-        data : numpy.ndarray
-            The original data used for clustering.
+        data : ndarray of shape (n_samples, n_features)
+            Original data used for clustering.
             
-        scale : float
-            Design for distance-clustering, when distance between the two group centers 
-            associated with two distinct groups smaller than scale*radius, then the two groups merge.
+        scale : float, default=1.5
+            Multiplicative factor applied to ``radius`` when drawing linkage
+            edges.
+
+        figsize : tuple of int, default=(10, 7)
+            Matplotlib figure size.
         
-        labelsize : int 
-            The fontsize of ticks. 
+        labelsize : int, default=24
+            Tick-label font size.
             
-        markersize : int 
-            The size of the markers for group centers.
+        markersize : int, default=320
+            Marker size for group starting points.
             
-        plot_boundary : boolean
-            If it is true, will plot the boundary of groups for the group centers.
+        plot_boundary : bool, default=False
+            Whether to draw each group's radius boundary when data is
+            two-dimensional.
             
-        bound_color : str
-            The color for the boundary for groups with the specified radius.
+        bound_color : str, default='red'
+            Boundary-circle color.
             
-        path : str
-            Relative file location for figure storage.
+        path : str, default='.'
+            Output directory for the saved figure.
             
-        fmt : str
-            Specify the format of the image to be saved, default as 'pdf', other choice: png.
+        fmt : str, default='pdf'
+            Output format. ``'pdf'`` writes a PDF; any other value writes a PNG.
+
+        Returns
+        -------
+        None
+            The figure is saved to ``path``.
         
         """
         from scipy.sparse import csr_matrix
@@ -2149,8 +2236,23 @@ class CLASSIX:
 
 
     def preprocessing(self, data):
-        """
-        Normalize the data by the fitted model.
+        """Apply the fitted preprocessing transform to new data.
+
+        Parameters
+        ----------
+        data : array-like of shape (n_samples, n_features)
+            Data to transform.
+
+        Returns
+        -------
+        transformed : ndarray of shape (n_samples, n_features)
+            Data shifted and scaled using the fitted Euclidean preprocessing
+            parameters.
+
+        Raises
+        ------
+        NotFittedError
+            If the estimator has not been fitted.
         """
 
         if hasattr(self, '__fit__'):
@@ -2162,6 +2264,7 @@ class CLASSIX:
     
     @property
     def groupCenters_(self):
+        """ndarray of shape (n_groups,): Original indices of group centers."""
         if hasattr(self, '__fit__'):
             return self._gcIndices(np.arange(self.splist_.shape[0]))
         else:
@@ -2171,6 +2274,7 @@ class CLASSIX:
     
     @property
     def clusterSizes_(self):
+        """ndarray of shape (n_clusters,): Number of samples per cluster."""
         if hasattr(self, '__fit__'):
             counter = collections.Counter(self.labels_)
             return np.array(list(counter.values()))[np.argsort(list(counter.keys()))]
@@ -2180,11 +2284,35 @@ class CLASSIX:
     
     
     def gcIndices(self, ids):
+        """Map group ids to original input indices of their starting points.
+
+        Parameters
+        ----------
+        ids : array-like of int
+            Group identifiers.
+
+        Returns
+        -------
+        indices : ndarray
+            Original input row indices of the selected group starting points.
+        """
         return self._gcIndices(ids)
 
 
         
     def gc2ind(self, spid):
+        """Map one group id to the original index of its starting point.
+
+        Parameters
+        ----------
+        spid : int
+            Group identifier.
+
+        Returns
+        -------
+        index : int
+            Original input row index of the group's starting point.
+        """
         if self.splist_.ndim == 2:
             return self.ind[self.splist_[spid, 0]]
         else:
@@ -2193,7 +2321,18 @@ class CLASSIX:
 
     
     def load_group_centers(self, data):
-        """Load group centers."""
+        """Return the mean center of each aggregation group.
+
+        Parameters
+        ----------
+        data : ndarray of shape (n_samples, n_features)
+            Original data used for fitting.
+
+        Returns
+        -------
+        centers : ndarray of shape (n_groups, n_features)
+            Mean center of each aggregation group.
+        """
         
         if not hasattr(self, '__fit__'):
             raise NotFittedError("Please use .fit() method first.")
@@ -2207,7 +2346,18 @@ class CLASSIX:
         
 
     def load_cluster_centers(self, data):
-        """Load cluster centers."""
+        """Return the mean center of each final cluster.
+
+        Parameters
+        ----------
+        data : ndarray of shape (n_samples, n_features)
+            Original data used for fitting.
+
+        Returns
+        -------
+        centers : ndarray of shape (n_clusters, n_features)
+            Mean center of each final cluster.
+        """
             
         if not hasattr(self, '__fit__'):
             raise NotFittedError("Please use .fit() method first.")
@@ -2221,7 +2371,23 @@ class CLASSIX:
         
 
     def outlier_filter(self, min_samples=None, min_samples_rate=0.1): # percent
-        """Filter outliers in terms of ``min_samples`` or ``min_samples_rate``. """
+        """Return labels of clusters smaller than a size threshold.
+
+        Parameters
+        ----------
+        min_samples : int or float, optional
+            Absolute minimum cluster size. If ``None``, the threshold is
+            computed from ``min_samples_rate``.
+
+        min_samples_rate : float, default=0.1
+            Fraction of fitted samples used as the threshold when
+            ``min_samples`` is ``None``.
+
+        Returns
+        -------
+        outlier_labels : list of int
+            Cluster labels whose sizes are below the threshold.
+        """
         
         if min_samples == None:
             min_samples = min_samples_rate*sum(self.old_cluster_count.values())
@@ -2231,7 +2397,21 @@ class CLASSIX:
 
 
     def pprint_format(self, items, truncate=True):
-        """Format item value for clusters. """
+        """Print cluster sizes in compact form.
+
+        Parameters
+        ----------
+        items : collections.abc.Mapping
+            Mapping from cluster labels to cluster sizes.
+
+        truncate : bool, default=True
+            If ``True``, print only the 20 largest sizes.
+
+        Returns
+        -------
+        None
+            The formatted sizes are printed to standard output.
+        """
         
         cluster_sizes = [str(value) for key, value in sorted(items.items(), key=lambda x: x[1], reverse=True)]
 
@@ -2248,12 +2428,14 @@ class CLASSIX:
 
             
     def __repr__(self):
+        """Return the estimator representation."""
         _name = "CLASSIX(radius={0.radius!r}, minPts={0.minPts!r}, group_merging={0.group_merging!r})".format(self)
         return _name 
 
     
     
     def __str__(self):
+        """Return the estimator string representation."""
         _name = 'CLASSIX(radius={0.radius!r}, minPts={0.minPts!r}, group_merging={0.group_merging!r})'.format(self)
         return _name
     
@@ -2261,12 +2443,14 @@ class CLASSIX:
     
     @property
     def radius(self):
+        """float: Aggregation radius."""
         return self._radius
     
     
     
     @radius.setter
     def radius(self, value):
+        """Set the aggregation radius."""
         if not isinstance(value, float) and not isinstance(value,int):
             raise TypeError('Expected a float or int type')
         if value <= 0:
@@ -2279,12 +2463,14 @@ class CLASSIX:
         
     @property
     def sorting(self):
+        """str or None: Sorting strategy used during aggregation."""
         return self._sorting
     
     
     
     @sorting.setter
     def sorting(self, value):
+        """Set the sorting strategy."""
         if not isinstance(value, str) and not isinstance(value, type(None)):
             raise TypeError('Expected a string type')
         if value not in ['pca', 'norm-mean', 'norm-orthant', 'sum', 'popcount'] and value != None:
@@ -2296,12 +2482,14 @@ class CLASSIX:
     
     @property
     def group_merging(self):
+        """str or None: Strategy used to merge aggregation groups."""
         return self._group_merging
     
     
     
     @group_merging.setter
     def group_merging(self, value):
+        """Set the group-merging strategy."""
         if not isinstance(value, str) and not isinstance(value, type(None)):
             raise TypeError('Expected a string type or None.')
         if value not in ['density', 
@@ -2317,12 +2505,14 @@ class CLASSIX:
     
     @property
     def minPts(self):
+        """int: Minimum valid cluster size."""
         return self._minPts
     
     
     
     @minPts.setter
     def minPts(self, value):
+        """Set the minimum valid cluster size."""
         if isinstance(value, str):
             raise TypeError('Expected a float or int type.')
         
@@ -2346,14 +2536,51 @@ class CLASSIX:
 
 
 def pairwise_distances(X):
-    """Calculate the Euclidean distance matrix."""
+    """Compute the pairwise Euclidean distance matrix.
+
+    Parameters
+    ----------
+    X : ndarray of shape (n_samples, n_features)
+        Input data.
+
+    Returns
+    -------
+    distances : ndarray of shape (n_samples, n_samples)
+        Pairwise Euclidean distances.
+    """
     
     return distance.squareform(distance.pdist(X))
 
 
 
 def visualize_connections(data, splist, radius=0.5, scale=1.5):
-    """Calculate the connected components for graph constructed by group centers given radius and mergeScale."""
+    """Build the group-center graph used for distance merging.
+
+    Parameters
+    ----------
+    data : ndarray of shape (n_samples, n_features)
+        Sorted input data.
+
+    splist : ndarray of shape (n_groups, 2)
+        Starting-point information from Euclidean aggregation.
+
+    radius : float, default=0.5
+        Base aggregation radius.
+
+    scale : float, default=1.5
+        Multiplicative factor for the linkage radius.
+
+    Returns
+    -------
+    distm : ndarray of shape (n_groups, n_groups)
+        Binary adjacency matrix for linked starting points.
+
+    n_components : int
+        Number of connected components.
+
+    labels : ndarray of shape (n_groups,)
+        Connected-component label for each group.
+    """
 
     from scipy.sparse.csgraph import connected_components
     
@@ -2366,7 +2593,24 @@ def visualize_connections(data, splist, radius=0.5, scale=1.5):
     
     
 def preprocessing(data, base):
-    """Initial data preparation of CLASSIX."""
+    """Preprocess data using one of CLASSIX's Euclidean sorting schemes.
+
+    Parameters
+    ----------
+    data : ndarray of shape (n_samples, n_features)
+        Input data.
+
+    base : {'norm-mean', 'pca', 'norm-orthant', None}
+        Preprocessing and sorting basis.
+
+    Returns
+    -------
+    ndata : ndarray of shape (n_samples, n_features)
+        Shifted and scaled data.
+
+    params : tuple
+        Tuple ``(mu, dataScale)`` containing the shift and scale.
+    """
     if base == "norm-mean":
         _mu = data.mean(axis=0)
         ndata = data - _mu
@@ -2394,7 +2638,22 @@ def preprocessing(data, base):
 
 
 def calculate_cluster_centers(data, labels):
-    """Calculate the mean centers of clusters from given data."""
+    """Compute mean centers for labeled clusters.
+
+    Parameters
+    ----------
+    data : ndarray of shape (n_samples, n_features)
+        Input data.
+
+    labels : array-like of shape (n_samples,)
+        Integer cluster labels. Labels are expected to be consecutive and
+        zero-based.
+
+    Returns
+    -------
+    centers : ndarray of shape (n_clusters, n_features)
+        Mean feature vector for each cluster.
+    """
     classes = np.unique(labels)
     centers = np.zeros((len(classes), data.shape[1]))
     for c in classes:
@@ -2410,30 +2669,28 @@ def calculate_cluster_centers(data, labels):
 
 
 def find_shortest_dist_path(source_node=None, graph=None, target_node=None, unweighted=True):
-    """ Get single-sourse shortest paths as well as distance from source node,
-    design especially for unweighted undirected graph. The time complexity is O(|V| + |E|)
-    where |V| is the number of vertices and |E| is the number of edges.
+    """Return the shortest path between two nodes in a sparse graph.
     
     Parameters
     ----------
-    source_node: int
-        A given source vertex.
+    source_node : int
+        Source vertex.
     
     graph : scipy.sparse._csr.csr_matrix
-        Input as a sparse matrix format.
+        Sparse adjacency matrix.
         
-    target_node: int, default=None
-        Find the shortest paths from source node to target node.
-        If not None, function returns the shortest path between source node and target node,
-        otherwise returns table storing shortest path information.
+    target_node : int, default=None
+        Target vertex.
     
     unweighted : bool, default=True
-        If True, then find unweighted distances, i.e., find the path such that the number of edges is minimized.
+        If ``True``, minimize the number of edges. If ``False``, use edge
+        weights stored in ``graph``.
         
     Returns
     -------
-    shortest_path_to_target: list
-        The shortest path between source node and target node
+    shortest_path_to_target : list of int
+        Path from ``target_node`` back to ``source_node`` as returned by scipy's
+        predecessor traversal. An empty list is returned when no path exists.
         
     """
     from scipy.sparse.csgraph import shortest_path
@@ -2455,7 +2712,18 @@ def find_shortest_dist_path(source_node=None, graph=None, target_node=None, unwe
 
     
 def return_csr_matrix_indices(csr_mat): 
-    """Return sparce matrix indices."""
+    """Return row and column indices of nonzero CSR entries.
+
+    Parameters
+    ----------
+    csr_mat : scipy.sparse.csr_matrix
+        Sparse matrix.
+
+    Returns
+    -------
+    indices : ndarray of shape (n_nonzero, 2)
+        Row and column index pairs for nonzero entries.
+    """
 
     from scipy.sparse import _sparsetools
     
@@ -2469,6 +2737,24 @@ def return_csr_matrix_indices(csr_mat):
 
 
 def euclid(xxt, X, v):
+    """Compute squared Euclidean distances from rows of ``X`` to ``v``.
+
+    Parameters
+    ----------
+    xxt : ndarray of shape (n_samples,)
+        Precomputed squared norms for rows of ``X``.
+
+    X : ndarray of shape (n_samples, n_features)
+        Input data.
+
+    v : ndarray of shape (n_features,)
+        Reference vector.
+
+    Returns
+    -------
+    distances : ndarray of shape (n_samples,)
+        Squared Euclidean distances.
+    """
     return (xxt + np.inner(v,v).ravel() -2*X.dot(v)).astype(float)
 
 

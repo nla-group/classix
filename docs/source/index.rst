@@ -1,99 +1,92 @@
-.. CLASSIX documentation
+CLASSIX documentation
+=====================
 
-Welcome to CLASSIX's documentation!
-===================================
+CLASSIX is a fast, scalable, and explainable clustering package with a
+scikit-learn-like estimator interface. The algorithm is built around a simple
+two-stage idea:
 
+1. **Aggregation** sorts the data and greedily groups nearby samples around
+   representative starting points.
+2. **Merging** connects those aggregation groups into final clusters by either
+   a distance criterion or, for Euclidean data, a density-overlap criterion.
 
-Clustering is a fundamental unsupervised learning technique used to identify patterns and structures in data. It groups data points into distinct clusters so that points within the same cluster share similar characteristics based on **distance, density, or other spatial properties**, while points in separate clusters are less similar.
+This design gives CLASSIX its main strengths: it is easy to tune, uses only a
+small number of interpretable parameters, can process large datasets with low
+memory overhead, and can explain cluster assignments through groups, starting
+points, and connecting paths.
 
-Since acquiring labeled data is often costly and time-consuming, clustering serves as a powerful tool for exploratory data analysis and pattern discovery across various scientific and engineering fields, including:
+Highlights
+----------
 
-- **Time series analysis** – Identifying trends, anomalies, and recurring patterns in sequential data.
-- **Social network analysis** – Detecting communities and influential entities within networks.
-- **Market segmentation** – Grouping customers based on behavior, demographics, or purchasing patterns.
-- **Anomaly detection** – Recognizing unusual patterns in cybersecurity, fraud detection, and medical diagnosis.
-- **Image segmentation** – Dividing images into meaningful regions for object recognition, medical imaging, and computer vision tasks.
+* A familiar estimator API with ``fit``, ``fit_transform``, ``predict`` and
+  fitted attributes such as ``labels_``.
+* Euclidean, Manhattan, and Tanimoto distance options.
+* Sorting strategies for Euclidean aggregation, including PCA-based sorting and
+  norm-based sorting.
+* Distance-based merging for speed and density-based merging for Euclidean
+  cluster-shape sensitivity.
+* Explanations for individual samples, sample pairs, and global clustering
+  structure.
+* Built-in datasets and examples for quick experimentation.
+* Optional Cython extensions for accelerated aggregation and merging.
 
+When to use CLASSIX
+-------------------
 
-We introduce **CLASSIX**, a novel, explainable clustering algorithm that integrates features of both **distance-based** and **density-based** methods. Unlike many traditional clustering techniques, CLASSIX is designed for **speed, scalability, and interpretability**, making it particularly well-suited for large datasets.
+CLASSIX is especially useful when you need a clustering method that is fast
+enough for large exploratory workflows but still transparent enough to explain.
+It is a good fit for numerical feature data, low-dimensional segmentation tasks,
+large scatter-like datasets, and non-negative binary or count vectors where
+Tanimoto distance is meaningful.
 
-Key Features of CLASSIX
------------------------
+The two most important parameters are:
 
-- **Sorting-based approach** – CLASSIX leverages data sorting as a core mechanism, enabling efficient clustering with minimal computational overhead.
-- **Fast and scalable** – The algorithm is optimized for large-scale data processing without sacrificing accuracy.
-- **Explainable** – The clustering process remains transparent, allowing users to understand and interpret how clusters are formed.
+``radius``
+    Controls how far a sample may be from a starting point during aggregation.
+    Smaller values create more groups and finer clusters; larger values create
+    fewer, coarser groups.
 
-This documentation provides a comprehensive guide on using CLASSIX, its practical applications, and best practices for parameter tuning.
+``minPts``
+    Sets the minimum valid cluster size. Clusters smaller than this threshold
+    are dissolved and their groups are reassigned when possible.
 
-How CLASSIX Works
------------------------
-
-CLASSIX follows a two-phase clustering process:
-
-1. **Aggregation** – A fast, initial partitioning of data based on **starting points**, which serve as reduced estimators of density.
-2. **Merging** – Overlapping groups from the aggregation phase are merged into clusters based on either a **distance-based** or **density-based** criterion.
-
-This two-step approach ensures that CLASSIX remains both computationally efficient and robust across various data distributions.
-
-Understanding CLASSIX Parameters
------------------------
-
-The behavior of CLASSIX is primarily controlled by two key parameters: **radius** and **minPts**, both of which are easy to interpret and tune.
-
-- **radius**: A distance-based threshold that governs the tolerance for grouping points during the aggregation phase.
-- **minPts**: Specifies the minimum number of points required for a valid cluster in the final output, ensuring small, insignificant clusters are filtered out.
-
-These parameters provide users with **flexible control** over clustering granularity and computational efficiency. In the following sections, we will explore their effects in greater detail and provide guidance on optimal parameter selection.
-
-
-
-.. raw:: html
-
-   <iframe width="720" height="420" src="https://www.youtube.com/embed/K94zgRjFEYo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-
-Guide
--------------
-
-
-The documentation mainly contains five chapters about user guidance and one chapter for API reference, which is organized as follows: The first chapter demonstrates a quick introduction to the installment of CLASSIX and its deployment; The second chapter compares CLASSIX with other sought-after clustering algorithms with respect to speed and accuracy on built-in data; The third chapter illustrates a vivid tutorial for density and distance merging applications; The fourth chapter illustrates the interpretable clustering result obtained from CLASSIX; The final chapter demonstrates how to use CLASSIX to find outliers in data; The API details can be found at the independent section titled as “API reference”. The documentation is still under construction, any suggestions from users are appreciated, please be free to email us for any questions on CLASSIX. 
-
+Contents
+--------
 
 .. toctree::
    :maxdepth: 2
-   
+
    quickstart
+   features
    clustering_tutorial
    matlab
    comparison
    outlier_detection
-   
 
 API Reference
 -------------
+
 .. toctree::
    :maxdepth: 2
 
    api_reference
 
+Project
+-------
 
-Others
--------------
 .. toctree::
    :maxdepth: 2
-   
+
    acknowledgement
    license
    contact
 
-
-Indices and Tables
--------------------
+Indices and tables
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
 
 .. image:: images/nla_group.png
-    :width: 360
+   :width: 360

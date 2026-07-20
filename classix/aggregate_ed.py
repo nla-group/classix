@@ -16,42 +16,46 @@ from scipy.linalg import get_blas_funcs, eigh
 
 
 def pca_aggregate(data, sorting='pca', tol=0.5):
-    """Aggregate the data with PCA using precomputation
+    """Aggregate Euclidean data sorted by the first principal component.
 
     Parameters
     ----------
-    data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
+    data : ndarray of shape (n_samples, n_features)
+        Preprocessed input data.
+
+    sorting : str, default='pca'
+        Sorting method. This implementation is specialized for PCA sorting and
+        keeps the parameter for API compatibility with other aggregation
+        functions.
     
-    tol : float
-        The tolerance to control the aggregation, if the distance between the starting point 
-        and the object is less than or equal than the tolerance,
-        the object should allocated to the group which starting point belongs to.  
+    tol : float, default=0.5
+        Maximum Euclidean distance from a starting point for assigning a sample
+        to the corresponding aggregation group.
     
     
     Returns
     -------
-    labels (list) : 
-        The group categories of the data after aggregation.
+    labels : list of int
+        Aggregation group labels in sorted-data order.
     
-    splist (list) : 
-        The list of the starting points.
+    splist : list of tuple
+        Pairs ``(start_index, group_size)`` for group starting points in sorted
+        data.
     
-    nr_dist (int) :
-        The number of pairwise distance calculations.
+    nr_dist : int
+        Number of pairwise distances evaluated.
 
-    ind (numpy.ndarray):
-        Array storing Sorting indices.
+    ind : ndarray of shape (n_samples,)
+        Permutation that maps sorted rows to original rows.
 
-    sort_vals (numpy.ndarray):
-        Sorting values.
+    sort_vals : ndarray of shape (n_samples,)
+        Sorted PCA scores.
     
-    data (numpy.ndarray):
+    data : ndarray of shape (n_samples, n_features)
         Sorted data.
     
-    half_nrm2 (numpy.ndarray):
-        Precomputed values for distance computation.
-
+    half_nrm2 : ndarray of shape (n_samples,)
+        Half squared Euclidean norm for each sorted row.
     """
     
     len_ind, fdim = data.shape
@@ -111,45 +115,44 @@ def pca_aggregate(data, sorting='pca', tol=0.5):
 
 
 def general_aggregate(data, sorting="pca", tol=0.5): 
-    """Aggregate the data using precomputation
+    """Aggregate Euclidean data using the selected sorting strategy.
 
     Parameters
     ----------
-    data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
+    data : ndarray of shape (n_samples, n_features)
+        Preprocessed input data.
     
-    sorting : str
-        The sorting way referred for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
+    sorting : {'pca', 'norm-mean', 'norm-orthant', None}, default='pca'
+        Sorting strategy used to order candidate starting points.
     
-    tol : float
-        The tolerance to control the aggregation, if the distance between the starting point 
-        and the object is less than or equal than the tolerance,
-        the object should allocated to the group which starting point belongs to.  
+    tol : float, default=0.5
+        Maximum Euclidean distance from a starting point for assigning a sample
+        to the corresponding aggregation group.
     
     
     Returns
     -------
-    labels (list) : 
-        The group categories of the data after aggregation.
+    labels : list of int
+        Aggregation group labels in sorted-data order.
     
-    splist (list) : 
-        The list of the starting points.
+    splist : list of tuple
+        Pairs ``(start_index, group_size)`` for group starting points in sorted
+        data.
     
-    nr_dist (int) :
-        The number of pairwise distance calculations.
+    nr_dist : int
+        Number of pairwise distances evaluated.
 
-    ind (numpy.ndarray):
-        Array storing Sorting indices.
+    ind : ndarray of shape (n_samples,)
+        Permutation that maps sorted rows to original rows.
 
-    sort_vals (numpy.ndarray):
-        Sorting values.
+    sort_vals : ndarray of shape (n_samples,)
+        Sorted scalar values used for pruning comparisons.
     
-    data (numpy.ndarray):
+    data : ndarray of shape (n_samples, n_features)
         Sorted data.
     
-    half_nrm2 (numpy.ndarray):
-        Precomputed values for distance computation.
-
+    half_nrm2 : ndarray of shape (n_samples,)
+        Half squared Euclidean norm for each sorted row.
     """
 
     splist = list() # store the starting points
@@ -227,41 +230,44 @@ def general_aggregate(data, sorting="pca", tol=0.5):
 
 
 def lm_aggregate(data, sorting="pca", tol=0.5): 
-    """Aggregate the data in low memory need (Linux)
+    """Aggregate Euclidean data with a lower-memory implementation.
 
     Parameters
     ----------
-    data : numpy.ndarray
-        The input that is array-like of shape (n_samples,).
+    data : ndarray of shape (n_samples, n_features)
+        Preprocessed input data.
 
-    sorting : str
-        The sorting method for aggregation, default='pca', other options: 'norm-mean', 'norm-orthant'.
+    sorting : {'pca', 'norm-mean', 'norm-orthant', None}, default='pca'
+        Sorting strategy used to order candidate starting points.
 
-    tol : float
-        The tolerance to control the aggregation. if the distance between the starting point 
-        of a group and another data point is less than or equal to the tolerance,
-        the point is allocated to that group.  
+    tol : float, default=0.5
+        Maximum Euclidean distance from a starting point for assigning a sample
+        to the corresponding aggregation group.
 
     Returns
     -------
-    labels (list) : 
-        The group categories of the data after aggregation.
+    labels : list of int
+        Aggregation group labels in sorted-data order.
     
-    splist (list) : 
-        The list of the starting points.
+    splist : list of tuple
+        Pairs ``(start_index, group_size)`` for group starting points in sorted
+        data.
     
-    nr_dist (int) :
-        The number of pairwise distance calculations.
+    nr_dist : int
+        Number of pairwise distances evaluated.
 
-    ind (numpy.ndarray):
-        Array storing Sorting indices.
+    ind : ndarray of shape (n_samples,)
+        Permutation that maps sorted rows to original rows.
 
-    sort_vals (numpy.ndarray):
-        Sorting values.
+    sort_vals : ndarray of shape (n_samples,)
+        Sorted scalar values used for pruning comparisons.
     
-    data (numpy.ndarray):
+    data : ndarray of shape (n_samples, n_features)
         Sorted data.
     
+    half_nrm2 : None
+        Placeholder returned for compatibility with the higher-memory
+        aggregation functions.
     """
 
     splist = list() # store the starting points

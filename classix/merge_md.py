@@ -51,14 +51,16 @@ def merge_manhattan(
 
     Returns
     -------
-    dict
-        Dictionary containing:
-        - 'group_cluster_labels' : ndarray of shape (n_groups,)
-            Final cluster label for each starting point (0, 1, 2, ..., n_clusters-1).
-        - 'Adj' : ndarray of shape (n_groups, n_groups), dtype=int8
-            Adjacency matrix of the merging graph.
-            1 = connected by Manhattan distance <= mergeScale * radius
-            2 = connection created during small-cluster redistribution
+    result : dict
+        Dictionary with the following keys:
+
+        ``'group_cluster_labels'`` : ndarray of shape (n_groups,)
+            Final cluster label for each starting point.
+
+        ``'Adj'`` : ndarray of shape (n_groups, n_groups), dtype=int8
+            Adjacency matrix of the merging graph. Value 1 marks a Manhattan
+            distance connection and value 2 marks a connection created during
+            small-cluster redistribution.
 
     """
     n_groups = len(spdata)
