@@ -508,6 +508,8 @@ class CLASSIX:
                 self._aggregate = general_aggregate
         else:
             self._aggregate = lm_aggregate
+        self._general_aggregate = general_aggregate
+        self._lm_aggregate = lm_aggregate
 
         self._density_merge = density_merge
         
@@ -545,6 +547,8 @@ class CLASSIX:
             data = data.astype('float64')
         
         # preprocessing phase
+        aggregation_sorting = self.sorting
+        aggregate = self._aggregate
         if self.metric == 'euclidean':
             if self.sorting == "norm-mean":
                 self.mu_ = data.mean(axis=0)
@@ -561,7 +565,10 @@ class CLASSIX:
                 self.dataScale_ = np.median(rds) # 50% of data points are within that radius
                 if self.dataScale_ == 0: # prevent zero-division
                     self.dataScale_ = 1
-                data = data / self.dataScale_ # now 50% of data are in unit ball 
+                data = data / self.dataScale_ # now 50% of data are in unit ball
+                if not np.any(data):
+                    aggregation_sorting = 'none'
+                    aggregate = self._lm_aggregate
                 
             elif self.sorting == "norm-orthant":
                 self.mu_ = data.min(axis=0)
@@ -598,11 +605,11 @@ class CLASSIX:
         # aggregation
         
         if self.metric == 'euclidean':
-            self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, data, self.__half_nrm2 = self._aggregate(
+            self.groups_, self.splist_, self.nrDistComp_, self.ind, sort_vals, data, self.__half_nrm2 = aggregate(
                                                                                     data=data,
-                                                                                    sorting=self.sorting, 
+                                                                                    sorting=aggregation_sorting,
                                                                                     tol=self.radius
-                                                                                ) 
+                                                                                )
             
             if self.__half_nrm2 is None: # the self.aggregate will return None if certain strategy is applied.
                 self.__half_nrm2 = np.einsum('ij,ij->i', data, data) * 0.5

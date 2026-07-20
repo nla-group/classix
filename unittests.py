@@ -3,6 +3,7 @@ import unittest
 import numpy as np
 import pandas as pd
 import sklearn.datasets as data
+from sklearn.metrics import adjusted_rand_score
 from classix import CLASSIX, loadData, cython_is_available
 from classix.clustering import (
     calculate_cluster_centers, preprocessing, pairwise_distances,
@@ -68,10 +69,24 @@ class TestCoverageBoosting(unittest.TestCase):
                     checkpoint = 0
         except:
             checkpoint = 0
-            
+
         self.assertEqual(checkpoint, 1)
-    
-    
+
+
+    def test_distance_cluster(self):
+        """Test distance merging against saved VDU signal checkpoints."""
+        vdu_signals = loadData('vdu_signals')
+
+        for tol in np.arange(0.8, 1, 0.1):
+            clx = CLASSIX(radius=tol, group_merging='distance', verbose=0)
+            clx.fit_transform(vdu_signals)
+            checkpoint = np.load(
+                'classix/data/checkpoint_distance_' + str(np.round(tol, 2)) + '.npy'
+            )
+
+            assert adjusted_rand_score(clx.labels_, checkpoint) == 1
+
+
     def test_preprocessing_all_modes(self):
         """Test preprocessing function with all modes"""
         checkpoint = 1

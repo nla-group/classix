@@ -84,7 +84,9 @@ cpdef pca_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting='pca', do
     cdef double half_r2 = tol**2 * 0.5
     cdef double rhs
 
-    if fdim > 1:
+    if not np.any(data):
+        sort_vals = np.zeros(len_ind)
+    elif fdim > 1:
         if fdim <= 3: # memory inefficient
             gemm = get_blas_funcs("gemm", [data.T, data])
             _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
@@ -194,7 +196,9 @@ cpdef general_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca"
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
 
     elif sorting == "pca":
-        if fdim > 1:
+        if not np.any(data):
+            sort_vals = np.zeros(len_ind)
+        elif fdim > 1:
             if fdim <= 3: # memory inefficient
                 gemm = get_blas_funcs("gemm", [data.T, data])
                 _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
@@ -314,7 +318,9 @@ cpdef lm_aggregate(np.ndarray[np.float64_t, ndim=2] data, str sorting="pca", flo
         ind = np.argsort(sort_vals)
 
     elif sorting == "pca":
-        if fdim > 1:
+        if not np.any(data):
+            sort_vals = np.zeros(len_ind)
+        elif fdim > 1:
             if fdim <= 3: # memory inefficient
                 gemm = get_blas_funcs("gemm", [data.T, data])
                 _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])

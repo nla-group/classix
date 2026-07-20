@@ -74,7 +74,9 @@ cpdef pca_aggregate(double[:,:] data, str sorting='pca', double tol=0.5):
     
     cdef double rhs
 
-    if fdim > 1:
+    if not np.any(np.asarray(data)):
+        sort_vals = np.zeros(len_ind)
+    elif fdim > 1:
         U1, s1, _ = svds(np.asarray(data), k=1, return_singular_vectors=True)
         sort_vals = U1[:,0]*s1[0]
     else:
@@ -183,7 +185,9 @@ cpdef general_aggregate(double[:,:] data, str sorting, double tol=0.5):
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
     
     elif sorting == "pca":
-        if fdim > 1:
+        if not np.any(np.asarray(data)):
+            sort_vals = np.zeros(len_ind)
+        elif fdim > 1:
             U1, s1, _ = svds(np.asarray(data), k=1, return_singular_vectors=True)
             sort_vals = U1[:,0]*s1[0]
         else:
@@ -296,7 +300,9 @@ cpdef lm_aggregate(double[:,:] data, str sorting, double tol=0.5):
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
     
     elif sorting == "pca":
-        if fdim > 1:
+        if not np.any(np.asarray(data)):
+            sort_vals = np.zeros(len_ind)
+        elif fdim > 1:
             U1, s1, _ = svds(np.asarray(data), k=1, return_singular_vectors=True)
             sort_vals = U1[:,0]*s1[0]
         else:
