@@ -85,6 +85,35 @@ fewer samples are treated as small clusters and are reassigned to nearby valid
 clusters when possible. If ``post_alloc=False`` is used with a supported merge
 path, filtered samples can be labeled ``-1`` instead.
 
+Hyperparameter tuning
+---------------------
+
+A practical tuning strategy is to start with ``radius=1`` and then reduce
+``radius`` until the number of clusters is only slightly larger than expected.
+After that, increase ``minPts`` until small clusters are dissolved and the
+desired number of clusters is obtained.
+
+The :meth:`classix.CLASSIX.minPtsChange` method makes the second step fast. It
+updates ``minPts`` after fitting and recomputes only the small-cluster filtering
+phase when possible:
+
+.. code-block:: python
+
+   from classix import CLASSIX
+
+   clx = CLASSIX(radius=0.7, minPts=1, verbose=0).fit(X)
+
+   for minPts in [3, 5, 10, 20]:
+       clx.minPtsChange(minPts)
+       print(minPts, len(set(clx.labels_)), clx.clusterSizes_)
+
+When ``mergeTinyGroups=True`` (the default), distance-based merging does not
+depend on ``minPts``, so ``minPtsChange`` reuses the existing aggregation and
+merge structure. When ``mergeTinyGroups=False``, the distance merge graph
+depends on ``minPts`` because tiny groups are excluded from merge edges; in that
+case ``minPtsChange`` recomputes the group-merging step but still reuses the
+existing preprocessing and aggregation results.
+
 Explanation tools
 -----------------
 

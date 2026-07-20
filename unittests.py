@@ -1181,6 +1181,95 @@ class TestCoverageBoosting(unittest.TestCase):
         self.assertEqual(checkpoint, 1)
 
 
+    def test_minPtsChange_requires_fit(self):
+        """Test minPtsChange raises before fitting"""
+        checkpoint = 1
+        try:
+            original_state = classix.__enable_cython__
+            classix.__enable_cython__ = False
+            clx = CLASSIX(radius=0.5, verbose=0)
+            try:
+                clx.minPtsChange(5)
+                checkpoint = 0
+            except Exception:
+                pass
+            classix.__enable_cython__ = original_state
+        except Exception as e:
+            print(f"minPtsChange requires fit test failed: {e}")
+            checkpoint = 0
+            classix.__enable_cython__ = original_state
+
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_minPtsChange_matches_refit_distance(self):
+        """Test minPtsChange matches refitting for distance merging"""
+        checkpoint = 1
+        try:
+            original_state = classix.__enable_cython__
+            classix.__enable_cython__ = False
+            X = np.random.RandomState(0).randn(160, 3)
+
+            clx = CLASSIX(radius=0.55, minPts=1, group_merging='distance', verbose=0)
+            clx.fit(X)
+            clx.minPtsChange(6)
+
+            refit = CLASSIX(radius=0.55, minPts=6, group_merging='distance', verbose=0)
+            refit.fit(X)
+
+            if not np.array_equal(clx.labels_, refit.labels_):
+                checkpoint = 0
+            if clx.minPts != 6:
+                checkpoint = 0
+            classix.__enable_cython__ = original_state
+
+        except Exception as e:
+            print(f"minPtsChange distance test failed: {e}")
+            checkpoint = 0
+            classix.__enable_cython__ = original_state
+
+        self.assertEqual(checkpoint, 1)
+
+
+    def test_minPtsChange_remerges_when_tiny_groups_are_excluded(self):
+        """Test minPtsChange redoes merging when mergeTinyGroups=False"""
+        checkpoint = 1
+        try:
+            original_state = classix.__enable_cython__
+            classix.__enable_cython__ = False
+            X = np.random.RandomState(1).randn(180, 2)
+
+            clx = CLASSIX(
+                radius=0.45,
+                minPts=1,
+                group_merging='distance',
+                mergeTinyGroups=False,
+                verbose=0,
+            )
+            clx.fit(X)
+            clx.minPtsChange(5)
+
+            refit = CLASSIX(
+                radius=0.45,
+                minPts=5,
+                group_merging='distance',
+                mergeTinyGroups=False,
+                verbose=0,
+            )
+            refit.fit(X)
+
+            if not np.array_equal(clx.labels_, refit.labels_):
+                checkpoint = 0
+            classix.__enable_cython__ = original_state
+
+        except Exception as e:
+            print(f"minPtsChange mergeTinyGroups=False test failed: {e}")
+            checkpoint = 0
+            classix.__enable_cython__ = original_state
+
+        self.assertEqual(checkpoint, 1)
+
+
     def test_cython_disabled_mode(self):
         """Test running with Cython explicitly disabled"""
         import warnings

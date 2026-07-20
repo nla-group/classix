@@ -11,11 +11,11 @@ import os
 sys.path.insert(0, os.path.abspath('../..'))
 
 project = 'CLASSIX'
-copyright = '2022, Stefan Güttel, Xinye Chen'
+copyright = '2026 Stefan Güttel, Xinye Chen'
 author = 'Stefan Güttel, Xinye Chen'
 
 # The full version, including alpha/beta/rc tags
-release = '1.5.1'
+release = '1.5.2'
 
 
 # -- General configuration ---------------------------------------------------

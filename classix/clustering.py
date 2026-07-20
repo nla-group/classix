@@ -474,7 +474,7 @@ class CLASSIX:
         if self.__enable_cython__:
             try:
                 try:
-                    from .aggregat_ed_cm import general_aggregate, pca_aggregate, lm_aggregate
+                    from .aggregate_ed_cm import general_aggregate, pca_aggregate, lm_aggregate
                     
                 except ModuleNotFoundError:
                     from .aggregate_ed_c import general_aggregate, pca_aggregate, lm_aggregate
@@ -492,7 +492,7 @@ class CLASSIX:
                 if not self.__enable_aggregate_cython__:
                     from .aggregate_ed import general_aggregate, pca_aggregate, lm_aggregate
                 
-                from .merg_ed import density_merge, distance_merge, distance_merge_mtg
+                from .merge_ed import density_merge, distance_merge, distance_merge_mtg
                 warnings.warn("This CLASSIX installation is not using Cython.")
 
         else:
@@ -583,7 +583,7 @@ class CLASSIX:
             sort_vals = np.sum(data, axis=1)
             mext = np.median(sort_vals) or 1.0
             data /= mext
-            dataScale_ = mext  # 可以視為 scale
+            dataScale_ = mext
             self.dataScale_ = mext
             sort_vals /= mext
             
@@ -650,6 +650,9 @@ class CLASSIX:
             
 
         self.splist_ = np.array(self.splist_)
+        self._fit_data_ = data
+        self._fit_sort_vals_ = sort_vals
+        self._fit_agg_labels_ = np.asarray(self.groups_)
         self.t2_aggregate = time() - self.t2_aggregate
 
         self.t3_merge = time()
@@ -677,6 +680,7 @@ class CLASSIX:
                     print(f"Euclidean merging completed: {len(np.unique(self.labels_))} clusters")
 
                 self.sp_data_pts = data[self.splist_[:, 0].astype(int),:]
+                self._update_minpts_base_state()
                 
             elif self.metric == 'manhattan':
                 try:
@@ -707,6 +711,7 @@ class CLASSIX:
                     print(f"Manhattan merging completed: {len(np.unique(self.labels_))} clusters")
 
                 self.sp_data_pts = data[self.splist_,:]
+                self._update_minpts_base_state()
 
             elif self.metric == 'tanimoto':
                 try:
@@ -737,6 +742,7 @@ class CLASSIX:
                     print(f"Tanimoto merging completed: {len(np.unique(self.labels_))} clusters")
 
                 self.sp_data_pts = data[self.splist_,:]
+                self._update_minpts_base_state()
 
         self.t3_merge = time() - self.t3_merge
         
@@ -1009,6 +1015,263 @@ class CLASSIX:
         return labels 
     
     
+    def _group_sizes_for_minpts(self):
+        """Return aggregation group sizes as an integer array."""
+        if self.splist_.ndim == 2:
+            return self.splist_[:, 1].astype(int)
+        return np.asarray(self.group_sizes_, dtype=int)
+
+
+    @staticmethod
+    def _renumber_labels(labels):
+        """Renumber non-negative labels to consecutive integers."""
+        labels = np.asarray(labels).copy()
+        unique_labels = [label for label in np.unique(labels) if label >= 0]
+        label_map = {old: new for new, old in enumerate(unique_labels)}
+        for old, new in label_map.items():
+            labels[labels == old] = new
+        return labels
+
+
+    def _distance_to_group_centers(self, group_id):
+        """Compute distances from one group center to all group centers."""
+        xi = self.sp_data_pts[group_id]
+        if self.metric == 'euclidean':
+            return np.linalg.norm(self.sp_data_pts - xi, axis=1, ord=2)
+        if self.metric == 'manhattan':
+            return np.sum(np.abs(self.sp_data_pts - xi), axis=1)
+        if self.metric == 'tanimoto':
+            ips = np.matmul(self.sp_data_pts, xi)
+            denom = np.sum(self.sp_data_pts, axis=1) + np.sum(xi) - ips
+            return 1 - ips / np.where(denom == 0, 1e-15, denom)
+        raise ValueError(f"Unsupported metric: {self.metric}")
+
+
+    def _compute_distance_base_labels(self, minPts=None):
+        """Compute group labels after distance merging and before minPts."""
+        n_groups = self.splist_.shape[0]
+        labels = np.arange(n_groups)
+        group_sizes = self._group_sizes_for_minpts()
+        active = np.ones(n_groups, dtype=bool)
+        if not self.__mergeTinyGroups and minPts is not None:
+            active = group_sizes >= minPts
+
+        adjacency = None
+        if self.metric in ('manhattan', 'tanimoto'):
+            adjacency = np.zeros((n_groups, n_groups), dtype=np.int8)
+
+        merge_radius = self.mergeScale_ * self.radius
+        for i in range(n_groups):
+            if not active[i]:
+                continue
+
+            dists = self._distance_to_group_centers(i)
+            inds = np.where(dists <= merge_radius)[0]
+            inds = inds[inds >= i]
+            if not self.__mergeTinyGroups:
+                inds = inds[active[inds]]
+            if inds.size == 0:
+                continue
+
+            if adjacency is not None:
+                adjacency[i, inds] = 1
+                adjacency[inds, i] = 1
+
+            connected_labels = np.unique(labels[inds])
+            min_label = np.min(connected_labels)
+            for label in connected_labels:
+                labels[labels == label] = min_label
+
+        return self._renumber_labels(labels), adjacency
+
+
+    def _compute_density_base_labels(self):
+        """Compute group labels after density merging and before minPts."""
+        n_groups = self.splist_.shape[0]
+        labels = np.arange(n_groups)
+        next_label = n_groups
+        for component in getattr(self, 'merge_groups', []):
+            component = np.asarray(component, dtype=int)
+            for group_id in component:
+                labels[labels == group_id] = next_label
+            next_label += 1
+        return labels
+
+
+    def _update_minpts_base_state(self):
+        """Cache the group labels that are independent of minPts changes."""
+        if self.group_merging is None or str(self.group_merging).lower() == 'none':
+            self._base_group_labels_ = np.arange(self.splist_.shape[0])
+            self._base_group_adjacency_ = None
+        elif self.group_merging == 'density':
+            self._base_group_labels_ = self._compute_density_base_labels()
+            self._base_group_adjacency_ = None
+        elif self.__mergeTinyGroups:
+            self._base_group_labels_, self._base_group_adjacency_ = self._compute_distance_base_labels()
+        else:
+            self._base_group_labels_, self._base_group_adjacency_ = self._compute_distance_base_labels(
+                minPts=self.minPts
+            )
+
+
+    def _apply_minpts_to_groups(self, base_group_labels, minPts, base_adjacency=None, allow_noise=False,
+                                renumber=True):
+        """Apply the minPts reassignment phase to pre-merged group labels."""
+        group_sizes = self._group_sizes_for_minpts()
+        base_group_labels = np.asarray(base_group_labels, dtype=int)
+        final_group_labels = base_group_labels.copy()
+        adjacency = None if base_adjacency is None else base_adjacency.copy()
+
+        old_cluster_count = collections.Counter()
+        for group_label, group_size in zip(base_group_labels, group_sizes):
+            old_cluster_count[int(group_label)] += int(group_size)
+
+        small_clusters = [
+            label for label, size in old_cluster_count.items()
+            if size < minPts
+        ] if minPts >= 1 else []
+        size_noise_labels = len(small_clusters)
+        self.group_outliers_ = np.array([], dtype=int)
+        self.clean_index_ = np.ones(len(self.groups_), dtype=bool)
+
+        if size_noise_labels == 0:
+            if renumber:
+                final_group_labels = self._renumber_labels(final_group_labels)
+            return final_group_labels, old_cluster_count, 0, adjacency
+
+        if size_noise_labels == len(old_cluster_count):
+            warnings.warn(
+                "Setting of noise related parameters is not correct; keeping "
+                "the clustering before minPts reassignment.",
+                DeprecationWarning
+            )
+            if renumber:
+                final_group_labels = self._renumber_labels(final_group_labels)
+            return final_group_labels, old_cluster_count, size_noise_labels, adjacency
+
+        small_group_mask = np.isin(base_group_labels, small_clusters)
+        self.group_outliers_ = np.nonzero(small_group_mask)[0]
+        self.clean_index_ = ~np.isin(self.groups_, self.group_outliers_)
+
+        if allow_noise:
+            final_group_labels[small_group_mask] = -1
+            if renumber:
+                final_group_labels = self._renumber_labels(final_group_labels)
+            return final_group_labels, old_cluster_count, size_noise_labels, adjacency
+
+        valid_clusters = {
+            label for label, size in old_cluster_count.items()
+            if size >= minPts
+        }
+        frozen_group_labels = base_group_labels.copy()
+        for group_id in self.group_outliers_:
+            dists = self._distance_to_group_centers(group_id)
+            for nearest_group_id in np.argsort(dists, kind='stable'):
+                target_cluster = frozen_group_labels[nearest_group_id]
+                if target_cluster in valid_clusters:
+                    final_group_labels[group_id] = target_cluster
+                    if adjacency is not None:
+                        adjacency[group_id, nearest_group_id] = 2
+                        adjacency[nearest_group_id, group_id] = 2
+                    break
+
+        if renumber:
+            final_group_labels = self._renumber_labels(final_group_labels)
+        return final_group_labels, old_cluster_count, size_noise_labels, adjacency
+
+
+    def _labels_from_group_labels(self, group_labels):
+        """Map group labels to sample labels in the original input order."""
+        labels_sorted = np.asarray(group_labels)[np.asarray(self.groups_, dtype=int)]
+        return labels_sorted[self.inverse_ind]
+
+
+    def _invalidate_label_dependent_cache(self):
+        """Remove cached values that depend on the current cluster labels."""
+        for attr in ('label_change', 'sp_info', 'sp_to_c_info', 'centers', 'connected_paths'):
+            if hasattr(self, attr):
+                delattr(self, attr)
+
+
+    def minPtsChange(self, minPts):
+        """Change ``minPts`` without rerunning preprocessing or aggregation.
+
+        This method supports fast hyperparameter tuning after :meth:`fit`.
+        CLASSIX users can fit once with a chosen ``radius`` and then adjust
+        ``minPts`` to dissolve and reassign small clusters. When
+        ``mergeTinyGroups=True``, only the minPts phase is recomputed. When
+        ``mergeTinyGroups=False``, distance-based group merging is recomputed
+        because tiny groups are excluded from merge edges according to the new
+        ``minPts`` value.
+
+        Parameters
+        ----------
+        minPts : int or float
+            New minimum valid cluster size. The value is validated with the same
+            rules as the constructor and rounded to an integer.
+
+        Returns
+        -------
+        self : CLASSIX
+            The estimator with updated ``minPts`` and ``labels_``.
+
+        Raises
+        ------
+        NotFittedError
+            If the estimator has not been fitted.
+        """
+        if not hasattr(self, '__fit__'):
+            raise NotFittedError("Please use .fit() method first.")
+
+        self.minPts = minPts
+        self.t4_minPts = time()
+        self.inverse_ind = np.argsort(self.ind)
+
+        if self.group_merging is None or str(self.group_merging).lower() == 'none':
+            self.labels_ = np.asarray(self.groups_)[self.inverse_ind]
+            self.t4_minPts = time() - self.t4_minPts
+            self._invalidate_label_dependent_cache()
+            return self
+
+        if self.group_merging == 'density':
+            base_group_labels = getattr(self, '_base_group_labels_', None)
+            if base_group_labels is None:
+                base_group_labels = self._compute_density_base_labels()
+            base_adjacency = None
+            allow_noise = not self.__post_alloc
+            renumber = False
+        else:
+            if self.__mergeTinyGroups:
+                base_group_labels = getattr(self, '_base_group_labels_', None)
+                base_adjacency = getattr(self, '_base_group_adjacency_', None)
+                if base_group_labels is None:
+                    base_group_labels, base_adjacency = self._compute_distance_base_labels()
+                    self._base_group_labels_ = base_group_labels
+                    self._base_group_adjacency_ = base_adjacency
+            else:
+                base_group_labels, base_adjacency = self._compute_distance_base_labels(
+                    minPts=self.minPts
+                )
+            allow_noise = False
+            renumber = True
+
+        group_labels, self.old_cluster_count, _, adjacency = self._apply_minpts_to_groups(
+            base_group_labels=base_group_labels,
+            minPts=self.minPts,
+            base_adjacency=base_adjacency,
+            allow_noise=allow_noise,
+            renumber=renumber,
+        )
+        self._group_cluster_labels_ = group_labels
+        self.labels_ = self._labels_from_group_labels(group_labels)
+        if adjacency is not None:
+            self.Adj = adjacency
+
+        self.t4_minPts = time() - self.t4_minPts
+        self._invalidate_label_dependent_cache()
+        return self
+
+
     
     def explain(self, data, index1=None, index2=None, cmap='jet', showalldata=False, showallgroups=False, showsplist=False, max_colwidth=None, replace_name=None, 
                 plot=False, figsize=(10, 7), figstyle="default", savefig=False, bcolor="#f5f9f9", obj_color="k", width=1.5,  obj_msize=160, sp1_color='lime', sp2_color='cyan',

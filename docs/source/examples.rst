@@ -119,7 +119,44 @@ This is useful during exploratory analysis because it answers questions such as
 "which starting point captured this sample?" and "which groups connect these two
 samples?" without requiring users to inspect implementation internals.
 
-Example 4: Manhattan distance for L1 geometry
+Example 4: Tune minPts without refitting
+----------------------------------------
+
+The recommended CLASSIX workflow is to tune ``radius`` first and ``minPts``
+second. Start with ``radius=1``, reduce it until the number of clusters is only
+slightly larger than expected, and then increase ``minPts`` until the desired
+number of clusters is reached. The ``minPtsChange`` method makes the second
+step inexpensive because it reuses the fitted aggregation result.
+
+.. code-block:: python
+
+   import numpy as np
+   from sklearn.datasets import make_blobs
+   from classix import CLASSIX
+
+   X, _ = make_blobs(
+       n_samples=3000,
+       centers=6,
+       n_features=4,
+       random_state=11,
+   )
+
+   clx = CLASSIX(radius=1.0, minPts=1, verbose=0).fit(X)
+
+   # Suppose radius=1.0 gives slightly more clusters than expected.
+   for minPts in [2, 5, 10, 20, 40]:
+       clx.minPtsChange(minPts)
+       print(f"minPts={minPts}: {np.unique(clx.labels_).size} clusters")
+
+Why CLASSIX helps here:
+
+* Changing ``minPts`` does not require recomputing the sorted aggregation.
+* With the default ``mergeTinyGroups=True``, the distance merge result is reused
+  and only the small-cluster phase is recomputed.
+* If ``mergeTinyGroups=False``, CLASSIX correctly recomputes group merging
+  because the merge graph itself depends on ``minPts``.
+
+Example 5: Manhattan distance for L1 geometry
 ---------------------------------------------
 
 When L1 distance is a better description of similarity, use
@@ -152,7 +189,7 @@ Why CLASSIX helps here:
 * CLASSIX keeps the same two-stage aggregation-and-merge workflow while
   changing the distance geometry.
 
-Example 5: Tanimoto distance for binary or count data
+Example 6: Tanimoto distance for binary or count data
 -----------------------------------------------------
 
 Tanimoto distance is common for non-negative sparse, binary, or count vectors.
