@@ -15,6 +15,25 @@ from scipy.sparse.linalg import svds
 from scipy.linalg import get_blas_funcs, eigh
 
 
+def _pca_sort_values(data):
+    """Return PCA sorting values, with a stable fallback for zero data."""
+    len_ind, fdim = data.shape
+    if fdim == 1:
+        return data[:, 0]
+    if not np.any(data):
+        return np.zeros(len_ind)
+
+    if fdim <= 3: # memory inefficient
+        gemm = get_blas_funcs("gemm", [data.T, data])
+        _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
+        sort_vals = data@U1.reshape(-1)
+    else:
+        U1, s1, _ = svds(data, k=1, return_singular_vectors=True)
+        sort_vals = U1[:,0]*s1[0]
+
+    return sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
+
+
 def pca_aggregate(data, sorting='pca', tol=0.5):
     """Aggregate Euclidean data sorted by the first principal component.
 
@@ -58,22 +77,11 @@ def pca_aggregate(data, sorting='pca', tol=0.5):
         Half squared Euclidean norm for each sorted row.
     """
     
-    len_ind, fdim = data.shape
+    len_ind = data.shape[0]
     
 
     # get sorting values
-    if fdim>1:
-        if fdim <= 3: # memory inefficient
-            gemm = get_blas_funcs("gemm", [data.T, data])
-            _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
-            sort_vals = data@U1.reshape(-1)
-        else:
-            U1, s1, _ = svds(data, k=1, return_singular_vectors=True)
-            sort_vals = U1[:,0]*s1[0]
-    else:
-        sort_vals = data[:,0]
-
-    sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
+    sort_vals = _pca_sort_values(data)
     ind = np.argsort(sort_vals)
     data = data[ind,:] # sort data
     sort_vals = sort_vals[ind] 
@@ -157,28 +165,14 @@ def general_aggregate(data, sorting="pca", tol=0.5):
 
     splist = list() # store the starting points
     len_ind = data.shape[0]
-    fdim = data.shape[1]
     
     if sorting == "norm-mean" or sorting == "norm-orthant": 
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
         
 
     elif sorting == "pca":
-        # change to svd 
-        if fdim > 1:
-            if fdim <= 3: # memory inefficient
-                gemm = get_blas_funcs("gemm", [data.T, data])
-                _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
-                sort_vals = data@U1.reshape(-1)
-            else:
-                U1, s1, _ = svds(data, k=1, return_singular_vectors=True)
-                sort_vals = U1[:,0]*s1[0]
-
-        else:
-            sort_vals = data[:,0]
-            
-        sort_vals = sort_vals*np.sign(-sort_vals[0]) 
-        # flip to enforce deterministic output
+        # change to svd
+        sort_vals = _pca_sort_values(data)
         
 
     else: # no sorting
@@ -272,26 +266,13 @@ def lm_aggregate(data, sorting="pca", tol=0.5):
 
     splist = list() # store the starting points
     len_ind = data.shape[0]
-    fdim = data.shape[1]
     
     if sorting == "norm-mean" or sorting == "norm-orthant": 
         sort_vals = np.linalg.norm(data, ord=2, axis=1)
         
     elif sorting == "pca":
-        # change to svd 
-        if fdim > 1:
-            if fdim <= 3: # memory inefficient
-                gemm = get_blas_funcs("gemm", [data.T, data])
-                _, U1 = eigh(gemm(1, data.T, data), subset_by_index=[fdim-1, fdim-1])
-                sort_vals = data@U1.reshape(-1)
-            else:
-                U1, s1, _ = svds(data, k=1, return_singular_vectors=True)
-                sort_vals = U1[:,0]*s1[0]
-
-        else:
-            sort_vals = data[:,0]
-            
-        sort_vals = sort_vals*np.sign(-sort_vals[0]) # flip to enforce deterministic output
+        # change to svd
+        sort_vals = _pca_sort_values(data)
         
 
     else: # no sorting
