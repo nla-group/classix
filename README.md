@@ -170,7 +170,20 @@ There is no path of overlapping groups between these clusters.
 
 ### How to tune the parameters `radius` and `minPts`?
 
-We recommend first running CLASSIX with a relatively large `radius` parameter, such as `radius=1`, and `minPts=1`. It also helps to use `verbose=1` to get more detailed feedback from the method. Typically, the larger the `radius` parameter, the faster the method performs and the smaller the number of computed clusters. If the number of clusters is too small, successively reduce the `radius` parameter until a "good" (depending on context) number of meaningful clusters is obtained. 
+We recommend first running CLASSIX with a relatively large `radius` parameter, such as `radius=1`, and `minPts=1`. It also helps to use `verbose=1` to get more detailed feedback from the method. Typically, the larger the `radius` parameter, the faster the method performs and the smaller the number of computed clusters. If the number of clusters is too small, successively reduce the `radius` parameter until a "good" (depending on context) number of meaningful clusters is obtained.
+
+Once the radius gives slightly more clusters than expected, `CLASSIX.minPtsChange(minPts)` can be used to tune `minPts` without fitting from scratch. This reuses the fitted preprocessing and aggregation result, which makes the second tuning step much faster:
+
+```Python
+clx = CLASSIX(radius=1.0, minPts=1, verbose=0)
+clx.fit(X)
+
+for minPts in [2, 5, 10, 20, 40]:
+    clx.minPtsChange(minPts)
+    print(minPts, len(set(clx.labels_)), clx.clusterSizes_)
+```
+
+With the default `mergeTinyGroups=True`, `minPtsChange` only reruns the small-cluster phase. If `mergeTinyGroups=False`, CLASSIX also recomputes group merging because the merge graph itself depends on `minPts`.
 
 One can access the size of the clusters via `clx.clusterSizes_`. If there are unwanted "noise" clusters containing just a small number of data points, increase the `minPts` parameter to remove them. If, for example, `minPts=14`, all clusters with fewer than 14 data points will be reassigned to larger clusters. Here is an example that demonstrates the effect of `minPts`:
 
