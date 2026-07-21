@@ -23,7 +23,6 @@
 
 <!---[![PyPI pyversions](https://img.shields.io/pypi/pyversions/ClassixClustering.svg)](https://pypi.python.org/pypi/ClassixClustering/)-->
 
-
 __CLASSIX__ is a fast, memory-efficient, and explainable clustering algorithm. Here are a few highlights:
 
 - Ability to cluster low and high-dimensional data of arbitrary shape efficiently
