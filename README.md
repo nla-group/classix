@@ -259,7 +259,18 @@ Any form of contribution is welcome. We particularly welcome the contribution of
 
 ## Citation 
 
-If you use the software and the method, cite: 
+If you use the software, cite:
+```bibtex
+@article{CGK26,
+  title   = {{CLASSIX}: A High-Performance Library for Explainable Clustering},
+  author  = {Chen, Xinye and G{\"u}ttel, Stefan and Roy, Kaustubh},
+  journal = {Journal of Machine Learning Research},
+  year    = {2026},
+  note    = {Accepted for publication}
+}
+```
+
+and the method, cite: 
 ```bibtex
 @article{CG24,
     title = {Fast and explainable clustering based on sorting},
