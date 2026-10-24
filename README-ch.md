@@ -268,10 +268,7 @@ python3 run exp_main.py
     year = {2024},
     doi = {https://doi.org/10.1016/j.patcog.2024.110298}
 }
-```
 
-如果使用本软件，请引用：
-```bibtex
 @article{CGK26,
   title   = {{CLASSIX}: A High-Performance Library for Explainable Clustering},
   author  = {Chen, Xinye and G{\"u}ttel, Stefan and Roy, Kaustubh},
