@@ -268,10 +268,7 @@ If you use CLASSIX, cite:
     year = {2024},
     doi = {https://doi.org/10.1016/j.patcog.2024.110298}
 }
-```
 
-If you use the software, cite:
-```bibtex
 @article{CGK26,
   title   = {{CLASSIX}: A High-Performance Library for Explainable Clustering},
   author  = {Chen, Xinye and G{\"u}ttel, Stefan and Roy, Kaustubh},
