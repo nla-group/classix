@@ -271,7 +271,7 @@ If you use CLASSIX, cite:
 
 @article{CGK26,
   title   = {{CLASSIX}: A High-Performance Library for Explainable Clustering},
-  author  = {Chen, Xinye and G{\"u}ttel, Stefan and Roy, Kaustubh},
+  author = {Xinye Chen and Stefan Güttel and Kaustubh Roy},
   journal = {Journal of Machine Learning Research},
   year    = {2026},
   note    = {Accepted for publication}
