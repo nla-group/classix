@@ -3,6 +3,7 @@
 </h1>
 
 ![English](https://img.shields.io/badge/English-007EC6?style=flat-square)
+[![简体中文](https://img.shields.io/badge/简体中文-555555?style=flat-square)](README-ch.md)
 
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
 [![!pypi](https://img.shields.io/pypi/v/classixclustering?color=tomato)](https://pypi.org/project/classixclustering/)
