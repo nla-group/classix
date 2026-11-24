@@ -2,7 +2,7 @@
   CLASSIX：Python 中快速且可解释的聚类算法
 </h1>
 
-[English](README.md) | **简体中文**
+[![简体中文](https://img.shields.io/badge/简体中文-555555?style=flat-square)](README-ch.md)
 
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
 [![!pypi](https://img.shields.io/pypi/v/classixclustering?color=tomato)](https://pypi.org/project/classixclustering/)
