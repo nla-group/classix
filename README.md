@@ -2,7 +2,7 @@
   CLASSIX: Fast and explainable clustering in Python
 </h1>
 
-**English** | [简体中文](README-ch.md)
+![English](https://img.shields.io/badge/English-007EC6?style=flat-square)
 
 [![Publish](https://github.com/nla-group/classix/actions/workflows/package_release.yml/badge.svg?branch=master)](https://github.com/nla-group/classix/actions/workflows/package_release.yml)
 [![!pypi](https://img.shields.io/pypi/v/classixclustering?color=tomato)](https://pypi.org/project/classixclustering/)
